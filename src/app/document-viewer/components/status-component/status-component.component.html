@@ -1,0 +1,40 @@
+<section class="container">
+  <div>
+    <img src="assets/icons/logo.svg" alt="Einstein II; powered by HHCS" />
+  </div>
+  <form [formGroup]="statusForm" (ngSubmit)="onSubmit()">
+    <div class="input-container">
+      <label>Order ID: </label>
+      <div class="input-group bootstrap">
+        <input appValidateWithMessage class="e-input" type="text" placeholder="Enter Order ID" formControlName="orderId" />
+      </div>
+    </div>
+    <div class="buttonStyle">
+      <button ejs-button [isPrimary]="true">Submit</button>
+    </div>
+  </form>
+</section>
+<section class="bootstrap">
+  <ejs-toast
+    [class]="cssClass"
+    #toastObj
+    showCloseButton="true"
+    [newestOnTop]="false"
+    [position]="{ X: 'Center', Y: 'Top' }"
+    width="330"
+  >
+    <ng-template #title>
+      <div *ngIf="cssClass == 'warning-toast'">
+        <div>Warning</div>
+      </div>
+      <div *ngIf="cssClass == 'success-toast'">
+        <i-feather name="check-circle" class="icon validation-icon"></i-feather>
+        <div>Success</div>
+      </div>
+      <div *ngIf="cssClass == 'error-toast'">
+        <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+        <div>Error</div>
+      </div>
+    </ng-template>
+  </ejs-toast>
+</section>

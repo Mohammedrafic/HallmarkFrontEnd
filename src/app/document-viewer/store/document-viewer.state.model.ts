@@ -14,3 +14,15 @@ export interface DocumentViewerFile {
   name: string;
   fileId: string;
 }
+
+export interface Statuses{
+  orderId: number;
+  jobId: number;
+  nextApplicantStatus: Status;
+  UserId:string;
+}
+
+export interface Status{
+  applicantStatus: number;
+  statusText: string;
+}
