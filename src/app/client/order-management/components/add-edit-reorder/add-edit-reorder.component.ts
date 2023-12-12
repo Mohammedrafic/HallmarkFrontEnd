@@ -186,6 +186,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
         this.predefinedBillrates, new Date(DateTimeHelper.setUtcTimeZone(dates[0])),
       );
       regularBillRate && this.reorderForm.get('billRate')?.setValue(regularBillRate.rateHour);
+    } else {
+      this.reorderForm.get('billRate')?.setValue(null);
     }
   }
 
