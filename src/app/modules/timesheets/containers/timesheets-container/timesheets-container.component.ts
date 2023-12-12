@@ -36,6 +36,7 @@ import { BulkTypeAction } from '@shared/enums/bulk-type-action.enum';
 import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
+import { SecurityState } from 'src/app/security/store/security.state';
 
 
 @Component({
@@ -111,6 +112,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public allowSelecton:boolean = true;
   public user: any;
   organizations: AgencyDataSourceItem[];
+  public isAgencyVisibilityFlagEnabled = false;
+
   constructor(
     private store: Store,
     private timesheetsService: TimesheetsService,
@@ -129,6 +132,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.routerState = this.router.getCurrentNavigation()?.extras?.state;
 
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
+    this.isAgencyVisibilityFlagEnabled = this.store.selectSnapshot(SecurityState.isAgencyVisibilityFlagEnabled);
   }
 
   ngOnInit(): void {
@@ -348,7 +352,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private initOrganizationsList(): void {
-    if(this.isAgency){
+    if(this.isAgency && this.isAgencyVisibilityFlagEnabled){
       this.user=this.store.selectSnapshot(UserState.user);
       this.store
       .dispatch(new Timesheets.GetOrganizationsForAgency(this.user.id))
