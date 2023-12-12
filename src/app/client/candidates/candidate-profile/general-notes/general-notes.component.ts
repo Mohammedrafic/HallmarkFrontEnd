@@ -97,7 +97,7 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   public exportOrientation$ = new Subject<ExportedFileType>();
   public columnsToExport: ExportColumn[] = GeneralNoteExportCols;
   tooltipInteraction: boolean;
-
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
   public constructor(
     @Inject(DOCUMENT) private document: Document,
     private datePipe: DatePipe,
@@ -228,5 +228,12 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   public export(event: ExportOptions): void {
     this.closeExport();
     this.defaultExport(event.fileType, event);
+  }
+
+  public override updatePage(){
+
+  }
+  public openImportDialog(): void {
+    this.importDialogEvent.next(true);
   }
 }
