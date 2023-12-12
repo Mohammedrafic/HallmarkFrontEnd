@@ -64,11 +64,11 @@ export enum OrganizationSettingKeys {
   ATPRateCalculation,
   AutomatedDistributionToVMS,
   ShowDeployedEmployees,
-  TimeLimitforManagerReviewEmail,
   OrganizationCanCarryClockIDFromParent,
   AllowDuplicateClockIdforOrganization,
   MandatorySpecialProjectDetails,
-  MarkZeroDollarInvoicetoPaidOnApproval
+  MarkZeroDollarInvoicetoPaidOnApproval,
+  TimeLimitforManagerReviewEmail,
 }
 
 export enum OrganizationalHierarchy {
