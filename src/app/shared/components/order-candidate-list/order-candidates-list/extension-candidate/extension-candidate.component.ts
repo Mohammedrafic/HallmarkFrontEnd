@@ -18,6 +18,7 @@ import {
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import {
+  cancelCandidateJobforIRP,
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
   GetOrganisationCandidateJob,
@@ -89,6 +90,7 @@ import { CandidateState } from '@agency/store/candidate.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { canceldto } from '../../interfaces/order-candidate.interface';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -107,6 +109,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Input() actionsAllowed = true;
   @Input() hasCanEditOrderBillRatePermission: boolean;
   @Output() updateDetails = new EventEmitter<void>();
+  @Output() closeModalEvent = new EventEmitter<never>();
 
   private _activeSystem: any;
   activeSystems: OrderManagementIRPSystemId | null;
@@ -400,6 +403,23 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.statusesFormControl.reset();
     this.selectedApplicantStatus = null;
   }
+
+  public cancelledCandidatefromIRP(cancelCandidateDto : canceldto): void {
+    if(this.candidateJob){
+      this.store.dispatch(
+        new cancelCandidateJobforIRP({
+          organizationId : this.candidateJob.organizationId,
+          jobId : this.candidateJob.jobId,
+          createReplacement: false,
+          actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
+          cancellationReasonId: cancelCandidateDto.jobCancellationReason
+        
+        })
+      );
+      this.updateDetails.emit();
+    }
+  }
+
 
   public onAccept(): void {
     if (this.candidateDOBRequired) {

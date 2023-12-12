@@ -450,7 +450,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       .subscribe();
   }
 
-  private getAgencyIds(jobDistributions: JobDistributionModel[]): (number | null)[] | void {   
+  private getAgencyIds(jobDistributions: JobDistributionModel[]): (number | null)[] | void {
     if (!jobDistributions?.length) {
       return [];
     }

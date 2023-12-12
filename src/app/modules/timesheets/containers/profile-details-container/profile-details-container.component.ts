@@ -222,6 +222,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public disableAnyAction = false;
 
+  public disableButton = false;
+
   public hasEditTimesheetRecordsPermission: boolean;
 
   public hasViewTimesheetPermission: boolean;
@@ -727,6 +729,29 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     })
   }
 
+  private subscribeAgency():void{
+    let organizationId = this.orgId;
+    this.settingsViewService.getViewSettingKey(
+      OrganizationSettingKeys.AgencyCanEditApprovedTimesheet,
+      OrganizationalHierarchy.Location,
+      organizationId as number,
+      organizationId as number,
+      false,
+      this.jobId
+    ).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(({ AgencyCanEditApprovedTimesheet }) => {
+      if (AgencyCanEditApprovedTimesheet == 'true') {
+        this.disableButton = true;
+      }
+      else {
+        this.disableButton = false;
+      }
+
+    })
+
+  }
+
   private watchForPermissions(): void {
     this.getPermissionStream()
       .pipe(takeUntil(this.componentDestroy()))
@@ -796,6 +821,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         this.setDNWBtnState(details.canEditTimesheet, !!details.allowDNWInTimesheets);
         this.checkForAllowActions(details.agencyStatus);
         this.allowEditButtonEnabled();
+        this.subscribeAgency();
         this.getOrderComments();
         this.cd.markForCheck();
 

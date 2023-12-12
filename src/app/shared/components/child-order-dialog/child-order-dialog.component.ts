@@ -42,6 +42,7 @@ import {
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { ReOpenOrderService } from '@client/order-management/components/reopen-order/reopen-order.service';
 import {
+  cancelCandidateJobforIRP,
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
   ClearOrderCandidatePage,
@@ -120,6 +121,7 @@ import { UserPermissions } from '@core/enums';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { canceldto } from '../order-candidate-list/interfaces';
 
 enum Template {
   accept,
@@ -167,7 +169,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   // TODO: Delete it when we will have re-open sidebar
   @Output() private reOpenPositionSuccess: EventEmitter<OrderManagementChild> =
     new EventEmitter<OrderManagementChild>();
-
+  @Output() private successEmitterIRP : EventEmitter<IRPOrderPosition> = new EventEmitter<IRPOrderPosition>();
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
   @ViewChild('tab') tab: TabComponent;
@@ -471,7 +473,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   public updateDetails(): void {
     if (this.isOrganization) {
-      this.reOpenPositionSuccess.emit(this.candidate);
+      this.activeSystem === this.OrderManagementIRPSystemId.IRP ? this.successEmitterIRP.emit(this.irpCandidates) : this.reOpenPositionSuccess.emit(this.candidate);
     } else {
       const allowedApplyStatuses = [ApplicantStatus.NotApplied, ApplicantStatus.Applied, ApplicantStatus.Shortlisted];
       const allowedAcceptStatuses = [
@@ -666,6 +668,22 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public resetStatusesFormControl(): void {
     this.jobStatusControl.reset();
     this.selectedApplicantStatus = null;
+  }
+
+  public cancelledCandidatefromIRP(cancelCandidateDto : canceldto): void {
+    if(this.candidateJob){
+      this.store.dispatch(
+        new cancelCandidateJobforIRP({
+          organizationId : this.candidateJob.organizationId,
+          jobId : this.candidateJob.jobId,
+          createReplacement: false,
+          actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
+          cancellationReasonId: cancelCandidateDto.jobCancellationReason
+        
+        })
+      );
+      this.updateDetails();
+    }
   }
 
   public onMobileMenuSelect({ item: { text } }: MenuEventArgs): void {

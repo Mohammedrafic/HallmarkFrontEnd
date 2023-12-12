@@ -597,6 +597,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       if (createdUntil) {
         createdUntil = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdUntil));
       }
+      
+      if (completedDate) {
+        completedDate = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(completedDate));
+      }
 
       const file = this.getFileToUpload();
 

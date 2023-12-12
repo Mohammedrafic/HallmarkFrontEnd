@@ -5,6 +5,7 @@ import { FeatureFlagResolverService } from '@core/resolvers';
 import { AdminGuard, AgencyGuard, EmployeeGuard, OrganizationGuard, RoleGuard } from '@core/guards';
 import { ShellPageComponent } from './shell.component';
 import { AllBusinessTypeRoles } from '@shell/shell.constant';
+import { MenuGuard } from '@core/guards/menu.guard';
 
 const shellRoutes: Routes = [
   {
@@ -20,7 +21,8 @@ const shellRoutes: Routes = [
       {
         path: 'client',
         loadChildren: () => import('../client/client.module').then((m) => m.ClientModule),
-        canActivate: [OrganizationGuard],
+        canActivate: [OrganizationGuard, MenuGuard],
+        data: { menuItem: 2 },
       },
       {
         path: 'agency',
@@ -86,7 +88,7 @@ const shellRoutes: Routes = [
       },
       {
         path: 'msp',
-        loadChildren: () => import('../msp/msp.module').then((m) => m.MspModule),        
+        loadChildren: () => import('../msp/msp.module').then((m) => m.MspModule),
       },
     ],
   },

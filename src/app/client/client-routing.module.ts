@@ -13,6 +13,7 @@ import { OrderManagementContentComponent,
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { NotificationResolver } from '@core/resolvers/notification.resolver';
 import { CreateEditOrderResolver } from '@client/order-management/resolvers/create-edit-order.resolver';
+import { MenuGuard } from '@core/guards/menu.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -97,9 +98,11 @@ const routes: Routes = [
           import('../client/candidates/organization-candidates.module').then(
             (m: typeof import('../client/candidates/organization-candidates.module')) => m.OrganizationCandidatesModule
           ),
+          canActivate: [MenuGuard],
         data: {
           isOrganizationArea: true,
           isAgencyArea: false,
+          menuItem: 36,
         },
       },
       {

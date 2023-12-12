@@ -16,9 +16,14 @@
     <ng-container right>
       <div *ngIf="isAgency" class="bootstrap agency-multiSelect">
           <div class="input-container">
-            <ejs-multiselect  id="regionIds" mode="CheckBox" [formControl]="organizationMultiSelectControl"
-              placeholder="All" [fields]="unitOrganizationsFields" [allowFiltering]="true" [showDropDownIcon]="true"
+            <ejs-multiselect  id="regionIds" mode="CheckBox" [formControl]="organizationMultiSelectControl" *ngIf="isAgencyVisibilityFlagEnabled"
+              placeholder="All" [fields]="unitAgencyOrganizationsFields" [allowFiltering]="true" [showDropDownIcon]="true"
               [dataSource]="agencyOrganizations$ | async" [selectAllText]='allOption'
+              [showSelectAll]="true" tabindex="2">
+            </ejs-multiselect>
+            <ejs-multiselect  id="regionIds" mode="CheckBox" [formControl]="organizationMultiSelectControl" *ngIf="!isAgencyVisibilityFlagEnabled"
+              placeholder="All" [fields]="unitOrganizationsFields" [allowFiltering]="true" [showDropDownIcon]="true"
+              [dataSource]="organizations$ | async" [selectAllText]='allOption'
               [showSelectAll]="true" tabindex="2">
             </ejs-multiselect>
         </div>
@@ -222,7 +227,7 @@
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>
 
-<app-invoices-filters-dialog [selectedTabId]="selectedTabId" [agencyOrganizations]="agencyOrganizationIds"
+<app-invoices-filters-dialog [selectedTabId]="selectedTabId"
                              (appliedFiltersAmount)="changeFiltersAmount($event)"
                              (resetFilters)="resetFilters()"
                              (updateTableByFilters)="updateTableByFilters($event)">

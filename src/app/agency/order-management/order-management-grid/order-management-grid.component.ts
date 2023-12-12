@@ -102,6 +102,7 @@ import { OrderManagementService } from '@client/order-management/components/orde
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { OutsideZone } from '@core/decorators';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { SecurityState } from 'src/app/security/store/security.state';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -162,7 +163,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public filters: AgencyOrderFilters = {
     includeReOrders: true,
   };
-  public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns();
+  public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns(false);
   public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
   public columnsToExport: ExportColumn[];
   public fileName: string;
@@ -188,6 +189,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private pageSubject = new Subject<number>();
   private alertOrderId:number;
   private orderPublicId:string;
+  public isAgencyVisibilityFlagEnabled = false;
 
   constructor(
     private store: Store,
@@ -207,6 +209,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   ngOnInit(): void {
     const user = this.store.selectSnapshot(UserState.user);
+    this.isAgencyVisibilityFlagEnabled = this.store.selectSnapshot(SecurityState.isAgencyVisibilityFlagEnabled);
+    this.filterColumns = AgencyOrderFiltersComponent.generateFilterColumns(this.isAgencyVisibilityFlagEnabled);
     this.getAlertOrderId();
     this.onOrderPreviewChange();
     this.onAgencyChange();
@@ -475,10 +479,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       if(this.ltaOrder){
         this.clearFilters();
       }
-        this.patchFilterForm();
-        this.prepopulateAgencyFilterFormStructure();
-        //this.patchFilterForm(!!this.filters?.regionIds?.length);
-        //this.prepopulateFilterFormStructure();
+        if(this.isAgencyVisibilityFlagEnabled){
+          this.patchFilterForm();
+          this.prepopulateAgencyFilterFormStructure();
+        }else{
+          this.patchFilterForm(!!this.filters?.regionIds?.length);
+          this.prepopulateFilterFormStructure();
+        }
+
       this.dispatchNewPage();
       return;
     }
