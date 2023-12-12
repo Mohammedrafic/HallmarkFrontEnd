@@ -1,7 +1,6 @@
-<div class="associated-grid"
-     [ngClass]="{'empty-grid': mspAgencyData.items.length < 1}">
+<div class="associated-grid">
   <ejs-grid #grid
-            [dataSource]="mspAgencyData.items"
+            [dataSource]="(mspAssociateListPage$ | async)?.items"
             [allowSorting]="true"
             [allowResizing]="true"
             [allowSelection]="false"
@@ -12,12 +11,13 @@
             (actionBegin)="actionBegin($event)"
             class="e-gridwithheader e-gridsubheader">
     <e-columns>
-      <e-column textAlign="Right" width="70" *ngIf="userPermission[userPermissions.CanManageLinkedAgencies]">
+      <e-column textAlign="Right" width="70">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button
                     appHideBeforeSyncfusionLoad
                     cssClass="e-flat secondary-icon-button"
+                    [disabled]="!userPermission[userPermissions.CanManageLinkedAgencies]"
                     (click)="onRemove(data)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
