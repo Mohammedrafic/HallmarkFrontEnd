@@ -44,13 +44,6 @@
               [disabled]="disableAddExtension || isAgencySuspended || isdisabledExtension"
               text="Add Extension"
             ></app-button>
-            <app-button
-            *ngIf="(order?.extensionFromId == null && candidate?.extensionFromId == null)"
-            (clickEmitter)="showExtensionDialog()"
-            [type]="buttonTypeEnum.OUTLINED"
-            [disabled]="true"
-            text="Add Extension"
-          ></app-button>
             <button
               ejs-button
               cssClass="e-outline"
