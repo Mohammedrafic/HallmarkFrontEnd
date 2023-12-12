@@ -28,9 +28,8 @@
         [externalCommentConfiguration]="order.externalCommentsConfiguration"
       ></app-comments>
     </div>
-    <div class="comments" *ngIf="!isPosition && activeSystem !== systemTypes.VMS">
+    <div class="comments" *ngIf="!isPosition && activeSystem !== systemTypes.VMS && CanOrganizationViewOrdersIRP">
       <app-comments-irp
-        *ngIf="CanOrganizationViewOrdersIRP"
         [comments]="comments"
         [orderId]="order.id"
         [commentContainerId]="order.commentContainerId || 0"
