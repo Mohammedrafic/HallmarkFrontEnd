@@ -1,3 +1,5 @@
+import { Status, Statuses } from "./document-viewer.state.model";
+
 export class GetFiles {
   static readonly type = '[document-viewer] Get Files';
   constructor(public fileHash: string, public fileId: string) {}
@@ -23,3 +25,5 @@ export class GetGroupedFiles {
   static readonly type = '[document-viewer] Get Grouped Files';
   constructor(public fileHash: string) {}
 }
+
+

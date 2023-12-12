@@ -82,7 +82,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'ShowDeployedEmployees',
   'LimitNumberOfCandidateanAgencycansubmitToaPosition',
   'OrganizationCanCarryClockIDFromParent',
-  'AllowDuplicateClockIdforOrganization'
+  'AllowDuplicateClockIdforOrganization',
+  'TimeLimitforManagerReviewEmail'
 ];
 
 export const DisabledSettingsByDefault = [
@@ -111,6 +112,7 @@ export const DisabledSettingsByDefault = [
   'MarkZeroDollarInvoicetoPaidOnApproval',
   'MandatorySpecialProjectDetails',
   'SplitReportedTimeOnBillRateEffectiveDate',
+  'TimeLimitforManagerReviewEmail',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

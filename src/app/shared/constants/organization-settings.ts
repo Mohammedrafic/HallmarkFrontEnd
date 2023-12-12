@@ -67,7 +67,8 @@ export enum OrganizationSettingKeys {
   OrganizationCanCarryClockIDFromParent,
   AllowDuplicateClockIdforOrganization,
   MandatorySpecialProjectDetails,
-  MarkZeroDollarInvoicetoPaidOnApproval
+  MarkZeroDollarInvoicetoPaidOnApproval,
+  TimeLimitforManagerReviewEmail,
 }
 
 export enum OrganizationalHierarchy {

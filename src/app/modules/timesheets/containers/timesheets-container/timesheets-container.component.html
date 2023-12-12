@@ -14,15 +14,26 @@
       <div class="dropdown-filter">
         <div *ngIf="isAgency" class="bootstrap org-selector">
           <div class="input-container">
-            <ejs-dropdownlist
+            <ejs-dropdownlist *ngIf="isAgencyVisibilityFlagEnabled"
               appHideBeforeSyncfusionLoad
               placeholder="Select organization"
               [allowFiltering]="true"
               [dataSource]="organizations"
-              [fields]="isAgency ? agencyFields : unitOrganizationsFields"
+              [fields]="agencyFields"
               [formControl]="organizationControl"
             >
             </ejs-dropdownlist>
+            <ng-container *ngIf="!isAgencyVisibilityFlagEnabled">
+              <ejs-dropdownlist  *ngIf="organizations$ | async as organizations" 
+                appHideBeforeSyncfusionLoad
+                placeholder="Select organization"
+                [allowFiltering]="true"
+                [dataSource]="organizations"
+                [fields]="unitOrganizationsFields"
+                [formControl]="organizationControl"
+              >
+              </ejs-dropdownlist>
+            </ng-container>
           </div>
         </div>
         <app-date-range-week-picker
