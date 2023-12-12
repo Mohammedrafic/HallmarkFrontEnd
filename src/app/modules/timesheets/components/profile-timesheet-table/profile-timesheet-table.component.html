@@ -35,7 +35,7 @@
               class="add-action spaced"
               cssClass="e-action-button"
               ejs-button
-              [disabled]="disableAnyAction || !hasEditPermissions ||disableEditButton || disableButton"
+              [disabled]="disableAnyAction || !hasEditPermissions ||disableEditButton"
               (click)="openAddDialog()"
             >
               <i-feather name="plus" class="icon"></i-feather> <span class="action-text">Add Record</span>
@@ -55,7 +55,7 @@
             <app-tooltip-container [showToolTip]="!hasEditPermissions" *ngIf="!isEditOn && !isTablet">
               <button *ngIf="titleMapper[currentTab] == 'Timesheet'"
                 (click)="editTimesheets()"
-                [disabled]="disableAnyAction || !hasEditPermissions || disableEditButton || disableButton"
+                [disabled]="disableAnyAction || !hasEditPermissions || disableEditButton"
                 ejs-button
                 cssClass="e-action-button"
                 class="add-action"
