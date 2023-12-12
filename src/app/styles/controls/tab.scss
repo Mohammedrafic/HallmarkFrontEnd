@@ -107,6 +107,10 @@ body.dark {
             }
           }
 
+          &:hover {
+            border-color: $primary-active-blue-10 !important;
+          }
+
           &.e-active {
             background-color: $primary-active-blue-10;
 
