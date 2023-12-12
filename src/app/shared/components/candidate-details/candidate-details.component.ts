@@ -186,6 +186,7 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     value:  string | number;
     regions: Region[];
   }[] = [];
+  public isAgencyVisibilityFlagEnabled = false;
 
   constructor(
     store: Store,
@@ -243,13 +244,14 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     this.subscribeOnLocationChange();
     this.watchForRegionControl();
 
-    const user = this.store.selectSnapshot(UserState.user);
-    if(user?.businessUnitType === BusinessUnitType.Agency){
+    this.isAgencyVisibilityFlagEnabled = this.store.selectSnapshot(SecurityState.isAgencyVisibilityFlagEnabled);
+    if(this.isAgencyVisibilityFlagEnabled){
       this.loginAsAgency= true;
       this.agencyOrganizations();
       this.isOrganizaionsLoaded$.pipe(takeUntil(this.destroy$)).subscribe((flag) => {
-        if(!flag){               
-          if(this.loginAsAgency){
+        if(!flag){   
+          const user = this.store.selectSnapshot(UserState.user);            
+          if(this.loginAsAgency && user){
             this.store.dispatch(new GetOrganizationsStructureAll(user?.id));  
           }       
         }
@@ -576,7 +578,9 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
             value: dataset.id
           })
         );
-        this.filterColumns.organizationIds.dataSource = this.organizationDropdownDatasource;
+        if(!this.loginAsAgency){
+          this.filterColumns.organizationIds.dataSource = this.organizationDropdownDatasource;
+        }
       })
     );
   }

@@ -324,10 +324,10 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
             if (data != null) {
               this.isAlive = true;
               this.filterOptionsData = data;
-              this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+              //this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
-              this.filterColumns.jobStatuses.dataSource = data.jobStatusesAndReasons;
-              this.filterColumns.candidateStatuses.dataSource = data.candidateStatusesAndReasons;
+              // this.filterColumns.jobStatuses.dataSource = data.jobStatusesAndReasons;
+              // this.filterColumns.candidateStatuses.dataSource = data.candidateStatusesAndReasons;
               
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               let masterSkills = this.filterOptionsData.masterSkills;
@@ -439,33 +439,38 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       this.isResetFilter = false;
       this.message = ""
     }
-
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
-    skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
+    debugger;
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : "";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "";
+    skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "";
     var orgName = this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "";
     let currentDate = new Date(Date.now());
     this.paramsData =
     {
-      "OrganizationParamVSC": this.selectedOrganizations?.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "StartDateParamVSC": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamVSC": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamVSC": regionIds.length == 0 ? "null" : regionIds,
-      "LocationParamVSC": locationIds.length == 0 ? "null" : locationIds,
-      "DepartmentParamVSC": departmentIds.length == 0 ? "null" : departmentIds,
-      "SkillsParamVSC": skillIds.length == 0 ? "null" : skillIds,
-      "OrderTypesParamVSC": orderTypes.length == 0 ? "null" : orderTypes.join(","),
+      "OrganizationsVSR": this.selectedOrganizations?.length == 0 ? "" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "StartDateVSR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateVSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionsVSR": regionIds.length == 0 ? "" : regionIds,
+      "LocationsVSR": locationIds.length == 0 ? "" : locationIds,
+      "DepartmentsVSR": departmentIds.length == 0 ? "" : departmentIds,
+      "SkillVSR": skillIds.length == 0 ? "" : skillIds,
+      "OrderTypeVSR": orderTypes.length == 0 ? "" : orderTypes.join(","),
       "BusinessUnitIdParamVSC": this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
         this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
-      "HostName": this.baseUrl,
+      "HostNameVSR": this.baseUrl,
       "organizationNameVSR": orgName,
-      "reportPulledMekssageVSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
-      "DateRangeParamVSR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
-      "PeriodParamVSR": period == null ? 0 : period,
+      "reportPulledMessageVSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
+      "DateRangeCS": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
+      "PeriodVSR": period == null ? 0 : period,
+      "ActiveAgencyVSR":0,
+      "AgenciesVSR":this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
+      this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
+      "OrderIDVSR":"",
       "UseridVSR": this.user?.id,
     };
     
+    debugger;
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }

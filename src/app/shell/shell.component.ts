@@ -866,8 +866,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     const user = this.store.selectSnapshot(UserState.user) as User;
     const lastSelectedOrgId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId) as number;
     const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const isOrgArea = appArea.isOrganizationArea
+    || (!appArea.isAgencyArea && !appArea.isOrganizationArea);
 
-    if (user.businessUnitType === BusinessUnitType.Hallmark && appArea.isOrganizationArea && lastSelectedOrgId) {
+    if (user.businessUnitType === BusinessUnitType.Hallmark && isOrgArea && lastSelectedOrgId) {
       return this.store.dispatch(new GetOrganizationById(lastSelectedOrgId));
     } else if (user.businessUnitType != BusinessUnitType.Agency && appArea.isOrganizationArea) {
       const id = user.businessUnitId as number;

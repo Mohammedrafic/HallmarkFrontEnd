@@ -60,6 +60,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { AdaptIrpCandidates } from '@shared/components/order-candidate-list/order-candidate-list.utils';
 import { GetQueryParams } from '@core/helpers/functions.helper';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
+import { CancelIrpCandidateDto } from '@shared/components/order-candidate-list/interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -219,8 +220,8 @@ export class OrderManagementContentService {
     ).pipe(map((data) => sortByField(data, 'statusText')));
   }
 
-  public getOrderById(id: number, isIRP?: boolean): Observable<Order> {
-    if(isIRP) {
+  public getOrderById(id: number, isIRP?: boolean, system?: string): Observable<Order> {
+    if(isIRP || system === "IRP") {
       return this.http.get<Order>(`/api/Orders/${id}`, { params: GetQueryParams({ isIRPTab: isIRP })});
     } else {
       return this.http.get<Order>(`/api/Orders/${id}`);
@@ -448,6 +449,11 @@ export class OrderManagementContentService {
 
     return this.http.post<void>('/api/AppliedCandidates/cancelCandidateJob', requestBody);
   }
+
+  public cancelIrpCandidate(payload: CancelIrpCandidateDto): Observable<void> {
+    return this.http.post<void>('/api/IRPApplicants/cancel', payload);
+  }
+
 
   /**
    * Get order filter data sources

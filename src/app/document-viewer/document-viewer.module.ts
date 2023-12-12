@@ -25,6 +25,10 @@ import {
 } from 'angular-feather/icons';
 import { NgxsModule } from '@ngxs/store';
 import { DocumentViewerState } from './store/document-viewer.state';
+import { StatusComponentComponent } from './components/status-component/status-component.component';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
+import { AppState } from '../store/app.state';
+import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 
 const icons = {
   X,
@@ -40,8 +44,8 @@ const icons = {
 };
 
 @NgModule({
-  declarations: [DocumentViewerComponent, FailedDocumentViewerComponent],
-  exports: [DocumentViewerComponent, FailedDocumentViewerComponent],
+  declarations: [DocumentViewerComponent, FailedDocumentViewerComponent, StatusComponentComponent],
+  exports: [DocumentViewerComponent, FailedDocumentViewerComponent, StatusComponentComponent],
   imports: [
     DialogModule,
     ButtonModule,
@@ -54,12 +58,15 @@ const icons = {
     ToolbarModule,
     ListBoxModule,
     PdfViewerModule,
+    ToastModule,
+    ValidateDirectiveModule,
     ReactiveFormsModule,
     FeatherModule.pick(icons),
     CommonModule,
     DocumentViewerRoutingModule,
     NgxsModule.forFeature([
       DocumentViewerState,
+      AppState
     ]),
   ],
 })

@@ -361,6 +361,7 @@
   [candidateJob]="candidateJob"
   (submitCandidateCancellation)="cancelCandidate($event)"
   (cancelCandidateCancellation)="resetStatusesFormControl()"
+  (cancelledCandidateforIRP)="cancelledCandidatefromIRP($event)"
 ></app-candidate-cancellation-dialog>
 
 <app-send-email-side-dialog [header]="templateEmailTitle" [isSend]="isSend"  (groupEmailFormCancelClicked)="onGroupEmailAddCancel()" (groupEmailFormSendClicked)="onGroupEmailSend()" [width]="'1000px'">

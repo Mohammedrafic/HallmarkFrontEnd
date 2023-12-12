@@ -45,6 +45,7 @@ import { RejectReasonState } from '@organization-management/store/reject-reason.
 import { PageOfCollections } from '@shared/models/page.model';
 import { CancelEmployeeReasons } from '@shared/models/reject-reason.model';
 import { GetCancelEmployeeReason } from '@organization-management/store/reject-reason.actions';
+import { canceldto } from '../order-candidate-list/interfaces';
 
 interface DataSourceObject<T> {
   text: string;
@@ -66,6 +67,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
 
   @Output() submitCandidateCancellation = new EventEmitter<JobCancellation>();
   @Output() cancelCandidateCancellation = new EventEmitter<void>();
+  @Output() cancelledCandidateforIRP = new EventEmitter<canceldto>();
 
   @Select(OrderManagementContentState.getCandidateCancellationReasons)
   private candidateCancellationReasons$: Observable<CandidateCancellationReason[] | null>;
@@ -99,8 +101,9 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   activeSystem: any;
   currentPage: number = 1;
   pageSize: number = 100;
-
-  constructor(
+  actualEndDate: string;
+  cancelcandidate: Observable<void>;
+constructor(
     private cd: ChangeDetectorRef,
     private orderService: OrderManagementContentService,
     private cancellationDialogService: CandidateCancellationDialogService,
@@ -134,7 +137,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
 
   public submit(): void {
     this.form.markAllAsTouched();
-    if (this.form.valid) {
+    if (this.form.valid || this.activeSystem !== OrderManagementIRPSystemId.IRP) {
       const { jobCancellationReason, penaltyCriteria,  rate, hours, actualEndDate } = this.form.getRawValue();
 
       this.submitCandidateCancellation.emit({
@@ -144,6 +147,16 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
         rate,
         hours,
       });
+      this.form.reset();
+      this.candidateCancellationDialog.hide();
+    } else if(this.activeSystem === OrderManagementIRPSystemId.IRP && this.form.get("actualEndDate")?.value !== null){
+      const { jobCancellationReason, actualEndDate } = this.form.getRawValue();
+      if(this.candidateJob){
+          this.cancelledCandidateforIRP.emit({
+            actualEndDate: actualEndDate ? DateTimeHelper.setUtcTimeZone(actualEndDate) : null,
+            jobCancellationReason,
+        })
+      }
       this.form.reset();
       this.candidateCancellationDialog.hide();
     }
@@ -181,17 +194,19 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     this.form?.get('jobCancellationReason')?.valueChanges.pipe(
       takeUntil(this.destroy$)
     ).subscribe((value: JobCancellationReason) => {
-      this.isReasonSelected = !!(value || value === JobCancellationReason.LTACancellationOnBehalfOfOrganization);
-      if (this.isReasonSelected && this.candidateJob) {
-        this.form?.get('penaltyCriteria')?.setValue(null);
-        this.predefinedPenalties = null;
-        this.orderService.getPredefinedPenalties(this.candidateJob, value).pipe(
-          takeUntil(this.destroy$)
-        ).subscribe((data) => {
-          this.predefinedPenalties = data;
-          this.form?.get('penaltyCriteria')?.setValue(data.penaltyCriteria);
-        });
-      }
+      if(this.activeSystem !== OrderManagementIRPSystemId.IRP){
+        this.isReasonSelected = !!(value || value === JobCancellationReason.LTACancellationOnBehalfOfOrganization);
+        if (this.isReasonSelected && this.candidateJob) {
+          this.form?.get('penaltyCriteria')?.setValue(null);
+          this.predefinedPenalties = null;
+          this.orderService.getPredefinedPenalties(this.candidateJob, value).pipe(
+            takeUntil(this.destroy$)
+          ).subscribe((data) => {
+            this.predefinedPenalties = data;
+            this.form?.get('penaltyCriteria')?.setValue(data.penaltyCriteria);
+          });
+        }
+      }      
       this.cd.markForCheck();
     });
 
