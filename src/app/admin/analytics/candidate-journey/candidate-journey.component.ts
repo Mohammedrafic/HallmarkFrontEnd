@@ -223,8 +223,84 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
   }
 
 
-  selectPeriod() {
+  selectPeriod(event: any) {
+    let { startDate, period } = this.candidateJourneyForm.getRawValue();
+    const value = event.itemData.id;
     this.periodIsDefault = this.candidateJourneyForm.controls['period'].value == "Custom" ? true : false;
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue("");
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue("");
+    const PeriodCheck = value;
+    if (PeriodCheck == 0) {
+      let startDate = new Date(Date.now());
+      startDate.setDate(startDate.getDate() - 30);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+
+    }
+    else if (PeriodCheck == 1) { // Last 30 days 
+      let startDate = new Date(Date.now());
+      startDate.setDate(startDate.getDate() - 30);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    }
+    else if (PeriodCheck == 2) {//Last 60 days 
+      let startDate = new Date(Date.now());
+      startDate.setDate(startDate.getDate() - 60);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    }
+    else if (PeriodCheck == 3) {//Last 90 days 
+      let startDate = new Date(Date.now());
+      startDate.setDate(startDate.getDate() - 90);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    }
+    else if (PeriodCheck == 4) {//MTD
+      var date = new Date(Date.now());
+      const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(firstDay);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    }
+    else if (PeriodCheck == 5) {//Last Quarter
+      const today = new Date(Date.now());
+      const quarter = Math.floor((today.getMonth() / 3));
+      const startFullQuarter = new Date(today.getFullYear(), quarter * 3 - 3, 1);
+      const endFullQuarter = new Date(startFullQuarter.getFullYear(), startFullQuarter.getMonth() + 3, 0);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startFullQuarter);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(endFullQuarter);
+    }
+    else if (PeriodCheck == 6) {//Year Till Date
+      let date = new Date(Date.now());
+      const startDate = new Date(date.getFullYear(), 0, 1)
+      startDate.setDate(startDate.getDate());
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(new Date(startDate));
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    }
+    else if (PeriodCheck == 7) {//Last Completed 6 Months
+      let startDate = new Date(Date.now());
+      const firstDay = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+      startDate = this.addMonths(firstDay, -6);
+      startDate.setDate(startDate.getDate());
+      var lastdayoflastmonth = new Date();
+      lastdayoflastmonth.setMonth(lastdayoflastmonth.getMonth(), 0);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date((lastdayoflastmonth)));
+    }
+    else if (PeriodCheck == 8) {//Last Completed 12 months
+      let startDate = new Date(Date.now());
+      const firstDay = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+      startDate = this.addMonths(firstDay, -12);
+      startDate.setDate(startDate.getDate());
+      var lastdayoflastmonth = new Date();
+      lastdayoflastmonth.setMonth(lastdayoflastmonth.getMonth(), 0);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+      this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date((lastdayoflastmonth)));
+    }
+
+  }
+  private addMonths(date: any, months: any) {
+    date.setMonth(date.getMonth() + months);
+    return date;
   }
   private loadperiod(): void {
     this.periodList = [];

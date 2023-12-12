@@ -43,7 +43,7 @@ export class MultiDatePickerComponent extends Destroyable implements OnInit, Aft
   private outerClickRemover: () => void;
   private applyListenerRemover: () => void;
   private cancelListenerRemover: () => void;
-  public lastdatevalue: Date;
+  public lastdatevalue: Date | null;
   constructor(private renderer2: Renderer2, private cdr: ChangeDetectorRef) {
     super();
   }
@@ -78,6 +78,12 @@ export class MultiDatePickerComponent extends Destroyable implements OnInit, Aft
     this.datesValues = this.datesValues.filter((el, idx) => idx !== dateIndex);
     this.appliedDates.emit(this.datesValues);
     this.datesControl.setValue(this.datesValues);
+    if (this.datesValues?.length) {
+      this.lastdatevalue = new Date(this.datesValues[this.datesValues.length - 1]);
+    } else {
+      this.lastdatevalue = null;
+    }
+
     this.cdr.detectChanges();
   }
 
