@@ -1,7 +1,6 @@
 export const RECORD_ADDED = 'Record has been added';
 export const RECORDS_ADDED = 'Records have been added';
 export const RECORD_ADD = 'Credential added successfully';
-export const NO_RECORD = 'Enter OrderID was not correct';
 export const RECORD_MODIFIED = 'Record has been modified';
 export const RECORD_UNSAVED = 'Credential added successfully : Only credentials associated with the order will be displayed';
 export const SETUPS_ACTIVATED = 'Setups were successfully activated';
