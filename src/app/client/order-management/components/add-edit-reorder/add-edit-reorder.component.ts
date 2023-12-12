@@ -178,7 +178,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.reorderForm.get('reorderDate')?.setValue(dates.length ? dates[0] : null);
     this.multipleReorderDates = dates;
     this.setDefaultBillRate(dates);
-    this.cdr.markForCheck();
   }
 
   private setDefaultBillRate(dates: Date[]): void {
