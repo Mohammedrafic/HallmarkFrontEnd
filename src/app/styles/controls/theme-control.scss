@@ -55,6 +55,7 @@ body.light {
   --selected-date-range-color: #{$white};
   --checkbox-background: #{$white};
   --chechbox-corder-color: #{$secondary-dark-blue-30};
+  --disabled-tab-background: #{$secondary-dark-blue-50};
 
   --shadow: #{$secondary-black-25};
   --redonly-text: #{$secondary-dark-blue-30};
@@ -118,6 +119,7 @@ body.dark {
   --selector-title: #{$white};
   --disabled-drop-area-text: #{$white};
   --selected-date-range-color: #{$black};
+  --disabled-tab-background: #{$grid-detail-row-bgcolor};
 
   --shadow: #{$secondary-dark-blue-10-2};
   --redonly-text: #{$icewind-dale};
