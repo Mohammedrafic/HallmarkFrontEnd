@@ -70,8 +70,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() disableEditButton = false;
 
-  @Input() disableButton = false;
-
   @Input() hasEditTimesheetRecordsPermission: boolean;
 
   @Input() hasApproveRejectRecordsPermission: boolean;
