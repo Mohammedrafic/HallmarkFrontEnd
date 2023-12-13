@@ -107,12 +107,12 @@ export const DisabledSettingsByDefault = [
   'Sourcing',
   'ATPRateCalculation',
   'ShowDeployedEmployees',
-  'TimeLimitforManagerReviewEmail',
   'OrganizationCanCarryClockIDFromParent',
   'AllowDuplicateClockIdforOrganization',
   'MarkZeroDollarInvoicetoPaidOnApproval',
   'MandatorySpecialProjectDetails',
   'SplitReportedTimeOnBillRateEffectiveDate',
+  'TimeLimitforManagerReviewEmail',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

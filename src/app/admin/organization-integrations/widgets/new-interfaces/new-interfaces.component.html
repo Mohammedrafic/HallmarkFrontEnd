@@ -1,0 +1,29 @@
+<div class="new_interface_main">
+    <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+    <ng-template #header>
+      <div class="">
+        <h3 class="new_interface_title">New Interfaces</h3>
+      </div>  
+    </ng-template>
+    <ng-template #OrgChart>
+      
+      <div class="widget" *ngIf="NewInterfaceListState$ | async as datalist"> 
+         <div class="widget widget_cus" *ngFor="let data of datalist.interfacedata">  
+            <div class="row flex-container">         
+                <div class="new_interface_icon">
+                  <app-custom-icon name="organization" class="icon"></app-custom-icon>                    
+                </div> 
+                     
+                <div class="new_interface_te">
+                  <h3 class="orgname">{{data.organizationName}} </h3>
+                  <p class="interfacename"> {{data.integrationType}} {{data.interfaceName}}</p>  
+                </div> 
+            </div>
+            
+            </div>      
+          </div> 
+      
+    </ng-template>
+    </app-widget-wrapper>
+    <div class="new_interface_link">View New Interfaces</div>
+</div>    

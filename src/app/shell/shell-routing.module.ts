@@ -21,8 +21,8 @@ const shellRoutes: Routes = [
       {
         path: 'client',
         loadChildren: () => import('../client/client.module').then((m) => m.ClientModule),
-        canActivate: [OrganizationGuard, MenuGuard],
-        data: { menuItem: 2 },
+        canActivate: [OrganizationGuard],
+       
       },
       {
         path: 'agency',

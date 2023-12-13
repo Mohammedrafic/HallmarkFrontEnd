@@ -60,7 +60,7 @@ export const billRateColDef: ColDef = {
   width: 110,
   minWidth: 90,
   valueFormatter: (data) => {
-    if(!data.value) return '0';
+    if(!data.value) {return '0';}
     return GridValuesHelper.formatCurrencyValue(data.value);
   },
 };
@@ -110,7 +110,7 @@ export const totalCol: ColDef = {
   width: 140,
   minWidth: 90,
   valueFormatter: (data) => {
-    if(!data.value) return '0';
+    if(!data.value) {return '0';}
     return GridValuesHelper.formatCurrencyValue(data.value);
   },
 };
@@ -144,6 +144,7 @@ export const recordStatusCell: ColDef = {
   headerClass: 'custom-wrap',
 };
 
+// eslint-disable-next-line max-lines-per-function
 export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  ([
   dayColDef,
   ...(isStatusAvaliable ? [recordStatusCell] : []),
@@ -264,7 +265,7 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     width: 200,
     cellRenderer: InputEditorComponent,
     valueFormatter: (data) => {
-      if(!data.value) return '0';
+      if(!data.value) {return '0';}
       return GridValuesHelper.formatCurrencyValue(data.value);
     },
     cellRendererParams: {
@@ -277,6 +278,7 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
   actionCol(),
 ]);
 
+// eslint-disable-next-line max-lines-per-function
 export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
   {
     field: 'timesheetId',
@@ -340,6 +342,22 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     },
   },
   {
+    field: 'location',
+    headerName: 'Location',
+    width: 120,
+    minWidth: 90,
+    resizable: true,
+    cellClass: ['common-cell'],
+  },
+  {
+    field: 'costCenter',
+    headerName: 'Cost Center',
+    width: 140,
+    minWidth: 90,
+    resizable: true,
+    cellClass: ['common-cell'],
+  },
+  {
     field: 'state',
     headerName: 'State',
     width: 187,
@@ -372,7 +390,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     cellClass: ['common-cell'],
     valueFormatter: (data) => {
       return data.value ? formatDate(data.value, 'MM/dd/yyyy HH:mm:ss', 'en-US', 'UTC') : '';
-    }
+    },
   },
   {
     field: 'user',
@@ -391,23 +409,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     cellClass: ['common-cell'],
     valueFormatter: (data) => {
       return InvoiceHistoricalSubmission[data.value];
-    }
-  },
-  {
-    field: 'location',
-    headerName: 'Location',
-    width: 120,
-    minWidth: 90,
-    resizable: true,
-    cellClass: ['common-cell'],
-  },
-  {
-    field: 'costCenter',
-    headerName: 'Cost Center',
-    width: 140,
-    minWidth: 90,
-    resizable: true,
-    cellClass: ['common-cell'],
+    },
   },
 ]);
 

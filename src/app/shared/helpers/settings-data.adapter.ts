@@ -376,8 +376,8 @@ export class SettingsDataAdapter {
 
     return result;
   }
-  private static getStartsOnDateDisplayValue(value: { IsEnabled: boolean, StartsOn: string }): CheckboxValue {
-    const result = value?.IsEnabled ? CheckboxValue.Yes : CheckboxValue.No;
+  private static getStartsOnDateDisplayValue(value: { IsEnabled?: boolean, isEnabled?: string }): CheckboxValue {
+    const result = value?.IsEnabled || value?.isEnabled ? CheckboxValue.Yes : CheckboxValue.No;
 
     return result;
   }
