@@ -176,8 +176,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
-    this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+        this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.orderFilterColumnsSetup();
       if (data != null && data != undefined) {
         this.defaultAgency = data.toString();
@@ -214,7 +213,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
       this.onFilterSkillCategoryChangedHandler();
-      
+
       this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.agencyVendorScorecardReportForm.get(VendorScorecardReportConstants.formControlNames.BusinessIds)?.enable() : this.agencyVendorScorecardReportForm.get(VendorScorecardReportConstants.formControlNames.BusinessIds)?.disable();
       this.loadperiod();
     });
@@ -227,8 +226,8 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.agencyVendorScorecardReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        startDate: new FormControl(startDate, [Validators.required]),
-        endDate: new FormControl(new Date(Date.now()), [Validators.required]),
+        startDate: new FormControl(startDate, []),
+        endDate: new FormControl(new Date(Date.now()), []),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
@@ -244,8 +243,61 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
     this.isAlive = false;
   }
-  selectPeriod() {
+  selectPeriod(event: any) {
+    let { startDate, period } = this.agencyVendorScorecardReportForm.getRawValue();
+    const value = event.itemData.id;
+    const PeriodCheck = value;
+    let startDateControl = new Date(Date.now());
+    let endDateControl = new Date(Date.now());
+    let lastDayOfLastMonth = new Date();
+    lastDayOfLastMonth.setMonth(lastDayOfLastMonth.getMonth(), 0);
+    switch (PeriodCheck) {
+      case 0:
+        startDateControl.setDate(startDateControl.getDate() - 30);
+        break;
+      case 1:
+        startDateControl.setDate(startDateControl.getDate() - 30);
+        break;
+      case 2:
+        startDateControl.setDate(startDateControl.getDate() - 60);
+        break;
+      case 3:
+        startDateControl.setDate(startDateControl.getDate() - 90);
+        break;
+      case 4:
+        startDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        break;
+      case 5:
+        const today = new Date(Date.now());
+        const quarter = Math.floor((today.getMonth() / 3));
+        startDateControl = new Date(today.getFullYear(), quarter * 3 - 3, 1);
+        endDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth() + 3, 0);
+        break;
+        case 6:
+        const startDate = new Date(startDateControl.getFullYear(), 0, 1)
+        startDate.setDate(startDate.getDate());
+        startDateControl = startDate;
+        break;
+      case 7:
+        const firstDay = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(firstDay, -6);
+        startDateControl.setDate(startDateControl.getDate());
+        endDateControl = new Date((lastDayOfLastMonth));
+        break;
+      case 8:
+        const dayFirst = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(dayFirst, -12);
+        startDateControl.setDate(startDateControl.getDate());
+        endDateControl = new Date((lastDayOfLastMonth));
+        break;
+    }
+    this.agencyVendorScorecardReportForm.get(VendorScorecardReportConstants.formControlNames.StartDate)?.setValue(startDateControl);
+    this.agencyVendorScorecardReportForm.get(VendorScorecardReportConstants.formControlNames.EndDate)?.setValue(new Date((endDateControl)));
     this.periodIsDefault = this.agencyVendorScorecardReportForm.controls['period'].value == "0" ? true : false;
+  }
+  private addMonths(date: any, months: any) {
+    date.setMonth(date.getMonth() + months);
+    return date;
   }
   private loadperiod(): void {
     this.periodList = [];
@@ -328,7 +380,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
               this.filterColumns.skillIds.dataSource = [];
               // this.filterColumns.jobStatuses.dataSource = data.jobStatusesAndReasons;
               // this.filterColumns.candidateStatuses.dataSource = data.candidateStatusesAndReasons;
-              
+
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               let masterSkills = this.filterOptionsData.masterSkills;
               let skills = masterSkills.filter((i) => this.defaultSkillCategories?.includes(i.skillCategoryId));
@@ -463,13 +515,13 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
       "reportPulledMessageVSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
       "DateRangeCS": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
       "PeriodVSR": period == null ? 0 : period,
-      "ActiveAgencyVSR":0,
-      "AgenciesVSR":this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
-      this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
-      "OrderIDVSR":"",
+      "ActiveAgencyVSR": 0,
+      "AgenciesVSR": this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
+        this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
+      "OrderIDVSR": "",
       "UseridVSR": this.user?.id,
     };
-    
+
     debugger;
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
