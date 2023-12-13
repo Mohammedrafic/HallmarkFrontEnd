@@ -374,7 +374,8 @@ export type AgencyOrderFilters = {
   creationDateTo?: Date | null;
   distributedOnFrom?: Date | null;
   distributedOnTo?: Date | null;
-  candidateName?: string | null;
+  firstNamePattern?: string | null;
+  lastNamePattern?: string | null;
   projectTypeIds?: number | null;
   projectNameIds?: number | null;
   poNumberIds?: number | null;
@@ -773,7 +774,8 @@ export class OrderFilter {
   creationDateTo?: Date | null;
   distributedOnFrom?: Date | null;
   distributedOnTo?: Date | null;
-  candidateName?: string | null;
+  firstNamePattern?: string | null;
+  lastNamePattern?: string | null;
   projectTypeIds?: number | null;
   projectNameIds?: number | null;
   poNumberIds?: number | null;

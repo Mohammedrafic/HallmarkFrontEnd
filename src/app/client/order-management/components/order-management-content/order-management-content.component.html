@@ -946,15 +946,24 @@
     <div class="filter-row bootstrap"
          *ngIf="!isActiveSystemIRP || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
       <div class="input-container">
-        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Name</label>
-        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Name</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee First Name</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate First Name</label>
         <div class="input-group">
-          <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
+          <input class="e-input" type="text" maxlength="50" formControlName="firstNamePattern" />
         </div>
       </div>
       <div class="input-container">
-          <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Status</label>
-          <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Status</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Last Name</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Last Name</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="lastNamePattern" />
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Status</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Status</label>
         <div class="input-group multiselect">
           <ejs-multiselect
             mode="CheckBox"
@@ -1281,7 +1290,7 @@
   (deleteFilter)="onFilterDelete($event)"
   (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()"
-  (closeDialogClicked)="onFilterClose()" 
+  (closeDialogClicked)="onFilterClose()"
 >
   <form [formGroup]="OrderFilterFormGroup" *ngIf="showFilterForm">
     <div class="bootstrap">
@@ -1929,7 +1938,7 @@
   [filters]="filters"
   (saveEmitter)="updateGrid()"
   (reOpenPositionSuccess)="updatePositionDetails($event)"
-  (successEmitterIRP)="updatePositionDetailsforIRP($event)" 
+  (successEmitterIRP)="updatePositionDetailsforIRP($event)"
 ></app-child-order-dialog>
 
 <app-close-order
