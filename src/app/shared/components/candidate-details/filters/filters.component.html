@@ -22,7 +22,7 @@
     </div>
   </div>
 
-   
+
   <div class="input-container bootstrap" hidden ="true"  *ngIf="isAgency">
     <label>Agency</label>
     <div class="input-group dropdown">
@@ -56,7 +56,7 @@
   <div class="input-container">
     <label>Location</label>
     <div class="input-group multiselect bootstrap">
-      <ejs-multiselect mode="CheckBox"   
+      <ejs-multiselect mode="CheckBox"
       #locationDropdown
                        formControlName="locationIds"
                        placeholder="All"
@@ -120,13 +120,18 @@
       </ejs-multiselect>
     </div>
   </div>
- 
+
   <div class="input-container bootstrap">
-    <label>Candidate Name</label>
-    <div class="input-group dropdown">          
-      <ejs-autocomplete formControlName="candidateNames"  [dataSource]="filterColumns.candidateNames.dataSource" 
-       filterType='StartsWith' [fields]='candidateNameFields' [htmlAttributes]="htmlAttributes"
-              [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='filterCandidateName($event)'></ejs-autocomplete>
+    <label>Candidate First Name</label>
+    <div class="input-group dropdown">
+      <input class="e-input" type="text" formControlName="firstNamePattern"/>
+    </div>
+  </div>
+
+  <div class="input-container bootstrap">
+    <label>Candidate Last Name</label>
+    <div class="input-group dropdown">
+      <input class="e-input" type="text" formControlName="lastNamePattern"/>
     </div>
   </div>
 
@@ -157,7 +162,7 @@
     </div>
   </div>
 
- 
+
   <div class="input-container bootstrap"  *ngIf="isAgency">
     <label>Position ID</label>
     <div class="input-group dropdown">
@@ -178,16 +183,16 @@
           </ejs-multiselect>
         </div>
       </div>
-    
-     
+
+
       <div class="input-container bootstrap"  *ngIf="!isAgency">
         <label>Position ID</label>
         <div class="input-group dropdown">
           <input class="e-input" type="text" appValidateWithMessage maxlength="50"  formControlName="orderId" />
         </div>
       </div>
-    
-      
+
+
   <div class="input-container calendar">
     <label>Start Date</label>
     <div class="input-group datepicker">

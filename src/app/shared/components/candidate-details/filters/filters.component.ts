@@ -1,14 +1,10 @@
-import { AfterViewInit, Component, Input, NgZone, OnInit, ViewChild } from '@angular/core';
-import { FieldSettingsModel, FilteringEventArgs, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { FormGroup } from '@angular/forms';
 import { FilterColumnsModel } from '@shared/components/candidate-details/models/candidate.model';
 import { Actions, Store, ofActionDispatched } from '@ngxs/store';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
-import { debounceTime, delay, distinctUntilChanged, takeUntil } from 'rxjs';
-import { EmitType } from '@syncfusion/ej2-base';
-import { OutsideZone } from '@core/decorators';
-import { DoNotReturnCandidateSearchFilter } from '@shared/models/donotreturn.model';
-import { GetcandidateOrgSearchbytext, Getcandidatesearchbytext } from '../store/candidate.actions';
+import { debounceTime, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
@@ -32,7 +28,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
     text: 'text',
     value: 'value',
   };
-  
+
   public typeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public skillFields: FieldSettingsModel = { text: 'skillDescription', value: 'masterSkillId' };
   public allOption: string = "All";
@@ -41,7 +37,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
     value: 'agencyId',
   };
   public filterType: string = 'Contains';
-  constructor(private actions$: Actions, protected  store: Store, private readonly ngZone: NgZone,) {
+  constructor(private actions$: Actions, protected  store: Store,) {
     super();
   }
   public htmlAttributes = {  maxlength: "50" };
@@ -49,7 +45,7 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
 
-  ngOnInit(): void {  
+  ngOnInit(): void {
     this.actions$.pipe(
       ofActionDispatched(ShowFilterDialog),
       debounceTime(300),
@@ -58,47 +54,11 @@ export class FiltersComponent extends DestroyableDirective implements OnInit, Af
       this.regionDropdown.refresh();
       this.locationDropdown.refresh();
       this.departmentDropdown.refresh();
-    }); 
-  }
-
-  public filterCandidateName: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
-    this.onFilterChild(e);
-  }
-
-  @OutsideZone
-  private onFilterChild(e: FilteringEventArgs) {
-    if (e.text != '') {
-      const filter: DoNotReturnCandidateSearchFilter = {
-        searchText: e.text,
-        businessUnitId: this.isAgency ? this.lastAgencyId : this.lastOrgId,
-      };
-      if(this.isAgency){
-        this.store.dispatch(new Getcandidatesearchbytext(filter))
-        .pipe(
-          delay(500),
-          distinctUntilChanged(),
-          takeUntil(this.destroy$)
-        ).subscribe((result) => {
-          e.updateData(result.candidateDetails.searchCandidates);
-
-        });
-      }else{
-        this.store.dispatch(new GetcandidateOrgSearchbytext(filter))
-        .pipe(
-          delay(500),
-          distinctUntilChanged(),
-          takeUntil(this.destroy$)
-        ).subscribe((result) => {
-            e.updateData(result.candidateDetails.searchOrgCandidates);
-        });
-      }
-  
-    }
+    });
   }
 
   ngAfterViewInit() {
     this.departmentDropdown.refresh();
     this.locationDropdown.refresh();
-    
   }
 }
