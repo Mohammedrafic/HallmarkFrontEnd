@@ -255,7 +255,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     private settingsViewService: SettingsViewService,
     private skillsService: SkillsService,
     private orderManagementService: OrderManagementService,
-    private shiftservice:ShiftsService
+    private shiftservice:ShiftsService,
   ) {
     super();
   }
@@ -439,7 +439,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
         );
         this.updateSpecialProjectValidation(this.specialProjectConfigurationSettings);
       }),
-      switchMap(() => this.setDistributionBasedOnAgencyStatus()),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
       this.changeDetection.markForCheck();
@@ -785,14 +784,16 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
               id, undefined, false),
         ]);
       }),
+      tap((logic) => {
+        const jobDistributionForm = this.getSelectedFormConfig(JobDistributionForm);
+        const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem, logic[0]['TieringLogic'] === 'true', false, logic[1]['TieringLogic'] === 'true');
+        setDataSource(jobDistributionForm.fields, 'jobDistribution', sourceForJobDistribution);
+  
+        this.changeDetection.markForCheck();
+      }),
+      switchMap(() => this.setDistributionBasedOnAgencyStatus()),
       takeUntil(this.componentDestroy())
-    ).subscribe((logic) => {
-      const jobDistributionForm = this.getSelectedFormConfig(JobDistributionForm);
-      const sourceForJobDistribution = getDataSourceForJobDistribution(this.selectedSystem, logic[0]['TieringLogic'] === 'true', false, logic[1]['TieringLogic'] === 'true');
-      setDataSource(jobDistributionForm.fields, 'jobDistribution', sourceForJobDistribution);
-
-      this.changeDetection.markForCheck();
-    });
+    ).subscribe();
 
     this.jobDistributionForm.get('jobDistribution')?.valueChanges.pipe(
       filter((id) => !!id),

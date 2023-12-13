@@ -9,7 +9,6 @@ import { OrderType } from '@shared/enums/order-type';
 import { OrderHistoricalEvent } from '@shared/models';
 import { Comment } from '@shared/models/comment.model';
 import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
-import { CommentsService } from '@shared/services/comments.service';
 import { HistoricalEventsService } from '@shared/services/historical-events.service';
 import { AccordionComponent, ExpandedEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { AppState } from '../../../store/app.state';
@@ -54,7 +53,6 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
 
     constructor(
     private store: Store,
-    private commentsService: CommentsService,
     private cdr: ChangeDetectorRef,
     private historicalEventsService: HistoricalEventsService,
     private settingsViewService: SettingsViewService,
@@ -84,7 +82,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
         ).subscribe(({ HideContactDetailsOfOrderInAgencyLogin }) => {
           this.isHideContactDetailsOfOrderInAgencyLogin = HideContactDetailsOfOrderInAgencyLogin === "true";
           this.cdr.markForCheck();
-        })
+        });
       }
 
     } else {
