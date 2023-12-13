@@ -276,7 +276,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   get disableAddExtension(): boolean {
-    return this.candidate?.orderStatus === this.orderStatus.InProgressOfferAccepted || !this.canCreateOrder;
+    return this.candidate?.orderStatus === this.orderStatus.InProgressOfferAccepted || !this.canCreateOrder || (this.order?.extensionFromId == null && this.candidate?.extensionFromId == null);
   }
 
   get showCloseOrder(): boolean {
@@ -322,6 +322,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   get isAgencySuspended(): boolean {
     return this.candidateJob?.partnershipStatus === PartnershipStatus.Suspended;
+  }
+
+  get isdisabledExtension(): boolean {
+    return (this.order?.extensionFromId == null && this.candidate?.extensionFromId == null) == false ? true : false;
   }
 
   get getPartnershipMessage(): string {
