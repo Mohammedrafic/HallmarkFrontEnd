@@ -239,3 +239,23 @@ export class LogTimeSheetHistory {
   createdDate:      Date;
   weekStartDate:    null;
 }
+
+export class EmpGeneralNoteImportDetails{
+  id: number;
+  interfaceLogId: number;
+  employeeID: string | null;
+  date : string | null
+  category : string | null
+  note : string | null
+  errorDescriptions: string[];
+  status: string | null;
+}
+
+export class EmpGeneralNoteImportDetailsPage {
+  items:           EmpGeneralNoteImportDetails[];
+  pageNumber:      number;
+  totalPages:      number;
+  totalCount:      number;
+  hasPreviousPage: boolean;
+  hasNextPage:     boolean;
+}
