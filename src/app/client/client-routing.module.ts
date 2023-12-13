@@ -118,6 +118,10 @@ const routes: Routes = [
         },
       },
       {
+        path: 'timesheets/notification/:notificationId',
+        resolve: [NotificationResolver],
+      },
+      {
         path: 'scheduling',
         loadChildren: () => import('../modules/schedule/schedule.module').then((m) => m.ScheduleModule),
         data: {
