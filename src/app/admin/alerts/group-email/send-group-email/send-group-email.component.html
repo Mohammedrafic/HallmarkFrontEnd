@@ -2,7 +2,6 @@
 
   <!-- validation errors-->
   <div class="section-container">
-
     <div class="left-section">
       <div class="business-dropdowns">
         <div class="bootstrap dropdown-container">
@@ -21,17 +20,14 @@
         <div class="bootstrap dropdown-container" *ngIf="!isBusinessUnitTypeAgency">
           <div class="input-group dropdown">
             <label>{{isMspUsertype ? 'Current MSP Name' : 'Business Unit'}}<span class="required">*</span></label>
-            <ejs-multiselect mode="CheckBox" appValidateWithMessage
-                             formControlName="business"
-                             [fields]="businessDataFields"
-                             [dataSource]="businessData"
-                             [allowFiltering]="true"
-                             placeholder="Business"
-                             [showDropDownIcon]="true"
-                             [selectAllText]='allOption'
-                             showSelectAll=true
-                             maximumSelectionLength="50000">
-            </ejs-multiselect>
+            <ejs-dropdownlist appValidateWithMessage
+                              formControlName="business"
+                              [fields]="businessDataFields"
+                              [dataSource]="businessData"
+                              [value]="defaultBusinessValue"
+                              [allowFiltering]="true"
+                              placeholder="Business">
+            </ejs-dropdownlist>
           </div>
         </div>
         <div class="bootstrap dropdown-container" *ngIf="isBusinessUnitTypeAgency">
@@ -360,7 +356,7 @@
     </div>
   </div>
 </div>
-<div class="rich-text-container input-container bootstrap">
+<div class="rich-text-container">
   <label>Mail Body<span class="required">*</span></label>
   <div class="input-group" id="richTextEditorDiv" [ngClass]="emailBodyRequired ? 'invalidRichTextEditorDiv' : ''">
     <ejs-richtexteditor #RTEGroupEmail id='defaultGroupEmailRTE' appValidateWithMessage
