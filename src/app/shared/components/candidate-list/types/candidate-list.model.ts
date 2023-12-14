@@ -1,8 +1,8 @@
 import { ListOfSkills } from '@shared/models/skill.model';
-import { ApplicantStatus } from '../../../enums/applicant-status.enum';
-import { ExportedFileType } from '../../../enums/exported-file-type';
-import { CandidateStatus } from '../../../enums/status';
-import { PageOfCollections } from '../../../models/page.model';
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { CandidateStatus } from '@shared/enums/status';
+import { PageOfCollections } from '@shared/models/page.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 
 export type CandidateRow = {

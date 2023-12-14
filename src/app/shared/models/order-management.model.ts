@@ -15,7 +15,6 @@ import { JobDistributionModel } from './job-distribution.model';
 import { IrpPrimarySkill } from './skill.model';
 import { CandidateProfileContactDetail } from './candidate.model';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
-import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 /**
  * TODO: rework classes with interfaces.
  */

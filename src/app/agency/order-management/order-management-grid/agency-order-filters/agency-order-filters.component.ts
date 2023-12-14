@@ -30,7 +30,6 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 enum RLDLevel {
   Orginization,

@@ -20,14 +20,13 @@ import { UserPermissions } from '@core/enums';
 })
 
 export class DoNotReturnDetailsComponent extends AbstractPermissionGrid implements OnInit {
-public filters: DonoreturnFilters = {};
-
   @ViewChild('grid')
   public grid: GridComponent;
 
   @Select(UserState.userPermission)
   currentUserPermissions$: Observable<Permission>;
 
+  public filters: DonoreturnFilters = {};
   public fileName: string;
   public defaultFileName: string;
   public isdnrActive=true;

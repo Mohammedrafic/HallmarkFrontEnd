@@ -601,13 +601,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return (
       candidates &&
       candidates.map((candidate: CandidateRow) => {
-        if (candidate.candidateProfileSkills.length > 2) {
-          // const [first, second] = candidate.candidateProfileSkills;
-          // candidate = {
-          //   ...candidate,
-          //   candidateProfileSkills: [first, second, { skillDescription: '...' }],
-          // };
-        }
         if (candidate.candidateProfileRegions.length > 2) {
           const [first, second] = candidate.candidateProfileRegions;
           candidate = {
@@ -625,14 +618,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return (
       candidates &&
       candidates.map((candidate: IRPCandidate) => {
-        if (candidate.employeeSkills?.length > 2) {
-          // const [first, second] = candidate.employeeSkills;
-          // candidate = {
-          //   ...candidate,
-          //   employeeSkills: [first, second, '...'],
-          // };
-        }
-
         return candidate;
       })
     );
