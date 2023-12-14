@@ -325,7 +325,13 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   get isdisabledExtension(): boolean {
-    return (this.order?.extensionFromId == null && this.candidate?.extensionFromId == null) == false ? true : false;
+    if(this.order?.extensionFromId != null && this.candidate?.extensionFromId != null){
+      return true;
+    }else if(this.candidate?.extensionFromId && this.order?.extensionFromId == null){
+      return this.extensions?.length > 0 ? true : false;
+    }else{
+      return false;
+    }
   }
 
   get getPartnershipMessage(): string {
@@ -818,6 +824,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.system = system as string
         this.order = order as MergedOrder;
         this.candidate = candidate;
+        console.log('order',this.order);
+        console.log('candidate',this.candidate)
         this.isClosedOrder = this.isClosedOrderPosition;
         this.getTemplate();
         windowScrollTop();
