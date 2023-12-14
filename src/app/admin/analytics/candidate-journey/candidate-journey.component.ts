@@ -240,13 +240,16 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
         startDateControl.setDate(startDateControl.getDate() - 30);
         break;
       case 1:
-        startDateControl.setDate(startDateControl.getDate() - 30);
+        startDateControl.setDate(startDateControl.getDate() - 31);
+        endDateControl.setDate(endDateControl.getDate() - 1);
         break;
       case 2:
-        startDateControl.setDate(startDateControl.getDate() - 60);
+        startDateControl.setDate(startDateControl.getDate() - 61);
+        endDateControl.setDate(endDateControl.getDate() - 1);
         break;
       case 3:
-        startDateControl.setDate(startDateControl.getDate() - 90);
+        startDateControl.setDate(startDateControl.getDate() - 91);
+        endDateControl.setDate(endDateControl.getDate() - 1);
         break;
       case 4:
         startDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
@@ -483,7 +486,15 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       this.isResetFilter = false;
       this.message = ""
     }
-
+    if (endDate == null) {
+      if (startDate > new Date(Date.now()))
+      {
+        endDate = startDate;
+      }
+      else {
+        endDate = new Date(Date.now())
+      }
+    }
     // locationIds = locationIds.length > 0 ? locationIds.join(",") : [];
     // departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : 'null';
 
