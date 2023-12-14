@@ -276,7 +276,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   get disableAddExtension(): boolean {
-    return this.candidate?.orderStatus === this.orderStatus.InProgressOfferAccepted || !this.canCreateOrder || (this.order?.extensionFromId == null && this.candidate?.extensionFromId == null);
+    return this.candidate?.orderStatus === this.orderStatus.InProgressOfferAccepted || !this.canCreateOrder;
   }
 
   get showCloseOrder(): boolean {

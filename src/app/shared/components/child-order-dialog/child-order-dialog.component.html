@@ -41,7 +41,7 @@
               *ngIf="!isAgency"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
-              [disabled]="disableAddExtension || isAgencySuspended || isdisabledExtension"
+              [disabled]="disableAddExtension || isAgencySuspended"
               text="Add Extension"
             ></app-button>
             <button
