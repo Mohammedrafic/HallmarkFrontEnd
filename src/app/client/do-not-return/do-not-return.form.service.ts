@@ -33,9 +33,8 @@ export class DoNotReturnFormService {
   createDoNotreturnFilterForm(): CustomFormGroup<DoNotReturnFilterForm> {
     return this.fb.group({
       businessUnitId: ['', [Validators.required]],
-      firstName: [''],
-      middleName: [''],
-      lastName: [''],
+      firstNamePattern: [''],
+      lastNamePattern: [''],
       ssn: [''],
       regionBlocked:[''],
       locationBlocked: [''],

@@ -27,7 +27,8 @@ export class TimesheetsService {
 
   public createForm(): CustomFormGroup<TimesheetForm> {
     return this.fb.group({
-      searchTerm: [''],
+      firstNamePattern: [''],
+      lastNamePattern: [''],
       orderIds: [[]],
       statusIds: [[]],
       skillIds: [[]],

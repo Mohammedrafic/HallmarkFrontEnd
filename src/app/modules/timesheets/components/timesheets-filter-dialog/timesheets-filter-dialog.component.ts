@@ -12,10 +12,9 @@ import { FilterColumns, TimesheetsFilterState } from '../../interface';
 import { UserState } from 'src/app/store/user.state';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-//import { FilteredUser } from '@shared/models/user.model';
 import { AppState } from 'src/app/store/app.state';
-import { FilteredOrderContactPerson } from '../../../../shared/models/order-contactperson.model';
-import { ORDER_CONTACT_DETAIL_TITLES } from '../../../../shared/constants';
+import { FilteredOrderContactPerson } from '@shared/models/order-contactperson.model';
+import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
 
 @Component({
   selector: 'app-timesheets-filter-dialog',

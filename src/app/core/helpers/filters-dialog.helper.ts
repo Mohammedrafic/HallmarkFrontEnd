@@ -38,7 +38,6 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   public filteredItems: FilteredItem[] = [];
   public filterOptionFields = filterOptionFields;
   public skillFields: FieldSettingsModel = { text: 'name', value: 'masterSkillsId' };
-  public contactPersonFields: FieldSettingsModel = { text: 'fullName', value: 'email' };
   public orderContactPersonFields: FieldSettingsModel = { text: 'name', value: 'email' };
   public filterColumns: T;
   public formGroup: CustomFormGroup<T>;

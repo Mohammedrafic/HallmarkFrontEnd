@@ -48,7 +48,6 @@ import { Candidatests, FormControlNames } from '../enums/dnotreturn.enum';
 
 export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   public blockunblockcandidate$: Subject<boolean> = new Subject<boolean>();
-  public organizationAgencyControl: FormControl = new FormControl();
   public generalInformationForm: FormGroup;
   public columnsToExport: ExportColumn[] = MasterDNRExportCols;
   public filterColumns = doNotReturnFilterConfig;
@@ -65,30 +64,20 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public defaultFileName: string;
   public readonly userPermissions = UserPermissions;
   public CandidateNames: DoNotReturnSearchCandidate[];
-  public masterDonotreturn: DonoreturnAddedit[] = [];
-  public submited: boolean = false;
-  public editedDNRId?: number;
   public candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   public remoteWaterMark: string = WATERMARK;
   public allOption: string = "All";
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
-  public IsSwitcher: boolean = false;
   public maskSSNPattern: string = '000-00-0000';
   public maskedSSN: string = '';
   public maskedFilterSSN: string = '';
   public filterSSNPattern: string = '000-00-0000';
   public readonly today = new Date();
-  filterSelectedBusinesUnitId: number | null;
 
   public optionFields = {
     text: 'name',
     value: 'id',
-  };
-
-  public readonly orgsFields = {
-    text: 'name',
-    value: 'organizationId',
   };
 
   public filters: DonoreturnFilter = {};
@@ -98,7 +87,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   private selectedOrganization: AllOrganization;
   public organizationRegionIds$: Subject<any> = new Subject();
   public gridApi: any;
-  private gridColumnApi: any;
   allOrganizations : UserAgencyOrganizationBusinessUnit[] = []
   sortByField : number = 1;
   fliterFlag:boolean = false;
@@ -349,9 +337,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     })
   }
 
-  get formAltaControls(): any {
-    return this.doNotReturnFormGroup['controls'];
-  }
 
   public onDOBBlur(e:any){
     if(e.model.inputWrapper.container.classList.contains('e-error')){

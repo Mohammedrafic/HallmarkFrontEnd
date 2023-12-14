@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ViewChild } from '@angular/
 import { Select, Store } from '@ngxs/store';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
-import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { ExportColumn } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { DonoreturnFilters } from '@shared/models/donotreturn.model';
@@ -39,20 +39,19 @@ public filters: DonoreturnFilters = {};
   public fliterFlag$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public override userPermissions = UserPermissions;
 
-  constructor(protected override store:Store) { 
+  constructor(protected override store:Store) {
     super(store)
     store.dispatch(new SetHeaderState({ title: TITLE, iconName: 'user-x' }));
   }
 
   override ngOnInit(): void {
-   // this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, 1)]);
     super.ngOnInit();
   }
 
   public override updatePage(){
     this.refreshGridEvent.next(true);
   }
-  
+
   public override customExport(): void {
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -60,16 +59,12 @@ public filters: DonoreturnFilters = {};
   public override defaultExport(fileType: ExportedFileType): void {
     if (this.isdnrActive) {
       this.exportDonotreturn$.next(fileType);
-    } 
+    }
   }
 
   public showFilters(): void {
     this.fliterFlag$.next(true);
     this.store.dispatch(new ShowFilterDialog(true));
-  }
-
-  public AddDonotlist(): void {
-    this.store.dispatch(new ShowSideDialog(true));
   }
 
   public addDoNotReturn(): void {
