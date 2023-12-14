@@ -21,6 +21,7 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { DoNotReturn } from '@admin/store/donotreturn.actions';
 import { GetEmployeeImportErrors, GetEmployeeImportTemplate, SaveEmployeeImportLogResult, SaveEmployeeImportResult, SaveEmployeeImportResultSucceeded, UploadEmployeeFile } from '@shared/components/candidate-list/store/candidate-list.actions';
+import { GetEmployeeGeneralNoteImportErrors, GetEmployeeGeneralNoteImportTemplate, SaveEmployeeGeneralNoteImportLogResult, UploadEmployeeGeneralNoteFile } from '@client/candidates/candidate-profile/general-notes/general-notes.action';
 
 type ImportTemplates =
   | typeof GetLocationsImportTemplate
@@ -28,28 +29,32 @@ type ImportTemplates =
   | typeof GetBillRatesImportTemplate
   | typeof GetOrderImportTemplate
   | typeof DoNotReturn.GetDoNotReturnImportTemplate
-  | typeof GetEmployeeImportTemplate;
+  | typeof GetEmployeeImportTemplate
+  |typeof GetEmployeeGeneralNoteImportTemplate;
 type ImportErrors =
   | typeof GetLocationsImportErrors
   | typeof GetDepartmentsImportErrors
   | typeof GetBillRatesImportErrors
   | typeof GetOrderImportErrors
   | typeof DoNotReturn.GetDoNotReturnImportErrors
-  | typeof GetEmployeeImportErrors;
+  | typeof GetEmployeeImportErrors
+  | typeof GetEmployeeGeneralNoteImportErrors;
 type SaveImportResult =
   | typeof SaveLocationsImportResult
   | typeof SaveDepartmentsImportResult
   | typeof SaveBillRatesImportResult
   | typeof SaveOrderImportResult
   | typeof DoNotReturn.SaveDoNotReturnImportResult
-  | typeof SaveEmployeeImportLogResult;
+  | typeof SaveEmployeeImportLogResult
+  |typeof SaveEmployeeGeneralNoteImportLogResult;
 type UploadFile =
   | typeof UploadLocationsFile
   | typeof UploadDepartmentsFile
   | typeof UploadBillRatesFile
   | typeof UploadOrderImportFile
   | typeof DoNotReturn.UploadDoNotReturnFile
-  | typeof UploadEmployeeFile;
+  | typeof UploadEmployeeFile
+  | typeof UploadEmployeeGeneralNoteFile;
 type UploadFileSucceeded = { instance: ActionType; message: string };
 type ImportErrorsSucceeded = { instance: ActionType; fileName: string };
 type ImportTemplatesSucceeded = ImportErrorsSucceeded;

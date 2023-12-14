@@ -417,6 +417,96 @@ import { GridErroredCellListComponent } from "@shared/components/import-dialog-c
       
   ];
 
+  export const EmpGeneralNoteWithErrorColumnsConfig: ColDef[] = [
+    {
+      field: 'employeeID',
+      width: 100,
+      headerName: 'Employee ID',
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      field: 'employeeName',
+      width: 100,
+      headerName: 'Employee Name',
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      field: 'date',
+     width: 100,
+      headerName: 'Date',
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      field: 'category',
+     width: 100,
+      headerName: 'Category',
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+    {
+      field: 'note',
+      width: 70,
+      headerName: 'Note',
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+    },
+      {
+        field: 'status',
+        width: 130,
+        headerName: 'Status',
+        filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: true,
+      resizable: true
+      },
+      {
+        field: 'errorDescriptions',
+        resizable: true,
+        autoHeight:true,
+        suppressSizeToFit:true,
+        headerName: 'Error Description',
+        cellRenderer: GridErroredCellListComponent,
+      },
+      
+  ];
+
   export enum LogStatusEnum {
     OverAll = 0,
     Inserted = 1,

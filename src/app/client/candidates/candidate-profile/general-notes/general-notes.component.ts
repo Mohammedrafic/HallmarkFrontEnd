@@ -97,7 +97,7 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   public exportOrientation$ = new Subject<ExportedFileType>();
   public columnsToExport: ExportColumn[] = GeneralNoteExportCols;
   tooltipInteraction: boolean;
-
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
   public constructor(
     @Inject(DOCUMENT) private document: Document,
     private datePipe: DatePipe,
@@ -135,27 +135,27 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   }
 
   public onSave() {
-    if(this.addEditNoteComponent.noteForm.valid){
+    if (this.addEditNoteComponent.noteForm.valid) {
       this.addEditNoteComponent.saveNote();
-      if (this.route.snapshot.paramMap.get('id')||this.candidatesService.employeeId||0) {
+      if (this.route.snapshot.paramMap.get('id') || this.candidatesService.employeeId || 0) {
         this.candidateProfileFormService.triggerSaveEvent();
         this.candidatesService.changeTab(CandidateTabsEnum.CandidateProfile);
-          this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })).pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.candidateProfileService
-              .getCandidateById(parseInt(this.route.snapshot.paramMap.get('id') || '0')||this.candidatesService.employeeId||0)
-              .pipe(takeUntil(this.destroy$))
-              .subscribe((candidate) => {
-                this.candidateProfileFormService.populateCandidateForm(candidate);
-                this.candidatesService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
-                this.candidatesService.setProfileData(candidate);
-                this.generalNotesService.notes$.next(candidate.generalNotes);
-              });
+        this.store.dispatch(new GetAssignedSkillsByOrganization({ params: { SystemType: SystemType.IRP } })).pipe(takeUntil(this.destroy$)).subscribe(() => {
+          this.candidateProfileService
+            .getCandidateById(parseInt(this.route.snapshot.paramMap.get('id') || '0') || this.candidatesService.employeeId || 0)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((candidate) => {
+              this.candidateProfileFormService.populateCandidateForm(candidate);
+              this.candidatesService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
+              this.candidatesService.setProfileData(candidate);
+              this.generalNotesService.notes$.next(candidate.generalNotes);
             });
-       }
-    }else{
+        });
+      }
+    } else {
       this.addEditNoteComponent.noteForm.markAllAsTouched();
     }
-   
+
   }
 
   private getFormattedDateWithFormat(date: string, format: string): string {
@@ -188,9 +188,9 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.exportOrientation$.next(fileType);
-    if (this.route.snapshot.paramMap.get('id')||this.candidatesService.employeeId||0) {
+    if (this.route.snapshot.paramMap.get('id') || this.candidatesService.employeeId || 0) {
 
-      this.filters.candidateId = parseInt(this.route.snapshot.paramMap.get('id') || '0')||this.candidatesService.employeeId||0
+      this.filters.candidateId = parseInt(this.route.snapshot.paramMap.get('id') || '0') || this.candidatesService.employeeId || 0
       this.store.dispatch(new ExportGeneralNote(new ExportPayload(
         fileType,
         { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
@@ -228,5 +228,22 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
   public export(event: ExportOptions): void {
     this.closeExport();
     this.defaultExport(event.fileType, event);
+  }
+
+  public override updatePage() {
+    if (this.route.snapshot.paramMap.get('id') || this.candidatesService.employeeId || 0) {
+      this.candidateProfileService
+        .getCandidateById(parseInt(this.route.snapshot.paramMap.get('id') || '0') || this.candidatesService.employeeId || 0)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((candidate) => {
+          this.candidateProfileFormService.populateCandidateForm(candidate);
+          this.candidatesService.setCandidateName(`${candidate.lastName}, ${candidate.firstName}`);
+          this.candidatesService.setProfileData(candidate);
+          this.generalNotesService.notes$.next(candidate.generalNotes);
+        });
+    }
+  }
+  public openImportDialog(): void {
+    this.importDialogEvent.next(true);
   }
 }
