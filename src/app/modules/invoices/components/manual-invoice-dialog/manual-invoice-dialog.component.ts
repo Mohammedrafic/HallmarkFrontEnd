@@ -25,6 +25,7 @@ import {
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesState } from "../../store/state/invoices.state";
 import { ManInvoiceOptionsKeys } from '../../enums';
+import { PUBLIC_ORDER_ID } from '@shared/constants';
 
 @Component({
   selector: 'app-manual-invoice-dialog',
@@ -105,6 +106,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   saveManualInvoice(): void {
     if (!this.form?.valid) {
+      this.form?.markAllAsTouched();
       this.form?.updateValueAndValidity();
       this.cd.markForCheck();
       return;
@@ -254,7 +256,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
            this.clearOptions();
         }
       }),
-      filter((value) => !!value),
+      filter((value) => !!value && PUBLIC_ORDER_ID.test(value)),
       distinctUntilChanged(),
       tap(() => this.clearDialog()),
       takeUntil(this.componentDestroy()),

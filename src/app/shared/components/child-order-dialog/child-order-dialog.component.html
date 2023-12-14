@@ -38,7 +38,7 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="!isAgency && (order?.extensionFromId == null && candidate?.extensionFromId == null)"
+              *ngIf="!isAgency"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
               [disabled]="disableAddExtension || isAgencySuspended"

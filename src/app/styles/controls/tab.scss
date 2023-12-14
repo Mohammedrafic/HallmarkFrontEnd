@@ -107,6 +107,10 @@ body.dark {
             }
           }
 
+          &:hover {
+            border-color: $primary-active-blue-10 !important;
+          }
+
           &.e-active {
             background-color: $primary-active-blue-10;
 
@@ -123,6 +127,7 @@ body.dark {
 
           &.e-disable {
             opacity: 0.5;
+            background-color: var(--disabled-tab-background);
 
             .stepper-header {
               .stepper-title {

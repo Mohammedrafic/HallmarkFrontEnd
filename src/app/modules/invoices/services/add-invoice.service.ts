@@ -1,5 +1,6 @@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Injectable } from '@angular/core';
+import { PUBLIC_ORDER_ID } from '@shared/constants';
 
 @Injectable()
 export class AddInvoiceService {
@@ -9,7 +10,7 @@ export class AddInvoiceService {
 
   public createForm(isAgency: boolean): FormGroup {
     return this.fb.group({
-      orderId: [null, Validators.required],
+      orderId: [null, [Validators.required, Validators.pattern(PUBLIC_ORDER_ID)]],
       nameId: [null, Validators.required],
       unitId: [null, Validators.required],
       locationId: [null, Validators.required],

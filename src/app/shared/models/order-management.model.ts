@@ -1049,6 +1049,13 @@ export interface OrderAuditHistory{
     departmentId?: number;
   }
 
+  export interface JobDistributionvalidation {
+    regionId?: number;
+    locationId?: number;
+    departmentId?: number;
+    jobDistribution?: number[];
+  }
+
   export interface OrderFilterDateList {
     jobStartDate: null | string;
     jobEndDate: null | string;

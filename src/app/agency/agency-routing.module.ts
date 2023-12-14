@@ -109,6 +109,10 @@ const routes: Routes = [
         },
       },
       {
+        path: 'timesheets/notification/:notificationId',
+        resolve: [NotificationResolver],
+      },
+      {
         path: 'invoices',
         loadChildren: () => import('../modules/invoices/invoices.module').then((m) => m.InvoicesModule),
         data: {

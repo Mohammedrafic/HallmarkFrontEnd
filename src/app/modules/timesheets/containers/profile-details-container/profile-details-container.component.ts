@@ -222,8 +222,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public disableAnyAction = false;
 
-  public disableButton = false;
-
   public hasEditTimesheetRecordsPermission: boolean;
 
   public hasViewTimesheetPermission: boolean;
@@ -328,7 +326,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             this.slectingindex = selectEvent.previousIndex;
             this.tabs.select(selectEvent.previousIndex);
           }
-          
+
           if((AlertIdEnum[AlertIdEnum['Timesheet Level Comments']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()){
             this.tabs.select(0);
             window.localStorage.setItem("TimesheetId", JSON.stringify(0));
@@ -631,7 +629,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       this.timesheetDetailsApiService.getTimesheetHistoricalEvents(this.isAgency, this.timesheetId, this.organizationId)
         .pipe(take(1))
         .subscribe((events: TimesheetHistoricalEvent[]) => {
-          this.historicalEvents = events;
+          this.historicalEvents = this.timesheetDetailsService.getSortedHistoricalEvents(events);
           this.cd.markForCheck();
         });
     }
@@ -729,29 +727,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     })
   }
 
-  private subscribeAgency():void{
-    let organizationId = this.orgId;
-    this.settingsViewService.getViewSettingKey(
-      OrganizationSettingKeys.AgencyCanEditApprovedTimesheet,
-      OrganizationalHierarchy.Location,
-      organizationId as number,
-      organizationId as number,
-      false,
-      this.jobId
-    ).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(({ AgencyCanEditApprovedTimesheet }) => {
-      if (AgencyCanEditApprovedTimesheet == 'true') {
-        this.disableButton = true;
-      }
-      else {
-        this.disableButton = false;
-      }
-
-    })
-
-  }
-
   private watchForPermissions(): void {
     this.getPermissionStream()
       .pipe(takeUntil(this.componentDestroy()))
@@ -821,7 +796,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         this.setDNWBtnState(details.canEditTimesheet, !!details.allowDNWInTimesheets);
         this.checkForAllowActions(details.agencyStatus);
         this.allowEditButtonEnabled();
-        this.subscribeAgency();
         this.getOrderComments();
         this.cd.markForCheck();
 
