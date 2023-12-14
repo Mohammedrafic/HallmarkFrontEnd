@@ -154,11 +154,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
  
   @Input() public set activeSystem(val: any) {
     this._activeSystem = val;
-    if(this._activeSystem === OrderManagementIRPSystemId.IRP){
-      this.subscribeOnCandidates();
-    } else {
-      this.subscribeOnCandidateJob();
-    }
   }
 
   @Input() orderComments: Comment[] = [];
@@ -363,11 +358,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.extensions = extensions.filter((extension: Order) => extension.id !== this.order?.id);
         this.isLastExtension = !this.extensions.map((ex) => ex.extensionFromId).includes(this.order?.id);
       });
-      if(this.activeSystem === OrderManagementIRPSystemId.IRP){
-        this.subscribeOnCandidates();
-      } else {
-        this.subscribeOnCandidateJob();
-      }
+      this.subscribeOnCandidateJob();
+      this.subscribeOnVMSCandidate();
     this.onOpenEvent();
     this.subscribeOnSelectedOrder();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
@@ -853,29 +845,34 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       });
     }
   }
-
+  private subscribeOnVMSCandidate(): void {
+    this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
+      if(this.isOrganization && this.order.extensionFromId === null && this.activeSystem === OrderManagementIRPSystemId.VMS){
+        this.candidateJob = orderCandidateJob;
+        if (orderCandidateJob) {
+          this.getExtensions();
+          this.getComments();
+          this.setAcceptForm(orderCandidateJob);
+        }
+      }
+  });  
+  }
   private subscribeOnCandidates(): void {
     this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
-      if(irpCandidates){
-        irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
-        this.setCloseOrderButtonStateforIRP();
-        this.getExtensionsforIRP();
-        this.getCommentsforIRP();
-      }
+      if(this.isOrganization && this.activeSystem !== OrderManagementIRPSystemId.VMS){
+        if(irpCandidates){
+          irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+          this.setCloseOrderButtonStateforIRP();
+          this.getExtensionsforIRP();
+          this.getCommentsforIRP();
+        }
+      } 
     });
   }
 
   private subscribeOnCandidateJob(): void {
     if (this.isOrganization) {
-        this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
-          this.candidateJob = orderCandidateJob;
-          if (orderCandidateJob) {
-            this.getExtensions();
-            this.getComments();
-            this.setAcceptForm(orderCandidateJob);
-          }
-          this.changeDetectorRef.detectChanges();
-        });  
+      this.subscribeOnCandidates();
       }
     if (this.isAgency) {
       this.agencyCandidatesJob$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
