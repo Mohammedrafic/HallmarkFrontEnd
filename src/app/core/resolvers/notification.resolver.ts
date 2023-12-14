@@ -42,6 +42,9 @@ export class NotificationResolver implements Resolve<boolean> {
         if(data.publicId){
           window.localStorage.setItem("OrderPublicId",JSON.stringify(data.publicId));
         }
+        if(data.timesheetId){
+          window.localStorage.setItem("TimesheetId",JSON.stringify(data.timesheetId));
+        }
 
         this.router.navigate([routeSnapshot[0]]);
         return true;

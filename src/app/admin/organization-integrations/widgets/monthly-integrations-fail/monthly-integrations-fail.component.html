@@ -1,5 +1,5 @@
-<div *ngIf="integrationsmonthlyFailureLast12Months$ | async as integrationsmonthlyFailureLast12Months">
-  <h3>{{integrationsmonthlyFailureLast12Months.title}}</h3>
+<div class="bor-rad" *ngIf="integrationsmonthlyFailureLast12Months$ | async as integrationsmonthlyFailureLast12Months">
+  <h3 class="h3Title">{{integrationsmonthlyFailureLast12Months.title}}</h3>
 <ejs-chart 
            [chartArea]="chartArea"
            [primaryXAxis]="isDarkTheme ? primaryXAxisDarkTheme : primaryXAxis"

@@ -96,7 +96,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #3e7fff;
+    color: $primary-active-blue-10;
     font-size: 12px;
     cursor: pointer;
 
@@ -169,6 +169,31 @@ h5{
         border-bottom-right-radius: var(--grid-border-radius);
       }
 
+      #defaultGroupEmailRTE_image_dialog-header {
+        background-color: var(--bg-default);
+      }
+
+      .e-footer-content {
+        background-color: var(--bg-default);
+      }
+
+      #defaultGroupEmailRTE_image_dialog-content {
+        .e-img-uploadwrap .e-droptext {
+          border: dashed 1px $primary-active-blue-10;
+
+          .e-rte-upload-text {
+            color: $primary-active-blue-10;
+            font-size: 12px;
+            font-weight: 400;
+          }
+        }
+
+        .e-linkheader {
+          color: $secondary-dark-blue-15;
+          margin-left: 20px;
+        }
+      }
+
       #defaultGroupEmailRTE_toolbar {
         background-color: var(--bg-default);
         border: 1px solid var(--grid-header-border);
@@ -176,12 +201,17 @@ h5{
 
         .e-toolbar-items {
           background-color: var(--bg-default);
+          border-top-left-radius: 12px;
 
           .e-toolbar-item.e-overlay {
             background-color: var(--bg-default);
           }
         }
       }
+    }
+
+    #defaultGroupEmailRTE_rte-edit-view {
+      color: var(--text);
     }
   }
 }
