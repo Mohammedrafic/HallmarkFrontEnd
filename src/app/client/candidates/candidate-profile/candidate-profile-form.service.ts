@@ -7,11 +7,12 @@ import { difference } from 'lodash';
 
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 import { CandidateModel } from '@client/candidates/candidate-profile/candidate.model';
-import { ProfileStatusesEnum, RecruitmentStatusEnum, SourceStatusEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
+import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { DateTimeHelper } from '@core/helpers';
 import { candidateDateFields } from '../constants';
 import { CandidatesService } from '../services/candidates.service';
+import { asteriskValidator } from '@shared/validators/asterisk.validator';
 
 @Injectable()
 export class CandidateProfileFormService {
@@ -45,9 +46,9 @@ export class CandidateProfileFormService {
     return this.formBuilder.group(
       {
         employeeId: [null, [Validators.required, Validators.maxLength(25)]],
-        firstName: [null, [Validators.required, Validators.maxLength(50)]],
+        firstName: [null, [Validators.required, Validators.maxLength(50), asteriskValidator()]],
         middleName: [null, [Validators.maxLength(10)]],
-        lastName: [null, [Validators.required, Validators.maxLength(50)]],
+        lastName: [null, [Validators.required, Validators.maxLength(50), asteriskValidator()]],
         dob: [null],
         primarySkillId: [null, [Validators.required]],
         secondarySkills: [{ value: null, disabled: true }],
