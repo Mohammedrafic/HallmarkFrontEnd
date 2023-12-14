@@ -824,8 +824,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.system = system as string
         this.order = order as MergedOrder;
         this.candidate = candidate;
-        console.log('order',this.order);
-        console.log('candidate',this.candidate)
         this.isClosedOrder = this.isClosedOrderPosition;
         this.getTemplate();
         windowScrollTop();
