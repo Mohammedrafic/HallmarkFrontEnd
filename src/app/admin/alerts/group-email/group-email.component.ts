@@ -254,22 +254,21 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     if (this.groupEmailTemplateForm.emailBody != '' && this.groupEmailTemplateForm.emailTo != '' && this.groupEmailTemplateForm.emailSubject != '') {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
       let businessUnitId: number | null = null;
+      let selectedBussinessUnitIds: number | null = null;
       const user = this.store.selectSnapshot(UserState.user);
       if (user?.businessUnitType === BusinessUnitType.Organization) {
         this.isOrgUser = true;
       }
       if (formValues.businessUnit == 4)
-        if(user?.businessUnitType == BusinessUnitType.MSP){
-          businessUnitId = formValues.business == 0 ? null : user?.businessUnitId
-        }
-        else{
-          businessUnitId = this.isOrgUser == true ? user?.businessUnitId : formValues.businesses[0]
-        }
+        businessUnitId = this.isOrgUser == true ? user?.businessUnitId : formValues.businesses[0]
       if (formValues.businessUnit == 3)
-        businessUnitId = formValues.business == 0 ? null : formValues.business
-        if(user?.businessUnitType == BusinessUnitType.MSP){
-          businessUnitId = formValues.business == 0 ? null : user?.businessUnitId
-        }
+        businessUnitId = formValues.business == 0 ? null : formValues.business;
+      if (formValues.businessUnit == BusinessUnitType.MSP){
+        businessUnitId = formValues.business == 0 ? null : formValues.business;
+      }
+      if(user && user.businessUnitType === BusinessUnitType.MSP){
+        selectedBussinessUnitIds = user.businessUnitId;
+      }
       const sendGroupEmailDto: SendGroupEmailRequest = {
         businessUnitId: businessUnitId,
         bodyMail: formValues.emailBody,
@@ -282,7 +281,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         selectedFile: formValues.fileUpload,
         businessUnitType: formValues.businessUnit == 0 ? null : formValues.businessUnit,
         userType: formValues.userType,
-        selectedBusinessUnitId:  formValues.businesses != null ? formValues.businesses.join(',') : null
+        selectedBusinessUnitId: selectedBussinessUnitIds?.toString(),
       };
       this.emailBodyRequiredFlag$.next(false);
       this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));

@@ -55,7 +55,7 @@ import { Attachment } from '@shared/components/attachments';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
 import { InvoiceFiltersAdapter } from '../../adapters';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import {  Invoicebase, agencyInvoicebase, commonInvoiceHistory } from '../../interfaces/invoice-auditlog.interface';
+import {  Invoicebase, InvoicecheckAuditHistory, InvoicepaymentAuditHistory, agencyInvoicebase, commonInvoiceHistory } from '../../interfaces/invoice-auditlog.interface';
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -176,6 +176,14 @@ export class InvoicesState {
   @Selector([InvoicesState])
   static getAgecnyInvoiceAuditHistory(state: commonInvoiceHistory): agencyInvoicebase[] {
     return state.agencyInvoicebase;
+  }
+  @Selector([InvoicesState])
+  static getPayemntAuditHistory(state: commonInvoiceHistory): InvoicepaymentAuditHistory[] {
+    return state.InvoicepaymentAuditHistory;
+  }
+  @Selector([InvoicesState])
+  static getCheckAuditHistory(state: commonInvoiceHistory): InvoicecheckAuditHistory[] {
+    return state.InvoicecheckAuditHistory;
   }
 
 
@@ -935,4 +943,33 @@ export class InvoicesState {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }));
   }
+
+  //PaymentAudit History
+  @Action(Invoices.GetPaymentAuditHistory)
+  GetPaymentAuditHistory({ patchState, dispatch }: StateContext<commonInvoiceHistory>, { payload ,isagency}:
+    Invoices.GetPaymentAuditHistory): Observable<InvoicepaymentAuditHistory[] | void> {
+    return this.invoicesAPIService.getPayemntAuditHistory(payload,isagency).pipe(
+      tap((payloads) => {
+        patchState({ InvoicepaymentAuditHistory: payloads });
+        dispatch(new Invoices.GetPaymentHistoryDetailSucceeded());
+        return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      }));
+  }
+  @Action(Invoices.GetCheckAuditHistory)
+  GetCheckAuditHistory({ patchState, dispatch }: StateContext<commonInvoiceHistory>, { payload ,isagency}:
+    Invoices.GetPaymentAuditHistory): Observable<InvoicecheckAuditHistory[] | void> {
+    return this.invoicesAPIService.getCheckAuditHistory(payload,isagency).pipe(
+      tap((payloads) => {
+        patchState({ InvoicecheckAuditHistory: payloads });
+        dispatch(new Invoices.GetCheckHistoryDetailSucceeded());
+        return payloads;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      }));
+  }
+
 }
