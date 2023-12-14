@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { GeneralNotesService } from "./general-notes.service";
-import { ExportGeneralNote, GetEmployeeGeneralNoteImportErrors, GetEmployeeGeneralNoteImportErrorsSucceeded, GetEmployeeGeneralNoteImportTemplate, GetEmployeeGeneralNoteImportTemplateSucceeded, SaveEmployeeGeneralNoteImportLogResult, SaveEmployeeGeneralNoteImportResultSucceeded, UploadEmployeeGeneralNoteFile, UploadEmployeeGeneralNoteFileSucceeded } from "./general-notes.action";
+import { ExportGeneralNote, GetEmployeeGeneralNoteImportErrors, GetEmployeeGeneralNoteImportErrorsSucceeded, GetEmployeeGeneralNoteImportTemplate, GetEmployeeGeneralNoteImportTemplateSucceeded, SaveEmployeeGeneralNoteImportLogResult, SaveEmployeeGeneralNoteImportResultFailAndSucceeded, SaveEmployeeGeneralNoteImportResultSucceeded, UploadEmployeeGeneralNoteFile, UploadEmployeeGeneralNoteFileSucceeded } from "./general-notes.action";
 import { Observable, catchError, of, tap } from "rxjs";
 import { saveSpreadSheetDocument } from "@shared/utils/file.utils";
 import { Action, State, StateContext } from "@ngxs/store";
@@ -96,7 +96,7 @@ export class GeneralNoteState {
   ): Observable<ImportResult<any> | Observable<void>> {
     return this.generalNotesService.saveImportEmployeeGeneralNoteResult(payload).pipe(
       tap((payload) => {
-        dispatch(new SaveEmployeeGeneralNoteImportResultSucceeded(payload));  
+        dispatch(new SaveEmployeeGeneralNoteImportResultFailAndSucceeded(payload));  
         return payload;
       }),
       catchError((error:any) => of( dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))))

@@ -20,7 +20,7 @@
       <i-feather name="upload" class="icon"></i-feather>
     </div>
   </button>
-  <button ejs-button  action-button (click)="openImportDialog()" class="e-outline">
+  <button ejs-button  [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageNotes]"  action-button (click)="openImportDialog()" class="e-outline">
     <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
   </button>
   <button

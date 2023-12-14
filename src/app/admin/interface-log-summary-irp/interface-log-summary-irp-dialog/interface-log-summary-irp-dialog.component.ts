@@ -161,8 +161,7 @@ export class InterfaceLogSummaryIrpDialogComponent extends AbstractGridConfigura
       }
     });
 
-  //  if (this.getImportType == "Employee Import") {
-      this.logInterfaceDetailsPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
+       this.logInterfaceDetailsPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
         if (data != null) {
           this.timeSheetHistoryItemList = data?.items;
           this.totalRecordsCount$.next(data?.totalCount);
@@ -174,9 +173,8 @@ export class InterfaceLogSummaryIrpDialogComponent extends AbstractGridConfigura
           this.gridApi?.setRowData(this.timeSheetHistoryItemList);
         }
       });
-    //}else if(this.getImportType == "Employee General Note Import") {
-
-    this.logGeneralNoteDetailsPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
+  
+      this.logGeneralNoteDetailsPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data: any) => {
       if (data != null) {
         this.empGeneralNoteImportList = data?.items;
         this.totalRecordsCount$.next(data?.totalCount);
@@ -188,7 +186,7 @@ export class InterfaceLogSummaryIrpDialogComponent extends AbstractGridConfigura
         this.gridApi?.setRowData(this.empGeneralNoteImportList);
       }
     });
- // }
+ 
 
   }
 

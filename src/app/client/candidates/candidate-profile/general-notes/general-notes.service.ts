@@ -93,9 +93,6 @@ export class GeneralNotesService {
     return this.http.post<EmployeeGeneralNoteImportResult>('/api/Employee/importGeneralNote', formData);
   }
 
-  // public saveImportEmployeeGeneralNoteResult(successfullRecords: ImportedEmployeeGenralNote[]): Observable<EmployeeGeneralNoteImportResult> {
-  //   return this.http.post<EmployeeGeneralNoteImportResult>('/api/Employee/saveGeneralNoteimport', successfullRecords);
-  // }
 
   
   public saveImportEmployeeGeneralNoteResult(payload: EmployeeGeneralImportSaveResult): Observable<EmployeeGeneralNoteImportResult> {
