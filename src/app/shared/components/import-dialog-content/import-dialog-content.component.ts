@@ -92,6 +92,9 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
     return  this.importResult == null && this.isEmployeeIRPImport
 
   }
+  get empImportButton(): boolean {
+    return   this.isEmployeeIRPImport
+  }
 
   constructor(private confirmService: ConfirmService, private cdr: ChangeDetectorRef) {
     super();
