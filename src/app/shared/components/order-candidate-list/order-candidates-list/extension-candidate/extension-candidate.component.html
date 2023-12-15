@@ -166,7 +166,7 @@
                         />
                       </div>
                     </div>
-                    <div class="d-flex" *ngIf="activeSystems !== systemTypes.IRP">
+                    <div class="d-flex">
                       <div class="input-container bootstrap">
                         <label class="input-group">Actual Start Date</label>
                         <div class="input-group">
@@ -250,7 +250,7 @@
                       />
                     </div>
                   </div>
-                  <div class="input-container bootstrap">
+                  <div class="input-container bootstrap" *ngIf="!isIRP">
                     <label class="input-group">Penalty Criteria</label>
                     <div class="input-group input-readonly">
                       <input
@@ -262,17 +262,19 @@
                       />
                     </div>
                   </div>
-                  <div class="d-flex" *ngIf="!verifyNoPenalty">
-                    <div class="input-container bootstrap">
-                      <label class="input-group">{{ showPercentage ? '% ' : '' }}Rate</label>
-                      <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="rate" class="e-input" type="text" readonly />
+                  <div>
+                    <div class="d-flex" *ngIf="!verifyNoPenalty && !isIRP">
+                      <div class="input-container bootstrap">
+                        <label class="input-group">{{ showPercentage ? '% ' : '' }}Rate</label>
+                        <div class="input-group input-readonly">
+                          <input appValidateWithMessage formControlName="rate" class="e-input" type="text" readonly />
+                        </div>
                       </div>
-                    </div>
-                    <div class="input-container bootstrap" *ngIf="showHoursControl">
-                      <label class="input-group">Hours</label>
-                      <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="hours" class="e-input" type="text" readonly />
+                      <div class="input-container bootstrap" *ngIf="showHoursControl">
+                        <label class="input-group">Hours</label>
+                        <div class="input-group input-readonly">
+                          <input appValidateWithMessage formControlName="hours" class="e-input" type="text" readonly />
+                        </div>
                       </div>
                     </div>
                   </div>
