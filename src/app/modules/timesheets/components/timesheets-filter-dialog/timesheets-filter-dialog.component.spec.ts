@@ -23,7 +23,6 @@ import { FilterColumns } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { FilteredOrderContactPerson } from '@shared/models/order-contactperson.model';
 
-
 @Component({
   selector: 'app-filter-dialog',
   template: '<ng-content></ng-content>'
@@ -38,7 +37,8 @@ class FakeFilterDialogComponent {
 }
 
 const emptyForm = new FormGroup({
-  searchTerm: new FormControl(''),
+  firstNamePattern: new FormControl(''),
+  lastNamePattern: new FormControl(''),
   orderIds: new FormControl([]),
   statusIds: new FormControl([]),
   skillIds: new FormControl([]),
@@ -51,7 +51,8 @@ const emptyForm = new FormGroup({
 }) as CustomFormGroup<FilterColumns>;
 
 const filteredColumns = {
-  searchTerm: { type: 0, valueType: 1 },
+  firstNamePattern: { type: 0, valueType: 1 },
+  lastNamePattern: { type: 0, valueType: 1 },
   orderIds: { type: 0, valueType: 1 },
   statusIds: { type: 2, valueType: 0, valueField: 'name', valueId: 'id' },
   skillIds: { type: 2, valueType: 0, valueField: 'name', valueId: 'masterSkillsId' },

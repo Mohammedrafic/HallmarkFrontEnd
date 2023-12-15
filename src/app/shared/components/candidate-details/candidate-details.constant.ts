@@ -28,17 +28,17 @@ export const FilterColumnsDefinition = {
     valueField: 'name',
     valueId: 'id',
   },
-  candidateNames: {
-    type: ControlTypes.Autocomplete,
-    valueType: ValueType.Id,
-    dataSource: [],
-    valueField: 'fullName',
-    valueId: 'id',
+  firstNamePattern: {
+    type: ControlTypes.Text,
+    valueType: ValueType.Text,
+  },
+  lastNamePattern: {
+    type: ControlTypes.Text,
+    valueType: ValueType.Text,
   },
   orderId: {
     type: ControlTypes.Text,
     valueType: ValueType.Text,
-
   },
   agencyIds: {
     type: ControlTypes.Dropdown,
@@ -90,6 +90,6 @@ export const FilterColumnsDefinition = {
     valueType: ValueType.Id,
     dataSource: [],
     valueField: 'name',
-    valueId: 'id',  
+    valueId: 'id',
   },
 };

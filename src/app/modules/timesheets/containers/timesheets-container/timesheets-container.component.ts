@@ -38,7 +38,6 @@ import * as Interfaces from '../../interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
 
-
 @Component({
   selector: 'app-timesheets-container',
   templateUrl: './timesheets-container.component.html',
@@ -164,7 +163,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           this.rowSelected({rowIndex:filterTimesheetIndex,data:filterTimesheet});
           this.timesheetId = 0;
           this.orderPublicId = '';
-        }  
+        }
       }
     })
 
@@ -383,9 +382,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     }
   }
 
-  private timeSheetBasedonOrg(orgId:any): void{   
+  private timeSheetBasedonOrg(orgId:any): void{
     this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
-    this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });    
+    this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });
 
     this.store.dispatch([
       new Timesheets.UpdateFiltersState(

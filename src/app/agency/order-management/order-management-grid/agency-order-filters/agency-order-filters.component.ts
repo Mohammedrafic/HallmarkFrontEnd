@@ -30,7 +30,6 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 enum RLDLevel {
   Orginization,
@@ -112,8 +111,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   }
 
   constructor(
-    private store: Store, 
-    private actions$: Actions, 
+    private store: Store,
+    private actions$: Actions,
     private orderManagementAgencyService: OrderManagementAgencyService,
     private cd: ChangeDetectorRef,
   ) {
@@ -127,8 +126,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     if(this.isAgencyVisibilityFlagEnabled){
       this.agencyOrganizations();
       this.isOrganizaionsLoaded$.pipe(takeUntil(this.destroy$)).subscribe((flag) => {
-        if(user && !flag){               
-            this.store.dispatch(new GetOrganizationsStructureAll(user?.id));  
+        if(user && !flag){
+            this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
          }
       });
     }
@@ -165,7 +164,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           }else{
              this.store.dispatch(new GetOrganizationStructure(value));
           }
-            
+
         }
         this.cd.detectChanges();
       })
@@ -357,7 +356,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       creationDateTo: new FormControl(null),
       distributedOnFrom: new FormControl(null),
       distributedOnTo: new FormControl(null),
-      candidateName: new FormControl(null),
+      firstNamePattern: new FormControl(null),
+      lastNamePattern: new FormControl(null),
       projectTypeIds: new FormControl(null),
       projectNameIds: new FormControl(null),
       poNumberIds: new FormControl(null),
@@ -439,7 +439,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       creationDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
       distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
       distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
-      candidateName: { type: ControlTypes.TextOrNull, valueType: ValueType.Text },
+      firstNamePattern: { type: ControlTypes.TextOrNull, valueType: ValueType.Text },
+      lastNamePattern: { type: ControlTypes.TextOrNull, valueType: ValueType.Text },
       projectTypeIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,

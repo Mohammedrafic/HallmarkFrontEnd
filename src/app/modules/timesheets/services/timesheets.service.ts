@@ -14,9 +14,6 @@ import { TimesheetsTableFiltersColumns } from '../enums';
 
 @Injectable()
 export class TimesheetsService {
-  /**
-   * TODO: remove any.
-   */
   private currentSelectedTableRowIndex: BaseObservable<number> = new BaseObservable<number>(null as unknown as number);
 
   constructor(
@@ -27,7 +24,8 @@ export class TimesheetsService {
 
   public createForm(): CustomFormGroup<TimesheetForm> {
     return this.fb.group({
-      searchTerm: [''],
+      firstNamePattern: [''],
+      lastNamePattern: [''],
       orderIds: [[]],
       statusIds: [[]],
       skillIds: [[]],

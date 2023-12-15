@@ -38,9 +38,10 @@ export type FilterColumnsModel = {
   applicantStatuses : FilterColumn;
   locationIds:FilterColumn;
   departmentIds:FilterColumn;
-  candidateNames:FilterColumn
-  agencyIds:FilterColumn
-  organizationIds:FilterColumn
+  firstNamePattern:FilterColumn;
+  lastNamePattern:FilterColumn;
+  agencyIds:FilterColumn;
+  organizationIds:FilterColumn;
   orderId:FilterColumn;
 };
 
@@ -54,7 +55,8 @@ export type FiltersModal = {
   locationIds?: Array<number>;
   departmentIds?: Array<number>;
   applicantStatuses?: Array<number>;
-  candidateNames?:number
+  firstNamePattern?: number;
+  lastNamePattern?: number;
   agencyIds?: number;
   orderId?:string;
   orderBy?:string;

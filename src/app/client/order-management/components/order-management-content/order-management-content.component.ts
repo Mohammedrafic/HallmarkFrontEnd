@@ -1217,7 +1217,8 @@ public RedirecttoIRPOrder(order:Order)
       creationDateTo: this.filters.creationDateTo || null,
       distributedOnFrom: this.filters.distributedOnFrom || null,
       distributedOnTo: this.filters.distributedOnTo || null,
-      candidateName: this.filters.candidateName || null,
+      firstNamePattern: this.filters.firstNamePattern || null,
+      lastNamePattern: this.filters.lastNamePattern || null,
       projectTypeIds: this.filters.projectTypeIds || null,
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
@@ -3040,7 +3041,8 @@ public RedirecttoIRPOrder(order:Order)
         ? [this.filters.contactEmails]
         : this.filters.contactEmails;
     }
-    this.filters.candidateName = this.filters.candidateName || null;
+    this.filters.firstNamePattern = this.filters.firstNamePattern || null;
+    this.filters.lastNamePattern = this.filters.lastNamePattern || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;
     this.filters.billRateTo = this.filters.billRateTo || null;
