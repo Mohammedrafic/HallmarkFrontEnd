@@ -127,6 +127,7 @@ body.dark {
 
           &.e-disable {
             opacity: 0.5;
+            background-color: var(--disabled-tab-background);
 
             .stepper-header {
               .stepper-title {

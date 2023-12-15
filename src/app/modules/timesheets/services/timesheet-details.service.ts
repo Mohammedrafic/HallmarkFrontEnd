@@ -17,7 +17,7 @@ import { Timesheets } from '../store/actions/timesheets.actions';
 import { Attachment, AttachmentsListConfig } from '@shared/components/attachments';
 import { TimesheetDetailsApiService } from './timesheet-details-api.service';
 import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
-import { TimesheetStatisticsDetails } from '../interface';
+import { TimesheetHistoricalEvent, TimesheetStatisticsDetails } from '../interface';
 import { HourOccupationType } from '../enums';
 import { getEmptyHoursOccupationData } from '../helpers';
 
@@ -176,5 +176,11 @@ export class TimesheetDetailsService {
     }
 
     return chartItems;
+  }
+
+  public getSortedHistoricalEvents(events: TimesheetHistoricalEvent[]): TimesheetHistoricalEvent[] {
+    return events.sort((a, b) => {
+      return new Date(b.localDateTime).getTime() - new Date(a.localDateTime).getTime();
+    });
   }
 }

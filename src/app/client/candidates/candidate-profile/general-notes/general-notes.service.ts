@@ -8,6 +8,7 @@ import { NavigationWrapperService } from '@shared/services/navigation-wrapper.se
 import { CandidateProfileFormService } from '@client/candidates/candidate-profile/candidate-profile-form.service';
 import isEqual from 'lodash/fp/isEqual';
 import { ExportPayload } from '@shared/models/export.model';
+import { EmployeeGeneralImportSaveResult, EmployeeGeneralNoteImportDto, EmployeeGeneralNoteImportResult, ImportedEmployeeGenralNote } from '@shared/models/imported-employee';
 
 @Injectable()
 export class GeneralNotesService {
@@ -73,5 +74,31 @@ export class GeneralNotesService {
   public getExport(filters: ExportPayload): Observable<Blob> {
    
     return this.http.post(`/api/employee/export/GeneralNote`, filters, { responseType: 'blob' });
+  }
+  
+  
+  //General Note
+  public getImportEmployeeGeneralNoteTemplate(): Observable<any> {
+    return this.http.post('/api/Employee/generalNoteTemplate', [], { responseType: 'blob' });
+  }
+
+  public getImportEmployeeGeneralNoteErrors(errorRecords: EmployeeGeneralNoteImportDto[]): Observable<any> {
+    return this.http.post('/api/Employee/generalNoteTemplate', errorRecords, { responseType: 'blob' });
+  }
+
+  public uploadImportEmployeeGeneralNoteFile(file: Blob): Observable<EmployeeGeneralNoteImportResult> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<EmployeeGeneralNoteImportResult>('/api/Employee/importGeneralNote', formData);
+  }
+
+
+  
+  public saveImportEmployeeGeneralNoteResult(payload: EmployeeGeneralImportSaveResult): Observable<EmployeeGeneralNoteImportResult> {
+    const formData = new FormData();
+    formData.append('file', payload?.selectedFile);
+    formData.append('data',JSON.stringify(payload.employeeImportData));
+    return this.http.post<EmployeeGeneralNoteImportResult>('/api/Employee/saveGeneralNoteimport', formData);
   }
 }

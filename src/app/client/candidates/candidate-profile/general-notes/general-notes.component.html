@@ -20,6 +20,9 @@
       <i-feather name="upload" class="icon"></i-feather>
     </div>
   </button>
+  <button ejs-button  [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageNotes]"  action-button (click)="openImportDialog()" class="e-outline">
+    <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
+  </button>
   <button
     action-button
     ejs-button
@@ -40,3 +43,4 @@
   [targetElement]="targetElement">
   <app-add-edit-note #addEditNoteComponent></app-add-edit-note>
 </app-side-dialog>
+<app-import-employee-general-note [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-employee-general-note>

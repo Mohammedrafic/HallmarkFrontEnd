@@ -119,7 +119,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
- 
+
 
   readonly daysOfWeek = Days;
   readonly noOfWeek = Weeks;
@@ -338,7 +338,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
     this.setFormValidation(data);
   }
-  
+
   openEditSettingDialog(
     data: {
       parentRecord: Configuration,
@@ -824,9 +824,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
 
       dynamicValue = SettingsDataAdapter.getParsedValue(valueOptions);
+      const startsOn = dynamicValue.StartsOn || dynamicValue.startsOn;
+      const isEnabled = dynamicValue.IsEnabled || dynamicValue.isEnabled;
+
       this.startsOnFormGroup.setValue({
-        startsOn: dynamicValue.StartsOn ? new Date(dynamicValue.StartsOn) : new Date(),
-        isEnabled: dynamicValue.IsEnabled ? dynamicValue.IsEnabled : false,
+        startsOn: startsOn ? new Date(startsOn) : new Date(),
+        isEnabled: isEnabled ? isEnabled : false,
       });
     }
 
