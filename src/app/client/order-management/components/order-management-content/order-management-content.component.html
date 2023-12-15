@@ -944,6 +944,21 @@
         </div>
       </div>
     </div>
+    <div class="input-container calendar" *ngIf="!isActiveSystemIRP && activeTab === OrganizationOrderManagementTabs.PerDiem">
+      <label for="reOrderDate">Re-Order Date</label>
+      <div class="input-group datepicker">
+        <ejs-datepicker
+          id="reOrderDate"
+          class="datepicker"
+          [format]="formatDate"
+          [placeholder]="placeholderDate"
+          [enableMask]="true"
+          [maskPlaceholder]="datepickerMask"
+          formControlName="reOrderDate"
+        >
+        </ejs-datepicker>
+      </div>
+    </div>
     <div class="filter-row bootstrap"
          *ngIf="!isActiveSystemIRP || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
       <div class="input-container">

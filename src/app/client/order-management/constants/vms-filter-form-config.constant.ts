@@ -64,6 +64,7 @@ const PerdiemFormConfig: CommonFormConfig[] = [
   { field: 'agencyIds' },
   { field: 'orderStatuses' },
   { field: 'reorderStatuses'},
+  { field: 'reOrderDate'},
   { field: 'firstNamePattern' },
   { field: 'lastNamePattern' },
   { field: 'candidateStatuses' },

@@ -187,6 +187,23 @@
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="input-container calendar" *ngIf="activeTab === AgencyOrderManagementTabs.PerDiem">
+      <label for="reOrderDate">Re-Order Date</label>
+      <div class="input-group datepicker">
+        <ejs-datepicker
+          id="reOrderDate"
+          class="datepicker"
+          [format]="formatDate"
+          [placeholder]="placeholderDate"
+          [enableMask]="true"
+          [maskPlaceholder]="datepickerMask"
+          formControlName="reOrderDate"
+        >
+        </ejs-datepicker>
+      </div>
+    </div>
+  </div>
   <div  class="row">
     <div class="input-container" *ngIf="activeTab != AgencyOrderManagementTabs.ReOrders">
       <label>Order Lock</label>
@@ -323,7 +340,7 @@
     </div>
   </div>
   <div>
-    <div *ngIf="activeTab !== AgencyOrderManagementTabs.PermPlacement" class="input-container">
+    <div *ngIf="activeTab !== AgencyOrderManagementTabs.PermPlacement && activeTab !== AgencyOrderManagementTabs.PerDiem" class="input-container">
       <label for="numberOfPositions"># of Positions</label>
       <div class="input-group">
         <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />

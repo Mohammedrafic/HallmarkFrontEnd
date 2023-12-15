@@ -373,6 +373,7 @@ export type AgencyOrderFilters = {
   creationDateFrom?: Date | null;
   creationDateTo?: Date | null;
   distributedOnFrom?: Date | null;
+  reOrderDate?: Date | null;
   distributedOnTo?: Date | null;
   firstNamePattern?: string | null;
   lastNamePattern?: string | null;
@@ -757,6 +758,7 @@ export class OrderFilter {
   jobStartDate?: Date | null;
   jobEndDate?: Date | null;
   orderStatuses?: (string | number)[];
+  reOrderDate?: Date | null;
   candidateStatuses?: string[];
   reorderCandidateStatuses?:CandidatesStatusText[];
   candidatesCountFrom?: number | null;
@@ -1064,4 +1066,5 @@ export interface OrderAuditHistory{
     creationDateTo: null | string;
     distributedOnFrom: null | string;
     distributedOnTo: null | string;
+    reOrderDate: null | string;
   }

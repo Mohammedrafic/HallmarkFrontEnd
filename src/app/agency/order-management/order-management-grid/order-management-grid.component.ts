@@ -102,6 +102,7 @@ import { OrderManagementService } from '@client/order-management/components/orde
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { OutsideZone } from '@core/decorators';
 import { SecurityState } from 'src/app/security/store/security.state';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -907,6 +908,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       billRateTo: this.filters.billRateTo || null,
       openPositions: this.filters.openPositions || null,
       jobStartDate: this.filters.jobStartDate || null,
+      reOrderDate: this.filters.reOrderDate || null,
       jobEndDate: this.filters.jobEndDate || null,
       candidateStatuses: this.filters.candidateStatuses || [],
       candidatesCountFrom: this.filters.candidatesCountFrom || null,
@@ -986,6 +988,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.filters.billRateTo = this.filters.billRateTo || null;
       this.filters.jobStartDate = this.filters.jobStartDate || null;
       this.filters.jobEndDate = this.filters.jobEndDate || null;
+      this.filters.reOrderDate = this.filters.reOrderDate || null;
       this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
       this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
       this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;

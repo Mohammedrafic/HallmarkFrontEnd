@@ -56,6 +56,7 @@ const PerDiemFilterFormConfig: CommonFormConfig[] = [
   ...CommonFields,
   { field: 'openPositions' },
   { field: 'orderLocked' },
+  { field: 'reOrderDate' },
 ];
 
 const PermPlacementFilterFormConfig: CommonFormConfig[] = [

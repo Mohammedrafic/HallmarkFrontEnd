@@ -1187,7 +1187,6 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   private patchFilterForm(prepopulate = false): void {
-    console.log(this.filters.orderStatuses, '---> this.filters.orderStatuses')
     this.OrderFilterFormGroup.setValue({
       orderPublicId: this.filters.orderPublicId || null,
       regionIds: this.filters.regionIds || [],
@@ -1226,6 +1225,7 @@ public RedirecttoIRPOrder(order:Order)
       shiftIds: this.filters.shiftIds || [],
       irpOnly: this.filters.irpOnly || null,
       reorderStatuses: this.filters.reorderStatuses || null,
+      reOrderDate: this.filters.reOrderDate || null,
       shift:this.filters.shift || null,
       orderLocked:this.filters.orderLocked || null,
       orderDistributionType:this.filters.orderDistributionType || null
