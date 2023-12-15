@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -7,6 +7,7 @@ import { debounceTime, Observable, takeUntil } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { ChangeEventArgs as  ChangeEventArgsButtons } from '@syncfusion/ej2-angular-buttons';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Titles } from '@shared/enums/title';
 import { OrganizationTypes } from '@shared/enums/organization-type';
@@ -44,9 +45,10 @@ import { AppState } from '../../../store/app.state';
   selector: 'app-add-edit-organization',
   templateUrl: './add-edit-organization.component.html',
   styleUrls: ['./add-edit-organization.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddEditOrganizationComponent extends AbstractPermission implements OnInit, OnDestroy {
-  public allowExtensions: string = '.png, .jpg, .jpeg';
+  public allowExtensions = '.png, .jpg, .jpeg';
   public dropElement: HTMLElement;
   public filesDetails: Blob[] = [];
   public filesName: string[] = [];
@@ -58,7 +60,7 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
   public BillingDetailsFormGroup: FormGroup;
   public ContactFormGroup: FormGroup;
   public PreferencesFormGroup: FormGroup;
-  public isSameAsOrg: boolean = false;
+  public isSameAsOrg = false;
   public isEditTitle: boolean[] = [];
   public currentBusinessUnitId: number | null = null;
   public title = 'Add';
@@ -74,13 +76,13 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
     text: 'text',
     value: 'id',
   };
-  public profileMode: boolean = false;
+  public profileMode = false;
   public isIRPFlagEnabled = false;
   public isOrgHasIRPPermissions = true;
 
   private isInitStatusIsActive = false;
-  private showDataBaseControlValue: boolean = false;
-  private logoToDelete: boolean = false;
+  private showDataBaseControlValue = false;
+  private logoToDelete = false;
   private user: User | null;
 
   @Select(AdminState.countries)
@@ -133,6 +135,7 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
     private fb: FormBuilder,
     private addEditOrganizationService: AddEditOrganizationService,
     private confirmService: ConfirmService,
+    private cd: ChangeDetectorRef,
   ) {
     super(store);
 
@@ -150,8 +153,7 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
       if (route.snapshot.paramMap.get('organizationId')) {
         this.title = 'Edit';
         const businessUnitId = parseInt(route.snapshot.paramMap.get('organizationId') as string);
-        store.dispatch(new GetOrganizationById(businessUnitId));
-        store.dispatch(new GetOrganizationLogo(businessUnitId));
+        store.dispatch([new GetOrganizationById(businessUnitId), new GetOrganizationLogo(businessUnitId)]);
       } else {
         this.initForms();
       }
@@ -285,8 +287,8 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
       });
   }
 
-  public sameAsOrgChange(event: any): void {
-    this.isSameAsOrg = event.checked;
+  public sameAsOrgChange(event: ChangeEventArgsButtons): void {
+    this.isSameAsOrg = !!event.checked;
     if (this.isSameAsOrg) {
       this.disableBillingForm();
       this.copyGeneralToBilling();
@@ -347,7 +349,7 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
         title: 'Confirm',
         okButtonLabel: 'YES',
         cancelButtonLabel: 'NO',
-        okButtonClass: ''
+        okButtonClass: '',
       }).pipe(
         take(1),
         takeUntil(this.componentDestroy())
@@ -375,7 +377,10 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
       this.store.dispatch(new SetDirtyState(this.CreateUnderFormGroup.dirty));
     });
     this.GeneralInformationFormGroup = this.addEditOrganizationService.createGeneralInfoGroup(organization, this.user);
-    this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
+    this.GeneralInformationFormGroup.valueChanges.pipe(
+      debounceTime(500), 
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.GeneralInformationFormGroup.dirty));
     });
     this.BillingDetailsFormGroup = this.addEditOrganizationService.createBillingDetailForm(organization);
@@ -405,14 +410,14 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
 
     if (organization) {
       //Populate state dropdown with values based on selected country
-      this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
-      this.store.dispatch(new SetBillingStatesByCountry(organization.billingDetails.country));
-      this.store.dispatch(new SetDirtyState(false));
+      this.store.dispatch([
+        new SetGeneralStatesByCountry(organization.generalInformation.country),
+        new SetBillingStatesByCountry(organization.billingDetails.country),
+      ]);
     } else {
-      this.store.dispatch(new SetGeneralStatesByCountry(Country.USA));
-      this.store.dispatch(new SetBillingStatesByCountry(Country.USA));
-      this.store.dispatch(new SetDirtyState(false));
+      this.store.dispatch([new SetGeneralStatesByCountry(Country.USA), new SetBillingStatesByCountry(Country.USA)]);
     }
+    this.store.dispatch(new SetDirtyState(false));
   }
 
   private subscribeOnUser(): void {
@@ -442,6 +447,7 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
         if (this.profileMode) {
           this.disableForms();
         }
+        this.cd.detectChanges();
       });
   }
 
@@ -450,6 +456,7 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
       .pipe(ofActionSuccessful(GetOrganizationLogoSucceeded), takeUntil(this.componentDestroy()))
       .subscribe((logo: { payload: Blob }) => {
         this.logo = logo.payload;
+        this.cd.detectChanges();
       });
   }
 
@@ -457,14 +464,16 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
     this.profileMode = true;
     this.store.dispatch(new SetHeaderState({ iconName: 'organization', custom: true, title: 'Organization Profile' }));
     const user = this.store.selectSnapshot(UserState.user);
-    this.store.dispatch(new GetOrganizationById(user?.businessUnitId as number));
-    this.store.dispatch(new GetOrganizationLogo(user?.businessUnitId as number));
+    this.store.dispatch([
+      new GetOrganizationById(user?.businessUnitId as number), new GetOrganizationLogo(user?.businessUnitId as number)
+    ]);
   }
 
   private orgListActions(): void {
-    this.store.dispatch(new SetHeaderState({ iconName: 'organization', custom: true, title: 'Organization List' }));
-    this.store.dispatch(new GetBusinessUnitList());
-    this.store.dispatch(new GetDBConnections());
+    this.store.dispatch([
+      new SetHeaderState({ iconName: 'organization', custom: true, title: 'Organization List' }),
+      new GetBusinessUnitList(), new GetDBConnections(),
+    ]);
   }
 
   private startSaveOrgActionWatching(): void {
