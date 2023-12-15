@@ -440,7 +440,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public setDefaultFilters(statuses: string[]): void {
+  //todo: add model
+  public setDefaultFilters(orderStatusesList: any): void {
+   // debugger;
     if (this.orderManagementPagerState?.filters) {
       // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
@@ -470,7 +472,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       }
       if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
         this.clearFilters();
-        this.setDefaultStatuses(statuses, true);
+        this.setDefaultStatuses(orderStatusesList, true);
       }
       if(this.ltaOrder){
         this.clearFilters();
@@ -497,7 +499,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.redirectFromPerDiem = false;
       selectedOrderAfterRedirect && this.selectedTab && this.dispatchNewPage();
     } else {
-      this.setDefaultStatuses(statuses, preservedFiltes.dispatch);
+      this.setDefaultStatuses(orderStatusesList, preservedFiltes.dispatch);
     }
     this.cd.detectChanges();
   }
@@ -547,7 +549,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       });
   }
 
-  private setDefaultStatuses(statuses: string[], setDefaultFilters: boolean): void {
+  //todo: remove any
+  private setDefaultStatuses(orderStatusesList: any, setDefaultFilters: boolean): void {
+    console.log(orderStatusesList, '---orderStatusesList:>')
     if(this.ltaOrder){
       this.clearFilters();
     }
@@ -560,13 +564,25 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.filters.candidateStatuses = this.candidateStatuses.length > 0 ? this.candidateStatuses : undefined;
     }
     if (setDefaultFilters) {
+      //todo: Prepopulate
       let Status = [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];
       const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
         Status.includes(f)
       );
+
+      const filteredReorderStatuses = orderStatusesList.reorderStatuses?.filter((status: FilterOrderStatusText) => {
+        return [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled].includes(status)
+      });
+
       setTimeout(() => {
+        if (this.selectedTab === AgencyOrderManagementTabs.PerDiem) {
+          //move to condition orderStatusesList.reorderStatuses.length ? orderStatusesList.reorderStatuses : []
+          this.OrderFilterFormGroup.get('reorderStatuses')?.setValue(orderStatusesList.reorderStatuses.length ? orderStatusesList.reorderStatuses : filteredReorderStatuses);
+          this.filters.orderStatuses = orderStatusesList.reorderStatuses.length ? orderStatusesList.reorderStatuses : filteredReorderStatuses;
+        }
+
         if(!this.ltaOrder) {
-            this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
+            this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : orderStatusesList.orderStatuses);
             this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
           }
             this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
@@ -897,6 +913,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       candidatesCountTo: this.filters.candidatesCountTo || null,
       organizationIds: this.filters.organizationIds || [],
       orderStatuses: this.filters.orderStatuses || [],
+      reorderStatuses: this.filters.reorderStatuses || [],
       annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
       annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null,
       creationDateFrom: this.filters.creationDateFrom || null,

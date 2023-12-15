@@ -360,6 +360,7 @@ export type AgencyOrderFilters = {
   organizationIds?: number[];
   orderTypes?: number[];
   orderStatuses?: (string | number)[];
+  reorderStatuses?: (string | number)[];
   jobTitle?: string;
   billRateFrom?: number | null;
   billRateTo?: number | null;

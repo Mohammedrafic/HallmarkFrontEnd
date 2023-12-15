@@ -25,6 +25,7 @@ const CommonFields: CommonFormConfig[] = [
   { field: 'skillIds' },
   { field: 'candidateStatuses' },
   { field: 'orderStatuses' },
+  { field: 'reorderStatuses' },
   { field: 'candidatesCountFrom' },
   { field: 'candidatesCountTo' },
   { field: 'jobTitle' },

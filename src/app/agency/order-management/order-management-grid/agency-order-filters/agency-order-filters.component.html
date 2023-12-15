@@ -150,7 +150,8 @@
       </div>
     </div>
     <div class="input-container">
-      <label>Order Status</label>
+      <label *ngIf="activeTab !== AgencyOrderManagementTabs.PerDiem">Order Status</label>
+      <label *ngIf="activeTab === AgencyOrderManagementTabs.PerDiem">Open Per Diem Status</label>
       <div class="input-group multiselect">
         <ejs-multiselect
           #orderStatusFilter
@@ -164,6 +165,23 @@
           (select)="onSelect($event)"
             cssClass="custom"
             (click)="orderStatusSelect()"
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-container">
+      <div class="input-group multiselect">
+        <label>Re-Order Status</label>
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="reorderStatuses"
+          placeholder="All"
+          [fields]="statusFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.reorderStatuses.dataSource"
         >
         </ejs-multiselect>
       </div>

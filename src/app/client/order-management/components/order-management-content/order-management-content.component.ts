@@ -546,7 +546,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     super(store);
-
     this.context = { componentParent: this };
     this.gridOptions = OrderManagementIrpSubrowHelper.configureOrderGridSubRowOptions(this.context);
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
@@ -1188,6 +1187,7 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   private patchFilterForm(prepopulate = false): void {
+    console.log(this.filters.orderStatuses, '---> this.filters.orderStatuses')
     this.OrderFilterFormGroup.setValue({
       orderPublicId: this.filters.orderPublicId || null,
       regionIds: this.filters.regionIds || [],
@@ -2177,13 +2177,23 @@ public RedirecttoIRPOrder(order:Order)
       const statuses = this.filterColumns.orderStatuses.dataSource
         .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
         .map((status: FilterStatus) => status.status);
+
+      const reorderStatuses = this.filterColumns.reorderStatuses.dataSource.filter((status: FilterOrderStatus) => {
+        return ![FilterOrderStatusText.Closed].includes(status.status);
+      }).map((status: FilterStatus) => status.status);
       if(this.activeSystem != OrderManagementIRPSystemId.OrderJourney){
         this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
         this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
       }
+
+      if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
+        this.filters.reorderStatuses = reorderStatuses.length ? reorderStatuses : [];
+      }
+
       if(this.ltaOrderFlag){
         this.filters.orderStatuses = [];
         this.filters.candidateStatuses = [];
+        this.filters.reorderStatuses = [];
       }
     }
   }
@@ -3103,8 +3113,11 @@ public RedirecttoIRPOrder(order:Order)
         candidateStatuses = [];
       }
     } else {
+
+       //todo: here 2
       data.orderStatuses.forEach((val:any)=> val.status = val.status.trim());
       statuses = data.orderStatuses;
+      console.log(statuses, '----statuses >.')
       candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
     }
 
