@@ -32,5 +32,6 @@ export enum WidgetDescriptionEnum {
   ACTIVE_POSITIONS_INITIAL_EXTENDED="Count of Initial Positions and Extended Positions from Active Positions.",
   ORDERS_PENDING_IN_CUSTOM = "Average days orders pending in specific custom status",
   AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS_FOR_INITIAL_ORDERS = 'Average Days for Active Candidates in a Status for Initial Orders',
-  BILL_RATE_BY_SKILL_CATEGORY = "Average Regular Bill Rate per Skill Category per Month"
+  BILL_RATE_BY_SKILL_CATEGORY = "Average Regular Bill Rate per Skill Category per Month",
+  MISSING_TIMESHEETS = "Count of Missing Timesheet per Organization",
 }

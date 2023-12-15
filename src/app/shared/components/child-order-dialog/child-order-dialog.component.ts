@@ -324,6 +324,16 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     return this.candidateJob?.partnershipStatus === PartnershipStatus.Suspended;
   }
 
+  get isdisabledExtension(): boolean {
+    if(this.order?.extensionFromId != null && this.candidate?.extensionFromId != null){
+      return true;
+    }else if(this.candidate?.extensionFromId && this.order?.extensionFromId == null){
+      return this.extensions?.length > 0 ? true : false;
+    }else{
+      return false;
+    }
+  }
+
   get getPartnershipMessage(): string {
     return `Partnership with Agency is suspended on ${DateTimeHelper.formatDateUTC(
       this.candidateJob?.suspentionDate as string, 'MM/dd/yyyy')}. You cannot add extensions.`;

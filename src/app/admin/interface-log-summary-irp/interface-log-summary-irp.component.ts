@@ -13,13 +13,13 @@ import { InterfaceLogSummary, InterfaceLogSummaryIRPPage } from '@shared/models/
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { BehaviorSubject, Observable, Subject, take, takeUntil, takeWhile } from 'rxjs';
 import { OrgInterfaceService } from 'src/app/security/services/org-interface.service';
-import { GetInterfaceLogDetails, GetInterfaceLogSummaryPage } from 'src/app/security/store/security.actions';
+import { GetEmpGeneralNoteImportDetails, GetInterfaceLogDetails, GetInterfaceLogSummaryPage } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { DefaultUserGridColDef, SideBarConfig } from 'src/app/security/user-list/user-grid/user-grid.constant';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
-import { LogStatusEnum } from './interface-log-summary-irp.constants';
+import { EmpGeneralNoteWithErrorColumnsConfig, InterfaceEmployeesWithErrorColumnsConfig, LogStatusEnum } from './interface-log-summary-irp.constants';
 
 @Component({
   selector: 'app-interface-log-summary-irp',
@@ -252,7 +252,10 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
       }
     },
   ];
+  get getImportType(): string {
+    return this.selectedLogItem?.importType
 
+  }
   constructor(private store: Store, private datePipe: DatePipe, private orgInterfaceService: OrgInterfaceService) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Interface Log Summary IRP', iconName: 'file-text' }));
@@ -308,12 +311,19 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
 
       });
   }
+
   public openLogData(data: any): void {
     this.selectedLogItem = data.rowData;
     this.openLogDetailsDialogue.next(true);
     const options = this.getDialogNextPreviousOption(data.rowData);
-    this.store.dispatch(new GetInterfaceLogDetails(data.rowData.id, this.selectedType, this.currentPage, this.pageSize,options));
-  }
+    if(this.selectedLogItem.importType =="Employee Import"){
+      this.store.dispatch(new GetInterfaceLogDetails(data.rowData.id, this.selectedType, this.currentPage, this.pageSize,options));
+    }
+    else if(this.selectedLogItem.importType =="Employee General Note Import"){
+      this.store.dispatch(new GetEmpGeneralNoteImportDetails(data.rowData.id, this.selectedType, this.currentPage, this.pageSize,options));
+    }
+   
+   }
   public onViewOverallData(data: any) {
     this.selectedType = LogStatusEnum.OverAll;
     this.openLogData(data);
@@ -361,7 +371,12 @@ export class InterfaceLogSummaryIrpComponent extends AbstractGridConfigurationCo
       this.selectedLogItem = this.itemList[nextIndex];
       this.openLogDetailsDialogue.next(true);
       const options = this.getDialogNextPreviousOption(this.itemList[nextIndex]);
-      this.store.dispatch(new GetInterfaceLogDetails(this.itemList[nextIndex].id,LogStatusEnum.OverAll,this.currentPage,this.pageSize, options));
+      if(this.selectedLogItem.importType =="Employee Import"){
+        this.store.dispatch(new GetInterfaceLogDetails(this.itemList[nextIndex].id,LogStatusEnum.OverAll,this.currentPage,this.pageSize, options));
+      }
+      else if(this.selectedLogItem.importType =="Employee General Note Import"){
+        this.store.dispatch(new GetEmpGeneralNoteImportDetails(this.itemList[nextIndex].id,LogStatusEnum.OverAll,this.currentPage,this.pageSize, options));
+      }
     }
   }
 

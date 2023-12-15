@@ -38,7 +38,8 @@ describe('TimesheetsService', () => {
 
   it('createForm - should create a FormGroup with default values', () => {
     const expectedFormGroup = fb.group({
-      searchTerm: [''],
+      firstNamePattern: [''],
+      lastNamePattern: [''],
       orderIds: [[]],
       statusIds: [[]],
       skillIds: [[]],

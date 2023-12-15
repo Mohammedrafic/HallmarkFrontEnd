@@ -318,7 +318,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
             this.filters.profileStatuses = this.filters.profileStatuses || [];
             this.filters.regionsNames = this.filters.regionsNames || [];
             this.filters.skillsIds = this.filters.skillsIds || [];
-            this.filters.candidateName = this.filters.candidateName || null;
+            this.filters.firstNamePattern = this.filters.firstNamePattern || null;
+            this.filters.lastNamePattern = this.filters.lastNamePattern || null;
             this.filters.expiry = {
               type: this.filters.credType || [],
               startDate: this.filters.startDate ? DateTimeHelper.setUtcTimeZone(
@@ -350,7 +351,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.filters.profileStatuses = this.filters.profileStatuses || [];
         this.filters.regionsNames = this.filters.regionsNames || [];
         this.filters.skillsIds = this.filters.skillsIds || [];
-        this.filters.candidateName = this.filters.candidateName || null;
+        this.filters.firstNamePattern = this.filters.firstNamePattern || null;
+        this.filters.lastNamePattern = this.filters.lastNamePattern || null;
         this.filters.hireDate = this.filters.hireDate ? DateTimeHelper.setUtcTimeZone(this.filters.hireDate) : null,
           this.filters.expiry = {
             type: this.filters.credType || [],
@@ -571,7 +573,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       skillsIds: this.filters.skillsIds!,
       regionsNames: this.filters.regionsNames!,
       tab: this.activeTab ?? 0,
-      candidateName: this.filters.candidateName!,
+      firstNamePattern: this.filters.firstNamePattern!,
+      lastNamePattern: this.filters.lastNamePattern!,
       candidateId: this.filters.candidateId!,
       locationIds: this.filters.locationIds!,
       departmentIds: this.filters.departmentIds!,
@@ -598,13 +601,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return (
       candidates &&
       candidates.map((candidate: CandidateRow) => {
-        if (candidate.candidateProfileSkills.length > 2) {
-          // const [first, second] = candidate.candidateProfileSkills;
-          // candidate = {
-          //   ...candidate,
-          //   candidateProfileSkills: [first, second, { skillDescription: '...' }],
-          // };
-        }
         if (candidate.candidateProfileRegions.length > 2) {
           const [first, second] = candidate.candidateProfileRegions;
           candidate = {
@@ -622,14 +618,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return (
       candidates &&
       candidates.map((candidate: IRPCandidate) => {
-        if (candidate.employeeSkills?.length > 2) {
-          // const [first, second] = candidate.employeeSkills;
-          // candidate = {
-          //   ...candidate,
-          //   employeeSkills: [first, second, '...'],
-          // };
-        }
-
         return candidate;
       })
     );

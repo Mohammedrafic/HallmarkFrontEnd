@@ -382,5 +382,26 @@ export namespace Invoices {
     static readonly type = '[invoice] Get Invoice History Detail Succeeded';
     constructor() {}
   }
+
+  export class GetPaymentAuditHistory {
+    static readonly type = '[invoice] Get payment AuditHistory Details';
+    constructor(public payload: InvoiceAuditLogPayload,public isagency:boolean) {}
+  }
+
+  export class GetCheckAuditHistory {
+    static readonly type = '[invoice] Get check AuditHistory Details';
+    constructor(public payload: InvoiceAuditLogPayload,public isagency:boolean) {}
+  }
+
+  export class GetPaymentHistoryDetailSucceeded {
+    static readonly type = '[invoice] Get Payemnt History Detail Succeeded';
+    constructor() {}
+  }
+
+  export class GetCheckHistoryDetailSucceeded {
+    static readonly type = '[invoice] Get Check History Detail Succeeded';
+    constructor() {}
+  }
+
   
 }

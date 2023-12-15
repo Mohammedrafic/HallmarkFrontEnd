@@ -192,10 +192,19 @@
     <ng-container *ngIf="!isIRP && CandidateFilterFormGroup">
       <div class="bootstrap">
         <div class="input-container">
-          <label *ngIf="isIRP">Employee Name</label>
-          <label *ngIf="!isIRP">Candidate Name</label>
+          <label *ngIf="isIRP">Employee First Name</label>
+          <label *ngIf="!isIRP">Candidate First Name</label>
           <div class="input-group">
-            <input class="e-input" type="text" maxlength="50" formControlName="candidateName"/>
+            <input class="e-input" type="text" maxlength="50" formControlName="firstNamePattern"/>
+          </div>
+        </div>
+      </div>
+      <div class="bootstrap">
+        <div class="input-container">
+          <label *ngIf="isIRP">Employee Last Name</label>
+          <label *ngIf="!isIRP">Candidate Last Name</label>
+          <div class="input-group">
+            <input class="e-input" type="text" maxlength="50" formControlName="lastNamePattern"/>
           </div>
         </div>
       </div>
@@ -256,17 +265,27 @@
       </div>
     </ng-container>
     <ng-container *ngIf="isIRP && CandidateFilterFormGroup">
-      <div class="bootstrap row">
+      <div class="bootstrap">
         <div class="input-container candidate-id">
           <label>Employee ID</label>
           <div class="input-group">
             <input class="e-input" type="text" maxlength="10" formControlName="candidateId"/>
           </div>
         </div>
-        <div class="input-container candidate-name">
-          <label>Employee Name</label>
+      </div>
+      <div class="bootstrap">
+        <div class="input-container">
+          <label>Employee First Name</label>
           <div class="input-group">
-            <input class="e-input" type="text" maxlength="50" formControlName="candidateName"/>
+            <input class="e-input" type="text" maxlength="50" formControlName="firstNamePattern"/>
+          </div>
+        </div>
+      </div>
+      <div class="bootstrap">
+        <div class="input-container">
+          <label>Employee Last Name</label>
+          <div class="input-group">
+            <input class="e-input" type="text" maxlength="50" formControlName="lastNamePattern"/>
           </div>
         </div>
       </div>

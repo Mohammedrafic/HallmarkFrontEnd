@@ -10,10 +10,10 @@ import { ExpandEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { GRID_CONFIG } from '@shared/constants';
 import { FilterChangedEvent, GridOptions } from '@ag-grid-community/core';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { Invoicebase, agencyInvoicebase, agencypaymentDetails, paymentDetatils } from '../../interfaces/invoice-auditlog.interface';
+import { Invoicebase, InvoicecheckAuditHistory, InvoicepaymentAuditHistory, agencyInvoicebase } from '../../interfaces/invoice-auditlog.interface';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
-import { InvoiceAuditHistoryTableColumnsDefinition, agencyInvoiceAuditHistoryTableColumnsDefinition, agencypaymentAuditHistoryTableColumnsDefinition, paymentAuditHistoryTableColumnsDefinition } from './invoice-history-detail.constants';
+import { InvoiceAuditHistoryTableColumnsDefinition, agencyInvoiceAuditHistoryTableColumnsDefinition, checkAuditHistoryTableColumnsDefinition, paymentAuditHistoryTableColumnsDefinition } from './invoice-history-detail.constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { InvoicesState } from '../../store/state/invoices.state';
 
@@ -39,6 +39,12 @@ export class InvoiceHistoryDetailComponent extends AbstractPermissionGrid implem
   @Select(InvoicesState.getAgecnyInvoiceAuditHistory)
   agencyinvoiceHistoryDetails$: Observable<agencyInvoicebase[]>;
 
+  @Select(InvoicesState.getPayemntAuditHistory)
+  invoicepaymentHistoryDetails$: Observable<InvoicepaymentAuditHistory[]>;
+
+  @Select(InvoicesState.getCheckAuditHistory)
+  invoicecheckHistoryDetails$: Observable<InvoicecheckAuditHistory[]>;
+
   @Select(AppState.getMainContentElement)
   public readonly targetElement$: Observable<HTMLElement | null>;
   public targetElement: HTMLElement = document.body;
@@ -47,21 +53,22 @@ export class InvoiceHistoryDetailComponent extends AbstractPermissionGrid implem
   invoiceAuditHistoryDetails: Array<Invoicebase> = [];
   agencyinvoiceAuditHistoryDetails: Array<agencyInvoicebase> = [];
 
-  paymentHistory: Array<paymentDetatils> = [];
-  agencypaymentHistory: Array<agencypaymentDetails> = []
+  paymentHistory: Array<InvoicepaymentAuditHistory> = [];
+  checkHistory: Array<InvoicecheckAuditHistory> = []
 
   isAgency: boolean;
   public readonly InvoicehistorycolumnDefinitions: ColumnDefinitionModel[] = InvoiceAuditHistoryTableColumnsDefinition();
+  public readonly agencyInvoicehistorycolumnDefinitions: ColumnDefinitionModel[] = agencyInvoiceAuditHistoryTableColumnsDefinition();
+
   public readonly paymentDetailcolumnDefintion: ColumnDefinitionModel[] = paymentAuditHistoryTableColumnsDefinition();
 
-  public readonly agencyInvoicehistorycolumnDefinitions: ColumnDefinitionModel[] = agencyInvoiceAuditHistoryTableColumnsDefinition();
-  public readonly agencypaymentDetailcolumnDefintion: ColumnDefinitionModel[] = agencypaymentAuditHistoryTableColumnsDefinition();
+  public readonly checkDetailcolumnDefintion: ColumnDefinitionModel[] = checkAuditHistoryTableColumnsDefinition();
 
   public noRowsOverlayComponentParams: any = {
     noRowsMessageFunc: () => 'No Rows To Show',
   };
   title = "Organization"
-  agencypaymentDetails: any;
+  checkDetails: any;
   constructor(
     private actions$: Actions,
     protected override store: Store,
@@ -159,20 +166,20 @@ export class InvoiceHistoryDetailComponent extends AbstractPermissionGrid implem
     }
   };
 
-  public agencypaymentDetailGridOptions: GridOptions = {
+  public checkDetailGridOptions: GridOptions = {
     pagination: true,
     cacheBlockSize: this.pageSize,
     paginationPageSize: this.pageSize,
-    columnDefs: this.agencypaymentDetailcolumnDefintion,
+    columnDefs: this.checkDetailcolumnDefintion,
     rowData: this.paymentHistory,
     noRowsOverlayComponent: CustomNoRowsOverlayComponent,
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
       if (!event.api.getDisplayedRowCount()) {
-        this.agencypaymentDetails?.showNoRowsOverlay();
+        this.checkDetails?.showNoRowsOverlay();
       }
       else {
-        this.agencypaymentDetails?.hideOverlay();
+        this.checkDetails?.hideOverlay();
       }
     }
   };
@@ -186,9 +193,9 @@ export class InvoiceHistoryDetailComponent extends AbstractPermissionGrid implem
   }
 
 
-  onagencyPaymentDetail(params: any) {
-    this.agencypaymentDetails = params.api;
-    this.agencypaymentDetails.setRowData(this.agencypaymentHistory);
+  onCheckDetail(params: any) {
+    this.checkDetails = params.api;
+    this.checkDetails.setRowData(this.checkHistory);
   }
 
   public expanding(e: ExpandEventArgs) {
@@ -242,51 +249,63 @@ export class InvoiceHistoryDetailComponent extends AbstractPermissionGrid implem
           }
         }
         break;
-      case 1:
+        case 1:
         if (e.isExpanded) {
           if (!this.viewedTab.some(a => a == e.index)) {
-            if (!this.isAgency) {
-              const processedData = this.invoiceAuditHistoryDetails.map((item) => ({
-                ...item,
-                paymentDetails: item.jsonData.paymentDetails?.map((payment) => ({
-                  ...payment,
-                  organizationName: item.jsonData.organizationName,
-                  invoiceStateText: item.jsonData.invoiceStateText,
-                })),
-              }));
-              const paymentDetailsArray = processedData
-                .map(item => item.paymentDetails)
-                .filter(Boolean)
-
-              const flattenedPaymentDetailsArray = paymentDetailsArray.flat();
-
-              this.paymentHistory = flattenedPaymentDetailsArray;
-              this.paymentDetails?.setRowData(this.paymentHistory);
-
-            } else {
-              const processedData = this.agencyinvoiceAuditHistoryDetails.map((item) => ({
-                ...item,
-                paymentDetails: item.jsonData.paymentDetails?.map((payment) => ({
-                  ...payment,
-                  organizationName: item.jsonData.organizationName,
-                  invoiceStateText: item.jsonData.invoiceStateText,
-                })),
-              }));
-              const paymentDetailsArray = processedData
-                .map(item => item.paymentDetails)
-                .filter(Boolean)
-
-              const flattenedPaymentDetailsArray = paymentDetailsArray.flat();
-
-              this.agencypaymentHistory = flattenedPaymentDetailsArray;
-              this.agencypaymentDetails?.setRowData(this.agencypaymentHistory);
-
+            const entityType = this.isAgency
+              ? "Einstein.CoreApplication.Domain.Entities.InvoicesPayments.Agency.AgencyInvoicePaymentDetails"
+              : "Einstein.CoreApplication.Domain.Entities.InvoicesPayments.Organization.OrganizationInvoicePaymentDetails";
+            const invoiceId = Number(this.invoiceDetails.invoiceId)
+            const organizationId = Number(this.invoiceDetails.organizationId);
+            const agencySuffix = this.invoiceDetails.agencySuffix;
+        
+              this.store.dispatch(new Invoices.GetPaymentAuditHistory({ entityType: entityType, InvoiceId: invoiceId, organizationId: organizationId, AgencySuffix: agencySuffix }, this.isAgency));
+              this.actions$.pipe(ofActionDispatched(Invoices.GetPaymentHistoryDetailSucceeded),)
+                .subscribe(() => {
+                  this.viewedTab.push(expandData?.index!);
+                  this.invoicepaymentHistoryDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                    this.paymentHistory = order;
+                    this.paymentDetails?.setRowData(this.paymentHistory);
+                  });
+                });
+            }
+            else {
+              this.invoicepaymentHistoryDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                this.paymentHistory = order;
+                this.paymentDetails?.setRowData(this.paymentHistory);
+              });
             }
 
           }
-        }
         break;
-
+      case 2:
+        if (e.isExpanded) {
+          if (!this.viewedTab.some(a => a == e.index)) {
+            const entityType = this.isAgency
+              ? "Einstein.CoreApplication.Domain.Entities.InvoicesPayments.Agency.AgencyCheck"
+              : "Einstein.CoreApplication.Domain.Entities.InvoicesPayments.Organization.OrganizationCheck";
+            const invoiceId = Number(this.invoiceDetails.invoiceId)
+            const organizationId = Number(this.invoiceDetails.organizationId);
+            const agencySuffix = this.invoiceDetails.agencySuffix;
+        
+              this.store.dispatch(new Invoices.GetCheckAuditHistory({ entityType: entityType, InvoiceId: invoiceId, organizationId: organizationId, AgencySuffix: agencySuffix }, this.isAgency));
+              this.actions$.pipe(ofActionDispatched(Invoices.GetCheckHistoryDetailSucceeded),)
+                .subscribe(() => {
+                  this.viewedTab.push(expandData?.index!);
+                  this.invoicecheckHistoryDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                    this.checkHistory = order;
+                    this.checkDetails?.setRowData(this.checkHistory);
+                  });
+                });
+            }
+            else {
+              this.invoicecheckHistoryDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+                this.checkHistory = order;
+                this.checkDetails?.setRowData(this.checkHistory);
+              });
+            }
+      }
+      break;
 
     }
   }
@@ -301,6 +320,8 @@ export class InvoiceHistoryDetailComponent extends AbstractPermissionGrid implem
     this.viewedTab = [];
     this.gridApi?.setRowData([]);
     this.invoiceAuditHistoryDetails = [];
+    this.paymentHistory=[];
+    this.checkHistory=[]
     this.sideDialog.hide();
   }
 

@@ -36,7 +36,8 @@ export class InvoicesFiltersService {
 
   createForm(): CustomFormGroup<InvoiceFilterColumns> {
     return this.fb.group({
-      searchTerm: [null],
+      firstNamePattern: [null],
+      lastNamePattern: [null],
       formattedInvoiceIds: [null],
       organizationId: [null],
       invoiceState: [null],

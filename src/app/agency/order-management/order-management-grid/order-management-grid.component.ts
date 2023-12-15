@@ -16,7 +16,7 @@ import {
 import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
 
-import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take, distinctUntilChanged } from 'rxjs';
+import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
@@ -101,7 +101,6 @@ import { GetReOrdersByOrderId, SaveReOrderPageSettings } from
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { OutsideZone } from '@core/decorators';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SecurityState } from 'src/app/security/store/security.state';
 
 @Component({
@@ -208,7 +207,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   ngOnInit(): void {
-    const user = this.store.selectSnapshot(UserState.user);
     this.isAgencyVisibilityFlagEnabled = this.store.selectSnapshot(SecurityState.isAgencyVisibilityFlagEnabled);
     this.filterColumns = AgencyOrderFiltersComponent.generateFilterColumns(this.isAgencyVisibilityFlagEnabled);
     this.getAlertOrderId();
@@ -309,9 +307,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.openDetailsTab = true;
       }
     }
-
-
-
   }
 
   public override customExport(): void {
@@ -446,7 +441,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public setDefaultFilters(statuses: string[]): void {
-    if (this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
+    if (this.orderManagementPagerState?.filters) {
+      // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
       this.patchFilterForm(!!this.filters?.regionIds?.length);
       this.prepopulateFilterFormStructure();
@@ -523,7 +519,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.filters.organizationIds]);
     }
     this.generateFilterChips();
-    // this.dispatchNewPage();
   }
 
   private prepopulateFilterFormStructure(): void {
@@ -836,7 +831,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     super.onSubrowAllToggle();
   }
 
-  // Filter
   public onFilterClose() {
     this.patchFilterForm();
   }
@@ -909,7 +903,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       creationDateTo: this.filters.creationDateTo || null,
       distributedOnFrom: this.filters.distributedOnFrom || null,
       distributedOnTo: this.filters.distributedOnTo || null,
-      candidateName: this.filters.candidateName || null,
+      firstNamePattern: this.filters.firstNamePattern || null,
+      lastNamePattern: this.filters.lastNamePattern || null,
       projectTypeIds: this.filters.projectTypeIds || null,
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
@@ -990,7 +985,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.store.dispatch(new ShowFilterDialog(false));
     }
   }
-  // End - Filter
 
   private listenRedirectFromExtension(): void {
     this.orderManagementAgencyService.orderId$

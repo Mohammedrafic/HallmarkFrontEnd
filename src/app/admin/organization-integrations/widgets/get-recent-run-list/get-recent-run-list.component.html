@@ -1,0 +1,25 @@
+<div class="Recent_interface_main">
+  <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+    <ng-template #header>
+      <div class="">
+        <h3 class="Recent_interface_title">Recent Integration Runs List</h3>
+      </div>
+    </ng-template>
+    <ng-template #OrgChart>
+      <div class="widget" *ngIf="RecentListData$ | async as datalist">
+        <div class="widget widget_cus" *ngFor="let data of datalist">
+          <div class="row flex-container">
+            <div class="Recent_interface_icon">
+              <i-feather name="user" class="icon"></i-feather>
+            </div>
+            <div class="Recent_interface_te">
+              <h3 class="orgname">{{data.organizationName}} </h3>
+              <p class="interfacename"> {{data.integrationType}} {{data.etlFileName}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="Recent_interface_link">View Recent Integrations</div>
+    </ng-template>
+  </app-widget-wrapper>
+</div>    
