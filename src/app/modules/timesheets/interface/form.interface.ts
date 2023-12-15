@@ -11,7 +11,8 @@ export interface AddTimesheetForm {
 }
 
 export interface TimesheetForm {
-  searchTerm: string;
+  firstNamePattern: string;
+  lastNamePattern: string;
   orderIds: string[];
   statusIds: string[];
   skillIds: string[];

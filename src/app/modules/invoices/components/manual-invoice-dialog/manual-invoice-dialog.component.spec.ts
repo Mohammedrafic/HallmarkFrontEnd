@@ -44,7 +44,7 @@ describe('ManualInvoiceDialogComponent', () => {
   const storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'snapshot', 'select']);
   const addDialogHelperServiceSpy = jasmine.createSpyObj('AddDialogHelperService', ['createForm']);
   const dialogComponentSpy = jasmine.createSpyObj('DialogComponent', ['hide', 'show', 'setTitle']);
-  const formSpy = jasmine.createSpyObj('FormGroup', ['reset', 'get', 'patchValue', 'updateValueAndValidity']);
+  const formSpy = jasmine.createSpyObj('FormGroup', ['reset', 'get', 'patchValue', 'updateValueAndValidity', 'markAllAsTouched']);
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

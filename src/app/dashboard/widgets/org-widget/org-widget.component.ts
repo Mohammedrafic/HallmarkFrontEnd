@@ -29,6 +29,7 @@ export class OrgWidgetComponent extends AbstractPermissionGrid implements OnDest
   @Input() public isDarkTheme: boolean | false;
   @Input() public description: string;
   @Input() public chartData: OrgDetailsInfoModel | undefined;
+  @Input() public agencyTimesheet:boolean = false;
    @Select(OrganizationManagementState.organization)
   public readonly organization$: Observable<Organization>;
   public selectedSystem: SelectedSystemsFlag = SelectedSystems;

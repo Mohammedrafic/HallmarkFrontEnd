@@ -17,16 +17,15 @@ export const MasterDNRExportCols: MasterDoNotReturnExportColumn[] = [
 ];
 
 export const doNotReturnFilterConfig: FilterConfig = {
-  firstName: { type: ControlTypes.Text, valueType: ValueType.Text },
-  middleName: { type: ControlTypes.Text, valueType: ValueType.Text },
-  lastName: { type: ControlTypes.Text, valueType: ValueType.Text },
+  firstNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
+  lastNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
   ssn: { type: ControlTypes.Text, valueType: ValueType.Text },
-  regionBlocked: { type: ControlTypes.Multiselect, 
+  regionBlocked: { type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
     dataSource: [],
     valueField: 'name',
     valueId: 'id', },
-  locationBlocked: { type: ControlTypes.Multiselect,  
+  locationBlocked: { type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
     dataSource: [],
     valueField: 'name',

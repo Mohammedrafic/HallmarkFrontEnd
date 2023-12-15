@@ -41,7 +41,7 @@
               *ngIf="!isAgency"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
-              [disabled]="disableAddExtension || isAgencySuspended"
+              [disabled]="disableAddExtension || isAgencySuspended || (isdisabledExtension && activeSystem === OrderManagementIRPSystemId.VMS)"
               text="Add Extension"
             ></app-button>
             <button

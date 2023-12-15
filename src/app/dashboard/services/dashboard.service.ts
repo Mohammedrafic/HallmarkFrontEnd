@@ -101,6 +101,7 @@ export class DashboardService {
     [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : (filters: DashboartFilterDto) => this.getOrdersPendingInCustomStatus(filters),
     [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS_FOR_INITIAL_ORDERS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivecandidateStatusWidgetData(filters),
     [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getSkillCategoryByTypes(filters, timeSelection),
+    [WidgetTypeEnum.MISSING_TIMESHEETS]: (filters: DashboartFilterDto) => this.getAgencyTimesheetWidgetdata(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -439,6 +440,13 @@ export class DashboardService {
       map((data)=> data)
     )
   }
+  
+  private getAgencyTimesheetWidgetdata(filter: DashboartFilterDto) : Observable<OrgDetailsInfoModel> {
+    return this.httpClient.post<any>(`${this.baseUrl}/organizationpendingtimesheetcounts`, { ...filter }).pipe(
+      map((data)=> data)
+    )
+  }
+  
   private getAgencyPositionCount(filter: DashboartFilterDto) : Observable<AgencyPositionModel[]> {
     return this.httpClient.post<AgencyPositionModel[]>(`${this.baseUrl}/getOpenAndInprogressOpenPositions`, { ...filter }).pipe(
       map((data)=> data)
