@@ -510,6 +510,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public orderData: IRPOrderPosition;
   public irpSubOrder: Order;
   public systemType: string;
+  public redirectfromextension: boolean = false;
+  public node: { data: IRPOrderManagement; }
 
   private get contactEmails(): string | null {
     if (Array.isArray(this.filters?.contactEmails)) {
@@ -2100,8 +2102,8 @@ public RedirecttoIRPOrder(order:Order)
         }
       }
 
-      if (data?.items.length && this.isRedirectedFromVmsSystem) {
-        this.openFirstIrpOrderDetails();
+      if (data?.items.length && this.redirectfromextension) {
+        this.openIRPdialog(data.items[0] as unknown as IRPOrderManagement);
       }
 
       this.selectNavigationTab();
@@ -2638,7 +2640,23 @@ public RedirecttoIRPOrder(order:Order)
         this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
         this.getOrders(true);
+        this.redirectfromextension = true;
       });
+  }
+
+  private openIRPdialog(orderData : IRPOrderManagement){
+    this.node = {data : orderData};
+    this.selectedDataRow = orderData;
+    const options = {} as DialogNextPreviousOption;
+    this.store.dispatch(new GetOrderById(orderData.id, orderData.organizationId,options, true));
+    if (orderData.status !== OrderStatus.Incomplete) {
+      this.dispatchAgencyOrderCandidatesList(orderData.id, orderData.organizationId, true);
+    }
+    this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
+    this.openChildDialog.next(false);
+    this.orderPositionSelected$.next({ state: false });
+    this.openDetails.next(true);
+    this.redirectfromextension = false;
   }
 
   private listenRedirectFromPerDiem(): void {
