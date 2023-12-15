@@ -137,6 +137,12 @@
                           [isLoading]="isLoading"
                           [timeSelection]="timeSelection" [isDarkTheme]="isDarkTheme"
                           [description]="widgetDescriptionEnum.BILL_RATE_BY_SKILL_CATEGORY"></app-bill-rate-widget>
+          <app-org-widget *ngSwitchCase="widgetTypeEnum.MISSING_TIMESHEETS"
+                          [chartData]="widgetsData?.[widgetTypeEnum.MISSING_TIMESHEETS]"
+                          [isLoading]="isLoading"
+                          [agencyTimesheet]="true"
+                          [description]="widgetDescriptionEnum.MISSING_TIMESHEETS"
+                          [isDarkTheme]="isDarkTheme"></app-org-widget>
 
         </ng-template>
       </e-panel>
