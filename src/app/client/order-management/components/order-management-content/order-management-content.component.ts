@@ -3148,10 +3148,18 @@ public RedirecttoIRPOrder(order:Order)
       : GetVMSFilterFormConfig(this.activeTab);
 
     this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
+
+    if (this.activeTab === OrganizationOrderManagementTabs.Incomplete && this.filters) {
+      this.filters  = this.checkFiltersForIncompleteTab(this.filters);
+    }
   }
 
   private dispatchPreservedFilters(): void {
-    const filterState = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersState) as OrderFilter;
+    let filterState = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersState) as OrderFilter;
+
+    if (this.activeTab === OrganizationOrderManagementTabs.Incomplete && filterState) {
+      filterState = this.checkFiltersForIncompleteTab(filterState);
+    }
 
     if (filterState) {
       this.prepareFiltersToDispatch(filterState);
@@ -3410,5 +3418,61 @@ public RedirecttoIRPOrder(order:Order)
     setTimeout(() => {
       this.gridWithChildRow.element.querySelector('.reorder-row.selected')?.scrollIntoView(true);
     }, 300);
+  }
+
+  private checkFiltersForIncompleteTab(filters: OrderFilter): OrderFilter {
+     if (filters.orderStatuses && filters.orderStatuses.length) {
+      filters.orderStatuses = [];
+     }
+
+     if (filters.agencyIds && filters.agencyIds) {
+      filters.agencyIds = [];
+     }
+
+     if (filters.candidateName) {
+      filters.candidateName = null;
+     }
+
+     if (filters.candidateStatuses && filters.candidateStatuses.length) {
+      filters.candidateStatuses = [];
+     }
+
+     if (filters.candidatesCountFrom !== null && filters.candidatesCountFrom !== undefined) {
+      filters.candidatesCountFrom = null;
+     }
+
+     if (filters.candidatesCountTo !== null && filters.candidatesCountTo !== undefined) {
+      filters.candidatesCountTo = null;
+     }
+
+     if (filters.distributedOnFrom) {
+      filters.distributedOnFrom = null;
+     }
+
+     if (filters.distributedOnTo) {
+      filters.distributedOnTo = null;
+     }
+
+     if (filters.firstNamePattern) {
+      filters.firstNamePattern = null;
+     }
+
+     if (filters.lastNamePattern) {
+      filters.lastNamePattern = null;
+     }
+
+     if (typeof filters.orderLocked === 'boolean') {
+      filters.orderLocked = null;
+     }
+
+     if (filters.openPositions !== null || filters.openPositions !== undefined) {
+      filters.openPositions = null;
+     }
+
+     if (filters.orderDistributionType) {
+      filters.orderDistributionType = null;
+     }
+
+     return filters;
   }
 }
