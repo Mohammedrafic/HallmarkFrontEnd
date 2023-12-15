@@ -154,11 +154,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
  
   @Input() public set activeSystem(val: any) {
     this._activeSystem = val;
-    if(this._activeSystem === OrderManagementIRPSystemId.IRP){
-      this.subscribeOnCandidates();
-    } else {
-      this.subscribeOnCandidateJob();
-    }
   }
 
   @Input() orderComments: Comment[] = [];
