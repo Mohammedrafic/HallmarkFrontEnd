@@ -3429,10 +3429,6 @@ public RedirecttoIRPOrder(order:Order)
       filters.agencyIds = [];
      }
 
-     if (filters.candidateName) {
-      filters.candidateName = null;
-     }
-
      if (filters.candidateStatuses && filters.candidateStatuses.length) {
       filters.candidateStatuses = [];
      }
@@ -3471,6 +3467,10 @@ public RedirecttoIRPOrder(order:Order)
 
      if (filters.orderDistributionType) {
       filters.orderDistributionType = null;
+     }
+
+     if (typeof filters.irpOnly === 'boolean') {
+      filters.irpOnly = null;
      }
 
      return filters;
