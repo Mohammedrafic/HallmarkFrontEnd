@@ -148,6 +148,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   payPeriodFormGroup: FormGroup;
   aTPRateCalculationFormGroup : FormGroup;
   startsOnFormGroup: FormGroup;
+  startsOnMinDate: Date | null;
 
   dropdownDataSource: OrganizationSettingValueOptions[];
   allRegions: OrganizationRegion[] = [];
@@ -826,9 +827,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       dynamicValue = SettingsDataAdapter.getParsedValue(valueOptions);
       const startsOn = dynamicValue.StartsOn || dynamicValue.startsOn;
       const isEnabled = dynamicValue.IsEnabled || dynamicValue.isEnabled;
+      const startsOnDate = startsOn ? DateTimeHelper.setCurrentTimeZone(startsOn) : null;
 
+      this.startsOnMinDate = startsOnDate;
       this.startsOnFormGroup.setValue({
-        startsOn: startsOn ? new Date(startsOn) : new Date(),
+        startsOn: startsOnDate,
         isEnabled: isEnabled ? isEnabled : false,
       });
     }
