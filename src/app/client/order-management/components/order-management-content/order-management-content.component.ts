@@ -1239,6 +1239,7 @@ public RedirecttoIRPOrder(order:Order)
   private resetTabs(): void {
     this.activeIRPTabIndex = OrderManagementIRPTabsIndex.AllOrders;
     this.activeTab = OrganizationOrderManagementTabs.AllOrders;
+    this.activeIRPtabs = this.OrganizationIRPTabs.AllOrders;
   }
 
   private clearFilters(): void {
@@ -1818,8 +1819,8 @@ public RedirecttoIRPOrder(order:Order)
     }
     this.store.dispatch(new SetHelpSystem(this.activeSystem === OrderManagementIRPSystemId.IRP));
     this.orderManagementService.setOrderManagementSystem(this.activeSystem);
-    this.setOrderTypesFilterDataSource();
     this.resetTabs();
+    this.setOrderTypesFilterDataSource();
     this.initMenuItems();
     this.initGridColumns();
     this.getOrders();
@@ -3471,6 +3472,14 @@ public RedirecttoIRPOrder(order:Order)
 
      if (typeof filters.irpOnly === 'boolean') {
       filters.irpOnly = null;
+     }
+
+     if (this.activeSystem === OrderManagementIRPSystemId.IRP && filters.billRateFrom) {
+      filters.billRateFrom = null;
+     }
+
+     if (this.activeSystem === OrderManagementIRPSystemId.IRP && filters.billRateTo) {
+      filters.billRateTo = null;
      }
 
      return filters;
