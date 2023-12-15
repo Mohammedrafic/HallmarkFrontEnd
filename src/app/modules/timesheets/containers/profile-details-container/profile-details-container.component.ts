@@ -326,7 +326,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             this.slectingindex = selectEvent.previousIndex;
             this.tabs.select(selectEvent.previousIndex);
           }
-          
+
           if((AlertIdEnum[AlertIdEnum['Timesheet Level Comments']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()){
             this.tabs.select(0);
             window.localStorage.setItem("TimesheetId", JSON.stringify(0));
@@ -629,7 +629,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       this.timesheetDetailsApiService.getTimesheetHistoricalEvents(this.isAgency, this.timesheetId, this.organizationId)
         .pipe(take(1))
         .subscribe((events: TimesheetHistoricalEvent[]) => {
-          this.historicalEvents = events;
+          this.historicalEvents = this.timesheetDetailsService.getSortedHistoricalEvents(events);
           this.cd.markForCheck();
         });
     }

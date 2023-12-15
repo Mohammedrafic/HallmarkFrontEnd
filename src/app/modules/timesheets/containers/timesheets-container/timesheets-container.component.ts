@@ -38,7 +38,6 @@ import * as Interfaces from '../../interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
 
-
 @Component({
   selector: 'app-timesheets-container',
   templateUrl: './timesheets-container.component.html',
@@ -164,7 +163,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           this.rowSelected({rowIndex:filterTimesheetIndex,data:filterTimesheet});
           this.timesheetId = 0;
           this.orderPublicId = '';
-        }  
+        }
       }
     })
 
@@ -363,21 +362,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       .subscribe((res) => {
         this.organizations= res.filter((item)=> item.regions.length>0)
         const orgId = this.routerState?.["condition"] === "setOrg"
-        ? this.routerState?.["orderStatus"]
-        : this.getOrganizationIdFromState() || this.organizations[0].organizationId as number;
-        this.store.dispatch(new Timesheets.SelectOrganization(orgId));
-        this.organizationControl.setValue(orgId, { emitEvent: false });    
-
-        this.store.dispatch([
-          new Timesheets.UpdateFiltersState(
-            {
-              organizationId: orgId,
-              ...this.filters,
-            },
-            this.activeTabIdx !== 0
-          ),
-          new Timesheets.GetFiltersDataSource(),
-        ]);
+                      ? this.routerState?.["orderStatus"]
+                      : this.getOrganizationIdFromState() || this.organizations[0].organizationId as number;
+        this.timeSheetBasedonOrg(orgId);
       });
     }else{
       this.store
@@ -388,24 +375,27 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       )
       .subscribe((res) => {
         const orgId = this.routerState?.["condition"] === "setOrg"
-          ? this.routerState?.["orderStatus"]
-          : this.getOrganizationIdFromState() || res[0].id;
-
-        this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
-        this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });    
-
-        this.store.dispatch([
-          new Timesheets.UpdateFiltersState(
-            {
-              organizationId: this.isAgency && (this.businessUnitId ?? 0) > 0 ? this.businessUnitId : orgId,
-              ...this.filters,
-            },
-            this.activeTabIdx !== 0
-          ),
-          new Timesheets.GetFiltersDataSource(),
-        ]);
+                      ? this.routerState?.["orderStatus"]
+                      : this.getOrganizationIdFromState() || res[0].id;
+        this.timeSheetBasedonOrg(orgId);
       });
     }
+  }
+
+  private timeSheetBasedonOrg(orgId:any): void{
+    this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
+    this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });
+
+    this.store.dispatch([
+      new Timesheets.UpdateFiltersState(
+        {
+          organizationId: this.isAgency && (this.businessUnitId ?? 0) > 0 ? this.businessUnitId : orgId,
+          ...this.filters,
+        },
+        this.activeTabIdx !== 0
+      ),
+      new Timesheets.GetFiltersDataSource(),
+    ]);
   }
 
   private getOrganizationIdFromState(): number | null {

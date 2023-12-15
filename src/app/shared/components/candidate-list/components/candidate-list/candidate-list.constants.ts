@@ -27,7 +27,8 @@ export const filterColumns: CandidateListFiltersColumn = {
     valueField: 'name',
     valueId: 'id',
   },
-  candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+  firstNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
+  lastNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
   credType : {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
@@ -45,7 +46,8 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
     valueField: 'name',
     valueId: 'id',
   },
-  candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+  firstNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
+  lastNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
   candidateId: { type: ControlTypes.Text, valueType: ValueType.Text },
   locationIds: {
     type: ControlTypes.Multiselect,
@@ -214,7 +216,8 @@ export const IRPCandidates = [
 ];
 
 export const CandidatesTableFilters: CandidateListFilters = {
-  candidateName: null,
+  firstNamePattern: null,
+  lastNamePattern: null,
   profileStatuses: [],
   regionsNames: [],
   skillsIds: [],

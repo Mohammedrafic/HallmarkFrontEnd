@@ -98,7 +98,8 @@ const skillColumn = {
 
 export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
   [InvoicesTableFiltersColumns.FormattedInvoiceIds]: defaultInputMapping,
-  [InvoicesTableFiltersColumns.SearchTerm]: defaultInputMapping,
+  [InvoicesTableFiltersColumns.FirstNamePattern]: defaultInputMapping,
+  [InvoicesTableFiltersColumns.LastNamePattern]: defaultInputMapping,
   [InvoicesTableFiltersColumns.StatusIds]: {...defaultColumnMapping},
   [InvoicesTableFiltersColumns.AmountFrom]: defaultInputMapping,
   [InvoicesTableFiltersColumns.AmountTo]: defaultInputMapping,
@@ -176,8 +177,13 @@ export const ManualInvoicesFiltersFormConfig = (isAgency: boolean, agencyOrganiz
   }] : []),
   {
     type: ControlTypes.Text,
-    title: 'Candidate Name',
-    field: InvoicesTableFiltersColumns.SearchTerm,
+    title: 'Candidate First Name',
+    field: InvoicesTableFiltersColumns.FirstNamePattern,
+  },
+  {
+    type: ControlTypes.Text,
+    title: 'Candidate Last Name',
+    field: InvoicesTableFiltersColumns.LastNamePattern,
   },
   {
     type: ControlTypes.Text,
@@ -262,8 +268,13 @@ export const AllInvoicesFiltersFormConfig = (isAgency: boolean, selectedTabId: I
   },
   {
     type: ControlTypes.Text,
-    title: 'Candidate Name',
-    field: InvoicesTableFiltersColumns.SearchTerm,
+    title: 'Candidate First Name',
+    field: InvoicesTableFiltersColumns.FirstNamePattern,
+  },
+  {
+    type: ControlTypes.Text,
+    title: 'Candidate Last Name',
+    field: InvoicesTableFiltersColumns.LastNamePattern,
   },
   ...(selectedTabId === InvoicesOrgTabId.AllInvoices || isAgency && InvoicesAgencyTabId.AllInvoices ? [{
     type: ControlTypes.Multiselect,
@@ -378,8 +389,13 @@ export const PendingInvoicesFiltersFormConfig = (): InvoiceFilterFieldConfig[] =
   },
   {
     type: ControlTypes.Text,
-    title: 'Candidate Name',
-    field: InvoicesTableFiltersColumns.SearchTerm,
+    title: 'Candidate First Name',
+    field: InvoicesTableFiltersColumns.FirstNamePattern,
+  },
+  {
+    type: ControlTypes.Text,
+    title: 'Candidate Last Name',
+    field: InvoicesTableFiltersColumns.LastNamePattern,
   },
   {
     type: ControlTypes.Multiselect,

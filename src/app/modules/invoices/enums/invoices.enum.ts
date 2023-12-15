@@ -60,7 +60,6 @@ export enum INVOICES_ACTIONS {
 
 export enum InvoicesTableFiltersColumns {
   OrderBy = 'orderBy',
-  SearchTerm = 'searchTerm',
   PageNumber = 'pageNumber',
   PageSize = 'pageSize',
   OrganizationId = 'organizationId',
@@ -79,6 +78,8 @@ export enum InvoicesTableFiltersColumns {
   DueDateTo = 'dueDateTo',
   PaidDateFrom = 'paidDateFrom',
   PaidDateTo = 'paidDateTo',
+  FirstNamePattern = 'firstNamePattern',
+  LastNamePattern = 'lastNamePattern',
 
   // Keys for Pending Invoices Records
   OrderIds = 'orderIds',

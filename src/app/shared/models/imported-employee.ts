@@ -1,4 +1,5 @@
 import { ColDef } from "@ag-grid-community/core";
+import { GeneralNotesModel } from "@client/candidates/candidate-profile/general-notes/general-notes.model";
 import { IRPCandidate } from "@shared/components/candidate-list/types/candidate-list.model";
 
 export interface ImportedEmployeeGrid {
@@ -101,6 +102,43 @@ export interface EmployeeImportDtoResult{
   
 }
 export interface EmployeeImportSaveResult{
+  employeeImportData?: any[]|null;
+  selectedFile: Blob;
+}
+
+export type EmployeeGeneralNoteImportDto = {
+  employeeID: string;
+  employeeName: string;
+  date: string;
+  category: string;
+  note: string;
+  errorProperties: string[];
+}
+export type EmployeeGeneralNoteImportResult = {
+  succesfullRecords: ImportedEmployeeGenralNote[];
+  errorRecords: ImportedEmployeeGenralNote[];
+};
+
+
+export interface ImportedEmployeeGenralNote {
+  isSubmit: boolean;
+  employeeImport: ExtendedEmployeeGeneralNote;
+}
+
+export type ExtendedEmployeeGeneralNote = GeneralNotesModel & {
+  errorProperties: string[];
+};
+
+export interface ImportedEmployeeGeneralNoteGrid {
+  grids: EmployeeGeneralNoteGrid[];
+}
+
+export interface EmployeeGeneralNoteGrid {
+  columnDefs: ColDef[];
+  rowData: GeneralNotesModel[];
+  gridName?: string;
+}
+export interface EmployeeGeneralImportSaveResult{
   employeeImportData?: any[]|null;
   selectedFile: Blob;
 }

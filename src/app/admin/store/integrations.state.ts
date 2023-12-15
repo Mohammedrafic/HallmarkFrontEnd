@@ -5,7 +5,10 @@ import { ChartAccumulation } from '../../dashboard/models/chart-accumulation-wid
 
 import { IntegrationFilterDto } from "../../shared/models/integrations.model";
 import { OrgintegrationsService } from '../organization-integrations/services/orgintegrations.service';
-import { GetLast12MonthIntegrationRuns, GetLast12MonthFailIntegrationRuns } from "./integrations.actions";
+import { GetLast12MonthIntegrationRuns, GetLast12MonthFailIntegrationRuns, GetNewInterfaceList,  GetRecentRunsList } from "./integrations.actions";
+import { NewInterfaceListdata } from '@admin/organization-integrations/models/IntegrationMonthReportModel';
+import { RecentRunsListModel } from 'src/app/admin/organization-integrations/models/RecentRunsListModel';
+
 
 export interface IntegrationsStateModel extends IntegrationStateModel {
 }
@@ -18,6 +21,8 @@ interface IntegrationStateModel {
   filterData: IntegrationFilterDto | null;
   chartAccumulation: ChartAccumulation | null;
   failureChartAccumulation: ChartAccumulation | null;
+  Latestinterfacedata: NewInterfaceListdata | null;
+  RecentRunsList: RecentRunsListModel[] | null;
 }
 @State<IntegrationsStateModel>({
   name: 'integrations',
@@ -26,7 +31,9 @@ interface IntegrationStateModel {
     isDashboardLoading: false,
     filterData: null,
     chartAccumulation: null,
-    failureChartAccumulation: null
+    failureChartAccumulation: null,
+    Latestinterfacedata: null,
+     RecentRunsList: null,
   },
 })
 @Injectable()
@@ -42,6 +49,12 @@ export class IntegrationsState {
 
   @Selector()
   static failureChartAccumulation(state: IntegrationsStateModel): ChartAccumulation | null { return state.failureChartAccumulation; }
+
+
+  @Selector()
+  static getRecentRunsList(state: IntegrationsStateModel): RecentRunsListModel[] | null {
+    return state.RecentRunsList;
+  }
 
   @Action(GetLast12MonthIntegrationRuns)
   getDashboardData({ patchState }: StateContext<IntegrationsStateModel>, { payload }: GetLast12MonthIntegrationRuns): Observable<ChartAccumulation> {
@@ -65,4 +78,28 @@ export class IntegrationsState {
       })
     );
   }
+  
+  @Selector()
+  static NewInterfaceListState(state: IntegrationsStateModel): NewInterfaceListdata | null { return state.Latestinterfacedata; }
+
+  @Action(GetNewInterfaceList)
+  getDashboardNewInterfaceList({ patchState }: StateContext<IntegrationsStateModel>, { payload }: GetNewInterfaceList): Observable<NewInterfaceListdata> {
+    patchState({ isDashboardLoading: true });    
+    return this.orgintegrationsService.getLatestInterfaceList(payload).pipe(
+      tap((payload) => {
+        patchState({ isDashboardLoading: false, Latestinterfacedata: payload });
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetRecentRunsList)
+  private getRecentRunsList({ patchState }: StateContext<IntegrationsStateModel>, { payload }: GetRecentRunsList): Observable<RecentRunsListModel[]> {
+    return this.orgintegrationsService.getRecentRunsList(payload).pipe(
+      tap((payload: RecentRunsListModel[]) => {
+        patchState({ RecentRunsList: payload });
+      })
+    );
+  }
+
 }

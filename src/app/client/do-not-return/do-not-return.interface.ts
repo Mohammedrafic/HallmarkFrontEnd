@@ -1,5 +1,4 @@
 import { ControlTypes, ValueType } from "@shared/enums/control-types.enum";
-import { AgencyStatus } from "@shared/enums/status";
 import { DonoreturnAddedit, DoNotReturnSearchCandidate, DoNotReturnsPage, GetLocationByOrganization } from "@shared/models/donotreturn.model";
 import { UserAgencyOrganizationBusinessUnit } from "@shared/models/user-agency-organization.model";
 
@@ -29,16 +28,7 @@ export interface DoNotReturnForm {
     locations: GetLocationByOrganization[];
     searchCandidates: DoNotReturnSearchCandidate[];
   }
-  
-  export interface IOrganizationAgency {
-    id: number;
-    name: string;
-    type: 'Organization' | 'Agency';
-    hasLogo?: boolean;
-    lastUpdateTicks?: number;
-    status?: AgencyStatus;
-  }
-  
+
 export interface donotreturnFilterConfigItem<T> {
     type: ControlTypes;
     valueType: ValueType;
@@ -48,9 +38,8 @@ export interface donotreturnFilterConfigItem<T> {
 }
 
 export interface FilterConfig {
-  firstName?:donotreturnFilterConfigItem<string>;
-  middleName?:donotreturnFilterConfigItem<string>;
-  lastName?:donotreturnFilterConfigItem<string>;
+  firstNamePattern:donotreturnFilterConfigItem<string>;
+  lastNamePattern?:donotreturnFilterConfigItem<string>;
   ssn?: donotreturnFilterConfigItem<number>;
   regionBlocked?:donotreturnFilterConfigItem<any>;
   locationBlocked?:donotreturnFilterConfigItem<any>;
@@ -63,13 +52,12 @@ export interface DoNotReturnFilterForm {
     ssn?:number;
     regionBlocked:number[];
     locationBlocked:number[];
-    firstName:string;
-    middleName:string;
-    lastName:string;
+    firstNamePattern:string;
+    lastNamePattern:string;
     email:string;
     currentStatus: string;
   }
-  
+
 export interface MasterDoNotReturnExportColumn {
   text: string;
   column: string;

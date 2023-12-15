@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { CandidateList, CandidateListFilters, CandidateListRequest, EmployeeInactivateData, InactivateEmployeeDto, IRPCandidateList } from '../types/candidate-list.model';
-import { AssignedSkillsByOrganization } from '../../../models/skill.model';
-import { CandidateStatus } from '../../../enums/status';
-import { ExportPayload } from '../../../models/export.model';
+import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
+import { CandidateStatus } from '@shared/enums/status';
+import { ExportPayload } from '@shared/models/export.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { sortBy } from '@shared/helpers/sort-array.helper';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -87,7 +87,8 @@ export class CandidateListService {
 
   public generateVMSCandidateFilterForm(): FormGroup {
     return new FormGroup({
-      candidateName: new FormControl(null),
+      firstNamePattern: new FormControl(null),
+      lastNamePattern: new FormControl(null),
       profileStatuses: new FormControl([]),
       regionsNames: new FormControl([]),
       skillsIds: new FormControl([]),
@@ -97,7 +98,8 @@ export class CandidateListService {
   public generateIRPCandidateFilterForm(): FormGroup {
     return new FormGroup({
       candidateId: new FormControl(null),
-      candidateName: new FormControl(null),
+      firstNamePattern: new FormControl(null),
+      lastNamePattern: new FormControl(null),
       profileStatuses: new FormControl([]),
       locationIds: new FormControl([]),
       departmentIds: new FormControl([]),
@@ -112,13 +114,15 @@ export class CandidateListService {
 
   public refreshFilters(isIRP: boolean, formGroup: FormGroup, filters: CandidateListFilters): void {
     formGroup.setValue(!isIRP ? {
-      candidateName: filters.candidateName || '',
+      firstNamePattern: filters.firstNamePattern || '',
+      lastNamePattern: filters.lastNamePattern || '',
       profileStatuses: filters.profileStatuses || [],
       regionsNames: filters.regionsNames || [],
       skillsIds: filters.skillsIds || [],
     } : {
       candidateId: filters.candidateId || '',
-      candidateName: filters.candidateName || '',
+      firstNamePattern: filters.firstNamePattern || '',
+      lastNamePattern: filters.lastNamePattern || '',
       profileStatuses: filters.profileStatuses || [],
       locationIds: filters.locationIds || [],
       departmentIds: filters.departmentIds || [],
@@ -130,7 +134,7 @@ export class CandidateListService {
       credType: filters.credType || [],
     });
   }
- 
+
   public createInactivateForm(): CustomFormGroup<EmployeeInactivateData> {
     return this.fb.group({
       inactivationDate: [null, Validators.required],
