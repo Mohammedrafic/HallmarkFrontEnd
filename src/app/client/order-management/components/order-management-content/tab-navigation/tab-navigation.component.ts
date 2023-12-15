@@ -66,7 +66,7 @@ export class TabNavigationComponent extends Destroyable implements OnInit {
 
   private selectReOrderTab(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementService;
-    const reOrders = 3;
+    const reOrders = 2;
     if (selectedOrderAfterRedirect?.orderType === OrderType.ReOrder) {
       this.tabNavigation.select(reOrders);
       this.selectedTab.emit(this.tabsArray[reOrders]);
