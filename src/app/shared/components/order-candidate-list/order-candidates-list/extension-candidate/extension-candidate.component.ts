@@ -115,6 +115,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   activeSystems: OrderManagementIRPSystemId | null;
   CanOrganizationEditOrdersIRP: boolean;
   CanOrganizationViewOrdersIRP: boolean;
+  isIRP: boolean;
   public get activeSystem() {
     return this._activeSystem;
   }
@@ -279,6 +280,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   ngOnInit(): void {
     this.activeSystems = this.orderManagementService.getOrderManagementSystem();
+    this.isIRP = this.activeSystem === OrderManagementIRPSystemId.IRP ? true : false;
     this.subscribeOnPermissions();
     this.subsToCandidate();
     this.rejectReasons$ = this.subscribeOnReasonsList();
