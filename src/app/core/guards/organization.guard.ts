@@ -20,7 +20,10 @@ export class OrganizationGuard implements CanActivate {
 
   private canNavigate(): boolean {
     const user = this.store.selectSnapshot(UserState.user) as User;
-    const businessUnitType = user.businessUnitType;
+    if (!user) {
+      return false;
+    }
+    const businessUnitType = user?.businessUnitType;
 
     if (
       businessUnitType === BusinessUnitType.Hallmark ||

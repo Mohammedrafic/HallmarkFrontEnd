@@ -18,7 +18,10 @@ export class AgencyGuard implements CanActivate {
 
   public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     const user = this.store.selectSnapshot(UserState.user) as User;
-    const businessUnitType = user.businessUnitType;
+    if (!user) {
+      return false;
+    }
+    const businessUnitType = user?.businessUnitType;
     const hasCandidateLinksForOrgUser = HasCandidatesLink(
       state.url,
       businessUnitType,
