@@ -101,7 +101,7 @@
             <div class="input-container bootstrap">
               <label>Period</label>
               <div class="input-group dropdown">
-                <ejs-dropdownlist (change)="selectPeriod()" formControlName="period" appValidateWithMessage
+                <ejs-dropdownlist (change)="selectPeriod($event)" formControlName="period" appValidateWithMessage
                   placeholder="All" [allowFiltering]="true" [dataSource]="periodList" [fields]="periodFields"
                   
                   showSelectAll=true>
@@ -124,7 +124,7 @@
                     <div class="input-group datepicker">
                         <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                             appValidateWithMessage formControlName="endDate"
-                            [min]="agencyVendorScorecardReportForm.controls['startDate'].value"  [enabled]="agencyVendorScorecardReportForm.controls['period'].value=='0'">
+                       [min]="agencyVendorScorecardReportForm.controls['startDate'].value"  [enabled]="agencyVendorScorecardReportForm.controls['period'].value=='0'">
                         </ejs-datepicker>
                     </div>
                 </div>
