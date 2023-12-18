@@ -103,6 +103,7 @@ import { OrderManagementService } from '@client/order-management/components/orde
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { OutsideZone } from '@core/decorators';
 import { SecurityState } from 'src/app/security/store/security.state';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -981,15 +982,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.filters.orderPublicId = this.filters.orderPublicId?.toUpperCase() || null;
       this.filters.billRateFrom = this.filters.billRateFrom || null;
       this.filters.billRateTo = this.filters.billRateTo || null;
-      this.filters.jobStartDate = this.filters.jobStartDate || null;
-      this.filters.jobEndDate = this.filters.jobEndDate || null;
-      this.filters.reOrderDate = this.filters.reOrderDate || null;
       this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
       this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
+      this.filters.reOrderDate = this.filters.reOrderDate || null;
       this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
       this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
       this.filters.openPositions = this.filters.openPositions || null;
       this.filters.regionIds = this.filters.regionIds || [];
+      this.convertFilteredDates();
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       this.dispatchNewPage();
       this.store.dispatch(new ShowFilterDialog(false));
@@ -999,6 +999,21 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
     }
+  }
+
+  private convertFilteredDates(): void {
+    this.filters.jobStartDate = this.filters.jobStartDate ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.jobStartDate)) : null;
+    this.filters.jobEndDate = this.filters.jobEndDate ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.jobEndDate)) : null;
+    this.filters.creationDateFrom = this.filters.creationDateFrom ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.creationDateFrom)) : null;
+    this.filters.creationDateTo = this.filters.creationDateTo ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.creationDateTo)) : null;
+    this.filters.distributedOnFrom = this.filters.distributedOnFrom ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.distributedOnFrom)) : null;
+    this.filters.distributedOnTo = this.filters.distributedOnTo ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.distributedOnTo)) : null;
   }
 
   private listenRedirectFromExtension(): void {

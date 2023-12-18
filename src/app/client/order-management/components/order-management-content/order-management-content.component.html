@@ -760,9 +760,9 @@
 <app-filter-dialog
   *ngIf="
   activeTab !== OrganizationOrderManagementTabs.OrderTemplates
+  && activeTab !== OrganizationOrderManagementTabs.Incomplete
   && activeSystem != OrderManagementIRPSystemId.OrderJourney
   && activeIRPtabs != OrganizationIRPTabs.OrderTemplates
-  && activeTab !== OrganizationOrderManagementTabs.Incomplete
   && activeIRPtabs != OrganizationIRPTabs.Incomplete"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
@@ -1297,9 +1297,8 @@
 </app-filter-dialog>
 
 <app-filter-dialog
-  *ngIf="(activeTab === OrganizationOrderManagementTabs.Incomplete
-  || activeIRPtabs === OrganizationIRPTabs.Incomplete)
-  && activeSystem !== OrderManagementIRPSystemId.OrderJourney"
+  *ngIf="(activeTab === OrganizationOrderManagementTabs.Incomplete && this.activeSystem === OrderManagementIRPSystemId.VMS)
+  || (activeIRPtabs === OrganizationIRPTabs.Incomplete && this.activeSystem === OrderManagementIRPSystemId.IRP)"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   [targetElement]="targetElement"
@@ -1530,7 +1529,7 @@
       </div>
       </div>
       </div>
-    <div class="filter-row bootstrap">
+    <div class="filter-row bootstrap" *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">
       <div class="input-container">
         <label>Bill Rate From</label>
         <div class="input-group">

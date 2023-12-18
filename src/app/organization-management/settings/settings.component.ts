@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
@@ -1156,7 +1157,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private createStartsOnPayload(): StartsOnPayload {
-    return this.startsOnFormGroup.getRawValue();
+    const { startsOn, isEnabled } = this.startsOnFormGroup.getRawValue();
+
+    return {
+      startsOn: formatDate(startsOn, 'yyyy-MM-dd', 'en-US'),
+      isEnabled,
+    };
   }
 
   private createATPRateConfigurationdPayload(): ATPRateCalculationPayload {
