@@ -83,6 +83,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'LimitNumberOfCandidateanAgencycansubmitToaPosition',
   'OrganizationCanCarryClockIDFromParent',
   'AllowDuplicateClockIdforOrganization',
+  'SplitReportedTimeOnBillRateEffectiveDate',
   'TimeLimitforManagerReviewEmail'
 ];
 
