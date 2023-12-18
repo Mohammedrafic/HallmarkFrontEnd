@@ -61,6 +61,7 @@ import { Comment } from '@shared/models/comment.model';
 import {
   AcceptJobDTO,
   ApplicantStatus,
+  CandidateCancellationReason,
   IrpOrderCandidate,
   Order,
   OrderCandidateJob,
@@ -91,6 +92,7 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
 import { SystemType } from '@shared/enums/system-type.enum';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { canceldto } from '../../interfaces/order-candidate.interface';
+import { EditIrpCandidateService } from '../../edit-irp-candidate/services/edit-irp-candidate.service';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -116,6 +118,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   CanOrganizationEditOrdersIRP: boolean;
   CanOrganizationViewOrdersIRP: boolean;
   isIRP: boolean;
+  irpReason: CandidateCancellationReason[];
   public get activeSystem() {
     return this._activeSystem;
   }
@@ -185,7 +188,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public isCandidatePayRateVisible: boolean;
   public canCreateOrder: boolean;
   public irpdata : any;
-
+  public reasons: CandidateCancellationReason[] | null;
   public applicantStatusEnum = ApplicantStatusEnum;
   public candidateSSNRequired: boolean;
   public candidateDOBRequired: boolean;
@@ -263,7 +266,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private settingService: SettingsViewService,
     private permissionService: PermissionService,
     private confirmService: ConfirmService,
-    private orderManagementService: OrderManagementService
+    private orderManagementService: OrderManagementService,
+    private editIrpCandidateService: EditIrpCandidateService
   ) {
     super();
     this.isAgency = this.router.url.includes('agency');
@@ -571,6 +575,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             } else {
               this.orgId = this.currentOrder?.organizationId
             }
+            if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+              this.reasons = this.editIrpCandidateService.createReasonsOptionsforCancel(this.editIrpCandidateService.getCancelEmployeeReasons()) ?? [];
+              this.irpReason = this.reasons.filter(item => item.id === this.candidate?.cancellationReasonId);
+           }   
             const candidateJobId = candidate?.candidateJobId;
             const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;
             if (this.orgId && candidateJobId) {
