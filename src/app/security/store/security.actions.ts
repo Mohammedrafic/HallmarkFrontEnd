@@ -244,3 +244,14 @@ export class SetAgencyVisibilityFlag {
   static readonly type = '[security] Set Agency Visibility flag';
   constructor(public readonly agencyVisibilityEnabled: boolean) { }
 }
+
+export class GetEmpGeneralNoteImportDetails {
+  static readonly type = '[security log interface] Get Emp General NoteInterface Details';
+  constructor(public interfaceLogSummaryID: number, public statusType: number, public pageNumber: number,public pageSize: number,public options?: DialogNextPreviousOption) {}
+}
+
+
+export class ExportEmpGeneralNoteImportDetails {
+  static readonly type = '[security] Export Employee General Note Import List';
+  constructor(public payload: ExportPayload) {}
+}

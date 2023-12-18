@@ -760,9 +760,9 @@
 <app-filter-dialog
   *ngIf="
   activeTab !== OrganizationOrderManagementTabs.OrderTemplates
+  && activeTab !== OrganizationOrderManagementTabs.Incomplete
   && activeSystem != OrderManagementIRPSystemId.OrderJourney
   && activeIRPtabs != OrganizationIRPTabs.OrderTemplates
-  && activeTab !== OrganizationOrderManagementTabs.Incomplete
   && activeIRPtabs != OrganizationIRPTabs.Incomplete"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
@@ -946,15 +946,24 @@
     <div class="filter-row bootstrap"
          *ngIf="!isActiveSystemIRP || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
       <div class="input-container">
-        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Name</label>
-        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Name</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee First Name</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate First Name</label>
         <div class="input-group">
-          <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
+          <input class="e-input" type="text" maxlength="50" formControlName="firstNamePattern" />
         </div>
       </div>
       <div class="input-container">
-          <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Status</label>
-          <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Status</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Last Name</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Last Name</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="lastNamePattern" />
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Status</label>
+        <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Status</label>
         <div class="input-group multiselect">
           <ejs-multiselect
             mode="CheckBox"
@@ -1272,16 +1281,15 @@
 </app-filter-dialog>
 
 <app-filter-dialog
-  *ngIf="(activeTab === OrganizationOrderManagementTabs.Incomplete
-  || activeIRPtabs === OrganizationIRPTabs.Incomplete)
-  && activeSystem !== OrderManagementIRPSystemId.OrderJourney"
+  *ngIf="(activeTab === OrganizationOrderManagementTabs.Incomplete && this.activeSystem === OrderManagementIRPSystemId.VMS)
+  || (activeIRPtabs === OrganizationIRPTabs.Incomplete && this.activeSystem === OrderManagementIRPSystemId.IRP)"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   [targetElement]="targetElement"
   (deleteFilter)="onFilterDelete($event)"
   (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()"
-  (closeDialogClicked)="onFilterClose()" 
+  (closeDialogClicked)="onFilterClose()"
 >
   <form [formGroup]="OrderFilterFormGroup" *ngIf="showFilterForm">
     <div class="bootstrap">
@@ -1505,7 +1513,7 @@
       </div>
       </div>
       </div>
-    <div class="filter-row bootstrap">
+    <div class="filter-row bootstrap" *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">
       <div class="input-container">
         <label>Bill Rate From</label>
         <div class="input-group">
@@ -1929,7 +1937,7 @@
   [filters]="filters"
   (saveEmitter)="updateGrid()"
   (reOpenPositionSuccess)="updatePositionDetails($event)"
-  (successEmitterIRP)="updatePositionDetailsforIRP($event)" 
+  (successEmitterIRP)="updatePositionDetailsforIRP($event)"
 ></app-child-order-dialog>
 
 <app-close-order

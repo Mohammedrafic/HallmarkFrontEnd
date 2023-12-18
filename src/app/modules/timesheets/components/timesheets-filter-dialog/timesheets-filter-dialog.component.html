@@ -6,13 +6,23 @@
                    (applyFilterClicked)="applyFilters()">
   <form class="bootstrap" [formGroup]="formGroup">
     <div class="input-container">
-      <label for="searchTerm">Candidate name</label>
+      <label for="firstNamePattern">Candidate First Name</label>
       <div class="input-group">
-        <input id="searchTerm"
+        <input id="firstNamePattern"
                class="e-input"
                type="text"
                maxlength="50"
-               formControlName="searchTerm" />
+               formControlName="firstNamePattern" />
+      </div>
+    </div>
+    <div class="input-container">
+      <label for="lastNamePattern">Candidate Last Name</label>
+      <div class="input-group">
+        <input id="lastNamePattern"
+               class="e-input"
+               type="text"
+               maxlength="50"
+               formControlName="lastNamePattern" />
       </div>
     </div>
     <div class="input-container">

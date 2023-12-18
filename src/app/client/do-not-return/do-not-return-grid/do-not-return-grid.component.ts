@@ -3,7 +3,7 @@ import { DonotReturnState } from '@admin/store/donotreturn.state';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserPermissions } from '@core/enums';
 import { CustomFormGroup, Permission } from '@core/interface';
-import { BehaviorSubject, combineLatest, debounceTime, delay, distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { BehaviorSubject, debounceTime, delay, distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import {
@@ -12,14 +12,12 @@ import {
 } from '@shared/models/donotreturn.model';
 import { DoNotReturn } from '@admin/store/donotreturn.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { UserState } from 'src/app/store/user.state';
 import { User } from '@shared/models/user.model';
 import { BLOCK_RECORD_TEXT, BLOCK_RECORD_TITLE, CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { AdminState } from '@admin/store/admin.state';
-import { OrganizationDataSource } from '@shared/models/organization.model';
-import { GetOrganizationDataSources, GetOrganizationsByPage, SetDirtyState } from '@admin/store/admin.actions';
+import { GetOrganizationDataSources, SetDirtyState } from '@admin/store/admin.actions';
 import { DoNotReturnFilterForm, DoNotReturnForm } from '../do-not-return.interface';
 import { DoNotReturnFormService } from '../do-not-return.form.service';
 import { ChangeEventArgs, FieldSettingsModel, FilteringEventArgs, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
@@ -48,7 +46,6 @@ import { Candidatests, FormControlNames } from '../enums/dnotreturn.enum';
 
 export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   public blockunblockcandidate$: Subject<boolean> = new Subject<boolean>();
-  public organizationAgencyControl: FormControl = new FormControl();
   public generalInformationForm: FormGroup;
   public columnsToExport: ExportColumn[] = MasterDNRExportCols;
   public filterColumns = doNotReturnFilterConfig;
@@ -65,30 +62,20 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   public defaultFileName: string;
   public readonly userPermissions = UserPermissions;
   public CandidateNames: DoNotReturnSearchCandidate[];
-  public masterDonotreturn: DonoreturnAddedit[] = [];
-  public submited: boolean = false;
-  public editedDNRId?: number;
   public candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   public remoteWaterMark: string = WATERMARK;
   public allOption: string = "All";
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
-  public IsSwitcher: boolean = false;
   public maskSSNPattern: string = '000-00-0000';
   public maskedSSN: string = '';
   public maskedFilterSSN: string = '';
   public filterSSNPattern: string = '000-00-0000';
   public readonly today = new Date();
-  filterSelectedBusinesUnitId: number | null;
 
   public optionFields = {
     text: 'name',
     value: 'id',
-  };
-
-  public readonly orgsFields = {
-    text: 'name',
-    value: 'organizationId',
   };
 
   public filters: DonoreturnFilter = {};
@@ -98,7 +85,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   private selectedOrganization: AllOrganization;
   public organizationRegionIds$: Subject<any> = new Subject();
   public gridApi: any;
-  private gridColumnApi: any;
   allOrganizations : UserAgencyOrganizationBusinessUnit[] = []
   sortByField : number = 1;
   fliterFlag:boolean = false;
@@ -171,7 +157,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.doNotReturnFormGroup.reset();
       this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.orgid,this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     });
-    // this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.currentPage, this.pageSize, this.filters, this.sortByField)]);
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.orgid,this.currentPage, this.pageSize, this.filters, this.sortByField)]);
@@ -220,7 +205,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
               {});
             }
         }
-
      }
     });
 
@@ -349,9 +333,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     })
   }
 
-  get formAltaControls(): any {
-    return this.doNotReturnFormGroup['controls'];
-  }
 
   public onDOBBlur(e:any){
     if(e.model.inputWrapper.container.classList.contains('e-error')){
@@ -394,7 +375,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.filterSSNPattern = "AAA-AA-0000";
       this.doNotReturnFilterForm.get('ssn')?.setValue("XXX-XX-" + this.maskedFilterSSN.slice(-4));
     }
-
   }
 
   public onFilterSSNFocus(): void {
@@ -407,7 +387,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.maskSSNPattern = "AAA-AA-0000";
       this.doNotReturnFormGroup.get(FormControlNames.Ssn)?.setValue("XXX-XX-" + this.maskedSSN.slice(-4));
     }
-
   }
 
   public onSSNFocus(): void {
@@ -451,19 +430,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     return this.doNotReturnForm.get('organizationIds')?.value?.length || 0;
   }
 
-
-  public addRemoveFormcontrols() {
-      this.doNotReturnFormGroup.addControl(FormControlNames.BusinessUnitId, new FormControl('', []));
-      this.doNotReturnFormGroup.addControl(FormControlNames.RegionIds, new FormControl('', []));
-      this.doNotReturnFormGroup.addControl(FormControlNames.LocationIds, new FormControl('', []));
-      this.doNotReturnFormGroup.addControl(FormControlNames.CandidateProfileId, new FormControl('', []));
-      this.doNotReturnFormGroup.addControl(FormControlNames.Ssn, new FormControl('', []));
-      this.doNotReturnFormGroup.addControl(FormControlNames.DnrComment, new FormControl('', []));
-  }
-
-
   public loadRegionsAndLocations(selectedBusinessUnitId: number) {
-   // this.createForm();
       this.regionIdControl = this.doNotReturnFormGroup.get(FormControlNames.RegionIds) as AbstractControl;
       let regionFilter: regionFilter = {
         businessUnitId: selectedBusinessUnitId,
@@ -474,8 +441,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
       this.changeDetectorRef.markForCheck();
   }
-
-
 
   public setDictionaryRegionMappings() {
     let mapping: { [id: number]: number[]; } = {};
@@ -503,27 +468,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     return mapping;
   }
 
-  public setRegionsOnEdit(editRegionIds: any) {
-    if (editRegionIds.length > 0) {
-      this.regions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-        this.doNotReturnFormGroup.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
-      });
-    } else {
-      this.doNotReturnFormGroup.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
-    }
-  }
-
-  public setLocationsOnEdit(editLocationIds: any) {
-    if (editLocationIds.length > 0) {
-      this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-        this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
-      });
-    } else {
-      this.doNotReturnFormGroup.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
-    }
-  }
-
-
   public onSwitcher(event: { checked: boolean }): void {
     this.blockunblockcandidate$.next(event.checked);
     this.isBlock= event.checked;
@@ -545,9 +489,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
     this.isEdit=true;
     if (data.currentStatus == Candidatests.Block) {
       this.isBlock = true;
-    }
-    else
-    {
+    } else {
       this.isBlock=false;
     }
     this.addActiveCssClass(event);
@@ -620,7 +562,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
   public onOrganizationDropDownChanged(event: ChangeEventArgs): void {
     this.selectedOrganization = event.itemData as AllOrganization;
-    // this.orgid=this.selectedOrganization.id;
     if (this.selectedOrganization.id) {
        this.loadRegionsAndLocations(this.selectedOrganization.id);
     }
@@ -720,7 +661,6 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
       this.isEdit=false;
       this.isBlock = true;
     }
-
   }
 
   public closeExport(): void {
@@ -848,11 +788,9 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
   @OutsideZone
   private onFilterChild(e: FilteringEventArgs) {
     if (e.text != '') {
-      let ids = 0;
-      ids = this.orgid;
       let filter: DoNotReturnCandidateSearchFilter = {
         searchText: e.text,
-        businessUnitId: this.selectedOrganization?.id == undefined ? this.orgid : this.selectedOrganization?.id, //this.orgid,
+        businessUnitId: this.selectedOrganization?.id == undefined ? this.orgid : this.selectedOrganization?.id,
       };
       this.CandidateNames = [];
       this.store.dispatch(new DoNotReturn.GetDoNotReturnCandidateSearch(filter))

@@ -39,7 +39,7 @@ export interface PayPeriodPayload {
 
 export interface StartsOnPayload {
   isEnabled: boolean;
-  startsOn: Date;
+  startsOn: string;
 }
 
 export interface ATPRateCalculationPayload {

@@ -46,6 +46,8 @@ import {
   GetInterfaceLogDetails,
   ExportEmployeeImportDetails,
   SetAgencyVisibilityFlag,
+  GetEmpGeneralNoteImportDetails,
+  ExportEmpGeneralNoteImportDetails,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -64,7 +66,7 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from
 import { TimeZoneModel } from '@shared/models/location.model';
 import { GetUSCanadaTimeZoneIds } from './security.actions';
 import { NodatimeService } from '@shared/services/nodatime.service';
-import { InterfaceLogSummaryDetails, InterfaceLogSummaryIRPPage, LogInterface, LogInterfacePage, LogTimeSheetHistory, LogTimeSheetHistoryPage, OrgInterface, OrgInterfacePage } from '@shared/models/org-interface.model';
+import { EmpGeneralNoteImportDetails, InterfaceLogSummaryDetails, InterfaceLogSummaryIRPPage, LogInterface, LogInterfacePage, LogTimeSheetHistory, LogTimeSheetHistoryPage, OrgInterface, OrgInterfacePage } from '@shared/models/org-interface.model';
 import { OrgInterfaceService } from '../services/org-interface.service';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 
@@ -90,6 +92,7 @@ interface SecurityStateModel {
   logDialogOptions: DialogNextPreviousOption;
   logTimeSheetHistoryPage: LogTimeSheetHistoryPage | null;
   logSummaryDetailsPage: InterfaceLogSummaryDetails[] | null;
+  logSummaryEmpGeneralnoteDetailsPage : EmpGeneralNoteImportDetails[] | null;
   userData: User[];
   nonEmployeeUserData: User[];
   logFileDownloadDetail:any;
@@ -129,7 +132,8 @@ interface SecurityStateModel {
     interfaceLogSummaryIRP:null,
     logSummaryDetailsPage:null,
     isAgencyVisibilityEnabled:false,
-    isOrganizaionsLoaded:false
+    isOrganizaionsLoaded:false,
+    logSummaryEmpGeneralnoteDetailsPage:null
   },
 })
 @Injectable()
@@ -316,6 +320,10 @@ export class SecurityState {
   @Selector()
   static isAgencyVisibilityFlagEnabled(state: SecurityStateModel): boolean {
     return state.isAgencyVisibilityEnabled;
+  }
+  @Selector()
+  static logGeneralNoteSummaryDetails(state: SecurityStateModel): EmpGeneralNoteImportDetails[] | null {
+    return state.logSummaryEmpGeneralnoteDetailsPage;
   }
 
 
@@ -786,6 +794,25 @@ export class SecurityState {
       );
   }
   
+  @Action(GetEmpGeneralNoteImportDetails)
+  GetEmpGeneralNoteImportDetails(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { interfaceLogSummaryID,statusType,  pageNumber, pageSize,options }: GetEmpGeneralNoteImportDetails
+  ): Observable<EmpGeneralNoteImportDetails[] | void> {
+    patchState({ logDialogOptions: options });
+    return this.orgInterfaceService
+      .GetEmpGeneralNoteImportDetails(interfaceLogSummaryID,statusType, pageNumber, pageSize)
+      .pipe(
+        tap((payload) => {
+          patchState({ logSummaryEmpGeneralnoteDetailsPage: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
+  }
+
   @Action(GetLogFileDownload)
   GetLogFileDownload({ patchState, dispatch }: StateContext<SecurityStateModel>, { runId,organizationId }: GetLogFileDownload): Observable<any | void> {
     return this.orgInterfaceService.logFileDownload(runId,organizationId).pipe(
@@ -882,5 +909,14 @@ export class SecurityState {
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
     })
   );
+}
+@Action(ExportEmpGeneralNoteImportDetails)
+ExportEmpGeneralNoteImportDetails({}: StateContext<SecurityStateModel>, { payload }: ExportEmpGeneralNoteImportDetails): Observable<Blob> {
+return this.orgInterfaceService.exportEmpGeneralNoteImport(payload).pipe(
+  tap((file: Blob) => {
+    const url = window.URL.createObjectURL(file);
+    saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+  })
+);
 }
 }
