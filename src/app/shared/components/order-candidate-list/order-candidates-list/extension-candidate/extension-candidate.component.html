@@ -238,7 +238,18 @@
                   </div>
                 </div>
                 <div *ngIf="isCancelled">
-                  <div class="input-container bootstrap">
+                  <div class="input-container bootstrap" *ngIf="isIRP">
+                    <label class="input-group">Reason</label>
+                    <div class="input-group input-readonly">
+                      <input
+                        value="{{irpReason[0].name}}"
+                        class="e-input"
+                        type="text"
+                        readonly
+                      />
+                    </div>
+                  </div>
+                  <div class="input-container bootstrap" *ngIf="!isIRP">
                     <label class="input-group">Reason</label>
                     <div class="input-group input-readonly">
                       <input
