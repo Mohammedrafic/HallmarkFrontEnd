@@ -15,3 +15,18 @@ export interface NewInterfaceListdata {
   title: string;
   interfacedata: NewInterfaceListModel[];
 }
+
+export interface ScheduledIntegrationsListModel {
+  organizationId: string;
+  organizationName: string;
+  interfaceId:string;
+  interfaceName:string;
+  integrationType:string;
+  runTime : Date;
+}
+
+export interface ScheduledIntegrationsListData {
+  id: string;
+  title: string;
+  interfacedata: ScheduledIntegrationsListModel[];
+}
