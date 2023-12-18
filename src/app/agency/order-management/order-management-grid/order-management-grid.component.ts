@@ -184,7 +184,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderId: number | null;
   private redirectFromPerDiem = false;
   private orderManagementPagerState: OrderManagementPagerState | null;
-
   private isAlive = true;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
