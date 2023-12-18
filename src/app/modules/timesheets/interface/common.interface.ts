@@ -110,6 +110,7 @@ export interface RecordValue {
   invoiceId?: number;
   timesheetId?: number;
   type?: BillRateCalculationType;
+  timesheetItemId?: number | null;
 }
 
 export type RecordDto = Omit<RecordValue, 'day'>;
