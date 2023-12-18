@@ -284,6 +284,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   ngOnInit(): void {
     this.activeSystems = this.orderManagementService.getOrderManagementSystem();
+    this.isIRP = this.activeSystem === OrderManagementIRPSystemId.IRP ? true : false;
     this.subscribeOnPermissions();
     this.subsToCandidate();
     this.rejectReasons$ = this.subscribeOnReasonsList();
