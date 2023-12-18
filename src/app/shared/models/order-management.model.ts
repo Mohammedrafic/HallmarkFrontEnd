@@ -361,19 +361,21 @@ export type AgencyOrderFilters = {
   organizationIds?: number[];
   orderTypes?: number[];
   orderStatuses?: (string | number)[];
+  reorderStatuses?: (string | number)[];
   jobTitle?: string;
   billRateFrom?: number | null;
   billRateTo?: number | null;
   openPositions?: number | null;
-  jobStartDate?: Date | null;
-  jobEndDate?: Date | null;
+  jobStartDate?: Date | string | null;
+  jobEndDate?: Date | string | null;
   includeReOrders?: boolean;
   annualSalaryRangeFrom?: string | null;
   annualSalaryRangeTo?: string | null;
-  creationDateFrom?: Date | null;
-  creationDateTo?: Date | null;
-  distributedOnFrom?: Date | null;
-  distributedOnTo?: Date | null;
+  creationDateFrom?: Date | string | null;
+  creationDateTo?: Date | string | null;
+  distributedOnFrom?: Date | string | null;
+  distributedOnTo?: Date | string | null;
+  reOrderDate?: Date | null;
   firstNamePattern?: string | null;
   lastNamePattern?: string | null;
   projectTypeIds?: number | null;
@@ -754,9 +756,10 @@ export class OrderFilter {
   billRateFrom?: number | null;
   billRateTo?: number | null;
   openPositions?: number | null;
-  jobStartDate?: Date | null;
-  jobEndDate?: Date | null;
+  jobStartDate?: Date | string | null;
+  jobEndDate?: Date | string | null;
   orderStatuses?: (string | number)[];
+  reOrderDate?: Date | null;
   candidateStatuses?: string[];
   reorderCandidateStatuses?:CandidatesStatusText[];
   candidatesCountFrom?: number | null;
@@ -770,10 +773,10 @@ export class OrderFilter {
   templateTitle?: string;
   annualSalaryRangeFrom?: string | null;
   annualSalaryRangeTo?: string | null;
-  creationDateFrom?: Date | null;
-  creationDateTo?: Date | null;
-  distributedOnFrom?: Date | null;
-  distributedOnTo?: Date | null;
+  creationDateFrom?: Date | string | null;
+  creationDateTo?: Date | string | null;
+  distributedOnFrom?: Date | string | null;
+  distributedOnTo?: Date | string | null;
   firstNamePattern?: string | null;
   lastNamePattern?: string | null;
   projectTypeIds?: number | null;
@@ -1064,4 +1067,10 @@ export interface OrderAuditHistory{
     creationDateTo: null | string;
     distributedOnFrom: null | string;
     distributedOnTo: null | string;
+    reOrderDate: null | string;
+  }
+
+  export interface OrderStatusesList {
+    orderStatuses: string[];
+    reorderStatuses: string[];
   }

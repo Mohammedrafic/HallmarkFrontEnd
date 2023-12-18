@@ -393,6 +393,18 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     },
   },
   {
+    field: 'timesheetItemId',
+    headerName: 'Timesheet item id',
+    width: 200,
+    minWidth: 90,
+    resizable: true,
+    type: 'rightAligned',
+    cellClass: ['common-cell'],
+    valueFormatter: (data) => {
+      return data.value ?? '';
+    },
+  },
+  {
     field: 'user',
     headerName: 'User',
     width: 200,

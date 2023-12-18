@@ -47,7 +47,7 @@ export class CandidateProfileFormService {
       {
         employeeId: [null, [Validators.required, Validators.maxLength(25)]],
         firstName: [null, [Validators.required, Validators.maxLength(50), asteriskValidator()]],
-        middleName: [null, [Validators.maxLength(10)]],
+        middleName: [null, [Validators.maxLength(10), asteriskValidator()]],
         lastName: [null, [Validators.required, Validators.maxLength(50), asteriskValidator()]],
         dob: [null],
         primarySkillId: [null, [Validators.required]],
