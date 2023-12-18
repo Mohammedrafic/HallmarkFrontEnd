@@ -63,7 +63,8 @@ import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
   Order,
-  OrderManagementChild, OrderStatusesList,
+  OrderManagementChild,
+  OrderStatusesList,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
