@@ -101,7 +101,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   static createFormGroup(): FormGroup {
     return new FormGroup({
       firstName: new FormControl(null, [Validators.required, Validators.maxLength(50), asteriskValidator()]),
-      middleName: new FormControl(null, [Validators.maxLength(10)]),
+      middleName: new FormControl(null, [Validators.maxLength(10), asteriskValidator()]),
       lastName: new FormControl(null, [Validators.required, Validators.maxLength(50), asteriskValidator()]),
       dob: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
       classification: new FormControl(null),

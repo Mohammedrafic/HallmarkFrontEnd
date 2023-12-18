@@ -64,6 +64,7 @@ import {
   AgencyOrderManagementPage,
   Order,
   OrderManagementChild,
+  OrderStatusesList,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -102,6 +103,7 @@ import { OrderManagementService } from '@client/order-management/components/orde
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { OutsideZone } from '@core/decorators';
 import { SecurityState } from 'src/app/security/store/security.state';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -182,7 +184,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderId: number | null;
   private redirectFromPerDiem = false;
   private orderManagementPagerState: OrderManagementPagerState | null;
-
   private isAlive = true;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
@@ -440,7 +441,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public setDefaultFilters(statuses: string[]): void {
+  public setDefaultFilters(orderStatusesList: OrderStatusesList): void {
     if (this.orderManagementPagerState?.filters) {
       // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
@@ -470,7 +471,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       }
       if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
         this.clearFilters();
-        this.setDefaultStatuses(statuses, true);
+        this.setDefaultStatuses(orderStatusesList, true);
       }
       if(this.ltaOrder){
         this.clearFilters();
@@ -497,7 +498,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.redirectFromPerDiem = false;
       selectedOrderAfterRedirect && this.selectedTab && this.dispatchNewPage();
     } else {
-      this.setDefaultStatuses(statuses, preservedFiltes.dispatch);
+      this.setDefaultStatuses(orderStatusesList, preservedFiltes.dispatch);
     }
     this.cd.detectChanges();
   }
@@ -547,7 +548,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       });
   }
 
-  private setDefaultStatuses(statuses: string[], setDefaultFilters: boolean): void {
+  private setDefaultStatuses(orderStatusesList: OrderStatusesList, setDefaultFilters: boolean): void {
     if(this.ltaOrder){
       this.clearFilters();
     }
@@ -564,9 +565,20 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
         Status.includes(f)
       );
+
+      const filteredReorderStatuses = orderStatusesList.reorderStatuses?.filter((status: string) => {
+        return [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled].includes(status as FilterOrderStatusText)
+      });
+
       setTimeout(() => {
+        if (this.selectedTab === AgencyOrderManagementTabs.PerDiem) {
+          const reorderStatuses = orderStatusesList.reorderStatuses.length ? orderStatusesList.reorderStatuses : filteredReorderStatuses;
+          this.OrderFilterFormGroup.get('reorderStatuses')?.setValue(reorderStatuses);
+          this.filters.reorderStatuses = reorderStatuses;
+        }
+
         if(!this.ltaOrder) {
-            this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
+            this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : orderStatusesList.orderStatuses);
             this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
           }
             this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
@@ -891,12 +903,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       billRateTo: this.filters.billRateTo || null,
       openPositions: this.filters.openPositions || null,
       jobStartDate: this.filters.jobStartDate || null,
+      reOrderDate: this.filters.reOrderDate || null,
       jobEndDate: this.filters.jobEndDate || null,
       candidateStatuses: this.filters.candidateStatuses || [],
       candidatesCountFrom: this.filters.candidatesCountFrom || null,
       candidatesCountTo: this.filters.candidatesCountTo || null,
       organizationIds: this.filters.organizationIds || [],
       orderStatuses: this.filters.orderStatuses || [],
+      reorderStatuses: this.filters.reorderStatuses || [],
       annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
       annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null,
       creationDateFrom: this.filters.creationDateFrom || null,
@@ -967,14 +981,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.filters.orderPublicId = this.filters.orderPublicId?.toUpperCase() || null;
       this.filters.billRateFrom = this.filters.billRateFrom || null;
       this.filters.billRateTo = this.filters.billRateTo || null;
-      this.filters.jobStartDate = this.filters.jobStartDate || null;
-      this.filters.jobEndDate = this.filters.jobEndDate || null;
       this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
       this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
+      this.filters.reOrderDate = this.filters.reOrderDate || null;
       this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
       this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
       this.filters.openPositions = this.filters.openPositions || null;
       this.filters.regionIds = this.filters.regionIds || [];
+      this.convertFilteredDates();
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       this.dispatchNewPage();
       this.store.dispatch(new ShowFilterDialog(false));
@@ -984,6 +998,21 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     } else {
       this.store.dispatch(new ShowFilterDialog(false));
     }
+  }
+
+  private convertFilteredDates(): void {
+    this.filters.jobStartDate = this.filters.jobStartDate ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.jobStartDate)) : null;
+    this.filters.jobEndDate = this.filters.jobEndDate ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.jobEndDate)) : null;
+    this.filters.creationDateFrom = this.filters.creationDateFrom ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.creationDateFrom)) : null;
+    this.filters.creationDateTo = this.filters.creationDateTo ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.creationDateTo)) : null;
+    this.filters.distributedOnFrom = this.filters.distributedOnFrom ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.distributedOnFrom)) : null;
+    this.filters.distributedOnTo = this.filters.distributedOnTo ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.distributedOnTo)) : null;
   }
 
   private listenRedirectFromExtension(): void {
