@@ -25,7 +25,7 @@ export class CandidateDetailsApiService {
     }
     return this.http.post<CandidateDetailsPage>(`/api/CandidateProfile/profiles/details`, candidatePayload);
   }
-  
+
   public getSkills(): Observable<MasterSkillByOrganization[]> {
     return this.http.get<MasterSkillByOrganization[]>('/api/MasterSkills/listByActiveBusinessUnit').pipe(map((data) => sortByField(data, 'name')));
   }
@@ -36,7 +36,7 @@ export class CandidateDetailsApiService {
   public getcandidatesearchbytext(filter: any): Observable<DoNotReturnSearchCandidate[]> {
     return this.http.post<DoNotReturnSearchCandidate[]>(`/api/CandidateProfile/candidatesearchbytext`, filter);
   }
-  
+
   public getcandidateOrgsearchbytext(filter: any): Observable<GetCandidateOrgSearch[]> {
     return this.http.post<GetCandidateOrgSearch[]>(`/api/CandidateProfile/CandidateOrgSearchByText`, filter);
   }
@@ -60,6 +60,7 @@ export class CandidateDetailsApiService {
           partneredOrganizations: 'name',
           candidateStatuses: 'statusText',
           orderStatuses: 'statusText',
+          reorderStatuses: 'statusText',
           masterSkills: 'name',
           poNumbers: 'poNumber',
           projectNames: 'projectName',

@@ -548,7 +548,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     super(store);
-
     this.context = { componentParent: this };
     this.gridOptions = OrderManagementIrpSubrowHelper.configureOrderGridSubRowOptions(this.context);
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
@@ -1228,6 +1227,7 @@ public RedirecttoIRPOrder(order:Order)
       shiftIds: this.filters.shiftIds || [],
       irpOnly: this.filters.irpOnly || null,
       reorderStatuses: this.filters.reorderStatuses || null,
+      reOrderDate: this.filters.reOrderDate || null,
       shift:this.filters.shift || null,
       orderLocked:this.filters.orderLocked || null,
       orderDistributionType:this.filters.orderDistributionType || null
@@ -2180,13 +2180,23 @@ public RedirecttoIRPOrder(order:Order)
       const statuses = this.filterColumns.orderStatuses.dataSource
         .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
         .map((status: FilterStatus) => status.status);
+
+      const reorderStatuses = this.filterColumns.reorderStatuses.dataSource.filter((status: FilterOrderStatus) => {
+        return ![FilterOrderStatusText.Closed].includes(status.status);
+      }).map((status: FilterStatus) => status.status);
       if(this.activeSystem != OrderManagementIRPSystemId.OrderJourney){
         this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
         this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
       }
+
+      if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
+        this.filters.reorderStatuses = reorderStatuses.length ? reorderStatuses : [];
+      }
+
       if(this.ltaOrderFlag){
         this.filters.orderStatuses = [];
         this.filters.candidateStatuses = [];
+        this.filters.reorderStatuses = [];
       }
     }
   }

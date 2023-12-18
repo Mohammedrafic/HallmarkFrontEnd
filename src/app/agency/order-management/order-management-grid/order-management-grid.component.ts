@@ -64,6 +64,7 @@ import {
   AgencyOrderManagementPage,
   Order,
   OrderManagementChild,
+  OrderStatusesList,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -183,7 +184,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderId: number | null;
   private redirectFromPerDiem = false;
   private orderManagementPagerState: OrderManagementPagerState | null;
-
   private isAlive = true;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
@@ -441,7 +441,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public setDefaultFilters(statuses: string[]): void {
+  public setDefaultFilters(orderStatusesList: OrderStatusesList): void {
     if (this.orderManagementPagerState?.filters) {
       // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
@@ -471,7 +471,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       }
       if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
         this.clearFilters();
-        this.setDefaultStatuses(statuses, true);
+        this.setDefaultStatuses(orderStatusesList, true);
       }
       if(this.ltaOrder){
         this.clearFilters();
@@ -498,7 +498,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.redirectFromPerDiem = false;
       selectedOrderAfterRedirect && this.selectedTab && this.dispatchNewPage();
     } else {
-      this.setDefaultStatuses(statuses, preservedFiltes.dispatch);
+      this.setDefaultStatuses(orderStatusesList, preservedFiltes.dispatch);
     }
     this.cd.detectChanges();
   }
@@ -548,7 +548,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       });
   }
 
-  private setDefaultStatuses(statuses: string[], setDefaultFilters: boolean): void {
+  private setDefaultStatuses(orderStatusesList: OrderStatusesList, setDefaultFilters: boolean): void {
     if(this.ltaOrder){
       this.clearFilters();
     }
@@ -565,9 +565,20 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
         Status.includes(f)
       );
+
+      const filteredReorderStatuses = orderStatusesList.reorderStatuses?.filter((status: string) => {
+        return [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled].includes(status as FilterOrderStatusText)
+      });
+
       setTimeout(() => {
+        if (this.selectedTab === AgencyOrderManagementTabs.PerDiem) {
+          const reorderStatuses = orderStatusesList.reorderStatuses.length ? orderStatusesList.reorderStatuses : filteredReorderStatuses;
+          this.OrderFilterFormGroup.get('reorderStatuses')?.setValue(reorderStatuses);
+          this.filters.reorderStatuses = reorderStatuses;
+        }
+
         if(!this.ltaOrder) {
-            this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
+            this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : orderStatusesList.orderStatuses);
             this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
           }
             this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
@@ -892,12 +903,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       billRateTo: this.filters.billRateTo || null,
       openPositions: this.filters.openPositions || null,
       jobStartDate: this.filters.jobStartDate || null,
+      reOrderDate: this.filters.reOrderDate || null,
       jobEndDate: this.filters.jobEndDate || null,
       candidateStatuses: this.filters.candidateStatuses || [],
       candidatesCountFrom: this.filters.candidatesCountFrom || null,
       candidatesCountTo: this.filters.candidatesCountTo || null,
       organizationIds: this.filters.organizationIds || [],
       orderStatuses: this.filters.orderStatuses || [],
+      reorderStatuses: this.filters.reorderStatuses || [],
       annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
       annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null,
       creationDateFrom: this.filters.creationDateFrom || null,
@@ -970,6 +983,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.filters.billRateTo = this.filters.billRateTo || null;
       this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
       this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
+      this.filters.reOrderDate = this.filters.reOrderDate || null;
       this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
       this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
       this.filters.openPositions = this.filters.openPositions || null;
@@ -987,7 +1001,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private convertFilteredDates(): void {
-    this.filters.jobStartDate = this.filters.jobStartDate ? 
+    this.filters.jobStartDate = this.filters.jobStartDate ?
       DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.jobStartDate)) : null;
     this.filters.jobEndDate = this.filters.jobEndDate ?
       DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.jobEndDate)) : null;

@@ -45,7 +45,7 @@ export class TabNavigationComponent extends Destroyable implements OnInit {
     this.selectPerDiemTab();
     this.selectReorderAfterNavigation();
     this.getTabsWidth();
-  
+
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
   }
@@ -83,7 +83,7 @@ export class TabNavigationComponent extends Destroyable implements OnInit {
   }
 
   private selectReorderAfterNavigation(): void {
-    const reorderTabIndex = 3;
+    const reorderTabIndex = 2;
     this.orderManagementAgencyService.reorderId$
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
@@ -94,7 +94,7 @@ export class TabNavigationComponent extends Destroyable implements OnInit {
 
   private selectReOrderTab(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
-    const reOrders = 3;
+    const reOrders = 2;
 
     if (selectedOrderAfterRedirect?.orderType === OrderType.ReOrder) {
       this.tabNavigation.select(reOrders);

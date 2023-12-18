@@ -16,7 +16,8 @@ export const OrderManagementFilterDates: string[] = [
   'creationDateFrom',
   'creationDateTo',
   'distributedOnFrom',
-  'distributedOnTo'
+  'distributedOnTo',
+  'reOrderDate'
 ];
 export const OrderJourneyFilterDates: string[] = ['jobStartDate', 'jobEndDate'];
 
