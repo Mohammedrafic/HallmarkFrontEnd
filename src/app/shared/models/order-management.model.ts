@@ -1068,3 +1068,8 @@ export interface OrderAuditHistory{
     distributedOnTo: null | string;
     reOrderDate: null | string;
   }
+
+  export interface OrderStatusesList {
+    orderStatuses: string[];
+    reorderStatuses: string[];
+  }

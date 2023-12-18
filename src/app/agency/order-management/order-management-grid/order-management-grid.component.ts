@@ -63,7 +63,7 @@ import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
   Order,
-  OrderManagementChild,
+  OrderManagementChild, OrderStatusesList,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -102,7 +102,6 @@ import { OrderManagementService } from '@client/order-management/components/orde
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { OutsideZone } from '@core/decorators';
 import { SecurityState } from 'src/app/security/store/security.state';
-import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -441,9 +440,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  //todo: add model
-  public setDefaultFilters(orderStatusesList: any): void {
-   // debugger;
+  public setDefaultFilters(orderStatusesList: OrderStatusesList): void {
     if (this.orderManagementPagerState?.filters) {
       // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
@@ -550,9 +547,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       });
   }
 
-  //todo: remove any
-  private setDefaultStatuses(orderStatusesList: any, setDefaultFilters: boolean): void {
-    console.log(orderStatusesList, '---orderStatusesList:>')
+  private setDefaultStatuses(orderStatusesList: OrderStatusesList, setDefaultFilters: boolean): void {
     if(this.ltaOrder){
       this.clearFilters();
     }
@@ -565,21 +560,20 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.filters.candidateStatuses = this.candidateStatuses.length > 0 ? this.candidateStatuses : undefined;
     }
     if (setDefaultFilters) {
-      //todo: Prepopulate
       let Status = [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled];
       const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
         Status.includes(f)
       );
 
-      const filteredReorderStatuses = orderStatusesList.reorderStatuses?.filter((status: FilterOrderStatusText) => {
-        return [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled].includes(status)
+      const filteredReorderStatuses = orderStatusesList.reorderStatuses?.filter((status: string) => {
+        return [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled].includes(status as FilterOrderStatusText)
       });
 
       setTimeout(() => {
         if (this.selectedTab === AgencyOrderManagementTabs.PerDiem) {
-          //move to condition orderStatusesList.reorderStatuses.length ? orderStatusesList.reorderStatuses : []
-          this.OrderFilterFormGroup.get('reorderStatuses')?.setValue(orderStatusesList.reorderStatuses.length ? orderStatusesList.reorderStatuses : filteredReorderStatuses);
-          this.filters.orderStatuses = orderStatusesList.reorderStatuses.length ? orderStatusesList.reorderStatuses : filteredReorderStatuses;
+          const reorderStatuses = orderStatusesList.reorderStatuses.length ? orderStatusesList.reorderStatuses : filteredReorderStatuses;
+          this.OrderFilterFormGroup.get('reorderStatuses')?.setValue(reorderStatuses);
+          this.filters.reorderStatuses = reorderStatuses;
         }
 
         if(!this.ltaOrder) {

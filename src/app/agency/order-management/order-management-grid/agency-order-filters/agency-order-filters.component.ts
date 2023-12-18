@@ -30,6 +30,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
+import { OrderStatusesList } from '@shared/models/order-management.model';
 
 enum RLDLevel {
   Orginization,
@@ -327,33 +328,36 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     });
   }
 
+  private getReorderStatusLists(): string[] {
+    if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
+      const reorderStatusList = this.filterColumns.reorderStatuses.dataSource
+        .filter((source: {status: string}) => {
+          return source.status !== FilterOrderStatusText.Closed;
+        }).map((source: {status: string}) => source.status);
+      this.form.get('reorderStatuses')?.setValue(reorderStatusList);
+      return reorderStatusList;
+    }
+
+    return [];
+  }
+
   private setDefaultFilter(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     if (!this.activeTab) {
       return;
     }
     if (!selectedOrderAfterRedirect) {
-      const statusFields = {
+      const statusFields: OrderStatusesList = {
         orderStatuses: [],
         reorderStatuses: [],
       }
 
       const orderStatuses = this.filterColumns.orderStatuses.dataSource.filter((data:any) => data !== FilterOrderStatusText["Closed"]);
 
-      //move to method
-      if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
-        const reorderStatusList = this.filterColumns.reorderStatuses.dataSource
-          .filter((source: {status: string}) => {
-          console.log(source.status, ' ---> source.status')
-          return source.status !== FilterOrderStatusText.Closed;
-        }).map((source: {status: string}) => source.status);
-        this.form.get('reorderStatuses')?.setValue(reorderStatusList);
-        statusFields.reorderStatuses = reorderStatusList;
-      }
-
+      const reorderStatuses = this.getReorderStatusLists();
+      statusFields.reorderStatuses = reorderStatuses;
       this.form.get('orderStatuses')?.setValue(orderStatuses);
       statusFields.orderStatuses = orderStatuses;
-     // debugger;
       this.setDefault.emit(statusFields);
     } else {
       this.setDefault.emit({
@@ -361,7 +365,6 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         reorderStatuses: [],
       });
     }
-    //debugger;
   }
 
   static generateFiltersForm(): FormGroup {

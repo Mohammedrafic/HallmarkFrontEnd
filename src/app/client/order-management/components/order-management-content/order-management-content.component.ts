@@ -3113,11 +3113,8 @@ public RedirecttoIRPOrder(order:Order)
         candidateStatuses = [];
       }
     } else {
-
-       //todo: here 2
       data.orderStatuses.forEach((val:any)=> val.status = val.status.trim());
       statuses = data.orderStatuses;
-      console.log(statuses, '----statuses >.')
       candidateStatuses = data.candidateStatuses.filter((status) => !AllCandidateStatuses.includes(status.status)).sort((a, b) => a.filterStatus && b.filterStatus ? a.filterStatus.localeCompare(b.filterStatus) : a.statusText.localeCompare(b.statusText));
     }
 
