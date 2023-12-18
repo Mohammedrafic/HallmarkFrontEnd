@@ -3186,7 +3186,12 @@ public RedirecttoIRPOrder(order:Order)
   private dispatchPreservedFilters(): void {
     let filterState = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersState) as OrderFilter;
 
-    if (this.activeTab === OrganizationOrderManagementTabs.Incomplete && filterState) {
+    const isIncompleteTab =
+    (this.activeTab === OrganizationOrderManagementTabs.Incomplete && this.activeSystem === OrderManagementIRPSystemId.VMS)
+    || (this.activeIRPTabIndex === OrderManagementIRPTabsIndex.Incomplete
+      && this.activeSystem === OrderManagementIRPSystemId.IRP);
+
+    if (isIncompleteTab) {
       filterState = this.checkFiltersForIncompleteTab(filterState);
     }
 
