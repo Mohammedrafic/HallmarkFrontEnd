@@ -91,7 +91,7 @@ export class StatusComponentComponent implements OnInit {
         }
       } else {
         this.cssClass = 'warning-toast';
-        this.toastObj.content = '<div>' + 'Entered OrderID was not correct' + '</div',
+        this.toastObj.content = '<div>' + 'Entered OrderID was not correct:\n' + '</div',
         this.toastObj.show();
       }
     }
