@@ -196,6 +196,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
 
   private setDropElement(): void {
     this.dropElement = this.dropArea?.nativeElement;
+    this.cdr.detectChanges();
   }
 
   private subscribeOnOpenEvent(): void {
