@@ -104,7 +104,6 @@ import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { OutsideZone } from '@core/decorators';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { DateTimeHelper } from '@core/helpers';
-import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { Router } from '@angular/router';
 
 @Component({
