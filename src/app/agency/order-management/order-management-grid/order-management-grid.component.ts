@@ -105,6 +105,7 @@ import { OutsideZone } from '@core/decorators';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { DateTimeHelper } from '@core/helpers';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -191,6 +192,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private alertOrderId:number;
   private orderPublicId:string;
   public isAgencyVisibilityFlagEnabled = false;
+  public isRedirectedFromDashboard : boolean;
 
   constructor(
     private store: Store,
@@ -203,8 +205,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private orderManagementService: OrderManagementService,
     private cd: ChangeDetectorRef,
     private readonly ngZone: NgZone,
+    private router: Router
   ) {
     super();
+    const routerState = this.router.getCurrentNavigation()?.extras?.state;
+    this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
     this.listenRedirectFromExtension();
   }
 
@@ -391,6 +396,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         (filters[filterKey] as number[]) = [item.value];
       }
     });
+
+    // this.isRedirectedFromDashboard = false;
     return filters;
   }
 
@@ -647,8 +654,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private dispatchNewPage(): void {
-    let dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
-    if(dashboardFilterState){
+    console.log(this.isRedirectedFromDashboard)
+    if(this.isRedirectedFromDashboard){
       this.filters = this.applyDashboardFilters();
       this.OrderFilterFormGroup.get('organizationIds')?.setValue(this.filters.organizationIds);
       this.OrderFilterFormGroup.get('regionIds')?.setValue(this.filters.regionIds);
@@ -711,6 +718,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   
     this.checkSelectedChildrenItem();
     this.cd.detectChanges();
+    this.isRedirectedFromDashboard=false;
   }
 
   public onGridCreated(): void {
