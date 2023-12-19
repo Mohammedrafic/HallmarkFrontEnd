@@ -43,11 +43,13 @@ export class CommentsComponent {
   @Input() disabled = false;
   @Input() orderId: number;
   public commentData: Comment[] = [];
+  public searchcommentData: Comment[] = [];
   @Output() commentSaveCheck = new EventEmitter<boolean>();
   @Input() set comments(value: Comment[]) {
     if (value?.length) {
       this.commentsList = value;
       this.commentData = value.filter((comments) => !comments.isPrivate);
+      this.searchcommentData = this.commentData;
       this.hasUnreadMessages = this.hasUnread();
       this.initView$.next();
     } else {
@@ -138,6 +140,15 @@ export class CommentsComponent {
     this.unsubscribe$.complete();
   }
 
+  onKeyUpEvent(event: any){
+    const searchValue = event.target.value;
+    let users = searchValue == '' ? this.searchcommentData : this.searchcommentData.filter(function(user){
+      return user.text.toLowerCase().indexOf(searchValue.toLowerCase()) > -1; 
+    }); 
+    this.commentData = users; 
+  }
+  public clearInputField(): void {
+  }
   private scrollToLastMessage(): void {
     this.body?.nativeElement.lastElementChild?.scrollIntoView({ block: 'nearest' });
   }
@@ -195,7 +206,7 @@ export class CommentsComponent {
     if(this.useStyle === true){
       this.commentData.unshift(comment);
     }else{
-      this.commentData.push(comment);
+      this.commentData.unshift(comment);
     }
     this.message = '';
     this.scroll$.next(null);
