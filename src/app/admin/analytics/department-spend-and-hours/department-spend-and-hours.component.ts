@@ -27,7 +27,7 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-import { CommonReportFilter, CommonReportFilterOptions } from '../models/common-report.model';
+import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto } from '../models/common-report.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
 
@@ -176,6 +176,7 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
+      this.onFilterSkillCategoryChangedHandler();
 
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.departmentspendhourReportForm.get(departmentSpendHourReportConstants.formControlNames.BusinessIds)?.enable() : this.departmentspendhourReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
@@ -278,8 +279,8 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
               // this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               // this.defaultSkills=data.masterSkills.map((list)=>list.id);
               let masterSkills = this.filterOptionsData.masterSkills;
-              let skills = masterSkills.filter((i) => data.skillCategories.map((list) => list.id)?.includes(i.skillCategoryId));
-              this.filterColumns.skillIds.dataSource = skills;
+              // let skills = masterSkills.filter((i) => data.skillCategories.map((list) => list.id)?.includes(i.skillCategoryId));
+              // this.filterColumns.skillIds.dataSource = skills;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
 
               setTimeout(() => { this.SearchReport() }, 3000);
@@ -296,8 +297,34 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
       }
     });
   }
+  public skillCategoryIdControl: AbstractControl;
+  public skillIdControl: AbstractControl;
+  selectedSkillCategories: SkillCategoryDto[];
+  selectedSkills: MasterSkillDto[];
 
-
+  public onFilterSkillCategoryChangedHandler(): void {
+    this.skillCategoryIdControl = this.departmentspendhourReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds) as AbstractControl;
+    this.skillCategoryIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.skillCategoryIdControl.value.length > 0) {
+        let masterSkills = this.filterOptionsData.masterSkills;
+        this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
+        let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
+        this.filterColumns.skillIds.dataSource = skills;
+        this.departmentspendhourReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(skills.map((list) => list.id));
+      }
+      else {
+        this.filterColumns.skillIds.dataSource = [];
+        this.departmentspendhourReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
+      }
+    });
+    this.skillIdControl = this.departmentspendhourReportForm.get(analyticsConstants.formControlNames.SkillIds) as AbstractControl;
+    this.skillIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.skillIdControl.value.length > 0) {
+        let masterSkills = this.filterOptionsData.masterSkills;
+        this.selectedSkills = masterSkills?.filter((object) => data?.includes(object.id));
+      }
+    });
+  }
   public onFilterRegionChangedHandler(): void {
 
     this.regionIdControl = this.departmentspendhourReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
