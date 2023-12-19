@@ -104,6 +104,7 @@ import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { OutsideZone } from '@core/decorators';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { DateTimeHelper } from '@core/helpers';
+import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -218,7 +219,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onReloadOrderCandidatesLists();
     this.onExportSelectedSubscribe();
     this.idFieldName = 'orderId';
-
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe((value: string) => {
       if (value.length >= 2) {
         this.OrderFilterFormGroup.controls['jobTitle'].setValue(value);
@@ -375,6 +375,23 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.openPerDiemDetails();
     this.openMyAgencyTabWithCandidate();
     this.contentLoadedHandler(this.cd);
+  }
+
+  private applyDashboardFilters(): AgencyOrderFilters {
+    const filters = {} as AgencyOrderFilters;
+    filters.orderStatuses=this.orderStatus;
+    filters.candidateStatuses=this.candidateStatuses;
+    const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
+    const items = JSON.parse(dashboardFilterState) as FilteredItem[] || [];
+    items.forEach((item: FilteredItem) => {
+      const filterKey = item.column as keyof AgencyOrderFilters;
+      if (filterKey in filters) {
+        (filters[filterKey] as number[]).push(item.value);
+      } else {
+        (filters[filterKey] as number[]) = [item.value];
+      }
+    });
+    return filters;
   }
 
   private openMyAgencyTabWithCandidate(): void {
@@ -630,6 +647,17 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private dispatchNewPage(): void {
+    let dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
+    if(dashboardFilterState){
+      this.filters = this.applyDashboardFilters();
+      this.OrderFilterFormGroup.get('organizationIds')?.setValue(this.filters.organizationIds);
+      this.OrderFilterFormGroup.get('regionIds')?.setValue(this.filters.regionIds);
+      this.OrderFilterFormGroup.get('locationIds')?.setValue(this.filters.locationIds);
+      this.OrderFilterFormGroup.get('departmentsIds')?.setValue(this.filters.departmentsIds);
+      this.OrderFilterFormGroup.get('skillIds')?.setValue(this.filters.skillIds);
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+      this.filteredItems$.next(this.filteredItems.length);
+    }
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     this.filters.orderBy = this.orderBy;
     switch (this.selectedTab) {
@@ -680,7 +708,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, filtersDefault));
         break;
     }
-
+  
     this.checkSelectedChildrenItem();
     this.cd.detectChanges();
   }
