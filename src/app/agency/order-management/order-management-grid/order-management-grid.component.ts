@@ -651,7 +651,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private dispatchNewPage(): void {
-    console.log(this.isRedirectedFromDashboard)
     if(this.isRedirectedFromDashboard){
       this.filters = this.applyDashboardFilters();
       this.OrderFilterFormGroup.get('organizationIds')?.setValue(this.filters.organizationIds);
