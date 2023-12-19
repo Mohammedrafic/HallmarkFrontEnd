@@ -32,7 +32,7 @@
             <span class="action-link-btn" (click)="downloadTemplate()">Download template</span>
           </div>
           <div class="file-uploader" #fileUploader>
-            <div id="droparea" class="droparea" (click)="browse()">
+            <div #dropArea class="droparea" (click)="browse()">
               <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
             </div>
             <div class="file-info" [class.selected-file]="selectedFile">

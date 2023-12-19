@@ -40,6 +40,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   @ViewChild('sideDialog') private sideDialog: DialogComponent;
   @ViewChild('previewupload') private uploadObj: UploaderComponent;
   @ViewChild('fileUploader') private fileUploader: ElementRef;
+  @ViewChild('dropArea') private dropArea: ElementRef;
   @ViewChild('tab') tab: TabComponent;
   @ViewChild('confirmOrderImport') confirmOrderImport: DialogComponent;
 
@@ -47,13 +48,13 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   @Output() public downloadErrorsEvent: EventEmitter<any[]> = new EventEmitter<any[]>();
   @Output() public saveImportResult: EventEmitter<any[]> = new EventEmitter<any[]>();
   @Output() public uploadImportFile: EventEmitter<Blob> = new EventEmitter<Blob>();
-  @Output() public tabChange: EventEmitter<boolean> = new EventEmitter<boolean>();  
+  @Output() public tabChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() public employeeSaveImportResult: EventEmitter<EmployeeImportSaveResult> = new EventEmitter<EmployeeImportSaveResult>();
 
 
   @Input() public dialogEvent: Subject<boolean>;
   @Input() public isOrderImport: boolean;
-  @Input() public title = 'Import';  
+  @Input() public title = 'Import';
   @Input() public isEmployeeIRPImport: boolean;
   @Input() public zIndex: number;
   @Input() public selectErrorsTab: Subject<void>;
@@ -87,7 +88,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
 
   get enabledImportButton(): boolean {
     return this.selectedFile?.statusCode === UploaderFileStatus.ReadyForUpload && !this.activeErrorTab;
-  } 
+  }
    get hideImportButton(): boolean {
     return  this.importResult == null && this.isEmployeeIRPImport
 
@@ -194,7 +195,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   }
 
   private setDropElement(): void {
-    this.dropElement = document.getElementById('droparea') as HTMLElement;
+    this.dropElement = this.dropArea?.nativeElement;
   }
 
   private subscribeOnOpenEvent(): void {
@@ -242,7 +243,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
               let employeeData :EmployeeImportSaveResult={
                 employeeImportData :this.importResult?.succesfullRecords.concat(this.importResult?.errorRecords)||[],
                 selectedFile :this.selectedFile?.rawFile as Blob
-              };             
+              };
               this.employeeSaveImportResult.next(employeeData)
             }
             else{
