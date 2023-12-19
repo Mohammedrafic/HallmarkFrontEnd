@@ -396,8 +396,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         (filters[filterKey] as number[]) = [item.value];
       }
     });
-
-    // this.isRedirectedFromDashboard = false;
     return filters;
   }
 
