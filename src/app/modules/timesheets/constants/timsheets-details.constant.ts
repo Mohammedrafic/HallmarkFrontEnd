@@ -9,7 +9,7 @@ import { GridValuesHelper } from '@core/helpers/grid-values.helper';
 import { AttachmentsListComponent } from '@shared/components/attachments';
 import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
 import { BillRateCalculationType } from '@shared/models';
-import { InvoiceHistoricalSubmission, InvoiceRecordState, RecordFields } from 'src/app/modules/timesheets/enums';
+import { InvoiceHistoricalSubmission, InvoiceRecordState, RecordFields, TimesheetSubmissionStatus } from 'src/app/modules/timesheets/enums';
 import { ActionsCellComponent } from '../components/cell-editors/actions-cell/actions-cell.component';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
 import { GridDateEditorComponent } from '../components/cell-editors/grid-date-editor/grid-date-editor.component';
@@ -220,6 +220,21 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
   amountColdef('Hours'),
   billRateColDef,
   totalCol,
+  {
+    field: 'submission',
+    headerName: 'Source',
+    width: 180,
+    minWidth: 150,
+    ...commonColumn,
+    cellClass: 'common-cell',
+    valueFormatter: (data) => {
+      if (data.value === TimesheetSubmissionStatus.Manual) {
+        return 'Manual';
+      }
+
+      return 'Integration';
+    },
+  },
   actionCol(),
 ]);
 

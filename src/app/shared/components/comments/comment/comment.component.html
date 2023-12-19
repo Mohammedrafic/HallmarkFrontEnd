@@ -2,7 +2,7 @@
   <div class="comment-header">
     <div class="name">
       <span class="avatar"><i-feather name="user" class="icon"></i-feather></span>{{ comment.firstName }}
-      {{ comment.lastName }} ({{ comment.bussinessUnitType }})
+      {{ comment.lastName }} ({{ comment.bussinessUnitType == '' ? 'Hallmark' : comment.bussinessUnitType }})
     </div>
     <div class="d-flex" *ngIf="comment.organizationName != null">
       {{ comment.organizationName }}

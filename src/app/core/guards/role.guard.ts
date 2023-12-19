@@ -24,6 +24,9 @@ export class RoleGuard implements CanActivate, CanLoad {
 
   private canNavigate(route: ActivatedRouteSnapshot | Route): boolean {
     const user = this.store.selectSnapshot(UserState.user) as User;
+    if (!user) {
+      return false;
+    }
     const businessUnitType = user.businessUnitType;
     const routeRoles = route.data ? route.data['roles'] : [];
 

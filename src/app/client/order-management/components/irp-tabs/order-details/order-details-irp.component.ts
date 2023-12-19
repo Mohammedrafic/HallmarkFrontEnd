@@ -7,6 +7,7 @@ import {
   Input,
   OnInit,
   TrackByFunction,
+  ViewChild,
 } from '@angular/core';
 import { AbstractControl,FormGroup } from '@angular/forms';
 
@@ -97,7 +98,7 @@ import {
   OrderDetailsIrpService,
 } from '@client/order-management/components/irp-tabs/services/order-details-irp.service';
 import { ButtonType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
-import { ORDER_CONTACT_DETAIL_TITLES, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { ExtensionStartDateValidation, ORDER_CONTACT_DETAIL_TITLES, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
@@ -139,6 +140,7 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import { SubmitButtonItem } from '@client/order-management/components/irp-tabs/order-details/enums';
 import{ ShiftsService } from '@organization-management/shifts/shifts.service';
+import { ToastComponent } from '@syncfusion/ej2-angular-notifications';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -147,6 +149,7 @@ import{ ShiftsService } from '@organization-management/shifts/shifts.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
+  @ViewChild('toastObj') toastObj: ToastComponent;
   @Input() set system(value: SelectSystem) {
     this.selectedSystem = value;
 
@@ -764,6 +767,17 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
     ).subscribe((value: Date) => {
       this.getAllShifts();
+      if(value != null){
+        let startDate = new Date(this.selectedOrder?.jobStartDate);
+        let twoWeekDate = new Date(startDate.setDate(startDate.getDate() + 14));
+          if(value > twoWeekDate){
+            this.toastObj.content =  '<div>'+ExtensionStartDateValidation+'</div',
+            this.toastObj.show();
+            this.generalInformationForm.get('jobStartDate')?.reset();
+            return;
+          }
+      }
+
       const duration = this.generalInformationForm.get('duration')?.value;
 
       if (isNaN(parseInt(duration)) || !(value instanceof Date)) {

@@ -331,6 +331,7 @@ export type OrderCandidatesList = {
   availabilityOverlap?: OrderAvailabilityOverlap;
   partnershipStatus: PartnershipStatus;
   suspentionDate: string;
+  cancellationReasonId?: number;
 };
 
 export interface WorkflowStepType {
