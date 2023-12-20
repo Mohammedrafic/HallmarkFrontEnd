@@ -405,7 +405,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.order.jobStartDate,
         this.order.jobEndDate
       );
-      if(endDate){
+      if (endDate && !isNaN(endDate.getTime())) {
         const dateWithoutZone = DateTimeHelper.setUtcTimeZone(endDate);
 
         this.form.patchValue({ endDate: DateTimeHelper.setCurrentTimeZone(dateWithoutZone) });  
