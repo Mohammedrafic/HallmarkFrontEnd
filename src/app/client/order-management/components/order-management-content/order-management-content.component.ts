@@ -2180,10 +2180,10 @@ public RedirecttoIRPOrder(order:Order)
       const statuses = this.filterColumns.orderStatuses.dataSource
         .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
         .map((status: FilterStatus) => status.status);
-
-      const reorderStatuses = this.filterColumns.reorderStatuses.dataSource.filter((status: FilterOrderStatus) => {
+      const reorderStatuses = this.filterColumns.reorderStatuses.dataSource?.filter((status: FilterOrderStatus) => {
         return ![FilterOrderStatusText.Closed].includes(status.status);
       }).map((status: FilterStatus) => status.status);
+
       if(this.activeSystem != OrderManagementIRPSystemId.OrderJourney){
         this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
         this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
