@@ -608,6 +608,7 @@ export interface EditOrderDto extends Omit
   billRates: OrderBillRateDto[];
   deleteDocumentsGuids: string[];
   AllowToUpdateDept?:boolean;
+  deletedBillRateIds?: number[];
 }
 
 export type AcceptJobDTO = {
@@ -630,6 +631,7 @@ export type AcceptJobDTO = {
   availableStartDate?: string | null;
   candidatePayRate: string | null;
   billRatesUpdated?: boolean;
+  deletedBillRateIds?: number[];
 };
 
 export type CandidateProfile = {

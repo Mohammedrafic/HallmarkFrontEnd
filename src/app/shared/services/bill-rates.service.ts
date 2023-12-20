@@ -180,8 +180,20 @@ export class BillRatesService {
 
     return this.http.get<BillRate[]>(endpoint);
   }
-  
+
   public getCalculatedRates(jobId: number): Observable<BillRate[]> {
     return this.http.get<BillRate[]>(`/api/candidatejobs/${jobId}/billrates`);
+  }
+
+  public canRemoveBillRate(
+    deletedBillRateId: number,
+    organizationId: number | null,
+    orderId: number | null,
+    jobId: number | null
+  ): Observable<boolean> {
+    return this.http.post<boolean>(
+      '/api/BillRates/canDeleteBillRate',
+      { jobId, orderId, organizationId, deletedBillRateId }
+    );
   }
 }

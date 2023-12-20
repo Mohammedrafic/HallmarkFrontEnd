@@ -23,6 +23,7 @@ import {
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { AbstractPermission } from "@shared/helpers/permissions";
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 
 import {
   AccordionComponent,
@@ -151,7 +152,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public get activeSystem() {
     return this._activeSystem;
   }
- 
+
   @Input() public set activeSystem(val: any) {
     this._activeSystem = val;
   }
@@ -347,6 +348,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     private changeDetectorRef: ChangeDetectorRef,
     private childOrderDialogService: ChildOrderDialogService,
     private settingService: SettingsViewService,
+    private billRatesSyncService: BillRatesSyncService,
     private orderManagementService : OrderManagementService
   ) {
     super(store);
@@ -396,10 +398,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.orderStatusText[changes['candidate'].currentValue.orderStatus]
         );
       }
-    } 
+    }
     const irpcandidate = changes["irpCandidates"]?.currentValue;
     if(irpcandidate){
-      this.setCloseOrderButtonStateforIRP();      
+      this.setCloseOrderButtonStateforIRP();
       this.setAddExtensionBtnState(irpcandidate);
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(
@@ -524,10 +526,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
             billRates: rates,
             billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.candidateJob.candidatePayRate,
+            deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
           })
         )
         .pipe(takeWhile(() => this.isAlive))
         .subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
           this.deleteUpdateFieldInRate();
         });
@@ -685,7 +689,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           createReplacement: false,
           actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
           cancellationReasonId: cancelCandidateDto.jobCancellationReason
-        
+
         })
       );
       this.updateDetails();
@@ -869,7 +873,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.setAcceptForm(orderCandidateJob);
         }
       }
-  });  
+  });
   }
   private subscribeOnCandidates(): void {
     this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {

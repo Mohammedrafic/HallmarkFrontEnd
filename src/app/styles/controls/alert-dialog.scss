@@ -5,9 +5,13 @@ body.light, body.dark {
     width: 448px;
     border-radius: 8px;
 
+    & + .e-dlg-overlay {
+      background-color: $black;
+    }
+
     div.e-dlg-header-content {
       border-radius: 8px 8px 0 0;
-      border-bottom: 1px solid $secondary-dark-blue-40;
+      border-bottom: 1px solid var(--dialog-border);
       padding: 12px 18px;
 
       .e-dlg-header {
@@ -25,7 +29,7 @@ body.light, body.dark {
 
     div.e-footer-content {
       border-radius: 0 0 8px 8px;
-      border-top: 1px solid $secondary-dark-blue-40;
+      border-top: 1px solid var(--dialog-border);
       padding: 15px;
       display: flex;
       justify-content: flex-start;
@@ -33,6 +37,10 @@ body.light, body.dark {
 
       .ok-button {
         background-color: $supportive-red;
+      }
+
+      .close-button {
+        color: $primary-active-blue-10 !important;
       }
     }
   }

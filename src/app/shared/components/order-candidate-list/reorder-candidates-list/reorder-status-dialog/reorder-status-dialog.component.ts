@@ -41,6 +41,7 @@ import { JobCancellation } from "@shared/models/candidate-cancellation.model";
 import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList, } from '@shared/models/order-management.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import PriceUtils from '@shared/utils/price.utils';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -121,7 +122,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   get isBillRatePending(): boolean {
     return (
       [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard, CandidatStatus.Rejected]
-      .includes(this.currentCandidateApplicantStatus) && (!this.isAgency || 
+      .includes(this.currentCandidateApplicantStatus) && (!this.isAgency ||
         (this.isHallmarkMspUser && this.currentCandidateApplicantStatus === CandidatStatus.Rejected)));
   }
 
@@ -191,6 +192,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     private orderCandidateListViewService: OrderCandidateListViewService,
     private cdr: ChangeDetectorRef,
     private commentsService: CommentsService,
+    private billRatesSyncService: BillRatesSyncService,
     private permissionService : PermissionService
   ) {
     super();
@@ -370,9 +372,11 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
             billRates: rates,
             billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.orderCandidateJob.candidatePayRate,
+            deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
           })
         ).pipe(takeUntil(this.destroy$))
         .subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
           this.deleteUpdateFieldInRate();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
         });
