@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable, filter, take, takeUntil } from 'rxjs';
+import { Observable, filter, take, takeUntil, switchMap, tap, catchError, EMPTY } from 'rxjs';
 
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { DateTimeHelper } from '@core/helpers';
@@ -16,11 +16,14 @@ import { AbstractPermission } from '@shared/helpers/permissions';
 import { BillRate, BillRateCalculationType, BillRateOption, BillRateUnit } from '@shared/models/bill-rate.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
 import { GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
+import { BillRatesService } from '@shared/services/bill-rates.service';
+import { AlertService } from '@shared/services/alert.service';
 
 @Component({
   selector: 'app-bill-rates',
@@ -30,6 +33,9 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   @Select(OrderManagementContentState.predefinedBillRatesOptions)
   billRatesOptions$: Observable<BillRateOption[]>;
 
+  @Input() orderId: number | null = null;
+  @Input() organizationId: number | null = null;
+  @Input() candidateJobId: number | null = null;
   @Input() isActive: boolean | null = false;
   @Input() isLocal = false;
   @Input() readOnlyMode = false;
@@ -61,7 +67,9 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   constructor(
     protected override store: Store,
     private confirmService: ConfirmService,
+    private alertService: AlertService,
     private billRatesSyncService: BillRatesSyncService,
+    private billRatesService: BillRatesService,
     ) {
     super(store);
     this.billRatesControl = new FormArray([]);
@@ -85,6 +93,11 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     this.intervalMaxField.valueChanges.pipe(takeUntil(this.componentDestroy())).subscribe(() =>
       this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
+  }
+
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.billRatesSyncService.resetDeletedBillRateIds();
   }
 
   public addBillRate(): void {
@@ -160,7 +173,9 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public removeBillRate({ index }: BillRatesGridEvent): void {
+  public removeBillRate(event: BillRatesGridEvent): void {
+    const { index, id } = event;
+
     this.confirmService
       .confirm('Are you sure you want to delete it?', {
         okButtonLabel: 'Delete',
@@ -169,10 +184,23 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       })
       .pipe(
         take(1),
-        filter((confirm) => !!confirm)
+        filter((confirm) => !!confirm),
+        switchMap(() => this.billRatesService.canRemoveBillRate(id, this.organizationId, this.orderId, this.candidateJobId)),
+        catchError(() => {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, 'Cannot check and delete this bill rate'));
+
+          return EMPTY;
+        }),
+        tap((canRemove: boolean) => {
+          if (!canRemove) {
+            this.showRemoveBillRateErrorDialog();
+          }
+        }),
+        filter(Boolean)
       )
       .subscribe(() => {
         const removeIndex = Number(index);
+        this.billRatesSyncService.addDeletedBillRateId(id);
         this.billRatesControl.removeAt(removeIndex);
         this.billRatesChanged.emit(removeIndex);
       });
@@ -304,5 +332,16 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     this.billRatesChanged.emit(this.billRateForm.getRawValue());
     this.billRateForm.reset();
     this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  private showRemoveBillRateErrorDialog(): void {
+    this.alertService
+      .alert('This Bill Rate cannot be removed as it is already in use in Timesheets.', {
+        title: 'Remove Bill Rate',
+        okButtonClass: 'e-outline close-button',
+        okButtonLabel: 'Close',
+      })
+      .pipe(take(1))
+      .subscribe();
   }
 }

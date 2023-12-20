@@ -10,6 +10,8 @@ import { CredientialExpiryAgencyComponent } from "./crediential-expiry-agency/cr
 import { UserActivityComponent } from "./user-activity/user-activity.component";
 import { CandidateEligibilityAgencyComponent } from "./candidate-eligibility-agency/candidate-eligibility-agency.component";
 import { VendorScorecardComponent } from "./vendor-scorecard/vendor-scorecard.component";
+import { TimesheetReportComponent } from "./timesheet-report/timesheet-report.component";
+
 const routes: Routes = [
   {
     path: '',
@@ -62,7 +64,16 @@ const routes: Routes = [
         component: VendorScorecardComponent,
         data: {
           isAgencyArea: true,
-        }
+        },
+
+      },
+      {
+        path: 'timesheet-report',
+        component: TimesheetReportComponent,
+        data: {
+          isAgencyArea: true,
+        },
+
       },
     ],
   },

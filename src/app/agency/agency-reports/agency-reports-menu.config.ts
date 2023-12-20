@@ -46,5 +46,11 @@ export const AGENCYREPORTS_SETTINGS: MenuSettings[] = [
     permissionKeys: ['CanViewAgencyVendorScorecard'],
 
   },
-  
+  {
+    text: 'Timesheet Report ',
+    id: 7,
+    route: './timesheet-report',
+    permissionKeys: ['CanViewAgencyTimesheetReport'],
+
+  },
 ];

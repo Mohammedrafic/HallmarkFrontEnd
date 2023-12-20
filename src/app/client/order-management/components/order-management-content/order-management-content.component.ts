@@ -2742,6 +2742,8 @@ public RedirecttoIRPOrder(order:Order)
         positionClosureReasonId: res.positionClosureReasonId,
         orderStatus: res.orderStatus,
         candidateStatus: res.applicantStatus.applicantStatus,
+        actualStartDate: res.actualStartDate,
+        actualEndDate: res.actualEndDate,
       };
       this.cd.detectChanges();
       this.dispatchAgencyOrderCandidatesList(this.selectedCandidate.orderId, this.selectedCandidate.organizationId,
@@ -2827,17 +2829,6 @@ public RedirecttoIRPOrder(order:Order)
         res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
       });
 
-    } else {
-      this.candidatesJob$.pipe(
-        filter(Boolean),
-        take(1)
-      ).subscribe((data) => {
-        this.selectedCandidate = {
-          ...this.selectedCandidate,
-          actualStartDate: data.actualStartDate,
-          actualEndDate: data.actualEndDate,
-        };
-      });
     }
   }
 

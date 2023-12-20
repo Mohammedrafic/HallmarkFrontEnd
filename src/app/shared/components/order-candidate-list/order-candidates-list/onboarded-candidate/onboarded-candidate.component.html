@@ -283,10 +283,10 @@
       </ejs-accordion>
     </div>
     <div class="comments" *ngIf="candidateJob?.commentContainerId !== null && activeSystems !== OrderManagementIRPSystemId.IRP">
-      <app-comments 
-        *ngIf="candidateJob" 
-        [comments]="candidateComments" 
-        [externalCommentConfiguration]="order.externalCommentsConfiguration" 
+      <app-comments
+        *ngIf="candidateJob"
+        [comments]="candidateComments"
+        [externalCommentConfiguration]="order.externalCommentsConfiguration"
         [commentContainerId]="candidateJob.commentContainerId || 0">
       </app-comments>
     </div>
@@ -297,7 +297,7 @@
         [useBackground]="false"
         [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP"
         [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
-        [externalCommentConfiguration]="order.externalCommentsConfiguration" 
+        [externalCommentConfiguration]="order.externalCommentsConfiguration"
       ></app-comments-irp>
     </div>
 
@@ -311,6 +311,8 @@
       <app-bill-rates
         [billRates]="billRatesData"
         [isActive]="isActiveCandidateDialog$ | async"
+        [candidateJobId]="candidateJob?.jobId || null"
+        [organizationId]="candidateJob?.organizationId || null"
         [readOnlyMode]="isReadOnlyBillRates"
         (billRatesChanged)="onBillRatesChanged($event)"
       ></app-bill-rates>
