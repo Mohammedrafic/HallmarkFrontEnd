@@ -634,7 +634,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public onSave(): void {
     if (this.isCancelled) {
       this.updateOrganisationCandidateJob();
-    }else if(this.candidateJob?.applicantStatus.applicantStatus==CandidatStatus.OnBoard)
+    }else if(this.candidateJob?.applicantStatus.applicantStatus==CandidatStatus.OnBoard && this.selectedApplicantStatus?.applicantStatus !== ApplicantStatusEnum.Cancelled)
     {
       this.updateOrganisationCandidateonboardJob()
     } 
@@ -1134,7 +1134,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         statusText:"Onboard",
       },
     };
-    this.store.dispatch(new UpdateOrganisationCandidateJob(candidateJob));
+    this.store.dispatch(new UpdateOrganisationCandidateJob(candidateJob)).pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.closeSideDialog()
+        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+      }
+      )
   }
   private enabledisableAcceptform()
   {
