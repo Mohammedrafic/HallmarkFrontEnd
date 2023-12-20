@@ -634,7 +634,11 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public onSave(): void {
     if (this.isCancelled) {
       this.updateOrganisationCandidateJob();
-    } else {
+    }else if(this.candidateJob?.applicantStatus.applicantStatus==CandidatStatus.OnBoard && this.selectedApplicantStatus?.applicantStatus !== ApplicantStatusEnum.Cancelled)
+    {
+      this.updateOrganisationCandidateonboardJob()
+    } 
+    else {
       this.saveHandler({ itemData: this.selectedApplicantStatus });
     }
   }
@@ -962,6 +966,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.acceptForm.get('hourlyRate')?.enable();
         this.acceptForm.get('candidateBillRate')?.disable();
         break;
+      case CandidatStatus.OnBoard:
+         this.enabledisableAcceptform()
+        break;
       case CandidatStatus.OfferedBR:
       case CandidatStatus.OnBoard:
       case CandidatStatus.Rejected:
@@ -1107,5 +1114,56 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   private checkForBillRateUpdate(rates: BillRate[]): boolean {
     return rates.some((rate) => !!rate.isUpdated);
+  }
+  private updateOrganisationCandidateonboardJob(): void {
+    const value = this.acceptForm.getRawValue();
+    const candidateJob = {
+      actualStartDate: this.candidateJob?.actualStartDate,
+      actualEndDate: this.candidateJob?.actualEndDate,
+      billRates: this.candidateJob?.billRates,
+      orderId: this.candidateJob?.orderId as number,
+      organizationId: this.candidateJob?.organizationId as number,
+      jobId: this.candidateJob?.jobId as number,
+      candidateBillRate: value.candidateBillRate,
+      candidatePayRate: value.candidatePayRate,
+      offeredBillRate: value.offeredBillRate,
+      clockId: value.clockId,
+      skillName: value.skillName,
+      nextApplicantStatus: {
+        applicantStatus: ApplicantStatus.OnBoarded,
+        statusText:"Onboard",
+      },
+    };
+    this.store.dispatch(new UpdateOrganisationCandidateJob(candidateJob)).pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.closeSideDialog()
+        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+      }
+      )
+  }
+  private enabledisableAcceptform()
+  {
+    if(!this.isAgency)
+    { this.acceptForm.get('candidateBillRate')?.disable();
+      this.acceptForm.get('hourlyRate')?.disable();
+      this.acceptForm.get('clockId')?.enable();
+    }
+  }
+  private setCorrectActualDates(initDate: string, shiftStartTime: Date, shiftEndTime: Date) {
+    if (shiftStartTime > shiftEndTime) {
+      const formatedInitDate = DateTimeHelper.setUtcTimeZone(initDate);
+      const endDate = new Date(new Date(new Date(formatedInitDate).setDate(new Date(formatedInitDate)
+      .getDate() + 1)).setHours(0, 0, 0));
+
+      return {
+        actualStartDate: DateTimeHelper.setUtcTimeZone(initDate),
+        actualEndDate: DateTimeHelper.setUtcTimeZone(endDate),
+      };
+    }
+
+    return {
+      actualStartDate: DateTimeHelper.setUtcTimeZone(initDate),
+      actualEndDate: DateTimeHelper.setUtcTimeZone(initDate),
+    };
   }
 }

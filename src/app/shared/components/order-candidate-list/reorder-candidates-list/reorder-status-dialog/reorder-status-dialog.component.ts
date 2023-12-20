@@ -35,7 +35,7 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationVa
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderType } from '@shared/enums/order-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
-import { CandidatesStatusText } from '@shared/enums/status';
+import { CandidatesStatusText, CandidateStatus } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
 import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList, } from '@shared/models/order-management.model';
@@ -224,6 +224,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
     if (statusId && status) {
       this.handleOnboardedCandidate(status);
+    }else if(this.orderCandidateJob.applicantStatus.applicantStatus==ApplicantStatusEnum.OnBoarded)
+    {
+      this.updateOrganisationCandidateJob(false,this.orderCandidateJob.applicantStatus)
     }
   }
 
@@ -510,6 +513,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         offeredBillRate: isCandidateRevert ? this.orderCandidateJob?.candidateBillRate : value.hourlyRate,
         candidateBillRate: value.candidateBillRate,
         billRates: this.orderCandidateJob.billRates,
+        clockId: value.clockId,
         ...actualDates,
         candidatePayRate: value.candidatePayRate,
         nextApplicantStatus: {
@@ -649,6 +653,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         this.canReject && this.canOffer && this.canOnboard && this.acceptForm.get('hourlyRate')?.enable();
         this.acceptForm.get('candidateBillRate')?.disable();
         break;
+      case !this.isAgency && CandidatStatus.OnBoard:
+      this.enabledisableAcceptform()
+      break;
       case CandidatStatus.OfferedBR:
       case CandidatStatus.OnBoard:
       case CandidatStatus.Rejected:
@@ -769,5 +776,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
       this.canCreateOrder = canCreateOrder;
     });
+  }
+  private enabledisableAcceptform()
+  {
+    if(!this.isAgency)
+    { this.acceptForm.get('candidateBillRate')?.disable();
+      this.acceptForm.get('hourlyRate')?.disable();
+      this.acceptForm.get('clockId')?.enable();
+    }
   }
 }
