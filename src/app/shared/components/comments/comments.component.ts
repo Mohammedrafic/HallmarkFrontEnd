@@ -143,7 +143,7 @@ export class CommentsComponent {
   onKeyUpEvent(event: any){
     const searchValue = event.target.value;
     let users = searchValue == '' ? this.searchcommentData : this.searchcommentData.filter(function(user){
-      return user.text.toLowerCase().indexOf(searchValue.toLowerCase()) > -1; 
+      return (user.text.toLowerCase() || user.createdAt.toString().toLowerCase() || user.firstName.toLowerCase() || user.lastName.toLowerCase()).indexOf(searchValue.toLowerCase()) > -1; 
     }); 
     this.commentData = users; 
   }
@@ -184,7 +184,7 @@ export class CommentsComponent {
       this.isExternal = !this.isExternal;
     }
   }
-
+  
   public send(): void {
     if (!this.message) {
       return;
@@ -216,6 +216,7 @@ export class CommentsComponent {
   }
 
   public onFilterChange(event: SelectEventArgs): void {
+    debugger
     this.commentData = this.commentsList;
     event.itemData.value === CommentsFilter.External
       ? (this.commentData = this.commentData.filter(
@@ -230,6 +231,7 @@ export class CommentsComponent {
     event.itemData.value === CommentsFilter.All
       ? (this.commentData = this.commentData.filter((comments) => comments.isPrivate === false))
       : this.commentData;
+    this.searchcommentData = this.commentData;
     this.commentType = event.itemData.value;
     this.scroll$.next(null);
   }

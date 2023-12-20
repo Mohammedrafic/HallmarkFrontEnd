@@ -71,3 +71,15 @@
     width: 100%;
   }
 }
+
+.search-comment{
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-comment:hover{
+  overflow: unset !important;
+}
