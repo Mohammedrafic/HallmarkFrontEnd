@@ -513,6 +513,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         offeredBillRate: isCandidateRevert ? this.orderCandidateJob?.candidateBillRate : value.hourlyRate,
         candidateBillRate: value.candidateBillRate,
         billRates: this.orderCandidateJob.billRates,
+        clockId: value.clockId,
         ...actualDates,
         candidatePayRate: value.candidatePayRate,
         nextApplicantStatus: {

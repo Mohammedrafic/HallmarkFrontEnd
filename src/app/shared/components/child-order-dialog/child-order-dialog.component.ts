@@ -1117,7 +1117,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
   private updateOrganisationCandidateonboardJob(): void {
     const value = this.acceptForm.getRawValue();
-    const candidateJob: AcceptJobDTO = {
+    const candidateJob = {
+      actualStartDate: this.candidateJob?.actualStartDate,
+      actualEndDate: this.candidateJob?.actualEndDate,
+      billRates: this.candidateJob?.billRates,
       orderId: this.candidateJob?.orderId as number,
       organizationId: this.candidateJob?.organizationId as number,
       jobId: this.candidateJob?.jobId as number,
@@ -1125,10 +1128,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       candidatePayRate: value.candidatePayRate,
       offeredBillRate: value.offeredBillRate,
       clockId: value.clockId,
+      skillName: value.skillName,
       nextApplicantStatus: {
         applicantStatus: ApplicantStatus.OnBoarded,
         statusText:"Onboard",
-        isEnabled: true,
       },
     };
     this.store.dispatch(new UpdateOrganisationCandidateJob(candidateJob));
@@ -1140,5 +1143,22 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.acceptForm.get('hourlyRate')?.disable();
       this.acceptForm.get('clockId')?.enable();
     }
+  }
+  private setCorrectActualDates(initDate: string, shiftStartTime: Date, shiftEndTime: Date) {
+    if (shiftStartTime > shiftEndTime) {
+      const formatedInitDate = DateTimeHelper.setUtcTimeZone(initDate);
+      const endDate = new Date(new Date(new Date(formatedInitDate).setDate(new Date(formatedInitDate)
+      .getDate() + 1)).setHours(0, 0, 0));
+
+      return {
+        actualStartDate: DateTimeHelper.setUtcTimeZone(initDate),
+        actualEndDate: DateTimeHelper.setUtcTimeZone(endDate),
+      };
+    }
+
+    return {
+      actualStartDate: DateTimeHelper.setUtcTimeZone(initDate),
+      actualEndDate: DateTimeHelper.setUtcTimeZone(initDate),
+    };
   }
 }
