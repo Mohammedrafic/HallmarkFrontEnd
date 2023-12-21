@@ -944,19 +944,21 @@
         </div>
       </div>
     </div>
-    <div class="input-container calendar" *ngIf="!isActiveSystemIRP && activeTab === OrganizationOrderManagementTabs.PerDiem">
-      <label for="reOrderDate">Re-Order Date</label>
-      <div class="input-group datepicker">
-        <ejs-datepicker
-          id="reOrderDate"
-          class="datepicker"
-          [format]="formatDate"
-          [placeholder]="placeholderDate"
-          [enableMask]="true"
-          [maskPlaceholder]="datepickerMask"
-          formControlName="reOrderDate"
-        >
-        </ejs-datepicker>
+    <div class="bootstrap">
+      <div class="input-container calendar" *ngIf="!isActiveSystemIRP && activeTab === OrganizationOrderManagementTabs.PerDiem">
+        <label for="reOrderDate">Re-Order Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            id="reOrderDate"
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            formControlName="reOrderDate"
+          >
+          </ejs-datepicker>
+        </div>
       </div>
     </div>
     <div class="filter-row bootstrap"
@@ -1139,8 +1141,10 @@
         </div>
       </div>
     </div>
-    <div class="filter-row bootstrap"
-    *ngIf="(activeTab !== OrganizationOrderManagementTabs.PerDiem && !isActiveSystemIRP) || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
+    <div
+      class="filter-row bootstrap"
+      *ngIf="($any(activeTab) !== OrganizationOrderManagementTabs.Incomplete && !isActiveSystemIRP) || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)"
+    >
       <div class="input-container">
         <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Count From</label>
         <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Count From</label>
@@ -1155,7 +1159,11 @@
           <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountTo" />
         </div>
       </div>
-      <div class="input-container number-of-positions">
+    </div>
+    <div class="bootstrap">
+      <div
+        class="input-container number-of-positions"
+        *ngIf="(activeTab !== OrganizationOrderManagementTabs.PerDiem && !isActiveSystemIRP) || (isActiveSystemIRP && activeIRPTabIndex !== OrderManagementIRPTabsIndex.Incomplete)">
         <label for="numberOfPositions"># of Positions</label>
         <div class="input-group">
           <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />

@@ -57,6 +57,7 @@ import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { Comment } from '@shared/models/comment.model';
 import {
   AcceptJobDTO,
@@ -121,12 +122,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public get activeSystem() {
     return this._activeSystem;
   }
- 
+
   @Input() public set activeSystem(val: any) {
     this._activeSystem = val;
     this.subsToCandidate();
   }
-  
+
   public candidate$: Observable<OrderCandidatesList | null>;
 
   @Select(OrderManagementState.orderCandidatePage)
@@ -265,6 +266,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private settingService: SettingsViewService,
     private permissionService: PermissionService,
     private confirmService: ConfirmService,
+    private billRatesSyncService: BillRatesSyncService,
     private orderManagementService: OrderManagementService,
     private editIrpCandidateService: EditIrpCandidateService
   ) {
@@ -340,9 +342,14 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         billRates: rates,
         billRatesUpdated: this.checkForBillRateUpdate(rates),
         candidatePayRate: this.candidateJob.candidatePayRate,
+        deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
       };
 
-      this.store.dispatch(new UpdateOrganisationCandidateJob(valueForUpdate));
+      this.store.dispatch(new UpdateOrganisationCandidateJob(valueForUpdate))
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
+        });
       this.deleteUpdateFieldInRate();
     }
   }
@@ -417,7 +424,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           createReplacement: false,
           actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
           cancellationReasonId: cancelCandidateDto.jobCancellationReason
-        
+
         })
       );
       this.updateDetails.emit();

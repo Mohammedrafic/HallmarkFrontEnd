@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { DOCUMENT, Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime, Subject } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime, Subject, take } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction, FilterPageName } from '@core/enums';
@@ -303,13 +303,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
     idStream
       .pipe(
-        debounceTime(600),
         filter((id) => !!id),
         switchMap(() => {
           return this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
         }),
         switchMap(() => this.preservedFiltersByPageName$),
         filter(({ dispatch }) => dispatch),
+        debounceTime(600),
         tap((filters) => {
           this.filters = filters.state;
         }),
@@ -324,7 +324,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.timesheetsFilters$
       .pipe(
         filter(Boolean),
-        debounceTime(300),
+        debounceTime(600),
         filter((filters) => (this.isAgency ? !isNaN(filters.organizationId as number) : true)),
         switchMap(() => this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()])),
         takeUntil(this.componentDestroy())
@@ -357,7 +357,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       .dispatch(new Timesheets.GetOrganizationsForAgency(this.user.id))
       .pipe(
         switchMap(() => this.agencyOrganizations$.pipe(filter((res: AgencyDataSourceItem[]) => !!res.length))),
-        takeUntil(this.componentDestroy())
+        take(1)
       )
       .subscribe((res) => {
         this.organizations= res.filter((item)=> item.regions.length>0)
@@ -371,7 +371,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       .dispatch(new Timesheets.GetOrganizations())
       .pipe(
         switchMap(() => this.organizations$.pipe(filter((res: DataSourceItem[]) => !!res.length))),
-        takeUntil(this.componentDestroy())
+        take(1)
       )
       .subscribe((res) => {
         const orgId = this.routerState?.["condition"] === "setOrg"

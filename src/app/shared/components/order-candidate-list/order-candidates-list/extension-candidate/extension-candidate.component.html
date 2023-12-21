@@ -336,6 +336,8 @@
     <ng-template #editBillRates>
       <app-bill-rates
         [billRates]="billRatesData"
+        [candidateJobId]="candidateJob?.jobId || null"
+        [organizationId]="candidateJob?.organizationId || null"
         (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)"
         [isActive]="true"
         [isExtension]="!!currentOrder?.extensionFromId"

@@ -2181,10 +2181,10 @@ public RedirecttoIRPOrder(order:Order)
       const statuses = this.filterColumns.orderStatuses.dataSource
         .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed, FilterOrderStatusText.Incomplete].includes(status.status))
         .map((status: FilterStatus) => status.status);
-
-      const reorderStatuses = this.filterColumns.reorderStatuses.dataSource.filter((status: FilterOrderStatus) => {
+      const reorderStatuses = this.filterColumns.reorderStatuses.dataSource?.filter((status: FilterOrderStatus) => {
         return ![FilterOrderStatusText.Closed].includes(status.status);
       }).map((status: FilterStatus) => status.status);
+
       if(this.activeSystem != OrderManagementIRPSystemId.OrderJourney){
         this.filters.orderStatuses = (this.SelectedStatus.length > 0) ? this.SelectedStatus : statuses;
         this.filters.candidateStatuses = (this.candidateStatusIds.length > 0) ? this.candidateStatusIds : [];
@@ -2743,6 +2743,8 @@ public RedirecttoIRPOrder(order:Order)
         positionClosureReasonId: res.positionClosureReasonId,
         orderStatus: res.orderStatus,
         candidateStatus: res.applicantStatus.applicantStatus,
+        actualStartDate: res.actualStartDate,
+        actualEndDate: res.actualEndDate,
       };
       this.cd.detectChanges();
       this.dispatchAgencyOrderCandidatesList(this.selectedCandidate.orderId, this.selectedCandidate.organizationId,
@@ -2828,17 +2830,6 @@ public RedirecttoIRPOrder(order:Order)
         res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
       });
 
-    } else {
-      this.candidatesJob$.pipe(
-        filter(Boolean),
-        take(1)
-      ).subscribe((data) => {
-        this.selectedCandidate = {
-          ...this.selectedCandidate,
-          actualStartDate: data.actualStartDate,
-          actualEndDate: data.actualEndDate,
-        };
-      });
     }
   }
 
