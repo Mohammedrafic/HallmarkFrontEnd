@@ -1,7 +1,7 @@
 <section class="flex-column">
   <app-page-toolbar>
     <ng-container left>
-      <section class="page-title">
+      <section class="page-title" *ngIf="!isMobile">
         <h3>Organization List</h3>
       </section>
     </ng-container>

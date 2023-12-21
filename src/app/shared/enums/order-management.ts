@@ -16,7 +16,9 @@ export enum OrderStatus {
 }
 
 export enum OrderStatusIRP {
-  OnBoard = 60
+  OnBoard = 60,
+  Cancelled = 110,
+  Offboard = 90
 }
 
 export enum CandidateJobStatus {
