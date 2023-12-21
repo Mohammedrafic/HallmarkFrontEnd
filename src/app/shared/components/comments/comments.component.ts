@@ -143,7 +143,10 @@ export class CommentsComponent {
   onKeyUpEvent(event: any){
     const searchValue = event.target.value;
     let users = searchValue == '' ? this.searchcommentData : this.searchcommentData.filter(function(user){
-      return (user.text.toLowerCase() || user.createdAt.toString().toLowerCase() || user.firstName.toLowerCase() || user.lastName.toLowerCase()).indexOf(searchValue.toLowerCase()) > -1; 
+      return (user.text.toString().toLowerCase().indexOf(searchValue.toLowerCase()) > -1 ||
+      new Date(user.createdAt).toLocaleDateString().indexOf(searchValue.toLowerCase()) > -1 ||
+      user.firstName.toLowerCase().indexOf(searchValue.toLowerCase()) > -1 ||
+      user.lastName.toLowerCase().indexOf(searchValue.toLowerCase()) > -1);
     }); 
     this.commentData = users; 
   }
@@ -216,7 +219,6 @@ export class CommentsComponent {
   }
 
   public onFilterChange(event: SelectEventArgs): void {
-    debugger
     this.commentData = this.commentsList;
     event.itemData.value === CommentsFilter.External
       ? (this.commentData = this.commentData.filter(
