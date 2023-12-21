@@ -624,9 +624,9 @@ export class SecurityState {
   @Action(GetOrganizationsStructureAll)
   GetOrganizationsStructureAll(
     { dispatch, patchState }: StateContext<SecurityStateModel>,
-    { userId }: GetOrganizationsStructureAll
+    { userId, visibiltySettings }: GetOrganizationsStructureAll
   ): Observable<Organisation[] | void> {
-    return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(
+    return this.userService.getUserVisibilitySettingsOrganisation(userId, visibiltySettings).pipe(
       tap((payload) => {
         payload.forEach(item => {
           item.regions.forEach(region => region.organisationName = item.name);
