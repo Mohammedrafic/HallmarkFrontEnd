@@ -118,8 +118,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   activeSystems: OrderManagementIRPSystemId | null;
   CanOrganizationEditOrdersIRP: boolean;
   CanOrganizationViewOrdersIRP: boolean;
-  isIRP: boolean;
-  irpReason: CandidateCancellationReason[];
+  irpReasonName: string;
   public get activeSystem() {
     return this._activeSystem;
   }
@@ -286,7 +285,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   ngOnInit(): void {
     this.activeSystems = this.orderManagementService.getOrderManagementSystem();
-    this.isIRP = this.activeSystem === OrderManagementIRPSystemId.IRP ? true : false;
     this.subscribeOnPermissions();
     this.subsToCandidate();
     this.rejectReasons$ = this.subscribeOnReasonsList();
@@ -582,10 +580,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             } else {
               this.orgId = this.currentOrder?.organizationId
             }
-            if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+            if(this.activeSystem === OrderManagementIRPSystemId.IRP && this.candidate?.cancellationReasonId !== null){
               this.reasons = this.editIrpCandidateService.createReasonsOptionsforCancel(this.editIrpCandidateService.getCancelEmployeeReasons()) ?? [];
-              this.irpReason = this.reasons.filter(item => item.id === this.candidate?.cancellationReasonId);
-           }
+              const irpReason = this.reasons.filter(item => item.id === this.candidate?.cancellationReasonId);
+              this.irpReasonName = irpReason[0].name;
+           }   
             const candidateJobId = candidate?.candidateJobId;
             const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;
             if (this.orgId && candidateJobId) {

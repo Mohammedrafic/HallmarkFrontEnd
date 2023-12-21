@@ -82,7 +82,7 @@ import {
   CandidatStatus,
 } from '@shared/enums/applicant-status.enum';
 import { MessageTypes } from '@shared/enums/message-types';
-import { OrderStatus } from '@shared/enums/order-management';
+import { OrderStatus, OrderStatusIRP } from '@shared/enums/order-management';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
@@ -398,15 +398,16 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           this.orderStatusText[changes['candidate'].currentValue.orderStatus]
         );
       }
-    }
-    const irpcandidate = changes["irpCandidates"]?.currentValue;
+    } 
+    const irpcandidate = changes["candidateirp"]?.currentValue;
     if(irpcandidate){
-      this.setCloseOrderButtonStateforIRP();
+      this.setCloseOrderButtonStateforIRP(irpcandidate);      
       this.setAddExtensionBtnState(irpcandidate);
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(
-          this.orderStatusText[changes['irpCandidates'].currentValue.orderStatus]
+          this.CandidatesStatusText[changes['candidateirp'].currentValue.status]
         );
+        this.chipList.text = this.CandidatesStatusText[changes['candidateirp'].currentValue.statusName];
       }
 
     }
@@ -423,10 +424,13 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       !!this.order?.orderCloseDate;
   }
 
-  public setCloseOrderButtonStateforIRP(): void {
+  public setCloseOrderButtonStateforIRP(irpCandidate: IRPOrderPosition): void {
     this.disabledCloseButtonforIRP =
-      !!this.irpCandidates?.positionClosureReasonId ||
-      !!this.order?.orderCloseDate ;
+      !!irpCandidate?.positionClosureReasonId ||
+      !!this.order?.orderCloseDate || 
+      irpCandidate?.status === OrderStatusIRP.Cancelled || 
+      irpCandidate?.status === OrderStatusIRP.Offboard || 
+      !!irpCandidate?.closeDate;
   }
 
   public closeOrder(order: MergedOrder): void {
@@ -880,7 +884,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       if(this.isOrganization && this.activeSystem !== OrderManagementIRPSystemId.VMS){
         if(irpCandidates){
           irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
-          this.setCloseOrderButtonStateforIRP();
+          this.setCloseOrderButtonStateforIRP(this.irpCandidates);
           this.getExtensionsforIRP();
           this.getCommentsforIRP();
         }

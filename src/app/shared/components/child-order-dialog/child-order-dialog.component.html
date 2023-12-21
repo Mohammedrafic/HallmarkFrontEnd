@@ -26,11 +26,11 @@
                   ></e-chip>
                 </e-chips>
               </ejs-chiplist>
-              <ejs-chiplist #chipList class="events-off" *ngIf="irpCandidates?.status && activeSystem === OrderManagementIRPSystemId.IRP">
+              <ejs-chiplist #chipList class="events-off" *ngIf="candidateirp?.status && activeSystem === OrderManagementIRPSystemId.IRP">
                 <e-chips>
                   <e-chip
-                    [text]="CandidatesStatusText[irpCandidates.status]"
-                    [cssClass]="CandidatesStatusText[irpCandidates.status] | chipsCssClass"
+                    [text]="CandidatesStatusText[candidateirp.status]"
+                    [cssClass]="CandidatesStatusText[candidateirp.status] | chipsCssClass"
                   ></e-chip>
                 </e-chips>
               </ejs-chiplist>
@@ -140,7 +140,7 @@
                       <app-onboarded-candidate
                         *ngIf="!isReorderType"
                         [candidate]="$any(candidate)"
-                        [irpCandidate]="$any(irpCandidates)"
+                        [irpCandidate]="$any(candidateirp)"
                         [isTab]="true"
                         appUnsavedForm
                         (closeModalEvent)="onClose()"
