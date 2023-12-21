@@ -722,6 +722,7 @@ public watchForOrderIRPSubRowClickEvent(){
       this.irpSubOrder = Order;
       this.systemType = system;
     if(orderData.system === 'IRP' && Order.orderType === OrderType.LongTermAssignment){
+      this.subscribeToCandidateJob();
       this.openIrpSubrowDetails(Order, orderData, system)
     }
 })
@@ -2823,7 +2824,7 @@ public RedirecttoIRPOrder(order:Order)
 
   private subscribeToCandidateJob(): void {
     if(this.activeSystem === OrderManagementIRPSystemId.IRP){
-      this.getIrpCandidatesforExtension$.pipe(take(1), filter(Boolean)).subscribe((res) => {
+      this.getIrpCandidatesforExtension$.pipe(take(2), filter(Boolean)).subscribe((res) => {
         res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
       });
 
