@@ -29,12 +29,12 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { UserState } from 'src/app/store/user.state';
 import { ShowCloseOrderDialog, ShowToast } from '../../../../store/app.actions';
 import { PermissionService } from 'src/app/security/services/permission.service';
-import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-close-order',
   templateUrl: './close-order.component.html',
   styleUrls: ['./close-order.component.scss'],
+  providers: [CloseOrderService],
 })
 export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit {
   @Input() public order: Order | OrderManagement;
@@ -163,28 +163,14 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     });
   }
 
-  private getPositionMaxDate(): string | null {
-    if (this.candidate.actualEndDate) {
-      return formatDate(this.candidate.actualEndDate, 'MM/dd/yyyy', 'en-US', 'UTC');
-    }
-    return null;
-  }
-
-  private getReorderMaxDate(): string | null {
-    if (this.order.jobStartDate) {
-      return formatDate(this.order.jobStartDate, 'MM/dd/yyyy', 'en-US', 'UTC');
-    }
-    return null;
-  }
-
   private setMaxDate(): void {
     let maxDate;
     if (this.order.orderType === OrderType.ReOrder) {
-      maxDate = this.getReorderMaxDate();
+      maxDate = this.closeOrderService.getReorderMaxDate(this.order);
     } else if (this.isPosition && this.candidate !== null) {
-      maxDate = this.getPositionMaxDate();
+      maxDate = this.closeOrderService.getPositionMaxDate(this.candidate);
     } else {
-      maxDate = this.order.jobEndDate;
+      maxDate = this.closeOrderService.getOrderMaxDate(this.order);
     }
     this.maxDate = maxDate || null;
   }
