@@ -88,10 +88,6 @@ section {
       grid-template-areas: 'left left right right';
       row-gap: 17px;
 
-      &:not(.extension, .reorders) {
-        padding-bottom: 0;
-      }
-
       &.extension,
       &.reorders {
         grid-template-columns: repeat(4, 1fr);
@@ -234,6 +230,16 @@ section {
       .column {
         grid-column: 1/3;
       }
+    }
+
+    .no-bottom-padding {
+      padding-bottom: 0;
+    }
+  }
+
+  .candidates-additional-info {
+    .container-row  {
+      grid-template-columns: repeat(4, 1fr);
     }
   }
 }
