@@ -400,6 +400,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public selectedCandidate: any | null;
   public selectedReOrder: any | null;
   public openChildDialog = new Subject<any>();
+  public closeChildDialog = new Subject<any>();
   public isRowScaleUp = true;
   public isSubrowDisplay = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
@@ -2105,6 +2106,7 @@ public RedirecttoIRPOrder(order:Order)
       }
 
       if (data?.items.length && this.redirectfromextension) {
+        this.closeChildDialog.next(null);
         this.openIRPdialog(data.items[0] as unknown as IRPOrderManagement);
       }
 
@@ -2824,12 +2826,9 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   private subscribeToCandidateJob(): void {
-    if(this.activeSystem === OrderManagementIRPSystemId.IRP){
       this.getIrpCandidatesforExtension$.pipe(take(1), filter(Boolean)).subscribe((res) => {
         res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
       });
-
-    }
   }
 
   private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number, isIrp: boolean): void {

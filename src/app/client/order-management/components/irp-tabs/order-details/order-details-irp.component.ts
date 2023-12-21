@@ -124,7 +124,7 @@ import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
-import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
+import { addDays, getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { Permission } from '@core/interface/permission.interface';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 import { OrderManagementService } from '../../order-management-content/order-management.service';
@@ -141,6 +141,7 @@ import { IrpOrderJobDistribution } from '@shared/enums/job-distibution';
 import { SubmitButtonItem } from '@client/order-management/components/irp-tabs/order-details/enums';
 import{ ShiftsService } from '@organization-management/shifts/shifts.service';
 import { ToastComponent } from '@syncfusion/ej2-angular-notifications';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-order-details-irp',
@@ -150,6 +151,7 @@ import { ToastComponent } from '@syncfusion/ej2-angular-notifications';
 })
 export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   @ViewChild('toastObj') toastObj: ToastComponent;
+  minDate: Date;
   @Input() set system(value: SelectSystem) {
     this.selectedSystem = value;
 
@@ -773,8 +775,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
           if(value > twoWeekDate){
             this.toastObj.content =  '<div>'+ExtensionStartDateValidation+'</div',
             this.toastObj.show();
-            this.generalInformationForm.get('jobStartDate')?.reset();
-            return;
+            this.generalInformationForm.get('jobStartDate')?.setValue(this.selectedOrder.jobStartDate);
           }
       }
 
@@ -1226,6 +1227,10 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       }),
       takeUntil(this.componentDestroy())
     ).subscribe(({MandatorySpecialProjectDetails}) => {
+      if(this.selectedOrder.extensionFromId !== null){
+        const minDate = addDays(this.selectedOrder?.jobStartDate, 1)!;
+        this.minDate = DateTimeHelper.setCurrentTimeZone(minDate.toString());  
+      }
       this.distribution= {
         regionId: this.selectedOrder.regionId,
         locationId: this.selectedOrder.locationId,
