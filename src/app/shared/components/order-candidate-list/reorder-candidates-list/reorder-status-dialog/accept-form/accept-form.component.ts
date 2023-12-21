@@ -68,6 +68,7 @@ export class AcceptFormComponent implements OnChanges{
 
   public ngOnChanges(): void {
       this.configureCandidatePayRateField();
+      this.disableClockId();
   }
 
   private configureCandidatePayRateField(): void {
@@ -83,11 +84,19 @@ export class AcceptFormComponent implements OnChanges{
   }
 
   private disableClockId(): void {
+    const isOfferStatus = this.status === CandidatStatus.OnBoard;
     const candidateClockId = this.formGroup.get('clockId');
-
-    if (this.isReorder) {
-      candidateClockId?.disable();
-    } else {
+    if (this.isReorder && this.isAgency) {
+       candidateClockId?.disable();
+    }else if(this.isReorder && !this.isAgency && isOfferStatus)
+    {
+      candidateClockId?.enable()
+    } 
+    else if(this.isReorder && !this.isAgency && !isOfferStatus)
+    {
+      candidateClockId?.disable()
+    } 
+    else {
       candidateClockId?.enable();
     }
   }

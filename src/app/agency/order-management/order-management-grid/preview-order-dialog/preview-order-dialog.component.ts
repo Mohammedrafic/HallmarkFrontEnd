@@ -116,7 +116,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   public get getTitle(): string {
     return (
-      (this.isReOrder ? `Re-Order ID ` : `Order ID `) + `${this.order?.organizationPrefix}-${this.order?.publicId}`
+      (this.isReOrder ? `Re-Order ` : `Order `) + `${this.order?.organizationPrefix}-${this.order?.publicId}`
     );
   }
 

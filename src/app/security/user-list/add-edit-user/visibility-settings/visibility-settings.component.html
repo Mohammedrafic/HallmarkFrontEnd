@@ -48,6 +48,11 @@
           <span>{{data.departmentId === null ? 'All' : data.departmentName}}</span>
         </ng-template>
       </e-column>
+      <e-column headerText="Entity" width=190 *ngIf="isMspUser">
+        <ng-template #template let-data>
+          <span>{{data.entityName}}</span>
+        </ng-template>
+      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">

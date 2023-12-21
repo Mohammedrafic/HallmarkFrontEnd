@@ -57,6 +57,7 @@ import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { Comment } from '@shared/models/comment.model';
 import {
   AcceptJobDTO,
@@ -117,17 +118,16 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   activeSystems: OrderManagementIRPSystemId | null;
   CanOrganizationEditOrdersIRP: boolean;
   CanOrganizationViewOrdersIRP: boolean;
-  isIRP: boolean;
-  irpReason: CandidateCancellationReason[];
+  irpReasonName: string;
   public get activeSystem() {
     return this._activeSystem;
   }
- 
+
   @Input() public set activeSystem(val: any) {
     this._activeSystem = val;
     this.subsToCandidate();
   }
-  
+
   public candidate$: Observable<OrderCandidatesList | null>;
 
   @Select(OrderManagementState.orderCandidatePage)
@@ -266,6 +266,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private settingService: SettingsViewService,
     private permissionService: PermissionService,
     private confirmService: ConfirmService,
+    private billRatesSyncService: BillRatesSyncService,
     private orderManagementService: OrderManagementService,
     private editIrpCandidateService: EditIrpCandidateService
   ) {
@@ -284,7 +285,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   ngOnInit(): void {
     this.activeSystems = this.orderManagementService.getOrderManagementSystem();
-    this.isIRP = this.activeSystem === OrderManagementIRPSystemId.IRP ? true : false;
     this.subscribeOnPermissions();
     this.subsToCandidate();
     this.rejectReasons$ = this.subscribeOnReasonsList();
@@ -342,9 +342,14 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         billRates: rates,
         billRatesUpdated: this.checkForBillRateUpdate(rates),
         candidatePayRate: this.candidateJob.candidatePayRate,
+        deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
       };
 
-      this.store.dispatch(new UpdateOrganisationCandidateJob(valueForUpdate));
+      this.store.dispatch(new UpdateOrganisationCandidateJob(valueForUpdate))
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
+        });
       this.deleteUpdateFieldInRate();
     }
   }
@@ -419,7 +424,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           createReplacement: false,
           actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
           cancellationReasonId: cancelCandidateDto.jobCancellationReason
-        
+
         })
       );
       this.updateDetails.emit();
@@ -575,9 +580,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             } else {
               this.orgId = this.currentOrder?.organizationId
             }
-            if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+            if(this.activeSystem === OrderManagementIRPSystemId.IRP && this.candidate?.cancellationReasonId !== null){
               this.reasons = this.editIrpCandidateService.createReasonsOptionsforCancel(this.editIrpCandidateService.getCancelEmployeeReasons()) ?? [];
-              this.irpReason = this.reasons.filter(item => item.id === this.candidate?.cancellationReasonId);
+              const irpReason = this.reasons.filter(item => item.id === this.candidate?.cancellationReasonId);
+              this.irpReasonName = irpReason[0].name;
            }   
             const candidateJobId = candidate?.candidateJobId;
             const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;

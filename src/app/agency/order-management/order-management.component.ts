@@ -48,6 +48,8 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
     } else {
       if(routerState?.['status'] == "In Progress"){
         this.orderStatus.push("InProgress");
+      }else if(routerState?.['status']){
+        this.orderStatus.push(routerState?.['status']);
       }
       if(routerState?.['candidateStatusId'] != undefined){
         this.candidateStatuses.push(routerState?.['candidateStatusId']);

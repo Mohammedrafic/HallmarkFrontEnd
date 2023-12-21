@@ -431,7 +431,7 @@ export const HistoricalDataRecordsColDef = (isStatusAvaliable = false): ColDef[]
     field: 'submission',
     headerName: 'Submission source',
     width: 140,
-    minWidth: 90,
+    minWidth: 180,
     resizable: true,
     cellClass: ['common-cell'],
     valueFormatter: (data) => {
