@@ -193,7 +193,7 @@ export const OrderAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
       resizable: true
     },
     {
-      headerName: 'MODIFIED DATE',
+      headerName: 'Modified Date & Time',
       field: 'modifiedOn',
       minWidth: 100,
       filter: 'agDateColumnFilter',

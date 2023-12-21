@@ -31,7 +31,7 @@ export enum OrderCredentialAuditHistoryTableColumns {
   optional = "Optional",
   comment = "comment",
   changeType = "Change Type",
-  modifiedOn = "Modified Date",
+  modifiedOn = "Modified Date & Time",
   modifiedBy = "Modified By"
 }
 
@@ -46,7 +46,7 @@ export enum OrderBillRateAuditHistoryTableColumns {
   weeklyOtEnabled = "Weekly OT Enabled",
   isPredefined = "IsPredefined",
   changeType = "Change Type",
-  modifiedOn = "Modified Date",
+  modifiedOn = "Modified Date & Time",
   modifiedBy = "Modified By"
 }
 
@@ -58,7 +58,7 @@ export enum OrderContactAuditHistoryTableColumns {
   mobilePhone = "Mobile Phone",
   isPrimaryContact = "Primary Contact",
   changeType = "Change Type",
-  modifiedOn = "Modified Date",
+  modifiedOn = "Modified Date & Time",
   modifiedBy = "Modified By"
 }
 
@@ -69,7 +69,7 @@ export enum OrderWorkLocationAuditHistoryTableColumns {
   city = "city",
   zipCode = "zipCode",  
   changeType = "Change Type",
-  modifiedOn = "Modified Date",
+  modifiedOn = "Modified Date & Time",
   modifiedBy = "Modified By"
 }
 
@@ -77,13 +77,13 @@ export enum OrderJobDistributionAuditHistoryTableColumns {
   jobDistributionOption = "Job Distribution Option",
   agency = "Agency",
   changeType = "change Type",
-  modifiedOn = "Modified Date",
+  modifiedOn = "Modified Date & Time",
   modifiedBy = "Modified By"
 }
 
 export enum OrderClassificationAuditHistoryTableColumns {
   classification = "Classification",  
   changeType = "change Type",
-  modifiedOn = "Modified Date",
+  modifiedOn = "Modified Date & Time",
   modifiedBy = "Modified By"
 }
