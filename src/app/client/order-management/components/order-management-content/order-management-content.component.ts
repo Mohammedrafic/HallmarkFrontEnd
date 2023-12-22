@@ -401,6 +401,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public selectedCandidate: any | null;
   public selectedReOrder: any | null;
   public openChildDialog = new Subject<any>();
+  public closeChildDialog = new Subject<any>();
   public isRowScaleUp = true;
   public isSubrowDisplay = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
@@ -2104,6 +2105,7 @@ public RedirecttoIRPOrder(order:Order)
       }
 
       if (data?.items.length && this.redirectfromextension) {
+        this.closeChildDialog.next(null);
         this.openIRPdialog(data.items[0] as unknown as IRPOrderManagement);
       }
 

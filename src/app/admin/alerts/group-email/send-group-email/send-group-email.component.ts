@@ -602,10 +602,10 @@ export class SendGroupEmailComponent
         this.isOrgInternalUserType = false;
         this.isMspUsertype = false;
         this.filteredUserType = [];
-        if (value == 3) {
+        if (value === BusinessUnitType.Organization) {
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == false);
         }
-        else if (value == 4) {
+        else if (value === BusinessUnitType.Agency) {
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == true);
           this.isBusinessUnitTypeAgency = true;
           this.validationCheckForBusiness();
@@ -613,15 +613,15 @@ export class SendGroupEmailComponent
              this.filteredUserType.splice(0, 0);
           }
         }
-        else if(value == 2){
+        else if(value === BusinessUnitType.MSP){
           this.isMspUsertype = true;
           this.filteredUserType = [{ name: 'MSPUsers', value: 1}];                                           
         }
-        if (value == 1) {
+        if (value === BusinessUnitType.Hallmark) {
           this.dispatchUserPage([]);
         } else {
           this.businessData = [];
-          if (this.isOrgUser && value == 4) {
+          if (this.isOrgUser && value === BusinessUnitType.Agency) {
             this.orderManagementContentService.getAssociateAgencies().pipe(distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((data) => {
               if(data != undefined && data.length > 0){
                 let businessUnits:BusinessUnit[] = [];
@@ -683,10 +683,10 @@ export class SendGroupEmailComponent
       if(this.isSend == false){
         this.defaultBusinessValue = null;
         this.filteredUserType = [];
-        if (value == 3) {
+        if (value === BusinessUnitType.Organization) {
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == false);
         }
-        else if (value == 4) {
+        else if (value === BusinessUnitType.Agency) {
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == true);
           this.isBusinessUnitTypeAgency = true;
           this.validationCheckForBusiness();
@@ -694,12 +694,12 @@ export class SendGroupEmailComponent
              this.filteredUserType.splice(0, 0);
           }
         }
-        else if(value == 2){
+        else if(value === BusinessUnitType.MSP){
           this.isMspUsertype = true;
           this.filteredUserType = [{ name: 'MSPUsers', value: 1}];          
         }
         if(value != undefined) {
-          if (this.isOrgUser && value == 4) {
+          if (this.isOrgUser && value === BusinessUnitType.Agency) {
             this.isBusinessUnitTypeAgency = true;
             this.validationCheckForBusiness();
             this.orderManagementContentService.getAssociateAgencies().pipe(distinctUntilChanged(),takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -723,7 +723,6 @@ export class SendGroupEmailComponent
               }
             });
           } else {
-            console.log('this.businessUnit',this.businessUnit);
             this.store.dispatch(new GetBusinessByUnitType(value));
             this.businessData$.pipe(distinctUntilChanged(),takeWhile(() => this.isAlive)).subscribe((data) => {
               if(this.businessUnit != undefined)
@@ -731,9 +730,9 @@ export class SendGroupEmailComponent
             });
           }
         }
-        if (value == 3)
+        if (value === BusinessUnitType.Organization)
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == false);
-        if (value == 4)
+        if (value === BusinessUnitType.Agency)
           this.filteredUserType = this.userType.filter((i: any) => i.isAgency == true);
       }
     });
@@ -1063,14 +1062,14 @@ export class SendGroupEmailComponent
 
             });
           }
-          if (value == 4) {
+          if (value === BusinessUnitType.Agency) {
             this.onFormvalidation(['candidate']);
             this.isEmployeeType = true;
             this.userData = [];
             this.loadSkillsAndWorkCommitments(businessId);
           }
-        } else if (businessUnit == 4) {
-          if (value == 1) {
+        } else if (businessUnit === BusinessUnitType.Agency) {
+          if (value === BusinessUnitType.Hallmark) {
             this.onFormvalidation(['roles', 'user']);
 
             this.isAgencyUserType = true;
@@ -1087,7 +1086,7 @@ export class SendGroupEmailComponent
               }
             }
           }
-          if (value == 2) {
+          if (value === BusinessUnitType.MSP) {
             this.onFormvalidation(['skills', 'candidate']);
 
             this.userData = [];

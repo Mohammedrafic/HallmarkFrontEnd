@@ -159,6 +159,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   @Input() orderComments: Comment[] = [];
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild, string] | null>;
+  @Input() closeEvent: Subject<[AgencyOrderManagement, OrderManagementChild, string] | null>;
   @Output() saveEmitter = new EventEmitter<void>();
   @Output() updateOrderData = new EventEmitter<{ order: OrderManagement, candidate: OrderManagementChild }>();
 
@@ -373,6 +374,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.subscribeOnVMSCandidate();
     this.subscribeOnCandidateJob();
     this.onOpenEvent();
+    this.onCloseEvent();
     this.subscribeOnSelectedOrder();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeOnPermissions();
@@ -809,6 +811,14 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         }
       }
     }
+  }
+
+  private onCloseEvent(): void {
+    this.closeEvent.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+      if(data === null){
+        this.closeSideDialog();
+      }
+    });
   }
 
   private onOpenEvent(): void {

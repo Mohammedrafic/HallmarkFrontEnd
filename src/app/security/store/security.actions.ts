@@ -127,7 +127,7 @@ export class RemoveUserVisibilitySettingSucceeded {
 
 export class GetOrganizationsStructureAll {
   static readonly type = '[security] Get Organizations Structure All';
-  constructor(public userId: string) {}
+  constructor(public userId: string, public visibiltySettings: boolean = false) { }
 }
 
 export class ExportUserList {
