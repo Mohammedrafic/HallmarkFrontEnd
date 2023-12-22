@@ -140,8 +140,8 @@ export class CommentsComponent {
     this.unsubscribe$.complete();
   }
 
-  onKeyUpEvent(event: any){
-    const searchValue = event.target.value;
+  onKeyUpEvent(event: KeyboardEvent){
+    const searchValue = (event.target as HTMLInputElement).value;
     let users = searchValue == '' ? this.searchcommentData : this.searchcommentData.filter(function(user){
       return (user.text.toString().toLowerCase().indexOf(searchValue.toLowerCase()) > -1 ||
       new Date(user.createdAt).toLocaleDateString().indexOf(searchValue.toLowerCase()) > -1 ||
@@ -150,8 +150,7 @@ export class CommentsComponent {
     }); 
     this.commentData = users; 
   }
-  public clearInputField(): void {
-  }
+ 
   private scrollToLastMessage(): void {
     this.body?.nativeElement.lastElementChild?.scrollIntoView({ block: 'nearest' });
   }
@@ -206,11 +205,7 @@ export class CommentsComponent {
       bussinessUnitType: user.businessUnitType == 3 ? "Organization" : user.businessUnitType == 4 ? "Agency" : user.businessUnitType == 2 ? "MSP" : "Hallmark"
     };
     this.comments.push(comment);
-    if(this.useStyle === true){
-      this.commentData.unshift(comment);
-    }else{
-      this.commentData.unshift(comment);
-    }
+    this.commentData.unshift(comment);
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
