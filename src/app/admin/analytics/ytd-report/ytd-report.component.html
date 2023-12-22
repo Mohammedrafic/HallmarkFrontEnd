@@ -94,7 +94,7 @@
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage placeholder="All"
                              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
-                             [fields]="regionFields"  showSelectAll=true>
+                             [fields]="regionFields" [value]="defaultRegions" showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
@@ -105,7 +105,7 @@
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage
                              [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
-                             [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields"  showSelectAll=true>
+                            [value]="defaultLocations" [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields"  showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>

@@ -233,7 +233,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     this.ytdreportReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        regionIds: new FormControl([]),
+        regionIds: new FormControl([],[Validators.required]),
         locationIds: new FormControl([]),
         //departmentIds: new FormControl([]),
         //skillCategoryIds: new FormControl([]),
@@ -326,7 +326,9 @@ export class YtdReportComponent implements OnInit, OnDestroy {
           };
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
+          this.locations=this.locationsList;
           this.filterColumns.regionIds.dataSource = this.regions;
+          this.defaultRegions =this.regions.map(x=>x.id);
           if (this.isInitialLoad) {
             setTimeout(() => { this.SearchReport() }, 3000);
             this.isInitialLoad = false;
@@ -352,6 +354,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
       if (this.regionIdControl.value.length > 0) {
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
+         this.defaultLocations=this.locations.map(x=>x.id);
         //this.departments = this.locations.map(obj => {
         //  return obj.departments.filter(department => department.locationId === obj.id);
         //}).reduce((a, b) => a.concat(b), []);
@@ -547,7 +550,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    this.ytdreportReportForm.get(ytdReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+    this.ytdreportReportForm.get(ytdReportConstants.formControlNames.RegionIds)?.setValue([]);
     this.ytdreportReportForm.get(ytdReportConstants.formControlNames.LocationIds)?.setValue([]);
     let currentDate = new Date();
           this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([currentDate.getMonth() + 1]);
@@ -560,7 +563,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([this.defaultMonth]);
    // this.ytdreportReportForm.get(ytdReportConstants.formControlNames.SearchBy)?.setValue([]);
     this.filteredItems = [];
-    this.locations = [];
+    // this.locations = [];
     //this.departments = [];
     this.filterColumns.locationIds.dataSource = [];
     //this.filterColumns.departmentIds.dataSource = [];
@@ -571,15 +574,14 @@ export class YtdReportComponent implements OnInit, OnDestroy {
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
     locationIds = locationIds.length > 0 ? locationIds.join(",") : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
-    //departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
-
+    // departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
    /* if (!(regionIds.length > 0 && locationIds.length > 0 && departmentIds.length > 0)) {*/
-    if (!(regionIds.length > 0 && locationIds.length > 0 )) {
+     if (!(regionIds.length > 0 && locationIds.length > 0 )) {
       this.ytdreportReportForm.markAllAsTouched();
       if (this.ytdreportReportForm?.invalid) {
         return;
       }
-    }
+     }
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.updateValueAndValidity({ emitEvent: false });
     //this.changeDetectorRef.detectChanges();
 
