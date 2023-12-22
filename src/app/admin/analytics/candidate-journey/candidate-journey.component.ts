@@ -308,7 +308,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     this.periodList.push({ id: 4, name: 'MTD' });
     this.periodList.push({ id: 5, name: 'Last Quarter' });
     this.periodList.push({ id: 6, name: 'YTD' });
-    this.periodList.push({ id: 7, name: 'Last 6 Month' });
+    this.periodList.push({ id: 7, name: 'Last 6 Months' });
     this.periodList.push({ id: 8, name: 'Last 12 Months' });
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
   }
