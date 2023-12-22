@@ -259,11 +259,11 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       if (user?.businessUnitType === BusinessUnitType.Organization) {
         this.isOrgUser = true;
       }
-      if (formValues.businessUnit == 4)
+      if (formValues.businessUnit === BusinessUnitType.Agency)
         businessUnitId = this.isOrgUser == true ? user?.businessUnitId : formValues.businesses[0]
-      if (formValues.businessUnit == 3)
+      if (formValues.businessUnit === BusinessUnitType.Organization)
         businessUnitId = formValues.business == 0 ? null : formValues.business;
-      if (formValues.businessUnit == BusinessUnitType.MSP){
+      if (formValues.businessUnit === BusinessUnitType.MSP){
         businessUnitId = formValues.business == 0 ? null : formValues.business;
       }
       if(user && user.businessUnitType === BusinessUnitType.MSP){
@@ -381,7 +381,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.emailTo = data.toList == null ? "" : data.toList;
     this.groupEmailTemplateForm.emailCc = data.ccList == null ? "" : data.ccList;
     this.groupEmailTemplateForm.businessUnitType = data.businessUnitType;
-    if(data.businessUnitType == 4){
+    if(data.businessUnitType === BusinessUnitType.Agency){
       this.groupEmailTemplateForm.businessUnit = data.selectedBussinessUnitIds;
     }
     else{
