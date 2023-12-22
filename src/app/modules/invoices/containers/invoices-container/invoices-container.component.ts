@@ -601,7 +601,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public changeMultiSelection(nodes: RowNode[]): void {
     if (nodes.length) {
-      if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords || this.selectedTabIdx === OrganizationInvoicesGridTab.Manual )
+      if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords || (!this.isAgency && this.selectedTabIdx === OrganizationInvoicesGridTab.Manual) )
       this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.id);  
       else
         this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
