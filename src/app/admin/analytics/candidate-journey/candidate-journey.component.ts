@@ -5,7 +5,7 @@ import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { Observable, Subject, distinctUntilChanged, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -186,6 +186,18 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
 
       this.candidateJourneyForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
 
+      this.organizationData$.pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$)).subscribe((data) => {
+        if (data != null && data.length > 0) {
+          this.organizations = uniqBy(data, 'organizationId');
+          this.filterColumns.businessIds.dataSource = this.organizations;
+          if (this.agencyOrganizationId) {
+            this.defaultOrganizations = this.agencyOrganizationId;
+            this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
+          }
+          this.changeDetectorRef.detectChanges();
+        }
+      });
+
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
@@ -304,17 +316,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
-    this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data != null && data.length > 0) {
-        this.organizations = uniqBy(data, 'organizationId');
-        this.filterColumns.businessIds.dataSource = this.organizations;
-        this.defaultOrganizations = this.agencyOrganizationId;
-        this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
-        this.changeDetectorRef.detectChanges();
-      }
-    });
-
-    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+    this.bussinessControl.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.candidateJourneyForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       this.selectedOrganizations = [];
       //if (data != null && typeof data === 'number' && data != this.previousOrgId) {
@@ -487,8 +489,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       this.message = ""
     }
     if (endDate == null) {
-      if (startDate > new Date(Date.now()))
-      {
+      if (startDate > new Date(Date.now())) {
         endDate = startDate;
       }
       else {
