@@ -626,11 +626,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
   }
 
-  public getExtensionsforIRP(): void {
-    if (!this.irpCandidates?.candidateJobId) {
-      return;
-    }
-    this.store.dispatch(new GetOrganizationExtensions(this.irpCandidates.candidateJobId as number, this.order?.id));
+  public getExtensionsforIRP(irpCandidate: IRPOrderPosition): void {
+    this.store.dispatch(new GetOrganizationExtensions(irpCandidate.candidateJobId as number, this.order?.id));
   }
 
   public updateGrid(): void {
@@ -883,9 +880,13 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
       if(this.isOrganization && this.activeSystem !== OrderManagementIRPSystemId.VMS){
         if(irpCandidates){
-          irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+          if(this.candidateirp){
+            irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+          } else {
+            irpCandidates.items.filter(data => (data.candidateJobId !== null) ? this.irpCandidates = data : "");
+          }
           this.setCloseOrderButtonStateforIRP(this.irpCandidates);
-          this.getExtensionsforIRP();
+          this.getExtensionsforIRP(this.irpCandidates);
           this.getCommentsforIRP();
         }
       }
