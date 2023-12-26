@@ -1396,4 +1396,8 @@ export class OrderDetailsFormComponent extends AbstractPermission implements OnI
   public closeDropdown(): void {
     this.filterQueryString = '';
   }
+  addComments(saveComments: Comment[])
+  {
+    this.comments=saveComments;
+  }
 }

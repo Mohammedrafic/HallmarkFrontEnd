@@ -74,6 +74,7 @@ export class CommentsComponent {
   public commentsList: Comment[] = [];
   @Input() commentContainerId: number;
   @Input() isCreating = false;
+  @Output() saveCommentsEvent = new EventEmitter<Comment[]>();
 
   @ViewChild('textBox')
   public textBox: TextBoxComponent;
@@ -210,6 +211,9 @@ export class CommentsComponent {
     this.scroll$.next(null);
     if (!this.isCreating) {
       this.store.dispatch(new SaveComment(comment));
+    }
+    else{
+      this.saveCommentsEvent.emit(this.comments);
     }
   }
 
