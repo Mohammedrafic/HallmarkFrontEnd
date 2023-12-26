@@ -479,9 +479,9 @@ export class DepartmentSpendAndHoursComponent implements OnInit {
   }
 
   public showFilters(): void {
-    // if (this.isResetFilter) {
+     if (this.isResetFilter) {
       this.onFilterControlValueChangedHandler();
-    // }
+     }
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
