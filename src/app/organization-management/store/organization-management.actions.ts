@@ -677,4 +677,12 @@ export class BulkDeleteDepartment {
   static readonly type = '[organizationManagement] Bulk Delete Department';
   constructor(public selectedDepartmentItems: Number[]) {}
 }
+export class DeleteOrganizationSettingsValues {
+  static readonly type = '[organizationManagement] Delete Organization SettingsValues';
+  constructor(public settingValueId?: number) {}
+}
+export class DeleteOrganizationSettingsValuesSucceeded {
+  static readonly type = '[organizationManagement] Delete Organization SettingsValues Succeeded';
+  constructor() { }
+}
 

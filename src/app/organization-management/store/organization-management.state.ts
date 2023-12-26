@@ -143,7 +143,9 @@ import {
   BulkDeleteDepartmentFailed,
   BulkUpdateDepartmentsucceeded,
   BulkUpdateDepartmentFailed,
-  BulkUpdateDepartment
+  BulkUpdateDepartment,
+  DeleteOrganizationSettingsValues,
+  DeleteOrganizationSettingsValuesSucceeded
   
 } from './organization-management.actions';
 import { BulkDepartmentAction, Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
@@ -1969,6 +1971,20 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Regions were not imported'))))
+    );
+  }
+  @Action(DeleteOrganizationSettingsValues)
+  DeleteOrganizationSettingValue(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { settingValueId}: DeleteOrganizationSettingsValues
+  ): Observable<any> {
+    return this.organizationSettingsService.deleteOrganizationSettingValues(settingValueId).pipe(
+      tap((payload) => {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+        dispatch(new DeleteOrganizationSettingsValuesSucceeded());
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => of(dispatch(new ShowToast(MessageTypes.Error, error.error)))),
     );
   }
 }
