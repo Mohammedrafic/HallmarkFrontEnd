@@ -776,6 +776,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
             this.toastObj.content =  '<div>'+ExtensionStartDateValidation+'</div',
             this.toastObj.show();
             this.generalInformationForm.get('jobStartDate')?.setValue(this.selectedOrder.jobStartDate);
+            return
           }
       }
 
@@ -1227,10 +1228,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       }),
       takeUntil(this.componentDestroy())
     ).subscribe(({MandatorySpecialProjectDetails}) => {
-      if(this.selectedOrder.extensionFromId !== null){
-        const minDate = addDays(this.selectedOrder?.jobStartDate, 1)!;
-        this.minDate = DateTimeHelper.setCurrentTimeZone(minDate.toString());  
-      }
       this.distribution= {
         regionId: this.selectedOrder.regionId,
         locationId: this.selectedOrder.locationId,
