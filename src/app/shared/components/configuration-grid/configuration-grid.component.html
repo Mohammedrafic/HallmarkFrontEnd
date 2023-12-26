@@ -23,6 +23,11 @@
                       [disabled]="hasPermissions | hasAccess : data : false">
                       <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
                   </button>
+                  <button *ngIf="childData.settingValueId && !childData.isParentRecord" ejs-button cssClass="e-flat secondary-icon-button"
+                     (click)="onDeleteSettingValue(childData.settingValueId)"
+                      [disabled]="hasPermissions | hasAccess : data : false">
+                      <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+                  </button>
                 </div>
               </ng-template>
             </e-column>
