@@ -281,6 +281,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
   selectedCandidateforIRP: IRPOrderPosition;
+  selectedCandidateforIRPorderDetails: IRPOrderPosition;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -723,8 +724,7 @@ public watchForOrderIRPSubRowClickEvent(){
       this.irpSubOrder = Order;
       this.systemType = system;
     if(orderData.system === 'IRP' && Order.orderType === OrderType.LongTermAssignment){
-      this.subscribeToCandidateJob();
-      this.openIrpSubrowDetails(Order, orderData, system)
+      this.openIrpSubrowDetails(Order,orderData, system);
     }
 })
 }
@@ -735,7 +735,6 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   this.dispatchAgencyOrderCandidatesList(Order.id, Order.organizationId as number, true);
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
-  this.openDetails.next(false);
   this.selectedRowRef = Data;
 }
 
@@ -1481,7 +1480,7 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   openIrpDetails(event: RowSelectedEvent | Partial<RowSelectedEvent>) {
-
+    this.subscribeToCandidateJob(false);
     if(!this.redirecttovmsfromIRP){
       this.redirecttovmsfromIRP=!this.redirecttovmsfromIRP;
      return;
@@ -1891,7 +1890,6 @@ public RedirecttoIRPOrder(order:Order)
 
   public onOpenCandidateDialog(candidate: OrderManagementChild, order: OrderManagement, index?: number): void {
     this.selectedCandidate = candidate;
-    this.subscribeToCandidateJob();
     this.selectedCandidateMeta = this.selectedCandidate.selected = {
       order: order.id,
       positionId: candidate.positionId,
@@ -2826,9 +2824,13 @@ public RedirecttoIRPOrder(order:Order)
     });
   }
 
-  private subscribeToCandidateJob(): void {
+  private subscribeToCandidateJob(subrow?: boolean): void {
       this.getIrpCandidatesforExtension$.pipe(take(2), filter(Boolean)).subscribe((res) => {
-        res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
+        if(!subrow){
+          res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null ? this.selectedCandidateforIRPorderDetails = irpcandidate : "");
+        } else {
+          res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
+        }
       });
   }
 
