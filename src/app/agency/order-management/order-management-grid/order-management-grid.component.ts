@@ -719,7 +719,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, filtersDefault));
         break;
     }
-  
+
     this.checkSelectedChildrenItem();
     this.cd.detectChanges();
     this.isRedirectedFromDashboard=false;
@@ -1053,6 +1053,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.distributedOnFrom)) : null;
     this.filters.distributedOnTo = this.filters.distributedOnTo ?
       DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.distributedOnTo)) : null;
+    this.filters.reOrderDate = this.filters.reOrderDate ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.reOrderDate)) : null;
   }
 
   private listenRedirectFromExtension(): void {

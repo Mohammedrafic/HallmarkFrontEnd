@@ -375,7 +375,7 @@ export type AgencyOrderFilters = {
   creationDateTo?: Date | string | null;
   distributedOnFrom?: Date | string | null;
   distributedOnTo?: Date | string | null;
-  reOrderDate?: Date | null;
+  reOrderDate?: Date | string | null;
   firstNamePattern?: string | null;
   lastNamePattern?: string | null;
   projectTypeIds?: number | null;
@@ -761,7 +761,7 @@ export class OrderFilter {
   jobStartDate?: Date | string | null;
   jobEndDate?: Date | string | null;
   orderStatuses?: (string | number)[];
-  reOrderDate?: Date | null;
+  reOrderDate?: Date | string | null;
   candidateStatuses?: string[];
   reorderCandidateStatuses?:CandidatesStatusText[];
   candidatesCountFrom?: number | null;
