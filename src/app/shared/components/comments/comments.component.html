@@ -1,6 +1,13 @@
 <section class="comments-container" [class.background]="useBackground">
   <div class="comments-header">
     <div class="title">Comments</div>
+    <div class="title">
+    <app-search
+    class="title"
+    placeholder="Search by"
+    (inputKeyUpEnter)="onKeyUpEvent($event)"
+  ></app-search>
+</div>
     <div class="dropdown-container bootstrap">
       <ejs-dropdownlist
         *ngIf="!isAgencyUser"
