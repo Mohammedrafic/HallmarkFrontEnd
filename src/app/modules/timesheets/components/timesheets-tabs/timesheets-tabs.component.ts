@@ -26,6 +26,7 @@ import { GlobalWindow } from '@core/tokens';
 import { Destroyable, isObjectsEqual } from '@core/helpers';
 import { ResizeContentService } from '@shared/services/resize-main-content.service';
 import { TimesheetsState } from '../../store/state/timesheets.state';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -51,6 +52,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
   public alertTitle: string;
+  public AlertGetId: number;
   public orgwidgetpendingtimesheet: string;
   public missingtimesheet: string;
   public tabsWidth$: Observable<string>;
@@ -77,6 +79,9 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
 
   public getalerttitle(): void {
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+  }
+  public getAlertGetId(): void {
+    this.AlertGetId = JSON.parse(localStorage.getItem('AlertGetId') || '"0"') as number;
   }
 
   public ngOnInit(): void {
@@ -122,6 +127,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
   private navigatingTab():void{
     setTimeout(() => {
       this.getalerttitle();
+      this.getAlertGetId();
     if (AlertIdEnum[AlertIdEnum['Time Sheet: Org. pending approval']].toLowerCase() == this.alertTitle.toLowerCase()) {
         this.tabComponent.selectedItem = 1;
         this.changeTab.emit(1);
@@ -136,6 +142,12 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
       this.tabComponent.selectedItem = 1;
       this.changeTab.emit(1);
       this.document.defaultView?.localStorage.setItem("alertTitle", JSON.stringify(""));
+    }
+   
+    if(AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets'] ==  this.AlertGetId  ){
+      this.tabComponent.selectedItem = 2;
+      this.changeTab.emit(2);
+      this.document.defaultView?.localStorage.setItem("AlertGetId", JSON.stringify(""));
     }
     },10000);
 

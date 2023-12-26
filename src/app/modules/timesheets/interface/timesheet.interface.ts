@@ -57,6 +57,7 @@ export interface TimesheetsFilterState {
   skillIds?: string[];
   isAgency?: boolean;
   timesheetIds?: number[];
+  orderTypeId?: number | undefined;
   contactEmails?: string[];
 }
 

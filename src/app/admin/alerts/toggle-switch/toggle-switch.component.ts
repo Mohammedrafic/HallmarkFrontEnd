@@ -26,14 +26,14 @@ export class ToggleSwitchComponent implements ICellRendererAngularComp {
     if (this.params.column.colId == this.isEmailEnabled) {
       this.toggleYesOrNo = this.params.data[this.isEmailEnabled];
     }
-    else if (this.params.column.colId == this.isSMSEnabled) {
-      if(this.params.data.alertId === AlertIdEnum['Missing Credentials: Daily Alerts'] || this.params.data.alertId === AlertIdEnum['Missing Credentials: Weekly Alerts'] || this.params.data.alertId === AlertIdEnum['Expiry Credentials: Weekly Alerts']){
-        this.disableFlag = true;
+    else if (this.params.column.colId == this.isSMSEnabled) {     
+      if(this.params.data.alertId === AlertIdEnum['Missing Credentials: Daily Alerts'] || this.params.data.alertId === AlertIdEnum['Missing Credentials: Weekly Alerts'] || this.params.data.alertId === AlertIdEnum['Expiry Credentials: Weekly Alerts'] || this.params.data.alertId === AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets']){
+        this.disableFlag = true;     
       }
       this.toggleYesOrNo = this.params.data[this.isSMSEnabled];
     }
     else if (this.params.column.colId == this.isOnScreenEnabled) {
-      if(this.params.data.alertId === AlertIdEnum['Missing Credentials: Daily Alerts'] || this.params.data.alertId === AlertIdEnum['Missing Credentials: Weekly Alerts'] || this.params.data.alertId === AlertIdEnum['Expiry Credentials: Weekly Alerts']){
+      if(this.params.data.alertId === AlertIdEnum['Missing Credentials: Daily Alerts'] || this.params.data.alertId === AlertIdEnum['Missing Credentials: Weekly Alerts'] || this.params.data.alertId === AlertIdEnum['Expiry Credentials: Weekly Alerts'] || this.params.data.alertId === AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets']){
         this.disableFlag = true;
       }
       this.toggleYesOrNo = this.params.data[this.isOnScreenEnabled];

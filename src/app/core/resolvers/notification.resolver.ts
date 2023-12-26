@@ -1,3 +1,4 @@
+import { AlertEnum, AlertIdEnum } from '@admin/alerts/alerts.enum';
 import { Injectable } from '@angular/core';
 import {
   Router, Resolve,
@@ -6,6 +7,7 @@ import {
   ActivatedRoute
 } from '@angular/router';
 import { Store } from '@ngxs/store';
+import { OrderType } from '@shared/enums/order-type';
 import { UserService } from '@shared/services/user.service';
 import { Observable, catchError, map, of } from 'rxjs';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
@@ -30,6 +32,16 @@ export class NotificationResolver implements Resolve<boolean> {
               })
             );
         }
+        if(data.alertId==AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets'])
+        {
+          window.localStorage.setItem("OrderType",JSON.stringify(OrderType.ReOrder));
+          window.localStorage.setItem("AlertGetId",JSON.stringify(data.alertId));
+        }
+        if(data.agencyId){
+          window.localStorage.setItem("AgencyId",JSON.stringify(data.agencyId));
+         
+        
+      }
         if(data.orderId){
             window.localStorage.setItem("OrderId",JSON.stringify(data.orderId));
         }
@@ -45,7 +57,7 @@ export class NotificationResolver implements Resolve<boolean> {
         if(data.timesheetId){
           window.localStorage.setItem("TimesheetId",JSON.stringify(data.timesheetId));
         }
-
+       
         this.router.navigate([routeSnapshot[0]]);
         return true;
       }),catchError(err => {
