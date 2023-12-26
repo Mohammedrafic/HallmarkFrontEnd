@@ -248,8 +248,10 @@
   }
 
   ::ng-deep {
-    .e-dlg-content {
-      background-color: white!important;
+    .import-dialog {
+      .e-dlg-content {
+        background-color: white!important;
+      }
     }
   }
 
