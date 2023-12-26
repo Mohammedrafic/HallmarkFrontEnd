@@ -234,4 +234,30 @@
       display: block;
     }
   }
+
+  .section-header {
+    flex-direction: column;
+  }
+
+  .file-uploader {
+    flex-direction: column;
+  }
+
+  .file-info {
+    margin-left: 0!important;
+  }
+
+  ::ng-deep {
+    .e-dlg-content {
+      background-color: white!important;
+    }
+  }
+
+  .header-container {
+    background-color: white!important;
+  }
+
+  .file-uploader-container {
+    background-color: white!important;
+  }
 }
