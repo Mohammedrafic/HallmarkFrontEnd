@@ -162,7 +162,8 @@
     <div class="extension__comments" *ngIf="activeSystems !== OrderManagementIRPSystemId.IRP">
       <app-comments
         [comments]="comments"
-        [isCreating]="true"></app-comments>
+        [isCreating]="true" (saveCommentsEvent)="addComments($event)"
+        ></app-comments>
     </div>
     <div class="extension__comments" *ngIf="activeSystems === OrderManagementIRPSystemId.IRP">
       <app-comments-irp
