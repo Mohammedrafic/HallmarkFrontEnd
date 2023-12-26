@@ -37,6 +37,7 @@ import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -112,6 +113,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public user: any;
   organizations: AgencyDataSourceItem[];
   public isAgencyVisibilityFlagEnabled = false;
+  public orderTypeId: any;
 
   constructor(
     private store: Store,
@@ -166,7 +168,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         }
       }
     })
+    this.orderTypeId = JSON.parse(localStorage.getItem('OrderType') || '"0"') as number;
 
+    if(this.orderTypeId==OrderType.ReOrder)
+    {
+      const filter={ orderTypeId:this.orderTypeId}
+      this.updateTableByFilters(filter);
+    }
+  
+    
   }
 
   public override ngOnDestroy() {
