@@ -559,7 +559,11 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
           const cancelReasonField = GetConfigField(this.dialogConfig, CancelReasonField);
 
           rejectionReasonField.dataSource = this.editIrpCandidateService.createReasonsOptions(this.editIrpCandidateService.getRejectedReasons());
-          cancelReasonField.dataSource = this.editIrpCandidateService.createReasonsOptions(this.editIrpCandidateService.getCancelEmployeeReasons());
+          cancelReasonField.dataSource = this.editIrpCandidateService.createReasonsOptions(
+            this.editIrpCandidateService.getCancelEmployeeReasons().filter(reason => {
+              return this.candidateModelState.candidate.status === CandidatStatus.Cancelled || reason.organizationId;
+            })
+          );
 
           this.populateCancellationReasonIdField();
 
