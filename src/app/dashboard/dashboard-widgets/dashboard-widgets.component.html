@@ -143,6 +143,11 @@
                           [agencyTimesheet]="true"
                           [description]="widgetDescriptionEnum.MISSING_TIMESHEETS"
                           [isDarkTheme]="isDarkTheme"></app-org-widget>
+          <app-agency-timesheet-summary *ngSwitchCase="widgetTypeEnum.AGENCY_TIMESHEET_SUMMARY"
+                            [chartData]="widgetsData?.[widgetTypeEnum.AGENCY_TIMESHEET_SUMMARY]" [isLoading]="isLoading"
+                            [description]="widgetDescriptionEnum.AGENCY_TIMESHEET_SUMMARY"
+                            [isDarkTheme]="isDarkTheme"></app-agency-timesheet-summary>
+
 
         </ng-template>
       </e-panel>

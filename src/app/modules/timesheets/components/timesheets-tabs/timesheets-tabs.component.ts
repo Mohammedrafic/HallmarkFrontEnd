@@ -27,6 +27,7 @@ import { Destroyable, isObjectsEqual } from '@core/helpers';
 import { ResizeContentService } from '@shared/services/resize-main-content.service';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { OrderType } from '@shared/enums/order-type';
+import { timesheetsummarystatus } from 'src/app/dashboard/widgets/agency-timesheet-summary/agency-timesheet-summary.enum';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -59,6 +60,8 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
   public selectedTab = 0;
 
   @Select(TimesheetsState.tabCounts) private tabsConfig$: Observable<TabCountConfig>;
+  timesheetSummary: string;
+  timesheetIncomplete: string;
 
   constructor(
     @Inject(GlobalWindow)protected readonly globalWindow: WindowProxy & typeof globalThis,
@@ -111,6 +114,8 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
     setTimeout(() => {
       this.orgwidgetpendingtimesheet = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
       this.missingtimesheet = JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string;
+      this.timesheetSummary=JSON.parse(localStorage.getItem('agencytimeSheetSummary') || '""') as string;
+      this.timesheetIncomplete=JSON.parse(localStorage.getItem('agencytimeSheetincomplete') || '""') as string;
        if(this.orgwidgetpendingtimesheet === "Pending Timesheet") {
          this.tabComponent.selectedItem=1;
          this.changeTab.emit(1);
@@ -121,7 +126,24 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
         this.changeTab.emit(2);
         this.globalWindow.localStorage.setItem("timeSheetMissing", JSON.stringify(""));
       }
-   }, 2500);
+      if(this.timesheetSummary==timesheetsummarystatus.PendingApprovalTimesheet || this.timesheetSummary==timesheetsummarystatus.PendingApprovalMiles)
+      {
+        this.tabComponent.selectedItem=1;
+        this.changeTab.emit(1);
+        this.globalWindow.localStorage.setItem("agencytimeSheetSummary", JSON.stringify(""));
+      }
+      if(this.timesheetIncomplete==timesheetsummarystatus.Incomplete)
+      {
+        this.tabComponent.selectedItem=0;
+        this.changeTab.emit(0);
+      }
+      if(this.timesheetSummary == timesheetsummarystatus.Missing) {
+        this.tabComponent.selectedItem=2;
+        this.changeTab.emit(2);
+        this.globalWindow.localStorage.setItem("agencytimeSheetSummary", JSON.stringify(""));
+
+      }
+   }, 3500);
   }
   @OutsideZone
   private navigatingTab():void{

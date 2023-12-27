@@ -66,6 +66,7 @@ import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { sum } from 'lodash';
+import { AgencyTImesheetsummaryModel } from '../models/agency-timesheet-summary.models';
 
 @Injectable()
 export class DashboardService {
@@ -102,6 +103,7 @@ export class DashboardService {
     [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS_FOR_INITIAL_ORDERS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivecandidateStatusWidgetData(filters),
     [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getSkillCategoryByTypes(filters, timeSelection),
     [WidgetTypeEnum.MISSING_TIMESHEETS]: (filters: DashboartFilterDto) => this.getAgencyTimesheetWidgetdata(filters),
+    [WidgetTypeEnum.AGENCY_TIMESHEET_SUMMARY]: (filters: DashboartFilterDto) => this.getAgencytimesheetsummary(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -710,6 +712,12 @@ export class DashboardService {
       const dateFrom = DateTimeHelper.setUtcTimeZone(new Date(new Date(startDate.getFullYear(), startDate.getMonth()-1, 1)));
       const dateTo =  DateTimeHelper.setUtcTimeZone(new Date(new Date(today.getFullYear(), today.getMonth(), 0)));
       return { dateFrom, dateTo };
+    }
+
+    private getAgencytimesheetsummary(filter: DashboartFilterDto) : Observable<AgencyTImesheetsummaryModel[]> {
+      return this.httpClient.post<AgencyTImesheetsummaryModel[]>(`${this.baseUrl}/TimesheetSummary`, { ...filter }).pipe(
+        map((data)=> data)
+      )
     }
  
 }
