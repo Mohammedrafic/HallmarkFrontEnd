@@ -888,13 +888,11 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
   private subscribeOnCandidates(): void {
     this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
+      console.log(irpCandidates, this.candidate);
       if(this.isOrganization && this.activeSystem !== OrderManagementIRPSystemId.VMS){
         if(irpCandidates){
-          if(this.candidateirp){
-            irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
-          } else {
-            irpCandidates.items.filter(data => (data.candidateJobId !== null) ? this.irpCandidates = data : "");
-          }
+          irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidate?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+          console.log(this.irpCandidates);
           this.setCloseOrderButtonStateforIRP(this.irpCandidates);
           this.getExtensionsforIRP(this.irpCandidates);
           this.getCommentsforIRP();
