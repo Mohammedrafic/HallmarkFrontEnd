@@ -282,7 +282,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.isAvailable = state.isAvailable;
       this.includeDeployed = state.includeDeployed;
       this.cdr.markForCheck();
-    })
+    });
   }
 
   private getAllEmployeeCancelReasons(): void {
