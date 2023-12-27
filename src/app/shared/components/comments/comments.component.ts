@@ -202,6 +202,7 @@ export class CommentsComponent {
       new: true,
       commentContainerId: this.commentContainerId,
       isRead: true,
+      organizationName: user.businessUnitName,
       bussinessUnitType: user.businessUnitType == 3 ? "Organization" : user.businessUnitType == 4 ? "Agency" : user.businessUnitType == 2 ? "MSP" : "Hallmark"
     };
     this.comments.push(comment);
