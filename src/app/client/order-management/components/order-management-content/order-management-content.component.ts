@@ -720,7 +720,6 @@ private watchForOrderGridSystemClickEvent()
 public watchForOrderIRPSubRowClickEvent(){
   this.orderManagementIRPRowPositionService.handleStatusClickEvent.pipe(
     takeUntil(this.unsubscribe$)).subscribe(({Order, orderData, system}) => {
-      console.log(Order, orderData);
       this.orderData = orderData;
       this.irpSubOrder = Order;
       this.systemType = system;
