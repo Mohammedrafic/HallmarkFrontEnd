@@ -106,6 +106,7 @@ export const CreateNextStepStatusField = (
       multiple: hasDuplicateStep && (item.name === 'Shortlisted' || item.name === 'Offered') ? 'Multiple' : null,
       nextStepStatus: array[index + 1]?.status,
       nextStepId: isApplicantIrpWorkflow ? array[index + 1]?.id : null,
+      roleFieldDataSourceType: isApplicantIrpWorkflow ? array[index + 1]?.type : item.type,
     };
   });
 }

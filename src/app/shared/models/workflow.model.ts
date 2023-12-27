@@ -1,3 +1,5 @@
+import { WorkflowStepType } from '@shared/enums/workflow-step-type';
+
 export class WorkflowWithDetails {
   id?: number;
   name: string;
@@ -45,10 +47,11 @@ export interface Step {
   workflowId?: number;
   name: string;
   status: string;
-  type: number;
+  type: WorkflowStepType;
   formStepName?: string;
   order?: number;
   nextStepStatus?: string;
+  roleFieldDataSourceType?: WorkflowStepType;
   nextStepId?: number | null;
   parentId?: number | null;
   multiple?: string | null;
