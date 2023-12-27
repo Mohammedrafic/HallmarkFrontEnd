@@ -561,7 +561,7 @@
                     [allowFiltering]="true"
                     [showDropDownIcon]="true"
                     appValidateWithMessage
-                    [dataSource]="usersWithRoles[workflowTypes.ApplicationWorkflow][applicationWorkflowSteps[i]?.type ?? 0]"
+                    [dataSource]="usersWithRoles[workflowTypes.ApplicationWorkflow][applicationWorkflowSteps[i]?.roleFieldDataSourceType ?? 0]"
                     [fields]="fields"
                     formControlName="roleUserList"
                   >
