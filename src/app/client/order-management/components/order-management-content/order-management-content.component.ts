@@ -725,12 +725,12 @@ public watchForOrderIRPSubRowClickEvent(){
       this.systemType = system;
     if(orderData.system === 'IRP' && Order.orderType === OrderType.LongTermAssignment){
       this.openIrpSubrowDetails(Order,orderData, system);
+      this.subscribeToCandidateJob(true);
     }
 })
 }
 public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : string) {
   const orderData = Data as IRPOrderPosition;
-
   this.store.dispatch(new GetOrderById(orderData.orderId, orderData.organizationId));
   this.dispatchAgencyOrderCandidatesList(Order.id, Order.organizationId as number, true);
   this.openChildDialog.next([Order, Data, system]);
