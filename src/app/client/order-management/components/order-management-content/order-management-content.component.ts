@@ -963,7 +963,9 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   validateExport():boolean {
-    if (this.ordersPage.totalCount > 8000) {
+    if (this.activeSystem != OrderManagementIRPSystemId.OrderJourney &&
+      this.ordersPage &&
+      this.ordersPage?.totalCount > 8000) {
       this.exportWarning.show();
       return false;
     }
