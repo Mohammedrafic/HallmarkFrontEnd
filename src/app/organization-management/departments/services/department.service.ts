@@ -1,9 +1,12 @@
+import { ImportedLocation } from './../../../shared/models/location.model';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DateTimeHelper } from '@core/helpers';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { Department, DepartmentFilter } from '@shared/models/department.model';
+import { Department, DepartmentFilter, ImportedDepartment } from '@shared/models/department.model';
 import { FilterColumnsModel } from '@shared/models/filter.model';
+import { ImportResult } from '@shared/models/import.model';
+import { ImportedOrder } from '@shared/models/imported-order.model';
 
 @Injectable()
 export class DepartmentService {
@@ -116,5 +119,29 @@ export class DepartmentService {
         { text: item.optionText, value: item.option }
       ));
     }
+  }
+
+  prepareImportRecordsWithSkills(data: ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder>):
+  ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder> {
+    this.createSkillsProps(data.succesfullRecords || data.errorRecords);
+
+    return data;
+  }
+
+  // Create additional skills props for corresponding coldefs
+  private createSkillsProps(data: ImportedDepartment[]): void {
+    data.forEach((record) => {
+      if (record.primarySkills && record.primarySkills.length) {
+        record.primarySkills.forEach((skillName, index) => {
+          record[`primarySkill${index}`] = skillName;
+        });
+      }
+
+      if (record.secondarySkills && record.secondarySkills.length) {
+        record.secondarySkills.forEach((skillName, index) => {
+          record[`secondarySkill${index}`] = skillName;
+        });
+      }
+    });
   }
 }
