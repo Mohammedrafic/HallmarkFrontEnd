@@ -386,6 +386,18 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     if (this.orderStatusSummaryReportForm.invalid) {
       return;
     }
+    if (this.regions$.length == this.orderStatusSummaryReportForm.controls['region'].value.length) {
+      this.orderStatusSummaryReportForm.controls['region'].setValue([]);
+    }
+    if (this.locations$.length == this.orderStatusSummaryReportForm.controls['location'].value.length) {
+      this.orderStatusSummaryReportForm.controls['location'].setValue([]);
+    }
+    if (this.departments$.length == this.orderStatusSummaryReportForm.controls['department'].value.length) {
+      this.orderStatusSummaryReportForm.controls['department'].setValue([]);
+    }
+    if (this.skills$.length == this.orderStatusSummaryReportForm.controls['skills'].value.length) {
+      this.orderStatusSummaryReportForm.controls['skills'].setValue([]);
+    }
     const payload = {
       ...this.orderStatusSummaryReportForm.value
     };
