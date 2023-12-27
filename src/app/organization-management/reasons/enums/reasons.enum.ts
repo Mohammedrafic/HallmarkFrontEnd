@@ -29,6 +29,6 @@ export enum ReasonFormType {
 }
 
 export enum CancellationReasonType {
-	Custom = 0,
+  Custom = 0,
   EmployeeInactivation = 1,
 }
