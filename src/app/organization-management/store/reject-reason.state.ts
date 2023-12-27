@@ -82,6 +82,7 @@ import {
   RejectReasonPage,
   RejectReasonwithSystem,
   SourcingReasonPage,
+  UnavailabilityPaging,
   UnavailabilityReasons
 } from "@shared/models/reject-reason.model";
 import { HttpErrorResponse } from "@angular/common/http";
@@ -539,13 +540,17 @@ export class RejectReasonState {
   @Action(GetCancelEmployeeReason)
   GetCancelEmployeeReason(
     { patchState }: StateContext<RejectReasonStateModel>,
-    { page, pageSize, getAll}: GetCancelEmployeeReason
+    { page, pageSize, getAll, cancellationReasonType}: GetCancelEmployeeReason
   ): Observable<PageOfCollections<CancelEmployeeReasons>> {
-    return this.rejectReasonService.getCancelEmployeeReasons({
-      PageNumber: page as number,
-      PageSize: pageSize as number,
+    const payload: UnavailabilityPaging = {
+      PageNumber: page,
+      PageSize: pageSize,
       GetAll: getAll ?? false,
-    }).pipe(
+    };
+    if (cancellationReasonType !== undefined) {
+      payload.CancellationReasonType = cancellationReasonType;
+    }
+    return this.rejectReasonService.getCancelEmployeeReasons(payload).pipe(
       tap((response) => {
         patchState({
           cancelEmployeeReasons: response,
