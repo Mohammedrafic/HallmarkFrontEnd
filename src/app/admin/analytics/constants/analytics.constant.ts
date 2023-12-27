@@ -87,7 +87,7 @@ export const ytdReportConstants = {
     BusinessIds: 'businessIds',
     RegionIds: 'regionIds',
     LocationIds: 'locationIds',
-    //DepartmentIds: 'departmentIds',
+    DepartmentIds: 'departmentIds',
     //SkillCategoryIds: 'skillCategoryIds',
     //SkillIds: 'skillIds',
     Year: 'year',
