@@ -145,9 +145,9 @@ export class CommentsComponent {
     const searchValue = (event.target as HTMLInputElement).value;
     let users = searchValue == '' ? this.searchcommentData : this.searchcommentData.filter(function(user){
       return (user.text.toString().toLowerCase().indexOf(searchValue.toLowerCase()) > -1 ||
-      new Date(user.createdAt).toLocaleDateString().indexOf(searchValue.toLowerCase()) > -1 ||
-      user.firstName.toLowerCase().indexOf(searchValue.toLowerCase()) > -1 ||
-      user.lastName.toLowerCase().indexOf(searchValue.toLowerCase()) > -1);
+      new Date(user.createdAt).toLocaleDateString().indexOf(searchValue.toLowerCase()) > -1
+      ) ||
+      (user.firstName.toLowerCase() +" "+ user.lastName.toLowerCase()).indexOf(searchValue.toLowerCase()) > -1
     }); 
     this.commentData = users; 
   }
