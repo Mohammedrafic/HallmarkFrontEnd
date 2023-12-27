@@ -27,3 +27,8 @@ export enum ReasonFormType {
   SourcingReason = "SourcingReason",
   CancelEmployeeReasons = "CancelEmployeeReasons"
 }
+
+export enum CancellationReasonType {
+	Custom = 0,
+  EmployeeInactivation = 1,
+}
