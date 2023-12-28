@@ -119,7 +119,7 @@ export class TimesheetsFilterDialogComponent
           this.formGroup.controls['statusIds'].patchValue([TimesheetStatus.Incomplete]);
           this.formGroup.markAsDirty();
           const filter={ statusIds:[TimesheetStatus.Incomplete]}
-          // this.applyPreservedFilters(filter);
+           this.applyPreservedFilters(filter);
           this.applyFilters();
           window.localStorage.setItem("agencytimeSheetincomplete", JSON.stringify(""));
         }
