@@ -373,6 +373,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       });
     this.subscribeOnVMSCandidate();
     this.subscribeOnCandidateJob();
+    this.subscribeOnCandidates();
     this.onOpenEvent();
     this.onCloseEvent();
     this.subscribeOnSelectedOrder();
@@ -900,9 +901,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private subscribeOnCandidateJob(): void {
-    if (this.isOrganization) {
-      this.subscribeOnCandidates();
-      }
     if (this.isAgency) {
       this.agencyCandidatesJob$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
         this.candidateJob = orderCandidateJob;
