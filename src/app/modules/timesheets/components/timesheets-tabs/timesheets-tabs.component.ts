@@ -130,6 +130,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
       {
         this.tabComponent.selectedItem=1;
         this.changeTab.emit(1);
+        this.globalWindow.localStorage.setItem("agencytimeSheetRedire", JSON.stringify("redirection"));
         this.globalWindow.localStorage.setItem("agencytimeSheetSummary", JSON.stringify(""));
       }
       if(this.timesheetIncomplete==timesheetsummarystatus.Incomplete)
@@ -140,6 +141,7 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges, O
       if(this.timesheetSummary == timesheetsummarystatus.Missing) {
         this.tabComponent.selectedItem=2;
         this.changeTab.emit(2);
+        this.globalWindow.localStorage.setItem("agencytimeSheetRedire", JSON.stringify("redirection"));
         this.globalWindow.localStorage.setItem("agencytimeSheetSummary", JSON.stringify(""));
 
       }
