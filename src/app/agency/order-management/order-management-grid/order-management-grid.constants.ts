@@ -8,6 +8,7 @@ export const ROW_HEIGHT = {
 
 export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'Order ID', column: 'OrderId' },
+  { text: 'Assignment Type', column: 'AssignmentType' },
   { text: 'Status', column: 'OrderStatus' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Organization', column: 'Organization' },
@@ -40,6 +41,7 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
 
 export const myAgencyChildColumnsToExport: ExportColumn[] = [
   { text: 'Position ID', column: 'PositionId' },
+
   { text: 'Candidate Name', column: 'CandidateName' },
   { text: 'Position Status', column: 'ChildOrderStatus' },
   { text: 'Candidate Status', column: 'CandidateStatus' },
