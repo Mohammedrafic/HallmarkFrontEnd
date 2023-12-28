@@ -315,20 +315,7 @@ export const checkAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
                 return 'No';
             },
         },
-        {
-            headerName: 'Is Delete',
-            field: 'jsonData.isDeleted',
-            minWidth: 100,
-            filter: true,
-            sortable: true,
-            resizable: true,
-            valueFormatter: (params: ValueFormatterParams) => {
-                if (params.value) {
-                    return 'Yes';
-                }
-                return 'No';
-            },
-        },
+  
         {
             headerName: 'Change Type',
             field: 'changeType',
