@@ -196,4 +196,18 @@ export class BillRatesService {
       { jobId, orderId, organizationId, deletedBillRateId }
     );
   }
+
+  public getCandidateBillRateConfigs(JobId: number, OrganizationId: number): Observable<BillRateOption[]> {
+    return this.http.get<BillRateOption[]>(
+      `/api/AppliedCandidates/billRateConfigs/get`,
+      { params: { JobId, OrganizationId } }
+    );
+  }
+
+  public getOrderBillRateConfigs(OrderId: number, OrganizationId: number): Observable<BillRateOption[]> {
+    return this.http.get<BillRateOption[]>(
+      `/api/Orders/billRateConfigs/get`,
+      { params: { OrderId, OrganizationId } }
+    );
+  }
 }

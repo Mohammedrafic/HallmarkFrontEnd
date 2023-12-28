@@ -1,9 +1,9 @@
 /* eslint-disable max-lines-per-function */
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+
 import { Store } from '@ngxs/store';
 import { takeWhile } from 'rxjs';
-
 import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 
 import {
@@ -17,7 +17,7 @@ import {
 } from '@shared/models/bill-rate.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { OtBillRatesConfiguration } from '@shared/constants';
-import { DateTimeHelper, distinctByKey } from '@core/helpers';
+import { DateTimeHelper } from '@core/helpers';
 import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
@@ -31,12 +31,8 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   public rateHoursInput: MaskedTextBoxComponent;
 
   @Input() billRateForm: FormGroup;
-  @Input() set billRatesData (rates: BillRate[]) {
-    if (rates) {
-      this.jobBillRates = rates;
-      this.billRateOptions = distinctByKey(rates.map((rate) => rate.billRateConfig), 'id');
-    }
-  }
+  @Input() jobBillRates: BillRate[] = [];
+  @Input() billRateOptions: BillRateOption[] = [];
 
   @Input() selectedBillRateUnit: BillRateUnit;
   @Input() isExtension = false;
@@ -53,7 +49,6 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     value: 'id',
   };
 
-  public billRateOptions: BillRateOption[] = [];
   public isIntervalMinEnabled = true;
   public isIntervalMaxEnabled = true;
   public isIntervalMinRequired = true;
@@ -94,7 +89,6 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   }
 
   private isAlive = true;
-  private jobBillRates: BillRate[] = [];
 
   constructor(private store: Store, private cdr: ChangeDetectorRef) {}
 
@@ -142,7 +136,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     if (BillRateFormComponent.calculateOTSFlags) {
       const configId = this.billRateForm.get('billRateConfigId')?.value;
       const predefinedBillRates = this.store.selectSnapshot(OrderManagementContentState.predefinedBillRates);
-      const billRates = this.isExtension ? this.jobBillRates 
+      const billRates = this.isExtension ? this.jobBillRates
       : predefinedBillRates.filter(el => el.billRateConfigId === configId);
       const billRatesDates = billRates.map(el => el.effectiveDate);
       const date = this.billRateForm.get('effectiveDate')?.value;
