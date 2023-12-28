@@ -183,6 +183,9 @@
       [billRates]="candidateRates"
       [isActive]="true"
       [isLocal]="candidateJob?.isLocal!"
+      [candidateJobId]="candidateJob?.jobId || null"
+      [organizationId]="candidateJob?.organizationId || null"
+      [orderType]="candidateJob?.order?.orderType"
       (hourlyRateSync)="hourlyRateToOrderSync($event)"></app-bill-rates>
   </div>
 </div>

@@ -20,10 +20,10 @@ import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
-import { GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import { AlertService } from '@shared/services/alert.service';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-bill-rates',
@@ -47,6 +47,9 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       values.forEach((value) => this.billRatesControl.push(this.fromValueToBillRate(value)));
     }
   }
+  @Input() set orderType(type: OrderType | undefined) {
+    this.canDeletePredefinedBillRates = type !== OrderType.ContractToPerm;
+  }
 
   @Output() billRatesChanged: EventEmitter<any> = new EventEmitter();
   @Output() hourlyRateSync: EventEmitter<{ value: string; billRate: BillRate }> = new EventEmitter<{
@@ -62,6 +65,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   public billRatesOptions: BillRateOption[] = [];
   public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
   public allBillRatesConfigs: BillRateOption[] = [];
+  public canDeletePredefinedBillRates = false;
 
   private editBillRateIndex: string | null;
 
