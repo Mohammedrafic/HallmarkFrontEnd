@@ -1142,7 +1142,10 @@ public RedirecttoIRPOrder(order:Order)
           : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.Incomplete:
-        this.columnsToExport = allOrdersColumnsToExport;
+        let incompleteColumns = [...allOrdersColumnsToExport];
+        let assignmentIndex = incompleteColumns.findIndex(ele=>ele.column == 'AssignmentType');
+        incompleteColumns.splice(assignmentIndex,1)
+        this.columnsToExport = incompleteColumns;
         this.filters.isTemplate = false;
         this.isIncomplete = true;
         cleared ? this.store.dispatch([new GetOrders(this.filters, true)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
