@@ -1486,6 +1486,7 @@ public RedirecttoIRPOrder(order:Order)
 
   openIrpDetails(event: RowSelectedEvent | Partial<RowSelectedEvent>) {
     this.subscribeToCandidateJob(false);
+    this.watchForEmployeeToggleState();
     if(!this.redirecttovmsfromIRP){
       this.redirecttovmsfromIRP=!this.redirecttovmsfromIRP;
      return;
