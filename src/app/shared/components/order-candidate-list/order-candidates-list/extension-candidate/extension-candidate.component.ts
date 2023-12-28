@@ -284,11 +284,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   ngOnInit(): void {
+    this.createForm();
     this.activeSystems = this.orderManagementService.getOrderManagementSystem();
     this.subscribeOnPermissions();
     this.subsToCandidate();
     this.rejectReasons$ = this.subscribeOnReasonsList();
-    this.createForm();
     this.onRejectSuccess();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeToCandidateJob();
@@ -644,8 +644,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.form?.get('allowDeployCredentials')?.disable();
       this.form?.get('comments')?.disable();
       this.form?.get('allowDeployCredentials')?.disable();
-      this.form?.get('actualStartDate')?.disable();
-      this.form?.get('actualEndDate')?.disable();
       this.form?.get('offeredBillRate')?.disable();
     }
   }
@@ -952,11 +950,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.form.get('actualEndDate')?.enable();
       this.form.get('allowDeployCredentials')?.enable();
     }
-    if (this.isOnBoard && !this.isAgency) {
+    if ((this.isOnBoard || this.isOffboard) && !this.isAgency) {
       this.form.get('clockId')?.enable();
       this.form.get('actualStartDate')?.enable();
       this.form.get('actualEndDate')?.enable();
     }
+    this.changeDetectorRef.markForCheck();
   }
 
   private subscribeOnReasonsList(): Observable<RejectReason[]> {
@@ -995,7 +994,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       .subscribe((data) => {
         if (data.jobId === this.candidate?.candidateJobId) {
           this.resetStatusesFormControl();
-          this.createForm();
           this.patchForm(data);
           this.adjustCandidatePayRateField();
         }
