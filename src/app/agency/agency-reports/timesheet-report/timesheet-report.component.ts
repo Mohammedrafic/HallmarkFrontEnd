@@ -30,7 +30,7 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetCommonReportFilterOptions, GetLogiReportData, GetCommonReportCandidateSearch, ClearLogiReportState, GetOrganizationsByAgency,GetOrganizationsStructureByOrgIds } from '@organization-management/store/logi-report.action';
+import { GetCommonReportFilterOptions, GetLogiReportData, GetCommonReportCandidateSearch, ClearLogiReportState, GetOrganizationsByAgency, GetOrganizationsStructureByOrgIds, GetAgencyCommonFilterReportOptions } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -50,8 +50,8 @@ import { uniqBy } from 'lodash';
 import { DataSourceItem } from '../../../core/interface/common.interface';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '../../../shared/models/organization.model';
 import {
-  CommonAgencyCandidateSearchFilter, 
-  MasterSkillDto,  SkillCategoryDto, OrderTypeOptionsForReport, AgencyCommonFilterReportOptions
+  CommonAgencyCandidateSearchFilter,
+  MasterSkillDto, SkillCategoryDto, OrderTypeOptionsForReport, AgencyCommonFilterReportOptions
 } from '../models/agency-common-report.model';
 
 @Component({
@@ -126,7 +126,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
 
   candidateSearchData: SearchCandidate[] = [];
 
- // @Select(SecurityState.organisations)
+  // @Select(SecurityState.organisations)
 
   selectedOrganizations: OrganizationStructure[] = [];
 
@@ -141,10 +141,10 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedDepartments: Department[];
   selectedAgencies: AgencyDto[];
-  @Select(UserState.lastSelectedOrganizationId)  
+  @Select(UserState.lastSelectedOrganizationId)
   private agencyId$: Observable<number>;
 
- //private organizationId$: Observable<number>;
+  //private organizationId$: Observable<number>;
   private agencyOrganizationId: number;
 
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
@@ -162,11 +162,11 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
   public regions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
   public departments: OrganizationDepartment[] = [];
- // public organizations: Organisation[] = [];
+  // public organizations: Organisation[] = [];
   public regionsList: OrganizationRegion[] = [];
   public locationsList: OrganizationLocation[] = [];
   public departmentsList: OrganizationDepartment[] = [];
-  public defaultOrganizations: number[]=[];
+  public defaultOrganizations: number[] = [];
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultDepartments: (number | undefined)[] = [];
@@ -178,7 +178,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
   public isInitialLoad: boolean = false;
   public baseUrl: string = '';
   public user: User | null;
-  public filterOptionsData: CommonReportFilterOptions;
+  public filterOptionsData: AgencyCommonFilterReportOptions;
   public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
   public isLoadNewFilter: boolean = false;
   private isAlive = true;
@@ -190,7 +190,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
   public associatedOrganizations: DataSourceItem[] | Organisation[] = [];
   public isResetFilter: boolean = false;
   private culture = 'en-US';
- 
+
   private defaultAgency: string;
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
@@ -239,48 +239,48 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
     //      }
     //    });
     //  }
-      this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
-        this.orderFilterColumnsSetup();
-        if (data != null && data != undefined) {
-          this.defaultAgency = data.toString();
+    this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.orderFilterColumnsSetup();
+      if (data != null && data != undefined) {
+        this.defaultAgency = data.toString();
 
-          this.store.dispatch(new GetOrganizationsByAgency())
-          this.store.dispatch(new ClearLogiReportState());
-          this.organizationsByAgency$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: DataSourceItem[]) => {
-            if (data != null && data != undefined) {
-              this.associatedOrganizations = data;
+        this.store.dispatch(new GetOrganizationsByAgency())
+        this.store.dispatch(new ClearLogiReportState());
+        this.organizationsByAgency$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: DataSourceItem[]) => {
+          if (data != null && data != undefined) {
+            this.associatedOrganizations = data;
 
-              this.store.dispatch(new GetOrganizationsStructureByOrgIds(data.map(i => i.id ?? 0)));
-              this.getOrganizationsStructure$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrganizationStructure[]) => {
+            this.store.dispatch(new GetOrganizationsStructureByOrgIds(data.map(i => i.id ?? 0)));
+            this.getOrganizationsStructure$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrganizationStructure[]) => {
 
-                if (data != undefined && data != null && data.length > 0) {
-                  this.organizations = uniqBy(data, 'organizationId');
-                  this.filterColumns.businessIds.dataSource = this.organizations;
-                 // this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
-                 
-                  this.defaultOrganizations = this.organizations.map(element=>element.organizationId)
+              if (data != undefined && data != null && data.length > 0) {
+                this.organizations = uniqBy(data, 'organizationId');
+                this.filterColumns.businessIds.dataSource = this.organizations;
+                // this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
 
-                  this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
-                  this.changeDetectorRef.detectChanges();
-                }
-              });
-            }
-          });
-        }
-        //this.SetReportData();
-        this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
-          if (data.length > 0) {
-            this.logiReportComponent.SetReportData(data);
+                this.defaultOrganizations = this.organizations.map(element => element.organizationId)
+
+                this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
+                this.changeDetectorRef.detectChanges();
+              }
+            });
           }
         });
-        this.agencyOrganizationId = data;
-        this.isInitialLoad = true;
-        this.onFilterControlValueChangedHandler();
-        this.onFilterRegionChangedHandler();
-        this.onFilterLocationChangedHandler();
-        this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
-        // this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      }
+      //this.SetReportData();
+      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
+        if (data.length > 0) {
+          this.logiReportComponent.SetReportData(data);
+        }
       });
+      this.agencyOrganizationId = data;
+      this.isInitialLoad = true;
+      this.onFilterControlValueChangedHandler();
+      this.onFilterRegionChangedHandler();
+      this.onFilterLocationChangedHandler();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      // this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+    });
   }
 
   private initForm(): void {
@@ -390,8 +390,8 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
             businessUnitIds: businessIdData
           };
 
-          this.store.dispatch(new GetCommonReportFilterOptions(filter));
-          this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+          this.store.dispatch(new GetAgencyCommonFilterReportOptions(filter));
+          this.agencycommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: AgencyCommonFilterReportOptions | null) => {
             if (data != null) {
               this.isAlive = true;
               this.filterOptionsData = data;
@@ -412,8 +412,8 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
                 timesheetStatusData.splice(noMileageExistIndex, 1);
               }
               this.filterColumns.timesheetStatusIds.dataSource = timesheetStatusData;
-              this.filterColumns.agencyIds.dataSource = data.agencies;
-              this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
+              // this.filterColumns.agencyIds.dataSource = data.agencies;
+              //  this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
               this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
               if (this.isInitialLoad) {
                 this.SearchReport()
@@ -474,13 +474,13 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
-    this.agencyIdControl = this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
+    /*this.agencyIdControl = this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
     this.agencyIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.agencyIdControl.value.length > 0) {
         let agencyData = this.filterOptionsData.agencies;
         this.selectedAgencies = agencyData?.filter((object) => data?.includes(object.agencyId));
       }
-    });
+    });*/
   }
 
 

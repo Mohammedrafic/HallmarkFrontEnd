@@ -328,13 +328,15 @@ export class YtdReportComponent implements OnInit, OnDestroy {
           };
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
-          this.locations=this.locationsList;
+          this.locations = this.locationsList;
+          this.departments = this.departmentsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.defaultRegions =this.regions.map(x=>x.id);
           if (this.isInitialLoad) {
             setTimeout(() => { this.SearchReport() }, 3000);
             this.isInitialLoad = false;
           }
+          this.ytdreportReportForm.get(ytdReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
           this.changeDetectorRef.detectChanges();
         }
         else {
@@ -363,7 +365,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
           return obj.departments.filter(department => department.locationId === obj.id);
         }).reduce((a, b) => a.concat(b), []);
 
-
+        this.ytdreportReportForm.get(ytdReportConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
       }
       else {
         this.filterColumns.locationIds.dataSource = [];
@@ -382,7 +384,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
         this.filterColumns.departmentIds.dataSource = this.departments;
         this.defaultDepartments = this.departments.map(x => x.id);
-
+        this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
       }
       else {
         this.filterColumns.departmentIds.dataSource = [];
