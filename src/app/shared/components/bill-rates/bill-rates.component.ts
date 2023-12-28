@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable, filter, take, takeUntil, switchMap, tap, catchError, EMPTY } from 'rxjs';
+import { Observable, filter, take, takeUntil, switchMap, tap, catchError, EMPTY, of } from 'rxjs';
 
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { DateTimeHelper } from '@core/helpers';
@@ -20,10 +20,10 @@ import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
-import { GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import { AlertService } from '@shared/services/alert.service';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-bill-rates',
@@ -47,6 +47,9 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       values.forEach((value) => this.billRatesControl.push(this.fromValueToBillRate(value)));
     }
   }
+  @Input() set orderType(type: OrderType | undefined) {
+    this.canDeletePredefinedBillRates = type !== OrderType.ContractToPerm;
+  }
 
   @Output() billRatesChanged: EventEmitter<any> = new EventEmitter();
   @Output() hourlyRateSync: EventEmitter<{ value: string; billRate: BillRate }> = new EventEmitter<{
@@ -61,6 +64,8 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   public intervalMaxField: AbstractControl;
   public billRatesOptions: BillRateOption[] = [];
   public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
+  public allBillRatesConfigs: BillRateOption[] = [];
+  public canDeletePredefinedBillRates = false;
 
   private editBillRateIndex: string | null;
 
@@ -101,6 +106,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   }
 
   public addBillRate(): void {
+    this.setAllBillRates();
     this.billRatesSyncService.setFormChangedState(false);
     this.editBillRateIndex = null;
     this.billRateForm.reset();
@@ -120,6 +126,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
   }
 
   public editBillRate({ index, ...value }: BillRatesGridEvent): void {
+    this.setAllBillRates();
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
     this.billRatesSyncService.setFormChangedState(false);
@@ -343,5 +350,29 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       })
       .pipe(take(1))
       .subscribe();
+  }
+
+  private setAllBillRates(): void {
+    if (!this.organizationId || (!this.candidateJobId && !this.orderId)) {
+      this.allBillRatesConfigs = [];
+      return;
+    }
+
+    const allBillRatesConfigs$ = this.candidateJobId
+      ? this.billRatesService.getCandidateBillRateConfigs(this.candidateJobId, this.organizationId as number)
+      : this.billRatesService.getOrderBillRateConfigs(this.orderId as number, this.organizationId as number);
+
+    allBillRatesConfigs$
+      .pipe(
+        catchError(() => {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, 'Cannot fetch bill rates'));
+
+          return of([]);
+        }),
+        take(1)
+      )
+      .subscribe((billRates: BillRateOption[]) => {
+        this.allBillRatesConfigs = billRates;
+      });
   }
 }

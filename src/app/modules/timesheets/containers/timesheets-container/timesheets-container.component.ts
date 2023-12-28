@@ -114,6 +114,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   organizations: AgencyDataSourceItem[];
   public isAgencyVisibilityFlagEnabled = false;
   public orderTypeId: any;
+  isRedirectedFromDashboard: boolean;
 
   constructor(
     private store: Store,
@@ -151,6 +152,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     }
 
     this.document.defaultView?.localStorage.setItem('BussinessUnitID', JSON.stringify(''));
+
+    this.isRedirectedFromDashboard = this.routerState?.['redirectedFromDashboard'] || false;
 
     this.onOrganizationChangedHandler();
     this.startOrganizationWatching();
@@ -395,12 +398,18 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   private timeSheetBasedonOrg(orgId:any): void{
     this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
     this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });
-
+    const statusIds = this.tabConfig[this.activeTabIdx].value;
+    const filters=this.filters;
+    const updatedFilters = {
+      ...this.filters,
+      statusIds: statusIds
+    }
+    const finalresult=this.isRedirectedFromDashboard ? updatedFilters : filters;
     this.store.dispatch([
       new Timesheets.UpdateFiltersState(
         {
           organizationId: this.isAgency && (this.businessUnitId ?? 0) > 0 ? this.businessUnitId : orgId,
-          ...this.filters,
+          ...finalresult
         },
         this.activeTabIdx !== 0
       ),

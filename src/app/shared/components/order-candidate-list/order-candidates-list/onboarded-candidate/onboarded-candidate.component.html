@@ -313,6 +313,7 @@
         [isActive]="isActiveCandidateDialog$ | async"
         [candidateJobId]="candidateJob?.jobId || null"
         [organizationId]="candidateJob?.organizationId || null"
+        [orderType]="candidateJob?.order?.orderType"
         [readOnlyMode]="isReadOnlyBillRates"
         (billRatesChanged)="onBillRatesChanged($event)"
       ></app-bill-rates>
