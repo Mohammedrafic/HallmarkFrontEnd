@@ -64,6 +64,7 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { PendingApprovalInvoice } from '../../interfaces';
+import { ToggleRowExpansionHeaderCellService } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.service';
 
 @Component({
   selector: 'app-invoices-container',
@@ -212,6 +213,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private ngZone: NgZone,
     private invoiceApiService: InvoicesApiService,
     private filterService: FilterService,
+    private toggleservice: ToggleRowExpansionHeaderCellService,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     @Inject(DOCUMENT) private document: Document,
     store: Store,
@@ -279,6 +281,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchForPreservedFilters();
     this.getuserPermission();
     this.subscriptionOfPendingInvoices();
+    this.watchForShowDetailsEvent();
   }
 
   ngAfterViewInit(): void {
@@ -397,13 +400,18 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   isExpandedGrid = false;
-  public toggleField(event:any):void 
-  { 
-    this.isExpandedGrid=false;
-    if(event.target.checked){
-    this.isExpandedGrid=true;
-    }
-    this.resetFilters(true);
+
+  public watchForShowDetailsEvent(){
+    this.toggleservice.handleDetailsEvent.pipe(
+      takeUntil(this.componentDestroy())).subscribe((showdetails) => {
+        if(showdetails){
+          debugger;
+          this.isExpandedGrid=true;
+        } else {
+          this.isExpandedGrid=false;
+        }
+        this.resetFilters(true);
+    })
   }
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));

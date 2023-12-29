@@ -1,12 +1,17 @@
 <div (click)="sort(nextSort, $event)" class="grid-icon-cell-container">
-    <button ejs-button cssClass="e-flat icon-button" (click)="toggleRowExpansion($event)">
-        <span>
-            <img *ngIf="expanded; else collapsed" src="assets/icons/menu-collapse.svg" alt="collapse" class="icon c">
-            <ng-template #collapsed>
-                <img src="assets/icons/menu-expand.svg" alt="expand" class="icon">
-            </ng-template>
-        </span>
-    </button>
+        <button ejs-button cssClass="e-flat icon-button" (click)="toggleRowExpansion($event)">
+            <app-tooltip-container
+            [message]="toolTipMessage"
+            [showToolTip]="true"
+            >
+                <span>
+                    <img *ngIf="expanded; else collapsed" src="assets/icons/menu-collapse.svg" alt="collapse" class="icon c" tooltip>
+                    <ng-template #collapsed>
+                        <img src="assets/icons/menu-expand.svg" alt="expand" class="icon">
+                    </ng-template>
+                </span>
+            </app-tooltip-container>
+        </button>
 
     <div class="ag-header-cell-text">{{ params?.displayName }}</div>
     <i-feather *ngIf="currentSort" [ngClass]="currentSort" class="icon" name="arrow-up"></i-feather>
