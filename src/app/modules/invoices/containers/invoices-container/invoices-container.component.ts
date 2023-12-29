@@ -214,7 +214,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private ngZone: NgZone,
     private invoiceApiService: InvoicesApiService,
     private filterService: FilterService,
-    private toggleservice: ToggleRowExpansionHeaderCellService,
+    private toggleService: ToggleRowExpansionHeaderCellService,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     @Inject(DOCUMENT) private document: Document,
     store: Store,
@@ -402,7 +402,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
 
   public watchForShowDetailsEvent(){
-    this.toggleservice.handleDetailsEvent.pipe(
+    this.toggleService.handleDetailsEvent.pipe(
       takeUntil(this.componentDestroy())).subscribe((showdetails) => {
         this.isExpandedGrid = showdetails.Details;
         this.resetFilters(true);
