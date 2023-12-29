@@ -203,6 +203,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public noorgSelection:boolean = false;
   public addManualInvoiceDisable:boolean = false;
   public isAgencyVisibilityFlagEnabled = false;
+  public isExpandedGrid : boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -399,16 +400,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       });
   }
 
-  isExpandedGrid = false;
 
   public watchForShowDetailsEvent(){
     this.toggleservice.handleDetailsEvent.pipe(
       takeUntil(this.componentDestroy())).subscribe((showdetails) => {
-        if(showdetails){
-          this.isExpandedGrid=true;
-        } else {
-          this.isExpandedGrid=false;
-        }
+        this.isExpandedGrid = showdetails.Details;
         this.resetFilters(true);
     })
   }

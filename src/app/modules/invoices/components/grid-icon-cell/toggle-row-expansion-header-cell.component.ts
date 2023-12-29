@@ -23,7 +23,7 @@ export class ToggleRowExpansionHeaderCellComponent extends Destroyable implement
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
-    private service : ToggleRowExpansionHeaderCellService
+    private toggleRowExpansionService : ToggleRowExpansionHeaderCellService
   ) {
     super();
   }
@@ -50,7 +50,7 @@ export class ToggleRowExpansionHeaderCellComponent extends Destroyable implement
     this.gridApi?.onGroupExpandedOrCollapsed();
     this.cdr.markForCheck();
     this.expanded = this.checkIfAnyRowExpanded();
-    this.service.HandleStatusChangeClick(this.expanded);
+    this.toggleRowExpansionService.HandleStatusChangeClick(this.expanded);
     this.toolTipMessage = this.expanded ? "Hide Details" : "Show Details";
   }
 

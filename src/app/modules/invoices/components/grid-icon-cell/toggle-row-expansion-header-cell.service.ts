@@ -4,12 +4,12 @@ import { Subject } from 'rxjs';
 
 @Injectable()
 export class ToggleRowExpansionHeaderCellService {
-  public handleDetailsEvent: Subject<{showdetails : any}> = new Subject<{showdetails : any}>();
+  public handleDetailsEvent: Subject<{Details : boolean}> = new Subject<{Details : boolean}>();
   constructor() {
   }
 
-  public HandleStatusChangeClick(showdetails: any): void {
-      this.handleDetailsEvent.next(showdetails);
+  public HandleStatusChangeClick(Details: boolean): void {
+      this.handleDetailsEvent.next({Details : Details});
   }
  
 }
