@@ -673,6 +673,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.watchForOrderGridSystemClickEvent();
     this.watchForOrderFromNotification();
     this.watchForOrderIRPSubRowClickEvent();
+    this.subscribeForDeployedEmployees();
   }
 
   ngOnDestroy(): void {
@@ -2872,7 +2873,7 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.configdata,
+        this.configdata ? this.configdata : irpIncludeDeploy,
         ""
       ));
       this.store.dispatch(new GetIrpOrderExtensionCandidates(
@@ -2881,7 +2882,7 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.configdata,
+        this.configdata ? this.configdata : irpIncludeDeploy,
         ""
       ));
     }
