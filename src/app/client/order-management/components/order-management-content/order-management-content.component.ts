@@ -283,8 +283,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
   selectedCandidateforIRP: IRPOrderPosition;
   selectedCandidateforIRPorderDetails: IRPOrderPosition;
-  showdeployedEmp: Configuration[];
-  configdata: any;
+  DeployedEmployeeConfigValue: boolean;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -2848,9 +2847,8 @@ public RedirecttoIRPOrder(order:Order)
 
   private subscribeForDeployedEmployees(): void {
     this.organizationSettingService.getOrganizationSettings().subscribe(data => {
-      this.showdeployedEmp = data.filter(settingdata => settingdata.settingKey === SettingsKeys.ShowDeployedEmployees);
-      this.configdata = Object.assign({},...this.showdeployedEmp);
-      this.configdata = this.configdata.value && JSON.parse(this.configdata.value);
+      const showdeployedEmployee = data.filter(settingdata => settingdata.settingKey === SettingsKeys.ShowDeployedEmployees);
+      this.DeployedEmployeeConfigValue = Object.assign({},...showdeployedEmployee)?.value && JSON.parse(Object.assign({},...showdeployedEmployee)?.value);
     });
   }
 
@@ -2873,7 +2871,7 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.configdata ? this.configdata : irpIncludeDeploy,
+        this.DeployedEmployeeConfigValue ? this.DeployedEmployeeConfigValue : irpIncludeDeploy,
         ""
       ));
       this.store.dispatch(new GetIrpOrderExtensionCandidates(
@@ -2882,7 +2880,7 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.configdata ? this.configdata : irpIncludeDeploy,
+        this.DeployedEmployeeConfigValue ? this.DeployedEmployeeConfigValue : irpIncludeDeploy,
         ""
       ));
     }
