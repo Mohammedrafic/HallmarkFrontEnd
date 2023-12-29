@@ -537,7 +537,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
     if(this.activeSystem == OrderManagementIRPSystemId.IRP){
       this.applicantStatuses = [
-        { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'OnBoard' },
+        { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
         { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancel' },
       ]
     }
