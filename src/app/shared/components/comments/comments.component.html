@@ -28,7 +28,7 @@
         (onRead)="onRead(comment)"
       ></app-comment>
     </ng-container>
-    <div class="no-comments" *ngIf="!comments?.length">There are no comments to display yet!</div>
+    <div class="no-comments" *ngIf="!commentData?.length">There are no comments to display yet!</div>
   </div>
   <div class="comments-controls">
     <div class="input-group bootstrap">

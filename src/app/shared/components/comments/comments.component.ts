@@ -145,9 +145,8 @@ export class CommentsComponent {
     const searchValue = (event.target as HTMLInputElement).value;
     let users = searchValue == '' ? this.searchcommentData : this.searchcommentData.filter(function(user){
       return (user.text.toString().toLowerCase().indexOf(searchValue.toLowerCase()) > -1 ||
-      new Date(user.createdAt).toLocaleDateString().indexOf(searchValue.toLowerCase()) > -1 ||
-      user.firstName.toLowerCase().indexOf(searchValue.toLowerCase()) > -1 ||
-      user.lastName.toLowerCase().indexOf(searchValue.toLowerCase()) > -1);
+      new Date(user.createdAt).toLocaleDateString().indexOf(searchValue.toLowerCase()) > -1) ||
+      (user.firstName.toLowerCase() +" "+ user.lastName.toLowerCase()).indexOf(searchValue.toLowerCase()) > -1
     }); 
     this.commentData = users; 
   }
@@ -203,6 +202,7 @@ export class CommentsComponent {
       new: true,
       commentContainerId: this.commentContainerId,
       isRead: true,
+      organizationName: user.businessUnitName,
       bussinessUnitType: user.businessUnitType == 3 ? "Organization" : user.businessUnitType == 4 ? "Agency" : user.businessUnitType == 2 ? "MSP" : "Hallmark"
     };
     this.comments.push(comment);
