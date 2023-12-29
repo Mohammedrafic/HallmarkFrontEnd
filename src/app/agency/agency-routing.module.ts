@@ -27,6 +27,7 @@ const routes: Routes = [
           isOrganizationArea: true,
           isAgencyArea: true,
         },
+        resolve:[AgencyVisibilityFlagResolverService],
       },
       {
         path: 'organization',
