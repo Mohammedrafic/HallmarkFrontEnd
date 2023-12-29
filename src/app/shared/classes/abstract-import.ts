@@ -66,7 +66,7 @@ export abstract class AbstractImport extends DestroyableDirective implements OnI
     this.store.dispatch(new this.action.uploadFile(file));
   }
 
-  private subscribeOnFileActions(): void {
+  subscribeOnFileActions(): void {
     this.actions$
       .pipe(takeUntil(this.destroy$), ofActionSuccessful(this.action.uploadFileSucceeded.instance))
       .subscribe((result: { payload: ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder> }) => {

@@ -30,7 +30,7 @@ import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { AlertsEmailTemplateFormComponent } from './alerts-email-template-form/alerts-email-template-form.component';
 import { BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
-import { AlertChannel } from '../alerts.enum';
+import { AlertChannel, AlertIdEnum } from '../alerts.enum';
 import { AlertsSmsTemplateFromComponent } from './alerts-sms-template-from/alerts-sms-template-from.component';
 import { AlertsOnScreenTemplateFormComponent } from './alerts-on-screen-template-form/alerts-on-screen-template-form.component';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -286,7 +286,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem);
         this.adjustBusinessUnitTypeBasedActiveSystem();
       });
-    } else this.isIRPFlagEnabled = false;
+    } else this.isIRPFlagEnabled = false;    
   }
 
   ngOnDestroy(): void {
@@ -393,14 +393,19 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.onEdit(data.rowData);
   }
   public onSmsTemplateEdit(data: any): void {
-    this.alertChannel=AlertChannel.SMS;
-    this.alertTemplateType = AlertChannel[AlertChannel.SMS];
-    this.onEdit(data.rowData);
+    if(data.rowData['alertId']!=AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets'])
+    {  this.alertChannel=AlertChannel.SMS;
+      this.alertTemplateType = AlertChannel[AlertChannel.SMS];
+      this.onEdit(data.rowData);
+    }    
   }
   public onScreenTemplateEdit(data: any): void {
+   if(data.rowData['alertId']!=AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets'])
+    {
     this.alertChannel=AlertChannel.OnScreen;
     this.alertTemplateType = AlertChannel[AlertChannel.OnScreen];
     this.onEdit(data.rowData);
+  }
   }
 
   public onGridReady(params: GridReadyEvent): void {

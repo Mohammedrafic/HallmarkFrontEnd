@@ -225,6 +225,10 @@ section {
         &:has(.links) {
           grid-row: 9 !important;
         }
+
+        &.second-row {
+          grid-row: 9 !important;
+        }
       }
 
       .column {

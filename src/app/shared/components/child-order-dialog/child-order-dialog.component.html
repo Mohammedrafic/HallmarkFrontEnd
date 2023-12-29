@@ -368,6 +368,7 @@
           [billRates]="candidateJob?.billRates || []"
           [candidateJobId]="candidateJob?.jobId || null"
           [organizationId]="candidateJob?.organizationId || null"
+          [orderType]="candidateJob?.order?.orderType"
           [isActive]="true"
           (billRatesChanged)="onBillRatesChanged($event)"
         >

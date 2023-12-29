@@ -281,6 +281,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
   selectedCandidateforIRP: IRPOrderPosition;
+  selectedCandidateforIRPorderDetails: IRPOrderPosition;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -723,19 +724,17 @@ public watchForOrderIRPSubRowClickEvent(){
       this.irpSubOrder = Order;
       this.systemType = system;
     if(orderData.system === 'IRP' && Order.orderType === OrderType.LongTermAssignment){
-      this.subscribeToCandidateJob();
-      this.openIrpSubrowDetails(Order, orderData, system)
+      this.openIrpSubrowDetails(Order,orderData, system);
+      this.subscribeToCandidateJob(true);
     }
 })
 }
 public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : string) {
   const orderData = Data as IRPOrderPosition;
-
   this.store.dispatch(new GetOrderById(orderData.orderId, orderData.organizationId));
   this.dispatchAgencyOrderCandidatesList(Order.id, Order.organizationId as number, true);
   this.openChildDialog.next([Order, Data, system]);
   this.orderPositionSelected$.next({ state: false });
-  this.openDetails.next(false);
   this.selectedRowRef = Data;
 }
 
@@ -964,7 +963,9 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   validateExport():boolean {
-    if (this.ordersPage.totalCount > 8000) {
+    if (this.activeSystem != OrderManagementIRPSystemId.OrderJourney &&
+      this.ordersPage &&
+      this.ordersPage?.totalCount > 8000) {
       this.exportWarning.show();
       return false;
     }
@@ -1141,7 +1142,10 @@ public RedirecttoIRPOrder(order:Order)
           : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.Incomplete:
-        this.columnsToExport = allOrdersColumnsToExport;
+        let incompleteColumns = [...allOrdersColumnsToExport];
+        let assignmentIndex = incompleteColumns.findIndex(ele=>ele.column == 'AssignmentType');
+        incompleteColumns.splice(assignmentIndex,1)
+        this.columnsToExport = incompleteColumns;
         this.filters.isTemplate = false;
         this.isIncomplete = true;
         cleared ? this.store.dispatch([new GetOrders(this.filters, true)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
@@ -1481,7 +1485,8 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   openIrpDetails(event: RowSelectedEvent | Partial<RowSelectedEvent>) {
-
+    this.subscribeToCandidateJob(false);
+    this.watchForEmployeeToggleState();
     if(!this.redirecttovmsfromIRP){
       this.redirecttovmsfromIRP=!this.redirecttovmsfromIRP;
      return;
@@ -1891,7 +1896,6 @@ public RedirecttoIRPOrder(order:Order)
 
   public onOpenCandidateDialog(candidate: OrderManagementChild, order: OrderManagement, index?: number): void {
     this.selectedCandidate = candidate;
-    this.subscribeToCandidateJob();
     this.selectedCandidateMeta = this.selectedCandidate.selected = {
       order: order.id,
       positionId: candidate.positionId,
@@ -2826,9 +2830,13 @@ public RedirecttoIRPOrder(order:Order)
     });
   }
 
-  private subscribeToCandidateJob(): void {
+  private subscribeToCandidateJob(subrow?: boolean): void {
       this.getIrpCandidatesforExtension$.pipe(take(2), filter(Boolean)).subscribe((res) => {
-        res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
+        if(!subrow){
+          res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null ? this.selectedCandidateforIRPorderDetails = irpcandidate : "");
+        } else {
+          res.items.filter(irpcandidate => irpcandidate.candidateJobId !== null && this.orderData.candidateProfileId === irpcandidate.candidateProfileId ? this.selectedCandidateforIRP = irpcandidate : "");
+        }
       });
   }
 
@@ -2843,7 +2851,7 @@ public RedirecttoIRPOrder(order:Order)
       this.orderManagementService.excludeDeployed,
       ""
     ));
-    if (isIrp && (this.selectedDataRow?.extensionFromId === null)) {
+    if (isIrp) {
       this.store.dispatch(new GetIrpOrderCandidates(
         orderId,
         organizationId,
@@ -2853,7 +2861,6 @@ public RedirecttoIRPOrder(order:Order)
         irpIncludeDeploy,
         ""
       ));
-    } else if(isIrp && (this.selectedDataRow?.extensionFromId !== null)) {
       this.store.dispatch(new GetIrpOrderExtensionCandidates(
         orderId,
         organizationId,

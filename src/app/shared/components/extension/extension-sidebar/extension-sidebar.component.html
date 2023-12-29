@@ -162,7 +162,8 @@
     <div class="extension__comments" *ngIf="activeSystems !== OrderManagementIRPSystemId.IRP">
       <app-comments
         [comments]="comments"
-        [isCreating]="true"></app-comments>
+        [isCreating]="true" (saveCommentsEvent)="addComments($event)"
+        ></app-comments>
     </div>
     <div class="extension__comments" *ngIf="activeSystems === OrderManagementIRPSystemId.IRP">
       <app-comments-irp
@@ -182,6 +183,9 @@
       [billRates]="candidateRates"
       [isActive]="true"
       [isLocal]="candidateJob?.isLocal!"
+      [candidateJobId]="candidateJob?.jobId || null"
+      [organizationId]="candidateJob?.organizationId || null"
+      [orderType]="candidateJob?.order?.orderType"
       (hourlyRateSync)="hourlyRateToOrderSync($event)"></app-bill-rates>
   </div>
 </div>

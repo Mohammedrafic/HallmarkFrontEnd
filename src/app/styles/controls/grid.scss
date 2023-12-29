@@ -94,8 +94,8 @@ body.dark {
           font-size: 10px;
 
           &.e-check {
-            background-color: #fff;
-            color: $primary-active-blue-10;
+            background-color: $primary-active-blue-10!important;
+            color: #fff!important;
           }
         }
       }
@@ -441,9 +441,6 @@ body.dark {
 
     td.e-active {
       background-color: $primary-active-blue-70;
-      .subrow-toggle {
-        color: $white !important;
-      }
     }
 
     .e-frozenheader.e-frozen-right-header > .e-table {

@@ -601,6 +601,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.configurations = data;
         let settingData = this.getRowsPerPage(adaptedData, this.currentPagerPage);
         settingData.forEach(element => {
+          element.children?.map((ch)=>{
+          if(ch.regionId == null && ch.locationId == null && ch.departmentId==null){
+            ch.isParentRecord=true;
+          }
+        });
           if (element?.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
             element.children?.forEach(e => {
               if (e.regionId == null && e.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
@@ -1652,5 +1657,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.organizationHierarchy = OrganizationHierarchy.Department;
     this.organizationHierarchyId = id;
     this.departmentFormGroup.patchValue({ departmentId: id }, { emitEvent: false, onlySelf: true });
+  }
+  OnDeleteSucceeded(isDeleted: any):void{
+    if(isDeleted){
+      this.getSettings();
+    }
   }
 }

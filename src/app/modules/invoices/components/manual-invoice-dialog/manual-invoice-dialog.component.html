@@ -11,10 +11,7 @@
     <div class="dialog-container">
       <div class="dialog-header">
         <h3 class="title">{{ title | titlecase }}</h3>
-        <div class="controls">
-          <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
-          <button ejs-button [isPrimary]="true" (click)="saveManualInvoice()">Save</button>
-        </div>
+        <ng-container *ngIf="!(isMobile$ | async)" [ngTemplateOutlet]="actionButtons"></ng-container>
       </div>
 
       <div class="form" *ngIf="form">
@@ -138,4 +135,17 @@
       </div>
     </div>
   </ng-template>
+
+  <ng-template #footerTemplate>
+    <section class="footer">
+      <ng-container [ngTemplateOutlet]="actionButtons" *ngIf="isMobile$ | async"></ng-container>
+    </section>
+  </ng-template>
 </ejs-dialog>
+
+<ng-template #actionButtons>
+  <div class="controls e-card-content">
+    <button ejs-button cssClass="e-outline button-cancel action-btn" (click)="cancelChanges()">Cancel</button>
+    <button ejs-button cssClass="action-btn" [isPrimary]="true" (click)="saveManualInvoice()">Save</button>
+  </div>
+</ng-template>

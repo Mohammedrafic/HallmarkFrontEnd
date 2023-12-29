@@ -51,4 +51,7 @@ export class OrganizationSettingsService {
       { params: GetQueryParams(params) }
     ).pipe(map((data) => sortBy(data)));
   }
+  public deleteOrganizationSettingValues(settingValueId?:Number):Observable<any>{
+    return this.http.delete<any>(`/api/OrganizationSettings/${settingValueId}`);
+  }
 }

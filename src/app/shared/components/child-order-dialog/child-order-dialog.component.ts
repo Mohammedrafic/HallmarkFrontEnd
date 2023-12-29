@@ -373,6 +373,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       });
     this.subscribeOnVMSCandidate();
     this.subscribeOnCandidateJob();
+    this.subscribeOnCandidates();
     this.onOpenEvent();
     this.onCloseEvent();
     this.subscribeOnSelectedOrder();
@@ -628,11 +629,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
   }
 
-  public getExtensionsforIRP(): void {
-    if (!this.irpCandidates?.candidateJobId) {
-      return;
-    }
-    this.store.dispatch(new GetOrganizationExtensions(this.irpCandidates.candidateJobId as number, this.order?.id));
+  public getExtensionsforIRP(irpCandidate: IRPOrderPosition): void {
+    this.store.dispatch(new GetOrganizationExtensions(irpCandidate.candidateJobId as number, this.order?.id));
   }
 
   public updateGrid(): void {
@@ -892,10 +890,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private subscribeOnCandidates(): void {
     this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
       if(this.isOrganization && this.activeSystem !== OrderManagementIRPSystemId.VMS){
-        if(irpCandidates){
-          irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+        if(irpCandidates && this.candidate?.candidateProfileId){
+          irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidate?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
           this.setCloseOrderButtonStateforIRP(this.irpCandidates);
-          this.getExtensionsforIRP();
+          this.getExtensionsforIRP(this.irpCandidates);
           this.getCommentsforIRP();
         }
       }
@@ -903,9 +901,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private subscribeOnCandidateJob(): void {
-    if (this.isOrganization) {
-      this.subscribeOnCandidates();
-      }
     if (this.isAgency) {
       this.agencyCandidatesJob$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
         this.candidateJob = orderCandidateJob;

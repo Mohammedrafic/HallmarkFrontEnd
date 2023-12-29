@@ -66,7 +66,9 @@ export type ImportedDepartment = {
   facilityPhoneNo: string;
   inactiveDate: string;
   errorProperties: string[];
-}
+  primarySkills: string[];
+  secondarySkills: string[];
+} & Record<string, string>
 export class DepartmentsByLocationsFilter {
   ids?: number[];
   businessUnitIds?:number[];

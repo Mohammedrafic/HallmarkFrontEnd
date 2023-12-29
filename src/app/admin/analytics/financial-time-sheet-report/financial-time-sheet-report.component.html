@@ -127,7 +127,7 @@
         <div class="input-container bootstrap">
           <label>Period</label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist (change)="selectPeriod()" formControlName="period" appValidateWithMessage placeholder="All"
+            <ejs-dropdownlist (change)="selectPeriod($event)" formControlName="period" appValidateWithMessage placeholder="All"
                               [allowFiltering]="true" [dataSource]="periodList"
                               [fields]="periodFields" showSelectAll=true>
             </ejs-dropdownlist>
@@ -142,7 +142,7 @@
           <label>Start Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            appValidateWithMessage formControlName="startDate">
+                            appValidateWithMessage formControlName="startDate" [enabled]="financialTimesheetReportForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
         </div>
@@ -151,7 +151,8 @@
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                             appValidateWithMessage formControlName="endDate"
-                            [min]="financialTimesheetReportForm.controls['startDate'].value">
+                            [min]="financialTimesheetReportForm.controls['startDate'].value"
+                            [enabled]="financialTimesheetReportForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
         </div>

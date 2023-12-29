@@ -3,7 +3,6 @@ import { PenaltyPayload } from '@shared/models/penalty.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ReasonFormType, ReasonsNavigationTabs } from '../enums';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
-import { SaveCancelEmployeeReason } from '@organization-management/store/reject-reason.actions';
 
 export interface ReasonsFormTypesMap {
   [index: number]: ReasonFormType;

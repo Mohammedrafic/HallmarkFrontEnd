@@ -26,6 +26,7 @@ import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesState } from "../../store/state/invoices.state";
 import { ManInvoiceOptionsKeys } from '../../enums';
 import { PUBLIC_ORDER_ID } from '@shared/constants';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-manual-invoice-dialog',
@@ -77,6 +78,9 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   @Select(InvoicesState.agencyFeeApplicable)
   public agencyFeeApplicable$: Observable<boolean>;
+
+  @Select(AppState.isMobileScreen)
+  public readonly isMobile$: Observable<boolean>;
 
   ngOnInit(): void {
     this.strategy = this.injector.get<ManualInvoiceStrategy>(

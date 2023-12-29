@@ -43,11 +43,13 @@ export class CommentsComponent {
   @Input() disabled = false;
   @Input() orderId: number;
   public commentData: Comment[] = [];
+  public searchcommentData: Comment[] = [];
   @Output() commentSaveCheck = new EventEmitter<boolean>();
   @Input() set comments(value: Comment[]) {
     if (value?.length) {
       this.commentsList = value;
       this.commentData = value.filter((comments) => !comments.isPrivate);
+      this.searchcommentData = this.commentData;
       this.hasUnreadMessages = this.hasUnread();
       this.initView$.next();
     } else {
@@ -72,6 +74,7 @@ export class CommentsComponent {
   public commentsList: Comment[] = [];
   @Input() commentContainerId: number;
   @Input() isCreating = false;
+  @Output() saveCommentsEvent = new EventEmitter<Comment[]>();
 
   @ViewChild('textBox')
   public textBox: TextBoxComponent;
@@ -138,6 +141,16 @@ export class CommentsComponent {
     this.unsubscribe$.complete();
   }
 
+  onKeyUpEvent(event: KeyboardEvent){
+    const searchValue = (event.target as HTMLInputElement).value;
+    let users = searchValue == '' ? this.searchcommentData : this.searchcommentData.filter(function(user){
+      return (user.text.toString().toLowerCase().indexOf(searchValue.toLowerCase()) > -1 ||
+      new Date(user.createdAt).toLocaleDateString().indexOf(searchValue.toLowerCase()) > -1) ||
+      (user.firstName.toLowerCase() +" "+ user.lastName.toLowerCase()).indexOf(searchValue.toLowerCase()) > -1
+    }); 
+    this.commentData = users; 
+  }
+ 
   private scrollToLastMessage(): void {
     this.body?.nativeElement.lastElementChild?.scrollIntoView({ block: 'nearest' });
   }
@@ -173,7 +186,7 @@ export class CommentsComponent {
       this.isExternal = !this.isExternal;
     }
   }
-
+  
   public send(): void {
     if (!this.message) {
       return;
@@ -189,18 +202,18 @@ export class CommentsComponent {
       new: true,
       commentContainerId: this.commentContainerId,
       isRead: true,
+      organizationName: user.businessUnitName,
       bussinessUnitType: user.businessUnitType == 3 ? "Organization" : user.businessUnitType == 4 ? "Agency" : user.businessUnitType == 2 ? "MSP" : "Hallmark"
     };
     this.comments.push(comment);
-    if(this.useStyle === true){
-      this.commentData.unshift(comment);
-    }else{
-      this.commentData.push(comment);
-    }
+    this.commentData.unshift(comment);
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
       this.store.dispatch(new SaveComment(comment));
+    }
+    else{
+      this.saveCommentsEvent.emit(this.comments);
     }
   }
 
@@ -219,6 +232,7 @@ export class CommentsComponent {
     event.itemData.value === CommentsFilter.All
       ? (this.commentData = this.commentData.filter((comments) => comments.isPrivate === false))
       : this.commentData;
+    this.searchcommentData = this.commentData;
     this.commentType = event.itemData.value;
     this.scroll$.next(null);
   }

@@ -35,6 +35,7 @@ export class ConfigurationChild {
   displayValue: string;
   parsedValue?: any;
   hidden = false;
+  isParentRecord:boolean;
 }
 
 export class ConfigurationDTO {

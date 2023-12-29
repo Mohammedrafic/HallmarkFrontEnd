@@ -6,7 +6,7 @@ import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { EmitType } from '@syncfusion/ej2-base';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { distinctUntilChanged, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -195,6 +195,17 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       this.agencyOrganizationId = data;
       this.loadperiod();
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
+      this.organizationData$.pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$)).subscribe((data) => {
+        if (data != null && data.length > 0) {
+          this.organizations = uniqBy(data, 'organizationId');
+          this.filterColumns.businessIds.dataSource = this.organizations;
+          if (this.agencyOrganizationId) {
+            this.defaultOrganizations = this.agencyOrganizationId;
+            this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
+          }
+          this.changeDetectorRef.detectChanges();
+        }
+      });
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
@@ -234,8 +245,69 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
     this.isAlive = false;
   }
-  selectPeriod() {
+  selectPeriod(event: any) {
+    let { startDate, period } = this.financialTimesheetReportForm.getRawValue();
+    const value = event.itemData.id;
     this.periodIsDefault = this.financialTimesheetReportForm.controls['period'].value == "Custom" ? true : false;
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue("");
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue("");
+    const PeriodCheck = value;
+    let startDateControl = new Date(Date.now());
+    let endDateControl = new Date(Date.now());
+    let lastDayOfLastMonth = new Date();
+    lastDayOfLastMonth.setMonth(lastDayOfLastMonth.getMonth(), 0);
+
+    switch (PeriodCheck) {
+      case 0:
+        startDateControl.setDate(startDateControl.getDate() - 30);
+        break;
+      case 1:
+        startDateControl.setDate(startDateControl.getDate() - 31);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 2:
+        startDateControl.setDate(startDateControl.getDate() - 61);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 3:
+        startDateControl.setDate(startDateControl.getDate() - 91);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 4:
+        startDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        break;
+      case 5:
+        const today = new Date(Date.now());
+        const quarter = Math.floor((today.getMonth() / 3));
+        startDateControl = new Date(today.getFullYear(), quarter * 3 - 3, 1);
+        endDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth() + 3, 0);
+        break;
+      case 6:
+        const startDate = new Date(startDateControl.getFullYear(), 0, 1)
+        startDate.setDate(startDate.getDate());
+        startDateControl = startDate;
+        break;
+      case 7:
+        const firstDay = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(firstDay, -6);
+        startDateControl.setDate(startDateControl.getDate());
+        endDateControl = new Date((lastDayOfLastMonth));
+        break;
+      case 8:
+        const dayFirst = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(dayFirst, -12);
+        startDateControl.setDate(startDateControl.getDate());
+        endDateControl = new Date((lastDayOfLastMonth));
+        break;
+    }
+
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDateControl);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date((endDateControl)));
+
+  }
+  private addMonths(date: any, months: any) {
+    date.setMonth(date.getMonth() + months);
+    return date;
   }
   private loadperiod(): void {
     this.periodList = [];
@@ -246,23 +318,13 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.periodList.push({ id: 4, name: 'MTD' });
     this.periodList.push({ id: 5, name: 'Last Quarter' });
     this.periodList.push({ id: 6, name: 'YTD' });
-    this.periodList.push({ id: 7, name: 'Last 6 Month' });
+    this.periodList.push({ id: 7, name: 'Last 6 Months' });
     this.periodList.push({ id: 8, name: 'Last 12 Months' });
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
   }
 
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
-
-    this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data != null && data.length > 0) {
-        this.organizations = uniqBy(data, 'organizationId');
-        this.filterColumns.businessIds.dataSource = this.organizations;
-        this.defaultOrganizations = this.agencyOrganizationId;
-        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
-        this.changeDetectorRef.detectChanges();
-      }
-    });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);

@@ -452,4 +452,8 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       this.cd.markForCheck();
     });
   }
+  addComments(saveComments: Comment[])
+  {
+    this.comments=saveComments;
+  }
 }

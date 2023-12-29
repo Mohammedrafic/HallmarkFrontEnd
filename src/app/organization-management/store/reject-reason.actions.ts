@@ -1,3 +1,4 @@
+import { CancellationReasonType } from '@organization-management/reasons/enums';
 import { CancelEmployeeReasonValue, UnavailabilityValue } from '@organization-management/reasons/interfaces';
 import { PenaltyPayload } from "@shared/models/penalty.model";
 import { RejectReason, RejectReasonWithRedflag, RejectReasonwithSystem } from "@shared/models/reject-reason.model";
@@ -174,6 +175,7 @@ export class GetCancelEmployeeReason {
     public readonly page: number,
     public readonly pageSize: number,
     public readonly getAll?: boolean,
+    public readonly cancellationReasonType?: CancellationReasonType,
   ) {}
 }
 

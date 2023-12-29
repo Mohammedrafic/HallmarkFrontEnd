@@ -920,6 +920,7 @@
           [useBackground]="false"
           [isCreating]="!orderId"
           [externalCommentConfiguration]="externalCommentConfiguration"
+          (saveCommentsEvent)="addComments($event)"
         ></app-comments>
       </div>
     </div>

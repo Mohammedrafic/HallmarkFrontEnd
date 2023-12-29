@@ -37,6 +37,7 @@ import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -112,6 +113,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public user: any;
   organizations: AgencyDataSourceItem[];
   public isAgencyVisibilityFlagEnabled = false;
+  public orderTypeId: any;
+  isRedirectedFromDashboard: boolean;
 
   constructor(
     private store: Store,
@@ -150,6 +153,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
     this.document.defaultView?.localStorage.setItem('BussinessUnitID', JSON.stringify(''));
 
+    this.isRedirectedFromDashboard = this.routerState?.['redirectedFromDashboard'] || false;
+
     this.onOrganizationChangedHandler();
     this.startOrganizationWatching();
     this.startFiltersWatching();
@@ -166,7 +171,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         }
       }
     })
+    this.orderTypeId = JSON.parse(localStorage.getItem('OrderType') || '"0"') as number;
 
+    if(this.orderTypeId==OrderType.ReOrder)
+    {
+      const filter={ orderTypeId:this.orderTypeId}
+      this.updateTableByFilters(filter);
+    }
+  
+    
   }
 
   public override ngOnDestroy() {
@@ -385,12 +398,18 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   private timeSheetBasedonOrg(orgId:any): void{
     this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
     this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });
-
+    const statusIds = this.tabConfig[this.activeTabIdx].value;
+    const filters=this.filters;
+    const updatedFilters = {
+      ...this.filters,
+      statusIds: statusIds
+    }
+    const finalresult=this.isRedirectedFromDashboard ? updatedFilters : filters;
     this.store.dispatch([
       new Timesheets.UpdateFiltersState(
         {
           organizationId: this.isAgency && (this.businessUnitId ?? 0) > 0 ? this.businessUnitId : orgId,
-          ...this.filters,
+          ...finalresult
         },
         this.activeTabIdx !== 0
       ),
