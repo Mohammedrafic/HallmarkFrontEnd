@@ -405,7 +405,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.toggleservice.handleDetailsEvent.pipe(
       takeUntil(this.componentDestroy())).subscribe((showdetails) => {
         if(showdetails){
-          debugger;
           this.isExpandedGrid=true;
         } else {
           this.isExpandedGrid=false;
