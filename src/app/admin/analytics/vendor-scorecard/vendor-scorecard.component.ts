@@ -380,7 +380,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
           }
         }
           let businessIdData = [];
-          businessIdData.push(data);
+          businessIdData=data;
           let filter: CommonReportFilter = {
             businessUnitIds: businessIdData
           };
