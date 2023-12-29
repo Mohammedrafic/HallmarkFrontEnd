@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { BaseObservable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
@@ -18,6 +18,7 @@ import { ScheduleFilterHelper } from '../helpers';
 import {
   ChipsInitialState,
   DepartmentChipsStructureState,
+  GetEmployeeWorkCommitment,
   LocationChipsStructureState,
   RegionChipsStructureState,
   ScheduleFilterItem,
@@ -33,10 +34,14 @@ export class ScheduleFiltersService {
   private readonly scheduleFiltersData: BaseObservable<ScheduleFiltersData> = new BaseObservable(InitScheduleFiltersData);
   private readonly employeeOrganizationStructure: BaseObservable<OrganizationStructure>
     = new BaseObservable(InitEmployeeOrganizationStructure);
+    
   allDepartments: DropdownOption[];
   firstDepartment: OrganizationDepartment;
   getallDepartments: any;
   public fieldsWithAllToggle = ['regionIds', 'locationIds', 'departmentIds'];
+
+  getEmpWorkCommitments=new BehaviorSubject<string[]>([]); 
+  activeSchedulePeriod:string;
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -141,6 +146,23 @@ export class ScheduleFiltersService {
   getDeleteInlineChipStream(): Observable<ChipDeleteEventType> {
     return this.deletedInlineChip.asObservable();
   }
+
+  setEmpWorkCommitmentsData(event:string[]):void{
+    this.getEmpWorkCommitments.next(event);
+  }
+
+  getEmpWorkCommitmentsData() {
+    return this.getEmpWorkCommitments.asObservable();;
+  }
+  
+  setActiveScheduleTimePeriod(event:string):void{
+    this.activeSchedulePeriod=event;
+  }
+
+  getActiveScheduleTimePeriod() {
+    return this.activeSchedulePeriod;
+  }
+
 
   getScheduleFiltersData(): ScheduleFiltersData {
     return this.scheduleFiltersData.get();

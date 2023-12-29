@@ -414,6 +414,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   activePeriod(activePeriod: DatesRangeType): void {
     this.activeTimePeriod = activePeriod;
+    this.scheduleFiltersService.setActiveScheduleTimePeriod(activePeriod);
   }
 
   public exportTable() {

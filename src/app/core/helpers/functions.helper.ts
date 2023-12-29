@@ -167,3 +167,7 @@ export const EllipsisText = (text: string, characterCount: number): string => {
 
   return text;
 };
+
+export const  getKeyByValue=(obj: Record<string, unknown>, value:unknown): string | undefined =>{
+  return Object.keys(obj).find(key => obj[key] === value);
+}

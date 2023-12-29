@@ -22,7 +22,7 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { catchError, debounceTime, EMPTY, fromEvent, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { distinctUntilChanged, filter } from 'rxjs/operators';
 
 import { DatesRangeType, WeekDays } from '@shared/enums';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
@@ -41,6 +41,7 @@ import * as ScheduleInt from '../../interface';
 import {
   CardClickEvent,
   DroppedEvent,
+  GetEmployeeWorkCommitment,
   OpenPositionsList,
   PositionDragEvent,
   RemovedSlot,
@@ -49,9 +50,9 @@ import {
   ScheduleModel,
   SelectedCells,
 } from '../../interface';
-import { GetMonthRange, GetScheduledShift, GetStructureValue } from '../../helpers';
+import { GetMonthRange, GetScheduleFilterByEmployees, GetScheduledShift, GetStructureValue } from '../../helpers';
 import { ScheduleGridService } from './schedule-grid.service';
-import { ShowToast } from '../../../../store/app.actions';
+import { ShowFilterDialog, ShowSchduleSortFilterDialog, ShowToast } from '../../../../store/app.actions';
 import { ScheduleItemsService } from '../../services/schedule-items.service';
 import { GetPreservedFiltersByPage, ResetPageFilters } from 'src/app/store/preserved-filters.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
@@ -82,7 +83,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   @Input() selectedFilters: ScheduleInt.ScheduleFilters;
   @Input() hasViewPermission = false;
   @Input() hasSchedulePermission = false;
-  @Input() set redirectFromWidget(availableEmployeeData : ScheduleInt.ScheduleCandidate | null){
+  @Input() set redirectFromWidget(availableEmployeeData: ScheduleInt.ScheduleCandidate | null) {
     this.emitAvailableEmp(availableEmployeeData);
   }
 
@@ -108,12 +109,12 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   weekPeriod: [Date, Date] = [DateTimeHelper.getCurrentDateWithoutOffset(), DateTimeHelper.getCurrentDateWithoutOffset()];
 
   datesRanges: ScheduleInt.DateRangeOption[] = this.scheduleItemsService
-  .createRangeOptions(DateTimeHelper.getDatesBetween());
+    .createRangeOptions(DateTimeHelper.getDatesBetween());
 
   monthRangeDays: WeekDays[] = [];
 
   selectedCandidatesSlot: Map<number, ScheduleInt.ScheduleDateSlot>
-  = new Map<number, ScheduleInt.ScheduleDateSlot>();
+    = new Map<number, ScheduleInt.ScheduleDateSlot>();
 
   orgFirstDayOfWeek: number;
 
@@ -137,6 +138,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   private scheduleToBook: ScheduleBook | null;
 
+  public empWorkCommitments: GetEmployeeWorkCommitment[] = []
+
   constructor(
     private store: Store,
     private weekService: DateWeekService,
@@ -154,7 +157,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   trackByPeriods: TrackByFunction<ItemModel> = (_: number, period: ItemModel) => period.text;
 
   trackByDatesRange: TrackByFunction<ScheduleInt.DateRangeOption> =
-   (_: number, date: ScheduleInt.DateRangeOption) => date.dateText;
+    (_: number, date: ScheduleInt.DateRangeOption) => date.dateText;
 
   trackByweekDays: TrackByFunction<WeekDays> = (_: number, date: WeekDays) => date;
 
@@ -176,30 +179,30 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     }
   }
 
-   handleDroppedElement(event: CdkDragDrop<DroppedEvent>): void {
-   this.openPositionService.dropElementToDropList(event).pipe(
-   catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
-     switchMap((response: BookingsOverlapsResponse[]) => {
-       this.scheduleToBook = this.openPositionService.createPositionBookDto(event);
+  handleDroppedElement(event: CdkDragDrop<DroppedEvent>): void {
+    this.openPositionService.dropElementToDropList(event).pipe(
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+      switchMap((response: BookingsOverlapsResponse[]) => {
+        this.scheduleToBook = this.openPositionService.createPositionBookDto(event);
 
-       if (!response.length) {
-         return this.scheduleApiService.createBookSchedule(this.scheduleToBook);
-       } else {
-         this.openReplacementOrderDialog(response);
-         return EMPTY;
-       }
-     }),
-     catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
-     switchMap(() => {
-       return this.getOpenPositions();
-     }),
-     tap((positions: OpenPositionsList[]) => {
-       this.openPositionService.setOpenPosition('initialPositions', positions);
-     }),
-     takeUntil(this.componentDestroy()),
-   ).subscribe(() => {
-     this.successSaveBooking();
-   });
+        if (!response.length) {
+          return this.scheduleApiService.createBookSchedule(this.scheduleToBook);
+        } else {
+          this.openReplacementOrderDialog(response);
+          return EMPTY;
+        }
+      }),
+      catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
+      switchMap(() => {
+        return this.getOpenPositions();
+      }),
+      tap((positions: OpenPositionsList[]) => {
+        this.openPositionService.setOpenPosition('initialPositions', positions);
+      }),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => {
+      this.successSaveBooking();
+    });
   }
 
   closeReplacementOrderDialog(): void {
@@ -268,7 +271,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       } else {
         candidateSelectedSlot.dates.add(date);
 
-        if(schedule) {
+        if (schedule) {
           const days = candidateSelectedSlot.candidate?.days ?? candidate.days;
           candidateSelectedSlot.candidate.days =
             this.scheduleGridService.createDaysForSelectedSlots(days, schedule.daySchedules);
@@ -297,16 +300,16 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.markForCheck();
   }
 
-  emitAvailableEmp(candidate : ScheduleInt.ScheduleCandidate | null): void {
-    if(candidate !== undefined){
-      this.datesPeriods = [...DatesPeriods,...MonthPeriod];
+  emitAvailableEmp(candidate: ScheduleInt.ScheduleCandidate | null): void {
+    if (candidate !== undefined) {
+      this.datesPeriods = [...DatesPeriods, ...MonthPeriod];
       this.activePeriod = DatesRangeType.Month;
       this.selectCandidate.emit(candidate);
-      this.cdr.markForCheck();  
+      this.cdr.markForCheck();
     }
   }
 
-  handleMonthClick({date, candidate, cellDate }: CardClickEvent): void {
+  handleMonthClick({ date, candidate, cellDate }: CardClickEvent): void {
     this.selectCellSlots(date, candidate, cellDate);
   }
 
@@ -320,7 +323,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       candidateId
     );
 
-    if(isEditSideBar) {
+    if (isEditSideBar) {
       this.editCell.emit(GetScheduledShift(
         this.scheduleData as ScheduleInt.ScheduleModelPage,
         candidateId,
@@ -397,11 +400,11 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.scheduleItemsService.removeCandidateItem.pipe(
       takeUntil(this.componentDestroy()),
     ).subscribe((slot: RemovedSlot) => {
-      const {date, candidate} = slot;
+      const { date, candidate } = slot;
 
-      if(slot.date) {
-        this.selectCellSlots(date as string,candidate);
-        this.selectedCells.emit({cells: ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot)});
+      if (slot.date) {
+        this.selectCellSlots(date as string, candidate);
+        this.selectedCells.emit({ cells: ScheduleGridAdapter.prepareSelectedCells(this.selectedCandidatesSlot) });
       } else {
         this.selectedCandidatesSlot.delete(candidate.id);
         this.selectedCells.emit({
@@ -451,7 +454,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       .subscribe(() => {
         if (this.scheduleData) {
           const { pageNumber, totalPages } = this.scheduleData;
-          this.loadMoreItemPerPage(pageNumber,totalPages);
+          this.loadMoreItemPerPage(pageNumber, totalPages);
         }
       });
   }
@@ -461,12 +464,12 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       this.loadMoreData.emit(pageNumber + 1);
     }
   }
-   public clearCandidateSuggesstion():void{
+  public clearCandidateSuggesstion(): void {
     this.autoCompleteSearch?.clear();
-     this.store.dispatch([
-       new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
-     ]);
-   }
+    this.store.dispatch([
+      new GetPreservedFiltersByPage(FilterPageName.SchedullerOrganization),
+    ]);
+  }
   private watchForCandidateSearch(): void {
     this.searchControl.valueChanges.pipe(
       debounceTime(1000),
@@ -480,10 +483,10 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: filteringEventArgs.text,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
-        departmentIds : GetStructureValue(this.selectedFilters.departmentIds),
-        locationIds : GetStructureValue(this.selectedFilters.locationIds),
-        regionIds : GetStructureValue(this.selectedFilters.regionIds),
-        isExcludeNotOrganized : this.selectedFilters.isExcludeNotOrganized,
+        departmentIds: GetStructureValue(this.selectedFilters.departmentIds),
+        locationIds: GetStructureValue(this.selectedFilters.locationIds),
+        regionIds: GetStructureValue(this.selectedFilters.regionIds),
+        isExcludeNotOrganized: this.selectedFilters.isExcludeNotOrganized,
       }).pipe(
         tap((employeeDto) => {
           this.candidatesSuggestions = ScheduleGridAdapter.prepareCandidateFullName(employeeDto.items);
@@ -507,8 +510,8 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         firstLastNameOrId: user.fullName,
         startDate: this.selectedFilters.startDate,
         endDate: this.selectedFilters.endDate,
-        departmentIds : this.selectedFilters.departmentIds,
-        isExcludeNotOrganized : this.selectedFilters.isExcludeNotOrganized,
+        departmentIds: this.selectedFilters.departmentIds,
+        isExcludeNotOrganized: this.selectedFilters.isExcludeNotOrganized,
       })
         .pipe(take(1))
         .subscribe((page: ScheduleCandidatesPage) => {
@@ -535,17 +538,79 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
 
   private setScheduleData(scheduleData: ScheduleInt.ScheduleModelPage | null): void {
     const user = this.store.selectSnapshot(UserState.user);
-    if(scheduleData != null && this.selectedFilters?.isOnlySchedulatedCandidate === true && user?.isEmployee === false){
+    if (scheduleData != null && this.selectedFilters?.isOnlySchedulatedCandidate === true && user?.isEmployee === false) {
       scheduleData.items = scheduleData?.items?.filter(schedule_Data => schedule_Data.schedule?.find(day_Schedule => (day_Schedule.daySchedules?.find(schedule_Type => schedule_Type.scheduleType === ScheduleType.Book) || (day_Schedule.daySchedules.length == 0))));
     }
 
     this.scheduleData = scheduleData;
     this.employeesTitle = scheduleData?.totalCount && scheduleData.totalCount > 1 ? 'Employees' : 'Employee';
 
-    if(scheduleData) {
+    if (scheduleData) {
       this.scheduleSlotsWithDate = this.scheduleGridService.getSlotsWithDate(scheduleData);
     }
 
     this.cdr.markForCheck();
+  }
+  clickSort() {
+    // this.scheduleApiService
+    //   .getScheduleEmployees(this.selectedFilters)
+    //   .subscribe((scheduleData: ScheduleInt.ScheduleCandidatesPage) => {
+    //     this.scheduleApiService
+    //       .getEmployeeWorkCommitments(
+    //         scheduleData.items.map((c) => c.id),
+    //         GetScheduleFilterByEmployees(this.selectedFilters)
+    //       )
+    //       .pipe(takeUntil(this.componentDestroy()))
+    //       .subscribe((data: GetEmployeeWorkCommitment[]) => {
+    //         if (data != null)
+    //           this.scheduleFiltersService.setGetEmpWorkCommitmentsData(data);
+    //         this.store.dispatch(new ShowSchduleSortFilterDialog(true));
+    //         this.cdr.markForCheck();
+    //       })
+    //   })
+    // let workCommitments: string[] = [];
+    // this.scheduleFiltersService.getEmpWorkCommitmentsData().pipe(distinctUntilChanged(), takeUntil(this.componentDestroy())).subscribe((data:any)=>{
+    //   this.scheduleData?.items.forEach(element => {
+    //     element.candidate.workCommitments?.forEach(element => {
+    //       if (element) {
+    //         workCommitments.push(element)
+    //       }
+    //     });
+    //   });
+    //   let uniqueWorkCommitments = [...new Set(workCommitments)];
+    //   if(data.length==0){
+    //     this.scheduleFiltersService.setEmpWorkCommitmentsData(uniqueWorkCommitments);
+    //   }else{
+    let existingWorkCommitments: string[] = [];
+    let empWorkCommitments: string[] = [];
+    this.scheduleApiService
+      .getEmployeeWorkCommitments(
+        this.selectedFilters
+      )
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((data: string[]) => {
+        if (data != null)
+        empWorkCommitments=data;
+          this.scheduleFiltersService.getEmpWorkCommitmentsData().pipe(takeUntil(this.componentDestroy())).subscribe((data: any) => {
+            existingWorkCommitments = data;
+            if (existingWorkCommitments.length > 0) {
+              this.scheduleFiltersService.setEmpWorkCommitmentsData(data);
+            }else{
+              let newWorkCommitments = existingWorkCommitments.filter(f => !empWorkCommitments.includes(f));
+              if (newWorkCommitments != null && newWorkCommitments.length > 0) {
+                existingWorkCommitments = existingWorkCommitments.concat(newWorkCommitments)
+                this.scheduleFiltersService.setEmpWorkCommitmentsData(existingWorkCommitments);
+              }
+            }
+          
+
+            this.store.dispatch(new ShowSchduleSortFilterDialog(true));
+            this.cdr.markForCheck();
+          })
+
+
+      });
+
+
   }
 }

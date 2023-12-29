@@ -18,6 +18,7 @@ import {
   CandidateSchedules,
   DeleteScheduleRequest,
   EmployeesFilters,
+  GetEmployeeWorkCommitment,
   OpenPositionParams,
   OpenPositionsList,
   Schedule,
@@ -101,6 +102,11 @@ export class ScheduleApiService {
 
   exportSchedule( employeeIds: number[], filters: EmployeesFilters): Observable<ScheduleExport[]> {
     return this.http.post<ScheduleExport[]>('/api/Schedules/exportschedules', { employeeIds, ...filters });
+  }
+  
+
+  getEmployeeWorkCommitments( filters: ScheduleFilters | null = null): Observable<string[]> {
+    return this.http.post<string[]>('/api/Schedules/getEmployeeWorkCommitments', filters );
   }
 
 }
