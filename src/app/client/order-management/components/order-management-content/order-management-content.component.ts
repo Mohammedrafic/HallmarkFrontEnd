@@ -260,6 +260,7 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { IrpEmployeeToggleState } from '@shared/components/order-candidate-list/interfaces';
 import { OrderManagementIRPRowPositionService } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.service';
 import { OrderJobType } from '@shared/enums';
+import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -282,6 +283,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
   selectedCandidateforIRP: IRPOrderPosition;
   selectedCandidateforIRPorderDetails: IRPOrderPosition;
+  DeployedEmployeeConfigValue: boolean;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -546,6 +548,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private preservedOrderService: PreservedOrderService,
     private ordergridsystemstateservice:OrderGridSystemStateService,
     public orderManagementIRPRowPositionService: OrderManagementIRPRowPositionService,
+    private organizationSettingService : OrganizationSettingsService,
     @Inject(DOCUMENT) private documentEle: Document,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
@@ -669,6 +672,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.watchForOrderGridSystemClickEvent();
     this.watchForOrderFromNotification();
     this.watchForOrderIRPSubRowClickEvent();
+    this.subscribeForDeployedEmployees();
   }
 
   ngOnDestroy(): void {
@@ -1487,6 +1491,7 @@ public RedirecttoIRPOrder(order:Order)
   openIrpDetails(event: RowSelectedEvent | Partial<RowSelectedEvent>) {
     this.subscribeToCandidateJob(false);
     this.watchForEmployeeToggleState();
+    this.subscribeForDeployedEmployees();
     if(!this.redirecttovmsfromIRP){
       this.redirecttovmsfromIRP=!this.redirecttovmsfromIRP;
      return;
@@ -2840,6 +2845,14 @@ public RedirecttoIRPOrder(order:Order)
       });
   }
 
+  private subscribeForDeployedEmployees(): void {
+    this.organizationSettingService.getOrganizationSettings().subscribe(data => {
+      const showdeployedEmployee = data.filter(settingdata => settingdata.settingKey === SettingsKeys.ShowDeployedEmployees);
+      this.DeployedEmployeeConfigValue = Object.assign({},...showdeployedEmployee)?.value && JSON.parse(Object.assign({},...showdeployedEmployee)?.value);
+    });
+  }
+
+
   private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number, isIrp: boolean): void {
     const irpIncludeDeploy = this.selectedDataRow?.orderType === OrderJobType.PerDiem ? true : this.employeeToggleState?.includeDeployed;
 
@@ -2858,7 +2871,7 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        irpIncludeDeploy,
+        this.DeployedEmployeeConfigValue ? this.DeployedEmployeeConfigValue : irpIncludeDeploy,
         ""
       ));
       this.store.dispatch(new GetIrpOrderExtensionCandidates(
@@ -2867,7 +2880,7 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        irpIncludeDeploy,
+        this.DeployedEmployeeConfigValue ? this.DeployedEmployeeConfigValue : irpIncludeDeploy,
         ""
       ));
     }
