@@ -235,7 +235,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     this.ytdreportReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        regionIds: new FormControl([],[Validators.required]),
+        regionIds: new FormControl([]),
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
         //skillCategoryIds: new FormControl([]),
