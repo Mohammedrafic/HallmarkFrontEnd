@@ -815,7 +815,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private onCloseEvent(): void {
-    this.closeEvent.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+    this.closeEvent?.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if(data === null){
         this.closeSideDialog();
       }
