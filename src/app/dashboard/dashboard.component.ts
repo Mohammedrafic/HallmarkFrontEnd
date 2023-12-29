@@ -102,6 +102,8 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   public hasOrderCreatePermission: boolean = true;
   public userIsAgency: boolean = false;
 
+  public isAgencyVisibilityFlagEnabled = false;
+
   public widgetsData$: Observable<WidgetsDataModel>;
   public UserType:number;
   constructor(
@@ -147,9 +149,9 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
       }else{
         this.userIsAdmin$.next(userIsAdmin);
       }
-
+      this.isAgencyVisibilityFlagEnabled = this.store.selectSnapshot(SecurityState.isAgencyVisibilityFlagEnabled);
       if (user && userIsAdmin || this.userIsAgency) {
-        this.store.dispatch(new GetOrganizationsStructureAll(user.id));
+        this.store.dispatch(new GetOrganizationsStructureAll(user.id,this.isAgencyVisibilityFlagEnabled));
       }
     });
   }
