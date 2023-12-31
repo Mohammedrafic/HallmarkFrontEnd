@@ -22,7 +22,7 @@ import { DatesRangeType } from '@shared/enums';
 })
 export class ScheduleSortFiltersComponent extends DestroyableDirective implements OnInit {
   public description: string = "List of work commitment for listed employees.";
-  public activeSchedulePeriod :string
+  public activeSchedulePeriod: string
   @ViewChild('filterDialog') filterDialog: DialogComponent;
   @ContentChild('groupedChips') public groupedChips: TemplateRef<HTMLElement>;
   @ContentChild('scheduleChips') public scheduleChips: TemplateRef<HTMLElement>;
@@ -43,7 +43,7 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
   @Output() filterChipDelted: EventEmitter<ChipDeleteEventType> = new EventEmitter();
 
   @Output() public updateScheduleFilter: EventEmitter<ScheduleFiltersData> = new EventEmitter<ScheduleFiltersData>();
-  public schduleSortCategories = ScheduleSortingCategory;
+  public schduleSortCategories: any[] = [];
 
   public workCommitments = WorkCommitments;
   public sortCategories: any[] = [];
@@ -51,11 +51,12 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
   public isShowSorting = false;
   public isShowSortingChange = false;
   public isSortingClick = true;
-  public constructor(   private store: Store,private action$: Actions, private scheduleFiltersService: ScheduleFiltersService,) {
+  public constructor(private store: Store, private action$: Actions, private scheduleFiltersService: ScheduleFiltersService,) {
     super();
   }
 
   public ngOnInit(): void {
+    this.sortListCategories();
     this.initDialogStateChangeListener();
   }
 
@@ -64,29 +65,29 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
   }
 
   public onFilterClick(): void {
-   let employeeSortCategory: EmployeeSortCategory = {
+    let employeeSortCategory: EmployeeSortCategory = {
       sortCriterias: this.sortCategories,
       workCommitments: this.empWorkCommitments
     };
 
     let filters = this.scheduleFiltersService.getScheduleFiltersData();
     filters.filters.employeeSortCategory = employeeSortCategory;
-    
+
     this.updateScheduleFilter.emit(
       filters
-     );
-     this.store.dispatch(new ShowSchduleSortFilterDialog(false));
+    );
+    this.store.dispatch(new ShowSchduleSortFilterDialog(false));
   }
   public onBackToFilters(): void {
-    this.sortCategories =[];
-    this.empWorkCommitments=[];
-    this.schduleSortCategories = ScheduleSortingCategory;
-     let filters = this.scheduleFiltersService.getScheduleFiltersData();
+    this.sortCategories = [];
+    this.empWorkCommitments = [];
+    this.sortListCategories();
+    let filters = this.scheduleFiltersService.getScheduleFiltersData();
     filters.filters.employeeSortCategory = null;
     this.updateScheduleFilter.emit(
       filters
-     );
-     this.store.dispatch(new ShowSchduleSortFilterDialog(false));
+    );
+    this.store.dispatch(new ShowSchduleSortFilterDialog(false));
   }
   public onChipDelete(event: DeleteEventArgs): void {
     this.deleteFilter.emit(event.data as unknown as FilteredItem);
@@ -105,14 +106,7 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
           this.scheduleFiltersService.getEmpWorkCommitmentsData().pipe(takeUntil(this.destroy$),).subscribe((data: any) => {
             this.empWorkCommitments = data;
             console.log(data)
-          
-            this.activeSchedulePeriod =   this.scheduleFiltersService.getActiveScheduleTimePeriod();
-            if( this.activeSchedulePeriod ==DatesRangeType.Day){
-              let notAvailableIDs = [7,8]
-              this.schduleSortCategories = ScheduleSortingCategory.filter(f=>notAvailableIDs.includes(f.id) )
-            }else{
-              this.schduleSortCategories = ScheduleSortingCategory;
-            }
+            this.sortListCategories()
           });
           this.filterDialog.show();
         } else {
@@ -121,12 +115,7 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
       });
   }
 
-  deleteFilterChip(event: ChipDeletedEventArgs, groupField: string): void {
-    this.filterChipDelted.emit({
-      field: groupField,
-      value: event.data as string,
-    });
-  }
+
   drop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
@@ -161,10 +150,10 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
     else if (sort.sortOrder == SortOrder.DESCENDING && (sort.columnName == 'FirstName' || sort.columnName == 'LastName')) {
       return 'Z - A'
     }
-    else if (sort.sortOrder == SortOrder.DESCENDING && (sort.columnName == 'Scheduled Hours' || sort.columnName == 'Added Availability' || sort.columnName == 'Added UnAvailability')) {
+    else if (sort.sortOrder == SortOrder.DESCENDING && (sort.columnName == 'ScheduleHrs' || sort.columnName == 'AvailabilityHrs' || sort.columnName == 'UnAvailabilityHrs')) {
       return SortOrder.DESCENDING
     }
-    else if (sort.sortOrder == SortOrder.ASCENDING && (sort.columnName == 'Scheduled Hours' || sort.columnName == 'Added Availability' || sort.columnName == 'Added UnAvailability')) {
+    else if (sort.sortOrder == SortOrder.ASCENDING && (sort.columnName == 'ScheduleHrs' || sort.columnName == 'AvailabilityHrs' || sort.columnName == 'UnAvailabilityHrs')) {
       return SortOrder.ASCENDING
     } else {
       return sort.sortOrder == SortOrder.ASCENDING ? sort.tooltip.replace("bottom", 'top') : sort.tooltip.replace("top", 'bottom')
@@ -175,19 +164,41 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
     this.sortCategories.push(event.items[0]);
     this.isShowSorting = false
     this.isShowSortingChange = false;
-    this.schduleSortCategories = ScheduleSortingCategory.filter(f => !this.sortCategories.map(m => m.id).includes(f.id));
+    this.sortListCategories();
   }
   ChangeSortCategories(event: any) {
     this.isShowSortingChange = false;
     this.schduleSortCategories.push(this.sortChangeCategories[0]);
     this.sortCategories.push(event.items[0]);
     this.sortCategories = this.sortCategories.filter(f => !this.sortChangeCategories.map(m => m.id).includes(f.id));
-    this.schduleSortCategories = ScheduleSortingCategory.filter(f => !this.sortCategories.map(m => m.id).includes(f.id));
+    this.sortListCategories();
     this.sortChangeCategories = [];
   }
   onRemove(event: any) {
     this.sortCategories = this.sortCategories.filter(f => f.id !== event.id);
-    this.schduleSortCategories = ScheduleSortingCategory.filter(f => !this.sortCategories.map(m => m.id).includes(f.id));
+   this.schduleSortCategories.push(event);
+   this.schduleSortCategories=[...this.schduleSortCategories]
+  }
+
+  sortListCategories() {
+    //Add Sorting Categories set the values
+    if (this.schduleSortCategories?.length > 0) {
+     
+      this.schduleSortCategories = this.activeTimePeriodBasedSortCategories().filter(f => !this.sortCategories.map(m => m.id).includes(f.id));
+
+    } else {
+      this.schduleSortCategories = this.activeTimePeriodBasedSortCategories();
+    }
+  }
+
+  activeTimePeriodBasedSortCategories() {
+    this.activeSchedulePeriod = this.scheduleFiltersService.getActiveScheduleTimePeriod();
+    if (this.activeSchedulePeriod == DatesRangeType.Day) {
+      return ScheduleSortingCategory
+    } else {
+      let notAvailableIDs = [7, 8]
+      return ScheduleSortingCategory.filter(f => !notAvailableIDs.includes(f.id))
+    }
   }
 
   dragDropWorkCommitments(event: CdkDragDrop<any[]>) {
@@ -219,4 +230,7 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
     this.sortChangeCategories.push(event)
 
   }
+
+
+
 }

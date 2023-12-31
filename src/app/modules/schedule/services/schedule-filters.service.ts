@@ -22,11 +22,13 @@ import {
   LocationChipsStructureState,
   RegionChipsStructureState,
   ScheduleFilterItem,
+  ScheduleFilters,
   ScheduleFiltersConfig,
   ScheduleFiltersData,
   ScheduleFilterStructure,
 } from '../interface';
 
+import * as ScheduleInt from '../interface';
 @Injectable()
 export class ScheduleFiltersService {
   deletedInlineChip: Subject<ChipDeleteEventType> = new Subject();
@@ -41,8 +43,9 @@ export class ScheduleFiltersService {
   public fieldsWithAllToggle = ['regionIds', 'locationIds', 'departmentIds'];
 
   getEmpWorkCommitments=new BehaviorSubject<string[]>([]); 
-  activeSchedulePeriod:string;
+ public activeSchedulePeriod:string;
 
+  public SelectedPreservedFilters:  ScheduleInt.ScheduleFilters;
   constructor(private readonly fb: FormBuilder) {}
 
   createScheduleFilterForm(): FormGroup {
@@ -162,7 +165,14 @@ export class ScheduleFiltersService {
   getActiveScheduleTimePeriod() {
     return this.activeSchedulePeriod;
   }
+  setSelectedPreservedFilters(event:ScheduleInt.ScheduleFilters):void{
+    this.SelectedPreservedFilters=event;
+  }
 
+  getSelectedPreservedFilters() :ScheduleInt.ScheduleFilters{
+    return this.SelectedPreservedFilters;
+  }
+  
 
   getScheduleFiltersData(): ScheduleFiltersData {
     return this.scheduleFiltersData.get();

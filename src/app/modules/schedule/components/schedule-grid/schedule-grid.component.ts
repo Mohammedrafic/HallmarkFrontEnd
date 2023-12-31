@@ -25,7 +25,7 @@ import { catchError, debounceTime, EMPTY, fromEvent, Observable, switchMap, take
 import { distinctUntilChanged, filter } from 'rxjs/operators';
 
 import { DatesRangeType, WeekDays } from '@shared/enums';
-import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { DateTimeHelper, Destroyable, isObjectsEqual } from '@core/helpers';
 import { DateWeekService } from '@core/services';
 import { PreservedFiltersByPage } from '@core/interface';
 import { FilterPageName } from '@core/enums';
@@ -59,6 +59,7 @@ import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { ClearOrganizationStructure } from 'src/app/store/user.actions';
 import { BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
 import { ScheduleType } from '../../enums/schedule.enum';
+import isEqual from 'lodash/fp/isEqual';
 
 @Component({
   selector: 'app-schedule-grid',
@@ -552,65 +553,42 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
     this.cdr.markForCheck();
   }
   clickSort() {
-    // this.scheduleApiService
-    //   .getScheduleEmployees(this.selectedFilters)
-    //   .subscribe((scheduleData: ScheduleInt.ScheduleCandidatesPage) => {
-    //     this.scheduleApiService
-    //       .getEmployeeWorkCommitments(
-    //         scheduleData.items.map((c) => c.id),
-    //         GetScheduleFilterByEmployees(this.selectedFilters)
-    //       )
-    //       .pipe(takeUntil(this.componentDestroy()))
-    //       .subscribe((data: GetEmployeeWorkCommitment[]) => {
-    //         if (data != null)
-    //           this.scheduleFiltersService.setGetEmpWorkCommitmentsData(data);
-    //         this.store.dispatch(new ShowSchduleSortFilterDialog(true));
-    //         this.cdr.markForCheck();
-    //       })
-    //   })
-    // let workCommitments: string[] = [];
-    // this.scheduleFiltersService.getEmpWorkCommitmentsData().pipe(distinctUntilChanged(), takeUntil(this.componentDestroy())).subscribe((data:any)=>{
-    //   this.scheduleData?.items.forEach(element => {
-    //     element.candidate.workCommitments?.forEach(element => {
-    //       if (element) {
-    //         workCommitments.push(element)
-    //       }
-    //     });
-    //   });
-    //   let uniqueWorkCommitments = [...new Set(workCommitments)];
-    //   if(data.length==0){
-    //     this.scheduleFiltersService.setEmpWorkCommitmentsData(uniqueWorkCommitments);
-    //   }else{
-    let existingWorkCommitments: string[] = [];
-    let empWorkCommitments: string[] = [];
-    this.scheduleApiService
-      .getEmployeeWorkCommitments(
-        this.selectedFilters
-      )
-      .pipe(takeUntil(this.componentDestroy()))
-      .subscribe((data: string[]) => {
-        if (data != null)
-        empWorkCommitments=data;
+
+    if (!isEqual(this.scheduleFiltersService.getSelectedPreservedFilters(), this.selectedFilters)) {
+      let existingWorkCommitments: string[] = [];
+      let empWorkCommitments: string[] = [];
+      this.scheduleApiService
+        .getEmployeeWorkCommitments(
+          this.selectedFilters
+        )
+        .pipe(takeUntil(this.componentDestroy()))
+        .subscribe((data: string[]) => {
+          if (data != null)
+            empWorkCommitments = data;
           this.scheduleFiltersService.getEmpWorkCommitmentsData().pipe(takeUntil(this.componentDestroy())).subscribe((data: any) => {
             existingWorkCommitments = data;
-            if (existingWorkCommitments.length > 0) {
-              this.scheduleFiltersService.setEmpWorkCommitmentsData(data);
-            }else{
+            if (existingWorkCommitments.length == 0) {
+              this.scheduleFiltersService.setEmpWorkCommitmentsData(empWorkCommitments);
+            }
+            else {
+
               let newWorkCommitments = existingWorkCommitments.filter(f => !empWorkCommitments.includes(f));
               if (newWorkCommitments != null && newWorkCommitments.length > 0) {
                 existingWorkCommitments = existingWorkCommitments.concat(newWorkCommitments)
                 this.scheduleFiltersService.setEmpWorkCommitmentsData(existingWorkCommitments);
               }
             }
-          
-
+            this.scheduleFiltersService.setSelectedPreservedFilters(this.selectedFilters)
             this.store.dispatch(new ShowSchduleSortFilterDialog(true));
             this.cdr.markForCheck();
           })
 
 
-      });
-
-
+        });
+    }
+    else{
+      this.store.dispatch(new ShowSchduleSortFilterDialog(true));
+      this.cdr.markForCheck();
+    }
   }
 }
