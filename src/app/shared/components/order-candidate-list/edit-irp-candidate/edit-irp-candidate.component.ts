@@ -646,7 +646,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
       const enableStatusControl = this.orderDetailsData.orderType === OrderType.LongTermAssignment
       && this.candidateModelState.candidate.profileStatus !== this.profileStatus.OnHold
       && this.orderDetailsData.status !== OrderStatus.Filled && this.orderDetailsData.status !== OrderStatus.Cancelled
-      && this.orderDetailsData.status !== OrderStatus.Closed;
+      && this.orderDetailsData.irpOrderMetadata?.status !== OrderStatus.Closed;
       this.disableSaveButton = !enableStatusControl;
       DisableControls(fieldsToShow, this.candidateForm, enableStatusControl);
     }
