@@ -123,13 +123,12 @@ export class TimesheetsFilterDialogComponent
           this.applyFilters();
           window.localStorage.setItem("agencytimeSheetincomplete", JSON.stringify(""));
         }
-        if(agencyTimesheet !='')
+        if(this.isAgency && agencyTimesheet !='')
         {
           const filter={ statusIds:[]}
 
           this.applyPreservedFilters(filter);
           window.localStorage.setItem("agencytimeSheetRedire", JSON.stringify(""));
-
 
         }
       });
