@@ -232,6 +232,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   changeActiveDatePeriod(selectedPeriod: string | undefined): void {
     if (this.hasViewPermission) {
       this.activePeriod = selectedPeriod as DatesRangeType;
+      this.scheduleFiltersService.setActiveScheduleTimePeriod(this.activePeriod);
       this.cdr.detectChanges();
     }
   }

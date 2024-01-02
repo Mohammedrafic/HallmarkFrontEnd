@@ -18,11 +18,9 @@ import { ScheduleFilterHelper } from '../helpers';
 import {
   ChipsInitialState,
   DepartmentChipsStructureState,
-  GetEmployeeWorkCommitment,
   LocationChipsStructureState,
   RegionChipsStructureState,
   ScheduleFilterItem,
-  ScheduleFilters,
   ScheduleFiltersConfig,
   ScheduleFiltersData,
   ScheduleFilterStructure,

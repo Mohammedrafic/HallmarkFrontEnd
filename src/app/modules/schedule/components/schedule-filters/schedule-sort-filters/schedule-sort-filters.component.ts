@@ -176,14 +176,14 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
   }
   onRemove(event: any) {
     this.sortCategories = this.sortCategories.filter(f => f.id !== event.id);
-   this.schduleSortCategories.push(event);
-   this.schduleSortCategories=[...this.schduleSortCategories]
+    this.schduleSortCategories.push(event);
+    this.schduleSortCategories = [...this.schduleSortCategories]
   }
 
   sortListCategories() {
     //Add Sorting Categories set the values
     if (this.schduleSortCategories?.length > 0) {
-     
+
       this.schduleSortCategories = this.activeTimePeriodBasedSortCategories().filter(f => !this.sortCategories.map(m => m.id).includes(f.id));
 
     } else {
@@ -196,7 +196,23 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
     if (this.activeSchedulePeriod == DatesRangeType.Day) {
       return ScheduleSortingCategory
     } else {
-      let notAvailableIDs = [7, 8]
+      let notAvailableIDs = [7, 8];
+      if (this.sortCategories.some(f => notAvailableIDs.includes(f.id))) {
+        this.sortCategories = this.sortCategories.filter(f => !notAvailableIDs.includes(f.id));
+        let filters = this.scheduleFiltersService.getScheduleFiltersData();
+        let employeeSortCategory: EmployeeSortCategory = {
+          sortCriterias: this.sortCategories,
+          workCommitments: this.empWorkCommitments
+        };
+        filters.filters.employeeSortCategory = employeeSortCategory
+        this.updateScheduleFilter.emit(
+          filters
+        );
+        this.scheduleFiltersService.setScheduleFiltersData(filters);
+      }
+     
+
+
       return ScheduleSortingCategory.filter(f => !notAvailableIDs.includes(f.id))
     }
   }

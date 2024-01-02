@@ -18,7 +18,6 @@ import {
   CandidateSchedules,
   DeleteScheduleRequest,
   EmployeesFilters,
-  GetEmployeeWorkCommitment,
   OpenPositionParams,
   OpenPositionsList,
   Schedule,
