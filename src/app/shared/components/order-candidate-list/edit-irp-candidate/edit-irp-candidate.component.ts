@@ -840,7 +840,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     statusText: string;
   }): void {
     const statusConfig = GetConfigField(this.dialogConfig, StatusField);
-    debugger;
+  
     statusConfig.dataSource = [{
       text: jobStatus.statusText,
       value: jobStatus.applicantStatus,
