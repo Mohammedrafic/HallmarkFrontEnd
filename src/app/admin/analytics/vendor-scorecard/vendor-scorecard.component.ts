@@ -619,6 +619,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.SkillIds)?.setValue([]);
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.ExcludeInactiveAgency)?.setValue(false);
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.Period)?.setValue(0);
+    this.filterColumns.agencyIds.dataSource = this.agencyIds;
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
@@ -626,6 +627,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.regionsList = this.masterRegionsList;
     this.locationsList = this.masterLocationsList;
     this.departmentsList = this.masterDepartmentsList;
+    debugger;
   }
   public onFilterApply(): void {
     // if (this.selectedOrganizations.length == 0) {

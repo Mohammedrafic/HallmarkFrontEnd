@@ -28,6 +28,7 @@ import { useractivityReportState } from '@admin/store/userlog-activity.state';
 import { CandidateEligibilityAgencyComponent } from './candidate-eligibility-agency/candidate-eligibility-agency.component';
 import { VendorScorecardComponent } from './vendor-scorecard/vendor-scorecard.component';
 import { TimesheetReportComponent } from './timesheet-report/timesheet-report.component';
+import { UserVisibilityComponent } from './user-visibility/user-visibility.component';
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { TimesheetReportComponent } from './timesheet-report/timesheet-report.co
     UserActivityComponent,
     CandidateEligibilityAgencyComponent,
     VendorScorecardComponent,
-    TimesheetReportComponent
+    TimesheetReportComponent,
+    UserVisibilityComponent
   ],
   imports: [
     CommonModule,   
