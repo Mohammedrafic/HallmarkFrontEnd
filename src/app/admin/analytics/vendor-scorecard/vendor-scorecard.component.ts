@@ -604,7 +604,6 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    debugger;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
     this.VendorReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
@@ -619,6 +618,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.SkillIds)?.setValue([]);
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.ExcludeInactiveAgency)?.setValue(false);
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.Period)?.setValue(0);
+    this.filterColumns.agencyIds.dataSource = this.agencyIds;
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
