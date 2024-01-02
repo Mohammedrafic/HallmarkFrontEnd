@@ -371,6 +371,12 @@
                 }
             }
 
+            var verify = document.getElementById("verifying_blurb");
+            var clainVerification = document.getElementById("claimVerificationServerError");
+            if(clainVerification && verify){
+                verify.style.display = "none";
+            }
+
             var myEle = document.getElementById("emailVerificationControl_but_change_claims");
             const element = document.getElementById("continue").parentNode;
             if(myEle && myEle.innerText == "Change/Verify other E-mail"){
