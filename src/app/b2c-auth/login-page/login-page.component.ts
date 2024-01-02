@@ -1,9 +1,9 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 import { filter, takeUntil, tap } from 'rxjs';
-import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
+import { createSpinner, hideSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { B2CAuthService } from 'src/app/b2c-auth/b2c-auth.service';
@@ -16,7 +16,7 @@ import { InteractionType } from '@azure/msal-browser';
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.scss'],
 })
-export class LoginPageComponent extends DestroyableDirective implements AfterViewInit {
+export class LoginPageComponent extends DestroyableDirective implements AfterViewInit, OnInit {
   @ViewChild('spiner') spiner: ElementRef;
 
   constructor(private router: Router,
@@ -25,10 +25,7 @@ export class LoginPageComponent extends DestroyableDirective implements AfterVie
     super();
   }
 
-  ngAfterViewInit(): void {
-    createSpinner({
-      target: this.spiner.nativeElement,
-    });
+  ngOnInit() {
     // B2C Login
     this.b2CAuthService.onLoginSuccess().pipe(
       takeUntil(this.destroy$),
@@ -36,14 +33,23 @@ export class LoginPageComponent extends DestroyableDirective implements AfterVie
       filter((response) => (
         response.interactionType === InteractionType.Redirect ||
         response.interactionType === InteractionType.Popup)),
-      tap(() => this.navigateToDefaultPage())
-    ).subscribe();
+    ).subscribe(() => this.navigateToDefaultPage());
 
     this.b2CAuthService.interactionStatusNone().pipe(
       takeUntil(this.destroy$),
-      filter(() => (!this.b2CAuthService.isLoggedIn())),
-      tap(() => this.loginWithSSO())
-    ).subscribe();
+    ).subscribe(() => {
+      if (!this.b2CAuthService.isLoggedIn()) {
+        this.loginWithSSO();
+      } else {
+        this.navigateToDefaultPage();
+      }
+    });
+  }
+
+  ngAfterViewInit(): void {
+    createSpinner({
+      target: this.spiner.nativeElement,
+    });
   }
 
   public loginWithSSO(): void {
