@@ -474,7 +474,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { departmentIds, locationIds,
+    let { businessIds,  departmentIds, locationIds,
       regionIds, startDate, endDate, agencyIds, orderTypes, skillIds ,excludeInactiveAgency,period} = this.VendorReportForm.getRawValue();
 
 
@@ -494,7 +494,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
 
-      "OrganizationsVSR": this.selectedOrganizations?.length == 0 ? "null" :
+      "OrganizationsVSR": this.selectedOrganizations?.length == 0 ? businessIds.join(",") :
       this.selectedOrganizations?.join(","),
       "RegionsVSR": regionIds.length == 0 ? "null" : regionIds,
       "LocationsVSR": locationIds.length == 0 ? "null" : locationIds,
@@ -628,11 +628,11 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.departmentsList = this.masterDepartmentsList;
   }
   public onFilterApply(): void {
-    if (this.selectedOrganizations.length == 0) {
-      let error: any = "Organization is required";
-      this.store.dispatch(new ShowToast(MessageTypes.Error, error));
-      return;
-    }
+    // if (this.selectedOrganizations.length == 0) {
+    //   let error: any = "Organization is required";
+    //   this.store.dispatch(new ShowToast(MessageTypes.Error, error));
+    //   return;
+    // }
     if (!this.istypeSetupTabActive) {
       this.VendorReportForm.markAllAsTouched();
       if (this.VendorReportForm?.invalid) {
