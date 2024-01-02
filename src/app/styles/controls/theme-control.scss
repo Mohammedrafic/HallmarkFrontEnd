@@ -38,6 +38,7 @@ body.light {
   --dialog-border: #{$secondary-dark-blue-45};
   --separator: #{$secondary-dark-blue-45};
   --devider: #{$secondary-dark-blue-40};
+  --list-item-border: #{$grid-row-border};
 
   --icon-color: #{$secondary-dark-blue-10};
 
@@ -102,6 +103,7 @@ body.dark {
   --dialog-border: #{$secondary-dark-blue-10-2};
   --separator: #{$secondary-dark-blue-10-2};
   --devider: #{$secondary-dark-blue-15};
+  --list-item-border: #{$secondary-dark-blue-10-2};
   --checkbox-background: #{$secondary-dark-blue-10-2};
   --chechbox-corder-color: #{$secondary-dark-blue-40};
 
