@@ -12,11 +12,12 @@ import { CandidateTabsEnum } from '@client/candidates/enums';
 import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { Store } from '@ngxs/store';
 import { SystemType } from '@shared/enums/system-type.enum';
-import { EMPLOYEE_SKILL_CHANGE_WARNING, EMPLOYEE_INACTIVATED_WARNING } from '@shared/constants/messages';
+import { EMPLOYEE_SKILL_CHANGE_WARNING, EMPLOYEE_INACTIVATED_WARNING, EMPLOYEE_ON_HOLD_WARNING } from '@shared/constants/messages';
 import { ProfileStatusesEnum } from './candidate-profile.constants';
 import { UserState } from 'src/app/store/user.state';
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -32,6 +33,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   public showSkillConfirmDialog = false;
   public showStatusConfirmDialog = false;
   public replaceOrder = false;
+  public removeSchedules = false;
   public employeeTerminatedWaring = EMPLOYEE_INACTIVATED_WARNING;
   public employeeSkillChangeWarning = EMPLOYEE_SKILL_CHANGE_WARNING;
 
@@ -45,6 +47,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     private candidateProfileFormService: CandidateProfileFormService,
     private candidateProfileService: CandidateProfileService,
     private candidateService: CandidatesService,
+    private confirmService: ConfirmService,
     private generalNotesService: GeneralNotesService,
     private route: ActivatedRoute,
     private navigationWrapperService: NavigationWrapperService,
@@ -73,7 +76,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
       this.candidateProfileFormService.markCandidateFormAsTouched();
       return EMPTY;
     } else {
-      return this.skillsChangeHandler();
+      return this.employeeOnHoldHandler();
     }
   }
 
@@ -103,6 +106,15 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
         || profileStatusControl?.value === ProfileStatusesEnum.FallOffOnboarding));
   }
 
+  private isEmployeeOnHold(): boolean {
+    const profileStatusControl = this.candidateProfileFormService.candidateForm.get('profileStatus');
+    const holdStartDateControl = this.candidateProfileFormService.candidateForm.get('holdStartDate');
+    const holdEndDateControl = this.candidateProfileFormService.candidateForm.get('holdEndDate');
+    return !!(this.candidateService.employeeId &&
+      (profileStatusControl?.dirty && profileStatusControl?.value === ProfileStatusesEnum.OnHold) || 
+      (holdStartDateControl?.dirty || holdEndDateControl?.dirty));
+  }
+
   private profileStatusInactivatedConfirmation(): Observable<void | CandidateModel> {
     this.showStatusConfirmDialog = true;
     this.cd.markForCheck();
@@ -111,6 +123,19 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
       filter(Boolean),
       switchMap(() => this.saveCandidate()),
       take(1)
+    );
+  }
+
+  private profileStatusOnHoldConfirmation(): Observable<void | CandidateModel> {
+    return this.confirmService.confirm(EMPLOYEE_ON_HOLD_WARNING, {
+      title: 'Confirm',
+      okButtonLabel: 'Yes',
+      cancelButtonLabel: 'No',
+      okButtonClass: '',
+    }).pipe(
+      take(1),
+      tap((removeSchedules: boolean) => this.removeSchedules = removeSchedules),
+      switchMap(() => this.skillsChangeHandler()),
     );
   }
 
@@ -132,6 +157,13 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     return this.saveCandidate();
   }
 
+  private employeeOnHoldHandler(): Observable<void | CandidateModel> {
+    if (this.isEmployeeOnHold()) {
+      return this.profileStatusOnHoldConfirmation();
+    }
+    return this.skillsChangeHandler();
+  }
+
   private skillsChangeHandler(): Observable<void | CandidateModel> {
     if (this.isSkillChanged()) {
       return this.skillChangeConfirmation();
@@ -141,8 +173,9 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
 
   private saveCandidate(): Observable<void | CandidateModel> {
     return this.candidateProfileService
-      .saveCandidate(this.filesDetails, this.candidateId ?? this.candidateService.employeeId, this.replaceOrder)
-      .pipe(takeUntil(this.destroy$));
+      .saveCandidate(
+        this.filesDetails, this.candidateId ?? this.candidateService.employeeId, this.replaceOrder, this.removeSchedules
+      ).pipe(takeUntil(this.destroy$));
   }
 
   private hasUnsavedChanges(): boolean {
