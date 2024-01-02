@@ -11,10 +11,11 @@
   .list-box {
     .e-listbox-wrapper {
       border: none;
+      border-color: var(--list-item-border) !important;
 
       .e-list-item {
         height: 48px;
-        border-bottom: 1px solid var(--grid-header-border);
+        border-bottom: 1px solid var(--list-item-border);
         padding: 17px 23px;
         white-space: nowrap;
         overflow: hidden;
