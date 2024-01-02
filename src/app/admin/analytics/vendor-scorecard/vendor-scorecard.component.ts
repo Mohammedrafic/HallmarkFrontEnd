@@ -628,11 +628,11 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.departmentsList = this.masterDepartmentsList;
   }
   public onFilterApply(): void {
-    if (this.selectedOrganizations.length == 0) {
-      let error: any = "Organization is required";
-      this.store.dispatch(new ShowToast(MessageTypes.Error, error));
-      return;
-    }
+    // if (this.selectedOrganizations.length == 0) {
+    //   let error: any = "Organization is required";
+    //   this.store.dispatch(new ShowToast(MessageTypes.Error, error));
+    //   return;
+    // }
     if (!this.istypeSetupTabActive) {
       this.VendorReportForm.markAllAsTouched();
       if (this.VendorReportForm?.invalid) {
