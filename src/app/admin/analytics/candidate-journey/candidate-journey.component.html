@@ -35,8 +35,8 @@
         <label>Organization Name</label>
         <div class="input-group dropdown">
           <!--<ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
-                          [dataSource]="filterColumns.businessIds.dataSource" [allowFiltering]="true" placeholder="Business">
-        </ejs-dropdownlist>-->
+                            [dataSource]="filterColumns.businessIds.dataSource" [allowFiltering]="true" placeholder="Business">
+          </ejs-dropdownlist>-->
           <ejs-multiselect mode="CheckBox" formControlName="businessIds" placeholder="Business"
                            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.businessIds.dataSource"
                            [fields]="organizationFields" [selectAllText]='allOption' showSelectAll=true>
@@ -115,30 +115,7 @@
     <div class="form-element">
       <div class="group">
         <div class="input-container calendar">
-          <label>Order/Actual Start Date From<span class="required">*</span></label>
-          <div class="input-group datepicker">
-            <ejs-datepicker id="FromstartDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            appValidateWithMessage formControlName="FromstartDate" [disabled]="periodIsDefault"
-                            [enabled]="candidateJourneyForm.controls['period'].value=='Custom'">
-            </ejs-datepicker>
-          </div>
-        </div>
-        <div class="input-container calendar">
-          <label>Order/Actual Start Date To</label>
-          <div class="input-group datepicker">
-            <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            formControlName="endDate" [min]="candidateJourneyForm.controls['FromstartDate'].value"
-                            [enabled]="candidateJourneyForm.controls['period'].value=='Custom'">
-            </ejs-datepicker>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-element">
-      <div class="group">
-        <div class="input-container calendar">
-          <label>Order/Actual End Date From<span class="required">*</span></label>
+          <label>Order Start Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                             appValidateWithMessage formControlName="startDate" [disabled]="periodIsDefault"
@@ -147,7 +124,7 @@
           </div>
         </div>
         <div class="input-container calendar">
-          <label>Order/Actual End Date To</label>
+          <label>Order End Date</label>
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                             formControlName="endDate" [min]="candidateJourneyForm.controls['startDate'].value"
