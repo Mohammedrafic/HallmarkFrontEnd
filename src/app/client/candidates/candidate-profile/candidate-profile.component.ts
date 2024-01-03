@@ -76,7 +76,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
       this.candidateProfileFormService.markCandidateFormAsTouched();
       return EMPTY;
     } else {
-      return this.employeeOnHoldHandler();
+      return this.skillsChangeHandler();
     }
   }
 
@@ -135,7 +135,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     }).pipe(
       take(1),
       tap((removeSchedules: boolean) => this.removeSchedules = removeSchedules),
-      switchMap(() => this.skillsChangeHandler()),
+      switchMap(() => this.saveCandidate()),
     );
   }
 
@@ -154,14 +154,14 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
     if (this.isEmployeeInactivated()) {
       return this.profileStatusInactivatedConfirmation();
     }
-    return this.saveCandidate();
+    return this.employeeOnHoldHandler();
   }
 
   private employeeOnHoldHandler(): Observable<void | CandidateModel> {
     if (this.isEmployeeOnHold()) {
       return this.profileStatusOnHoldConfirmation();
     }
-    return this.skillsChangeHandler();
+    return this.saveCandidate();
   }
 
   private skillsChangeHandler(): Observable<void | CandidateModel> {
