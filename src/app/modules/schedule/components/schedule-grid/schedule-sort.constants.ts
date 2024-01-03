@@ -13,12 +13,4 @@ export const ScheduleSortingCategory = [
    
   ];
 
-  export const WorkCommitments =[
-    { id: 0, name: 'Work Commitment 1' },
-    { id: 1, name: 'Work Commitment 2' },
-    { id: 2, name: 'Work Commitment 3' },
-    { id: 3, name: 'Work Commitment 4' },
-    { id: 4, name: 'Work Commitment 5' },
-    { id: 5, name: 'Work Commitment 6' },
-  ]
   

@@ -1,14 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy, EventEmitter, Input, ContentChild, ViewChild, TemplateRef, Output } from '@angular/core';
+import { Component, OnInit,  EventEmitter, Input, ContentChild, ViewChild, TemplateRef, Output } from '@angular/core';
 import { Actions, Store, ofActionDispatched } from '@ngxs/store';
-import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { FilteredItem } from '@shared/models/filter.model';
-import { ChipDeletedEventArgs } from '@syncfusion/ej2-angular-buttons';
-import { DeleteEventArgs } from '@syncfusion/ej2-angular-grids';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { skip, takeUntil } from 'rxjs';
-import { ShowFilterDialog, ShowSchduleSortFilterDialog } from 'src/app/store/app.actions';
-import { ScheduleSortingCategory, WorkCommitments } from '../../schedule-grid/schedule-sort.constants';
+import {  takeUntil } from 'rxjs';
+import {  ShowSchduleSortFilterDialog } from 'src/app/store/app.actions';
+import { ScheduleSortingCategory } from '../../schedule-grid/schedule-sort.constants';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { SortOrder } from '@shared/enums/sort-order-dropdown.enum';
 import { EmployeeSortCategory, GetEmployeeWorkCommitment, ScheduleFiltersData } from '../../../interface';
@@ -24,28 +20,13 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
   public description: string = "List of work commitment for listed employees.";
   public activeSchedulePeriod: string
   @ViewChild('filterDialog') filterDialog: DialogComponent;
-  @ContentChild('groupedChips') public groupedChips: TemplateRef<HTMLElement>;
-  @ContentChild('scheduleChips') public scheduleChips: TemplateRef<HTMLElement>;
   empWorkCommitments: string[] = []
 
   @Input() targetElement: HTMLElement | null = document.body;
   @Input() width: string = '532px';
-  @Input() items: FilteredItem[] | null = [];
-  @Input() count: number | undefined | null = 0;
-  @Input() useGroupingFilters: boolean;
-  @Input() chipsData: ChipItem[];
-
-
-  @Output() clearAllFiltersClicked: EventEmitter<void> = new EventEmitter();
-  @Output() applyFilterClicked: EventEmitter<void> = new EventEmitter();
-  @Output() deleteFilter: EventEmitter<FilteredItem> = new EventEmitter();
-  @Output() closeDialogClicked: EventEmitter<void> = new EventEmitter();
-  @Output() filterChipDelted: EventEmitter<ChipDeleteEventType> = new EventEmitter();
-
   @Output() public updateScheduleFilter: EventEmitter<ScheduleFiltersData> = new EventEmitter<ScheduleFiltersData>();
   public schduleSortCategories: any[] = [];
 
-  public workCommitments = WorkCommitments;
   public sortCategories: any[] = [];
   public sortChangeCategories: any[] = [];
   public isShowSorting = false;
@@ -60,9 +41,7 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
     this.initDialogStateChangeListener();
   }
 
-  public onClearAllFilterClick(): void {
-    this.clearAllFiltersClicked.emit();
-  }
+ 
 
   public onFilterClick(): void {
     let employeeSortCategory: EmployeeSortCategory = {
@@ -89,12 +68,10 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
     );
     this.store.dispatch(new ShowSchduleSortFilterDialog(false));
   }
-  public onChipDelete(event: DeleteEventArgs): void {
-    this.deleteFilter.emit(event.data as unknown as FilteredItem);
-  }
+ 
 
   public onClose(): void {
-    this.closeDialogClicked.emit();
+    this.store.dispatch(new ShowSchduleSortFilterDialog(false));
   }
 
   private initDialogStateChangeListener(): void {
@@ -125,8 +102,6 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
         event.previousIndex,
         event.currentIndex);
     }
-    console.log("Data", this.workCommitments)
-    console.log("Drag&Drop", event.container.data)
     this.sortCategories = event.container.data;
   }
   AddSortingCategory() {
@@ -160,7 +135,6 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
     }
   }
   HideSortCategories(event: any) {
-    console.log(event)
     this.sortCategories.push(event.items[0]);
     this.isShowSorting = false
     this.isShowSortingChange = false;
@@ -210,9 +184,6 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
         );
         this.scheduleFiltersService.setScheduleFiltersData(filters);
       }
-     
-
-
       return ScheduleSortingCategory.filter(f => !notAvailableIDs.includes(f.id))
     }
   }
@@ -226,8 +197,6 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
         event.previousIndex,
         event.currentIndex);
     }
-    console.log("Data", this.workCommitments)
-    console.log("Drag&Drop", event.container.data)
     this.empWorkCommitments = event.container.data
     this.scheduleFiltersService.setEmpWorkCommitmentsData(event.container.data);
   }
@@ -241,12 +210,8 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
       if (event.id == element.id) {
         element.class = "active"
       }
-
     });
     this.sortChangeCategories.push(event)
 
   }
-
-
-
 }

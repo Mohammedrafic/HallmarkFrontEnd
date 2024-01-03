@@ -167,4 +167,3 @@ export const EllipsisText = (text: string, characterCount: number): string => {
 
   return text;
 };
-
