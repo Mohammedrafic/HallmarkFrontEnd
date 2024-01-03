@@ -147,7 +147,7 @@
       <div class="input-container bootstrap">
         <label>Period</label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist (change)="selectPeriod()"  formControlName="period" appValidateWithMessage placeholder="All"
+          <ejs-dropdownlist (change)="selectPeriod($event)"  formControlName="period" appValidateWithMessage placeholder="All"
                            [allowFiltering]="true"  [dataSource]="periodList"
                            [fields]="periodFields"  showSelectAll=true>
           </ejs-dropdownlist>
