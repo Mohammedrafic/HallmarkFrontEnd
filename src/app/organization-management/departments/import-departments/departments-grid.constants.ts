@@ -85,7 +85,7 @@ export const DepartmentsColumns = (isIRPEnabled: boolean, isInvoiceDepartmentIdF
   }
 
   if (isIRPEnabled) {
-    const records = data?.succesfullRecords || data?.errorRecords;
+    const records = data?.succesfullRecords.length && data.succesfullRecords || data?.errorRecords;
 
     // Find record which has longest skills array and create coldefs based on it's length with generic field name. 
     if (records) {
