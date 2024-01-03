@@ -24,6 +24,7 @@ import {
   UpdateGridCommentsCounter,
 } from './store/comments.actions';
 import { BusinessUnit } from '@shared/models/business-unit.model';
+import { DatePipe } from '@angular/common';
 
 enum CommentsFilter {
   All = 'All',
@@ -49,8 +50,9 @@ export class CommentsComponent {
   @Input() set comments(value: Comment[]) {
     if (value?.length) {
       this.commentsList = value;
-      this.commentData = value.filter((comments) => !comments.isPrivate);
-      this.searchcommentData = this.commentData;
+      this.commentData = value.filter((comments) => !comments.isPrivate);      
+      this.searchcommentData = [...this.commentData];
+      this.searchcommentData.map(ele=> ele.searchDate = this.datePipe.transform(new Date(ele.createdAt), 'MM/dd/yyy'))
       this.hasUnreadMessages = this.hasUnread();
       this.initView$.next();
     } else {
@@ -102,7 +104,7 @@ export class CommentsComponent {
 
   private hasUnreadMessages = false;
 
-  constructor(private store: Store, private router: Router, private cd: ChangeDetectorRef, private actions$: Actions) {
+  constructor(private store: Store, private router: Router, private cd: ChangeDetectorRef, private actions$: Actions, private datePipe: DatePipe) {
     this.commentType = CommentsFilter.All;
     this.scroll$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((messageEl: HTMLElement | null) => {
       if (messageEl) {
@@ -146,7 +148,7 @@ export class CommentsComponent {
     const searchValue = (event.target as HTMLInputElement).value;
     let users = searchValue == '' ? this.searchcommentData : this.searchcommentData.filter(function(user){
       return (user.text.toString().toLowerCase().indexOf(searchValue.toLowerCase()) > -1 ||
-      new Date(user.createdAt).toLocaleDateString().indexOf(searchValue.toLowerCase()) > -1) ||
+      user.searchDate && user.searchDate.toString().indexOf(searchValue.toLowerCase()) > -1) ||
       (user.firstName.toLowerCase() +" "+ user.lastName.toLowerCase()).indexOf(searchValue.toLowerCase()) > -1
     }); 
     this.commentData = users; 
@@ -208,6 +210,8 @@ export class CommentsComponent {
     };
     this.comments.push(comment);
     this.commentData.unshift(comment);
+    this.searchcommentData = [...this.commentData];
+    this.searchcommentData.map(ele=> ele.searchDate = this.datePipe.transform(new Date(ele.createdAt), 'MM/dd/yyy')).toString()
     this.message = '';
     this.scroll$.next(null);
     if (!this.isCreating) {
@@ -233,7 +237,8 @@ export class CommentsComponent {
     event.itemData.value === CommentsFilter.All
       ? (this.commentData = this.commentData.filter((comments) => comments.isPrivate === false))
       : this.commentData;
-    this.searchcommentData = this.commentData;
+    this.searchcommentData = [...this.commentData];
+    this.searchcommentData.map(ele=> ele.searchDate = this.datePipe.transform(new Date(ele.createdAt), 'MM/dd/yyy')).toString()
     this.commentType = event.itemData.value;
     this.scroll$.next(null);
   }
