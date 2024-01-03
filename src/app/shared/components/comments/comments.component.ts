@@ -44,6 +44,7 @@ export class CommentsComponent {
   @Input() orderId: number;
   public commentData: Comment[] = [];
   public searchcommentData: Comment[] = [];
+  public showSearchBox:boolean = false;
   @Output() commentSaveCheck = new EventEmitter<boolean>();
   @Input() set comments(value: Comment[]) {
     if (value?.length) {

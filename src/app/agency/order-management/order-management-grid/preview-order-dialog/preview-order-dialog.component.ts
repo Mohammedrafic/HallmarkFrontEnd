@@ -83,7 +83,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
   public readonly reasonClosure = {
     orderClosureReason: 'Candidate Rejected',
   } as Order;
-
+  public isOpen:boolean = false;
   public get showRejectInfo(): boolean {
     return !!(
       this.currentOrder?.status === OrderStatus.Closed &&
@@ -246,9 +246,11 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         windowScrollTop();
         this.sideDialog.show();
         disabledBodyOverflow(true);
+        this.isOpen = true;
       } else {
         this.sideDialog.hide();
         disabledBodyOverflow(false);
+        this.isOpen = false;
       }
     });
   }
