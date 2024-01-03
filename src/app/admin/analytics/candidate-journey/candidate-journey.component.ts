@@ -210,14 +210,14 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
   }
 
   private initForm(): void {
-    let startDateFrom = new Date(Date.now());
-    startDateFrom.setDate(startDateFrom.getDate() - 30);
+    let StartDateFrom = new Date(Date.now());
+    StartDateFrom.setDate(StartDateFrom.getDate() - 30);
     this.candidateJourneyForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        startDateFrom: new FormControl(startDateFrom, [Validators.required]),
-        startDateTo: new FormControl(startDateFrom, [Validators.required]),
-        EndDateFrom: new FormControl(new Date(Date.now())),
+        StartDateFrom: new FormControl(StartDateFrom, [Validators.required]),
+        StartDateTo: new FormControl(new Date(Date.now())),
+        EndDateFrom: new FormControl(StartDateFrom, [Validators.required]),
         EndDateTo: new FormControl(new Date(Date.now())),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
@@ -240,7 +240,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
 
 
   selectPeriod(event: any) {
-    let { startDateFrom, EndDateFrom, period } = this.candidateJourneyForm.getRawValue();
+    let { StartDateFrom, StartDateTo, EndDateFrom, EndDateTo, period } = this.candidateJourneyForm.getRawValue();
     const value = event.itemData.id;
     this.periodIsDefault = this.candidateJourneyForm.controls['period'].value == "Custom" ? true : false;
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue("");
@@ -248,8 +248,8 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue("");
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue("");
     const PeriodCheck = value;
-    let startDateFromControl = new Date(Date.now());
-    let startDateToControl = new Date(Date.now());
+    let StartDateFromControl = new Date(Date.now());
+    let StartDateToControl = new Date(Date.now());
     let EndDateFromControl = new Date(Date.now());
     let EndDateToControl = new Date(Date.now());
     let lastDayOfLastMonth = new Date();
@@ -257,74 +257,79 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
 
     switch (PeriodCheck) {
       case 0:
-        startDateFromControl.setDate(startDateFromControl.getDate() - 30);
+        StartDateFromControl.setDate(StartDateFromControl.getDate() - 30);
         EndDateFromControl.setDate(EndDateFromControl.getDate() - 30);
         break;
       case 1:
-        startDateFromControl.setDate(startDateFromControl.getDate() - 31);
+        StartDateFromControl.setDate(StartDateFromControl.getDate() - 31);
         EndDateFromControl.setDate(EndDateFromControl.getDate() - 31);
 
-        startDateToControl.setDate(startDateToControl.getDate() - 1);
+        StartDateToControl.setDate(StartDateToControl.getDate() - 1);
         EndDateToControl.setDate(EndDateToControl.getDate() - 1);
         break;
       case 2:
-        startDateFromControl.setDate(startDateFromControl.getDate() - 61);
+        StartDateFromControl.setDate(StartDateFromControl.getDate() - 61);
         EndDateFromControl.setDate(EndDateFromControl.getDate() - 61);
 
-        startDateToControl.setDate(startDateToControl.getDate() - 1);
+        StartDateToControl.setDate(StartDateToControl.getDate() - 1);
         EndDateToControl.setDate(EndDateToControl.getDate() - 1);
         break;
       case 3:
-        startDateFromControl.setDate(startDateFromControl.getDate() - 91);
+        StartDateFromControl.setDate(StartDateFromControl.getDate() - 91);
         EndDateFromControl.setDate(EndDateFromControl.getDate() - 91);
 
-        startDateToControl.setDate(startDateToControl.getDate() - 1);
+        StartDateToControl.setDate(StartDateToControl.getDate() - 1);
         EndDateToControl.setDate(EndDateToControl.getDate() - 1);
         break;
       case 4:
-        startDateFromControl = new Date(startDateFromControl.getFullYear(), startDateFromControl.getMonth(), 1);
+        StartDateFromControl = new Date(StartDateFromControl.getFullYear(), StartDateFromControl.getMonth(), 1);
         EndDateFromControl = new Date(EndDateFromControl.getFullYear(), EndDateFromControl.getMonth(), 1);
         break;
       case 5:
         const today = new Date(Date.now());
         const quarter = Math.floor((today.getMonth() / 3));
-        startDateFromControl = new Date(today.getFullYear(), quarter * 3 - 3, 1);
+        StartDateFromControl = new Date(today.getFullYear(), quarter * 3 - 3, 1);
         EndDateFromControl = new Date(today.getFullYear(), quarter * 3 - 3, 1);
 
-        startDateToControl = new Date(startDateFromControl.getFullYear(), startDateFromControl.getMonth() + 3, 0);
-        EndDateToControl = new Date(startDateFromControl.getFullYear(), startDateFromControl.getMonth() + 3, 0);
+        StartDateToControl = new Date(StartDateFromControl.getFullYear(), StartDateFromControl.getMonth() + 3, 0);
+        EndDateToControl = new Date(StartDateFromControl.getFullYear(), StartDateFromControl.getMonth() + 3, 0);
         break;
       case 6:
-        const startDateFrom = new Date(startDateFromControl.getFullYear(), 0, 1)
-        startDateFrom.setDate(startDateFrom.getDate());
-        EndDateFromControl.setDate(startDateFrom.getDate());
-        startDateFromControl = startDateFrom;
+        const StartDateFrom = new Date(StartDateFromControl.getFullYear(), 0, 1)
+        StartDateFrom.setDate(StartDateFrom.getDate());
+        EndDateFromControl.setDate(StartDateFrom.getDate());
+        StartDateFromControl = StartDateFrom;
         break;
       case 7:
-        const firstDay = new Date(startDateFromControl.getFullYear(), startDateFromControl.getMonth(), 1);
-        startDateFromControl = this.addMonths(firstDay, -6);
-        startDateFromControl.setDate(startDateFromControl.getDate());
-        EndDateFromControl.setDate(startDateFromControl.getDate());
+        const firstDay = new Date(StartDateFromControl.getFullYear(), StartDateFromControl.getMonth(), 1);
+        StartDateFromControl = this.addMonths(firstDay, -6);
+        StartDateFromControl.setDate(StartDateFromControl.getDate());
+        EndDateFromControl.setDate(StartDateFromControl.getDate());
 
-        startDateToControl = new Date((lastDayOfLastMonth));
+        StartDateToControl = new Date((lastDayOfLastMonth));
         EndDateToControl = new Date((lastDayOfLastMonth));
         break;
       case 8:
-        const dayFirst = new Date(startDateFromControl.getFullYear(), startDateFromControl.getMonth(), 1);
-        startDateFromControl = this.addMonths(dayFirst, -12);
-        startDateFromControl.setDate(startDateFromControl.getDate());
-        EndDateFromControl.setDate(startDateFromControl.getDate());
+        const dayFirst = new Date(StartDateFromControl.getFullYear(), StartDateFromControl.getMonth(), 1);
+        StartDateFromControl = this.addMonths(dayFirst, -12);
+        StartDateFromControl.setDate(StartDateFromControl.getDate());
+        EndDateFromControl.setDate(StartDateFromControl.getDate());
 
-        startDateToControl = new Date((lastDayOfLastMonth));
+        StartDateToControl = new Date((lastDayOfLastMonth));
         EndDateToControl = new Date((lastDayOfLastMonth));
         break;
     }
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue(((StartDateFromControl)));
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateTo)?.setValue(((StartDateToControl)));
 
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue(startDateFromControl);
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateTo)?.setValue(new Date((startDateToControl)));
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue(((EndDateFromControl)));
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue(((EndDateToControl)));
 
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue(EndDateFromControl);
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue(new Date((EndDateToControl)));
+    //this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue(new Date((StartDateFromControl)));
+    //this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateTo)?.setValue(new Date((StartDateToControl)));
+
+    //this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue(new Date((EndDateFromControl)));
+    //this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue(new Date((EndDateToControl)));
 
   }
   private addMonths(date: any, months: any) {
@@ -511,7 +516,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       }
     }
     let { businessIds, candidateStatuses, departmentIds, jobId,
-      jobStatuses, locationIds, orderTypes, regionIds, skillCategoryIds, skillIds, startDateFrom, startDateTo,EndDateFrom,EndDateTo, period }
+      jobStatuses, locationIds, orderTypes, regionIds, skillCategoryIds, skillIds, StartDateFrom, StartDateTo,EndDateFrom,EndDateTo, period }
       = this.candidateJourneyForm.getRawValue();
     if (!this.candidateJourneyForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 30 days";
@@ -520,12 +525,12 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       this.isResetFilter = false;
       this.message = ""
     }
-    if (startDateTo == null) {
-      if (startDateFrom > new Date(Date.now())) {
-        startDateTo = startDateFrom;
+    if (StartDateTo == null) {
+      if (StartDateFrom > new Date(Date.now())) {
+        StartDateTo = StartDateFrom;
       }
       else {
-        startDateTo = new Date(Date.now())
+        StartDateTo = new Date(Date.now())
       }
     }
     // locationIds = locationIds.length > 0 ? locationIds.join(",") : [];
@@ -543,10 +548,10 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     {
       "OrganizationParamCJR": this.selectedOrganizations?.length == 0 ? "null" :
         this.selectedOrganizations?.join(","),
-      "StartDateFromParamCJR": formatDate(startDateFrom, this.dateFormat, this.culture),
-      "StartDateToParamCJR": startDateTo == null ? "01/01/0001" : formatDate(startDateTo, this.dateFormat, this.culture),
+      "StartDateFromParamCJR": formatDate(StartDateFrom, this.dateFormat, this.culture),
+      "StartDateToParamCJR": StartDateTo == null ? "01/01/0001" : formatDate(StartDateTo, this.dateFormat, this.culture),
       "EndDateFromParamCJR": formatDate(EndDateFrom, this.dateFormat, this.culture),
-      "EndDateToParamCJR": startDateTo == null ? "01/01/0001" : formatDate(EndDateTo, this.dateFormat, this.culture),
+      "EndDateToParamCJR": EndDateTo == null ? "01/01/0001" : formatDate(EndDateTo, this.dateFormat, this.culture),
       "RegionParamCJR": regionIds.length == 0 ? "null" : regionIds,
       "LocationParamCJR": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamCJR": departmentIds.length == 0 ? "null" : departmentIds,
@@ -565,7 +570,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       "TodayParamCJR": formatDate(new Date(), this.dateFormat, this.culture),
       "organizationNameParamCJR": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
       "reportPulledMessageParamCJR": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
-      "DateRangeParamCJR": (formatDate(startDateFrom, "MMM", this.culture) + " " + startDateFrom.getDate() + ", " + startDateFrom.getFullYear().toString()).trim() + " - " + (formatDate(startDateTo, "MMM", this.culture) + " " + startDateTo.getDate() + ", " + startDateTo.getFullYear().toString()).trim(),
+      "DateRangeParamCJR": (formatDate(StartDateFrom, "MMM", this.culture) + " " + StartDateFrom.getDate() + ", " + StartDateFrom.getFullYear().toString()).trim() + " - " + (formatDate(StartDateTo, "MMM", this.culture) + " " + StartDateTo.getDate() + ", " + StartDateTo.getFullYear().toString()).trim(),
       "PeriodParamCJR": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id)),
       "UserIdParamCJR": this.user?.id
 
@@ -638,8 +643,8 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
         valueField: 'name',
         valueId: 'id',
       },
-      startDateFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
-      startDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
+      StartDateFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
+      StartDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
 
       EndDateFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
       EndDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
@@ -678,10 +683,10 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    let startDateFrom = new Date(Date.now());
-    startDateFrom.setDate(startDateFrom.getDate() - 30);
+    let StartDateFrom = new Date(Date.now());
+    StartDateFrom.setDate(StartDateFrom.getDate() - 30);
     let EndDateFrom = new Date(Date.now());
-    startDateFrom.setDate(EndDateFrom.getDate() - 30);
+    StartDateFrom.setDate(EndDateFrom.getDate() - 30);
 
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
@@ -692,7 +697,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.OrderTypes)?.setValue([]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.JobStatuses)?.setValue([]);
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue(startDateFrom);
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue(StartDateFrom);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateTo)?.setValue(new Date(Date.now()));
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue(EndDateFrom);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue(new Date(Date.now()));

@@ -117,8 +117,8 @@
         <div class="input-container calendar">
           <label>Order/Actual Start Date From<span class="required">*</span></label>
           <div class="input-group datepicker">
-            <ejs-datepicker id="startDateFrom" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            appValidateWithMessage formControlName="startDateFrom" [disabled]="periodIsDefault"
+            <ejs-datepicker id="StartDateFrom" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+                            appValidateWithMessage formControlName="StartDateFrom" [disabled]="periodIsDefault"
                             [enabled]="candidateJourneyForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
@@ -126,8 +126,8 @@
         <div class="input-container calendar">
           <label>Order/Actual Start Date To</label>
           <div class="input-group datepicker">
-            <ejs-datepicker id="startDateTo" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            formControlName="startDateTo" [min]="candidateJourneyForm.controls['startDateFrom'].value"
+            <ejs-datepicker id="StartDateTo" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
+                            formControlName="StartDateTo" [min]="candidateJourneyForm.controls['StartDateFrom'].value"
                             [enabled]="candidateJourneyForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
