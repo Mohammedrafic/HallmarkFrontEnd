@@ -17,6 +17,7 @@ export enum MoreMenuType {
 
 export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Order ID', column: 'OrderId' },
+  { text: 'Assignment Type', column: 'AssignmentType' },
   { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Skill', column: 'Skill' },
@@ -174,6 +175,7 @@ export const permPlacementColumnsToExport: ExportColumn[] = [
 
 export const irpAllOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Order ID', column: 'OrderID' },
+  { text: 'Assignment Type', column: 'AssignmentType' },
   { text: 'Status', column: 'Status' },
   { text: 'Critical', column: 'Critical' },
   { text: 'Type', column: 'Type' },
@@ -225,6 +227,7 @@ export const irpPerDiemOrdersColumnsToExport: ExportColumn[] = [
 
 export const irpLTAOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Order ID', column: 'OrderID' },
+  { text: 'Assignment Type', column: 'AssignmentType' },
   { text: 'Status', column: 'Status' },
   { text: 'Critical', column: 'Critical' },
   { text: 'Skill', column: 'Skill' },
@@ -276,6 +279,7 @@ export const irpIncompleteOrdersColumnsToExport: ExportColumn[] = [
 
 export const orderJourneyColumnsToExport: ExportColumn[] = [
   { text: 'Order ID', column: 'OrderID' },
+  { text: 'Assignment Type', column: 'AssignmentType' },
   { text: 'Status', column: 'Status' },
   { text: 'System', column: 'System' },
   { text: 'Type', column: 'Type' },

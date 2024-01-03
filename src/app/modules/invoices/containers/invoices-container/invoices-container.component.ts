@@ -64,6 +64,7 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { PendingApprovalInvoice } from '../../interfaces';
+import { ToggleRowExpansionHeaderCellService } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.service';
 
 @Component({
   selector: 'app-invoices-container',
@@ -202,6 +203,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public noorgSelection:boolean = false;
   public addManualInvoiceDisable:boolean = false;
   public isAgencyVisibilityFlagEnabled = false;
+  public isExpandedGrid : boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -396,15 +398,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       });
   }
 
-  isExpandedGrid = false;
-  public toggleField(event:any):void 
-  { 
-    this.isExpandedGrid=false;
-    if(event.target.checked){
-    this.isExpandedGrid=true;
-    }
-    this.resetFilters(true);
-  }
+
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }

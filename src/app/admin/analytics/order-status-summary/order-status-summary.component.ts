@@ -302,14 +302,15 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
 
   ngOnInit(): void {
     this.initForm();
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$))
-      .subscribe(() => {
-        this.setFilterDefaultValues();
-        this.store.dispatch([new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage(this.orderStatusSummaryReportForm.value),
-        new OrderStatusSummaryReportActions.GetOrderStatusSummaryFiltersByOrganization()]);
-        this.onFilterClearAll();
-        this.setFilters();
-      });
+    if (this.organizationId$ != null) {
+      this.organizationId$.pipe(takeUntil(this.unsubscribe$))
+        .subscribe(() => {
+          this.setFilterDefaultValues();
+          this.store.dispatch(new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage(this.orderStatusSummaryReportForm.value));
+          this.onFilterClearAll();
+          this.setFilters();
+        });
+    }
     this.getGridData();
     this.orderFilterColumnsSetup();
     this.watchForReason();
@@ -335,11 +336,13 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   public setFilters(): void {
     this.dataService.getFiltersByOrganizationId().pipe(takeUntil(this.unsubscribe$))
       .subscribe(data => {
-        this.regions$ = data.region.map(item => ({ region: item.region, regionId: item.regionId }));
-        this.locations$ = data.location.map(item => ({ locationId: item.locationId, location: item.location, regionId: item.regionId }));
-        this.departments$ = data.department.map(item => ({ departmentId: item.departmentId, department: item.department, locationId: item.locationId }));
-        this.skills$ = data.skills.map(item => ({ skillId: item.skillId, skill: item.skill }));
-        this.orderType$ = data.orderType.map(item => ({ orderTypeId: item.orderTypeId, orderTypeName: item.orderTypeName }));
+        if (data.region != null) {
+          this.regions$ = data.region.map(item => ({ region: item.region, regionId: item.regionId }));
+          this.locations$ = data.location.map(item => ({ locationId: item.locationId, location: item.location, regionId: item.regionId }));
+          this.departments$ = data.department.map(item => ({ departmentId: item.departmentId, department: item.department, locationId: item.locationId }));
+          this.skills$ = data.skills.map(item => ({ skillId: item.skillId, skill: item.skill }));
+          this.orderType$ = data.orderType.map(item => ({ orderTypeId: item.orderTypeId, orderTypeName: item.orderTypeName }));
+        }
       });
   }
 

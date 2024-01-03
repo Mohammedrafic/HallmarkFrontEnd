@@ -660,6 +660,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
         this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
       }else{
+        this.Organizations = this.filters.organizationIds && this.filters.organizationIds?.length > 0 ? this.filters.organizationIds : this.Organizations;
         this.OrderFilterFormGroup.get('organizationIds')?.setValue(this.filters.organizationIds);
       }
       this.OrderFilterFormGroup.get('regionIds')?.setValue(this.filters.regionIds);

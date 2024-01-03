@@ -5,5 +5,6 @@ export enum SettingsKeys {
   HideContactDetailsOfOrderInAgencyLogin ='HideContactDetailsOfOrderInAgencyLogin',
   DisableAddEditTimesheetsInAgencyLogin = 'DisableAddEditTimesheetsInAgencyLogin',
   ATPRateCalculation = 'ATPRateCalculation',
-  DisableNumberOfOpenPositions='DisableNumberOfOpenPositions'
+  DisableNumberOfOpenPositions='DisableNumberOfOpenPositions',
+  ShowDeployedEmployees = 'ShowDeployedEmployees',
 }

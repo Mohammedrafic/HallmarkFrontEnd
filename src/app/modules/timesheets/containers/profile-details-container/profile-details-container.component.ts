@@ -173,6 +173,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private jobId: number;
 
   public commentContainerId = 0;
+  public openEvent:boolean = false;
 
 
   @Select(TimesheetsState.orderComments)
@@ -614,6 +615,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(take(1))
       .subscribe(() => {
         this.candidateDialog.hide();
+        this.openEvent = false;
         if (this.isTimeSheetChanged) {
           this.refreshGrid();
         }
@@ -819,6 +821,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       )
       .subscribe(() => {
         this.candidateDialog?.show();
+        this.openEvent = true;
       });
   }
 

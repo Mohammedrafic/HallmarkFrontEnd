@@ -83,6 +83,7 @@ export interface ScheduleItem {
     regionId: number;
     locationId: number;
     departmentId: number;
+    secondarySkill: string | null;
   }
 }
 

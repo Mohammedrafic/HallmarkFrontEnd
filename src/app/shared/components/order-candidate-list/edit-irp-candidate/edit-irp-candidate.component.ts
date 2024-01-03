@@ -645,7 +645,8 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
 
       const enableStatusControl = this.orderDetailsData.orderType === OrderType.LongTermAssignment
       && this.candidateModelState.candidate.profileStatus !== this.profileStatus.OnHold
-      && this.orderDetailsData.status !== OrderStatus.Filled && this.orderDetailsData.status !== OrderStatus.Cancelled;
+      && this.orderDetailsData.status !== OrderStatus.Filled && this.orderDetailsData.status !== OrderStatus.Cancelled
+      && this.orderDetailsData.irpOrderMetadata?.status !== OrderStatus.Closed;
       this.disableSaveButton = !enableStatusControl;
       DisableControls(fieldsToShow, this.candidateForm, enableStatusControl);
     }
@@ -839,7 +840,7 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
     statusText: string;
   }): void {
     const statusConfig = GetConfigField(this.dialogConfig, StatusField);
-
+  
     statusConfig.dataSource = [{
       text: jobStatus.statusText,
       value: jobStatus.applicantStatus,

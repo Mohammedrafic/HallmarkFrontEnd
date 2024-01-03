@@ -130,6 +130,7 @@ export class AccumulationChartComponent
             candidatesDataset = data;
           });
         }else if(this.chartData?.title==="Average Days for Active Candidates in a Status for Initial Orders "){
+          window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true));
           this.dashboardService.candidatesavgForActivePositions$.subscribe(data=>{
             candidatesDataset = data;
           });

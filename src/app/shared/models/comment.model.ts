@@ -13,6 +13,6 @@ export class Comment {
   candidateJobId?:number;
   organizationName?:string;
   bussinessUnitType?:string;
-
+  searchDate?: string | null;
 }
   

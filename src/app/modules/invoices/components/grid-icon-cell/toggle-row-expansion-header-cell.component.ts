@@ -5,6 +5,7 @@ import { IHeaderAngularComp } from '@ag-grid-community/angular';
 import { filter, fromEvent, takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
+import { ToggleRowExpansionHeaderCellService } from './toggle-row-expansion-header-cell.service';
 
 @Component({
   selector: 'app-toggle-row-expansion-header-cell',
@@ -17,11 +18,12 @@ export class ToggleRowExpansionHeaderCellComponent extends Destroyable implement
   public expanded = false;
   public currentSort: 'asc' | 'desc' | null = null;
   public nextSort: 'asc' | 'desc' | null = 'asc';
-
+  public toolTipMessage: string = "Show Details";
   private gridApi: GridApi;
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
+    private toggleRowExpansionService : ToggleRowExpansionHeaderCellService
   ) {
     super();
   }
@@ -48,6 +50,8 @@ export class ToggleRowExpansionHeaderCellComponent extends Destroyable implement
     this.gridApi?.onGroupExpandedOrCollapsed();
     this.cdr.markForCheck();
     this.expanded = this.checkIfAnyRowExpanded();
+    this.toggleRowExpansionService.HandleStatusChangeClick(this.expanded);
+    this.toolTipMessage = this.expanded ? "Hide Details" : "Show Details";
   }
 
   public sort(order: 'asc' | 'desc' | null, event: { shiftKey: boolean }): void {
