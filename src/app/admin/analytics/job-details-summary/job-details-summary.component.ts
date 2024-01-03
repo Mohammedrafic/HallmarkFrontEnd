@@ -6,7 +6,7 @@ import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { EmitType } from '@syncfusion/ej2-base';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { Observable, Subject, distinctUntilChanged, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -28,7 +28,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { AgencyDto, CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SearchCandidate, SkillCategoryDto } from '../models/common-report.model';
 import { OutsideZone } from "@core/decorators";
-import { analyticsConstants } from '../constants/analytics.constant';
+import { analyticsConstants, Period } from '../constants/analytics.constant';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { uniqBy } from 'lodash';
 
@@ -90,9 +90,13 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
 
   candidateSearchData: SearchCandidate[] = [];
 
+  //@Select(SecurityState.organisations)
+  //public organizationData$: Observable<Organisation[]>;
+  //selectedOrganizations: Organisation[];
+
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
-  selectedOrganizations: Organisation[];
+  selectedOrganizations: Organisation[] = [];
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -126,6 +130,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public locations: Location[] = [];
   public departments: Department[] = [];
   public organizations: Organisation[] = [];
+  
   public regionsList: Region[] = [];
   public locationsList: Location[] = [];
   public departmentsList: Department[] = [];
@@ -153,7 +158,10 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public isResetFilter: boolean = false;
   private fixedCandidateStatusesIncluded: number[] = [50, 60, 100, 90, 110];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
+  periodFields: FieldSettingsModel = { text: 'name', value: 'name' };
 
+  public periodList: Period[] = [];
+  public periodIsDefault: boolean = false;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
     private filterService: FilterService,
@@ -173,6 +181,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.loadperiod();
       this.orderFilterColumnsSetup();
       this.store.dispatch(new ClearLogiReportState());
       //this.SetReportData();
@@ -183,11 +192,115 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       });
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
+
+      this.organizationData$.pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$)).subscribe((data) => {
+        if (data != null && data.length > 0) {
+          this.organizations = uniqBy(data, 'organizationId');
+          this.filterColumns.businessIds.dataSource = this.organizations;
+          if (this.agencyOrganizationId) {
+            this.defaultOrganizations = this.agencyOrganizationId;
+            this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
+          }
+          this.changeDetectorRef.detectChanges();
+        }
+      });
+
       this.onFilterControlValueChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
 
+  selectPeriod(event: any) {
+    let { startDate, endDate, period } = this.jobDetailSummaryReportForm.getRawValue();
+    const value = event.itemData.id;
+    this.periodIsDefault = this.jobDetailSummaryReportForm.controls['period'].value == "Custom" ? true : false;
+    this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.startDate)?.setValue("");
+    this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.endDate)?.setValue("");
+   
+    const PeriodCheck = value;
+    let startDateControl = new Date(Date.now());
+    let endDateControl = new Date(Date.now());
+   
+    let lastDayOfLastMonth = new Date();
+    lastDayOfLastMonth.setMonth(lastDayOfLastMonth.getMonth(), 0);
+
+    switch (PeriodCheck) {
+      case 0:
+        startDateControl.setDate(startDateControl.getDate() - 30);
+        
+        break;
+      case 1:
+        startDateControl.setDate(startDateControl.getDate() - 31);        
+
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        
+        break;
+      case 2:
+        startDateControl.setDate(startDateControl.getDate() - 61);       
+
+        endDateControl.setDate(endDateControl.getDate() - 1);        
+        break;
+      case 3:
+        startDateControl.setDate(startDateControl.getDate() - 91);       
+
+        endDateControl.setDate(endDateControl.getDate() - 1);        
+        break;
+      case 4:
+        startDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+       
+        break;
+      case 5:
+        const today = new Date(Date.now());
+        const quarter = Math.floor((today.getMonth() / 3));
+        startDateControl = new Date(today.getFullYear(), quarter * 3 - 3, 1);
+        
+
+        endDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth() + 3, 0);
+       
+        break;
+      case 6:
+        const startDate = new Date(startDateControl.getFullYear(), 0, 1)
+        startDate.setDate(startDate.getDate());
+       
+        startDateControl = startDate;
+        break;
+      case 7:
+        const firstDay = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(firstDay, -6);
+        startDateControl.setDate(startDateControl.getDate());
+       
+        endDateControl = new Date((lastDayOfLastMonth));
+        
+        break;
+      case 8:
+        const dayFirst = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(dayFirst, -12);
+        startDateControl.setDate(startDateControl.getDate());       
+
+        endDateControl = new Date((lastDayOfLastMonth));        
+        break;
+    }
+    this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.startDate)?.setValue(((startDateControl)));
+    this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.endDate)?.setValue(((endDateControl)));   
+
+  }
+  private addMonths(date: any, months: any) {
+    date.setMonth(date.getMonth() + months);
+    return date;
+  }
+  private loadperiod(): void {
+    this.periodList = [];
+    this.periodList.push({ id: 0, name: 'Custom' });
+    this.periodList.push({ id: 1, name: 'Last 30 days' });
+    this.periodList.push({ id: 2, name: 'Last 60 days' });
+    this.periodList.push({ id: 3, name: 'Last 90 days' });
+    this.periodList.push({ id: 4, name: 'MTD' });
+    this.periodList.push({ id: 5, name: 'Last Quarter' });
+    this.periodList.push({ id: 6, name: 'YTD' });
+    this.periodList.push({ id: 7, name: 'Last 6 Months' });
+    this.periodList.push({ id: 8, name: 'Last 12 Months' });
+    this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
+  }
   private initForm(): void {
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 30);
@@ -207,7 +320,8 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
         candidateStatuses: new FormControl([]),
         jobStatuses: new FormControl([]),
         jobId: new FormControl(''),
-        agencyIds: new FormControl([])
+        agencyIds: new FormControl([]),
+        period: new FormControl(null)
       }
     );
   }
@@ -220,56 +334,100 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
-    this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data != null && data.length > 0) {
-        this.organizations = uniqBy(data, 'organizationId');
-        this.filterColumns.businessIds.dataSource = this.organizations;
-        this.defaultOrganizations = this.agencyOrganizationId;
-        this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
-        this.changeDetectorRef.detectChanges();
-      }
-    });
+    //this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+    //  if (data != null && data.length > 0) {
+    //    this.organizations = uniqBy(data, 'organizationId');
+    //    this.filterColumns.businessIds.dataSource = this.organizations;
+    //    this.defaultOrganizations = this.agencyOrganizationId;
+    //    this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+    //    this.changeDetectorRef.detectChanges();
+    //  }
+    //});
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
-      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+      //if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+        if (data && data.length > 0) {
         this.isAlive = true;
         this.previousOrgId = data;
-        if (!this.isClearAll) {
-          let orgList = this.organizations?.filter((x) => data == x.organizationId);
-          this.selectedOrganizations = orgList;
-          this.regionsList = [];
-          let regionsList: Region[] = [];
-          let locationsList: Location[] = [];
-          let departmentsList: Department[] = [];
-          orgList.forEach((value) => {
-            regionsList.push(...value.regions);
-            locationsList = regionsList.map(obj => {
-              return obj.locations.filter(location => location.regionId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-            departmentsList = locationsList.map(obj => {
-              return obj.departments.filter(department => department.locationId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-          });
-          this.regionsList = sortByField(regionsList, "name");
-          this.locationsList = sortByField(locationsList, 'name');
-          this.departmentsList = sortByField(departmentsList, 'name');
+          if (!this.isClearAll) {
+            this.regionsList = [];
+            let regionsList: Region[] = [];
+            let locationsList: Location[] = [];
+            let departmentsList: Department[] = [];
+            this.selectedOrganizations = data;
+            if (data.length == 1) {
+              let orgList = this.organizations?.filter((x) => data[0] == x.organizationId);
+              orgList.forEach((value) => {
+                regionsList.push(...value.regions);
+                locationsList = regionsList.map(obj => {
+                  return obj.locations.filter(location => location.regionId === obj.id);
+                }).reduce((a, b) => a.concat(b), []);
+                departmentsList = locationsList.map(obj => {
+                  return obj.departments.filter(department => department.locationId === obj.id);
+                }).reduce((a, b) => a.concat(b), []);
+              });
 
-          this.masterRegionsList = this.regionsList;
-          this.masterLocationsList = this.locationsList;
-          this.masterDepartmentsList = this.departmentsList;
+              //this.regionsList = sortByField(regionsList, "name");
+              //this.locationsList = sortByField(locationsList, 'name');
+              //this.departmentsList = sortByField(departmentsList, 'name');
+            }
+            this.regionsList = regionsList.length > 0 ? sortByField(regionsList, "name") : [];
+            this.locationsList = locationsList.length > 0 ? sortByField(locationsList, 'name') : [];
+            this.departmentsList = departmentsList.length > 0 ? sortByField(departmentsList, 'name') : [];
 
-          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
-          }
-          else {
-            this.isResetFilter = true;
-          }
-          let businessIdData = [];
-          businessIdData.push(data);
-          let filter: CommonReportFilter = {
-            businessUnitIds: businessIdData
-          };
+            this.masterRegionsList = this.regionsList;
+            this.masterLocationsList = this.locationsList;
+            this.masterDepartmentsList = this.departmentsList;
+            this.regions = this.regionsList;
+            this.filterColumns.regionIds.dataSource = this.regions;
+            if (this.bussinessControl?.value.length == "1") {
+              if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+                this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+              }
+              else {
+                this.isResetFilter = true;
+              }
+            }
+            let businessIdData = [];
+            //businessIdData.push(data);
+            businessIdData = data;
+            let filter: CommonReportFilter = {
+              businessUnitIds: businessIdData
+            };
+          //this.selectedOrganizations = orgList;
+          //this.regionsList = [];
+          //let regionsList: Region[] = [];
+          //let locationsList: Location[] = [];
+          //let departmentsList: Department[] = [];
+          //orgList.forEach((value) => {
+          //  regionsList.push(...value.regions);
+          //  locationsList = regionsList.map(obj => {
+          //    return obj.locations.filter(location => location.regionId === obj.id);
+          //  }).reduce((a, b) => a.concat(b), []);
+          //  departmentsList = locationsList.map(obj => {
+          //    return obj.departments.filter(department => department.locationId === obj.id);
+          //  }).reduce((a, b) => a.concat(b), []);
+          //});
+          //this.regionsList = sortByField(regionsList, "name");
+          //this.locationsList = sortByField(locationsList, 'name');
+          //this.departmentsList = sortByField(departmentsList, 'name');
+
+          //this.masterRegionsList = this.regionsList;
+          //this.masterLocationsList = this.locationsList;
+          //this.masterDepartmentsList = this.departmentsList;
+
+          //if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+          //  this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          //}
+          //else {
+          //  this.isResetFilter = true;
+          //}
+          //let businessIdData = [];
+          //businessIdData.push(data);
+          //let filter: CommonReportFilter = {
+          //  businessUnitIds: businessIdData
+          //};
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             if (data != null) {
@@ -398,7 +556,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       }
     }
     let { businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds,
-      regionIds, skillCategoryIds, agencyIds, skillIds, startDate, endDate } = this.jobDetailSummaryReportForm.getRawValue();
+      regionIds, skillCategoryIds, agencyIds, skillIds, startDate, endDate, period } = this.jobDetailSummaryReportForm.getRawValue();
     if (!this.jobDetailSummaryReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for last and next 30 days.";
     }
@@ -412,7 +570,9 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     this.paramsData =
     {
-      "OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      //"OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "OrganizationParamCJR": this.selectedOrganizations?.length == 0 ? "null" :
+        this.selectedOrganizations?.join(","),
       "StartDateParamJDSR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamJDSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionParamJDSR": regionIds.length == 0 ? "null" : regionIds,
@@ -552,6 +712,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(endDate);
     this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
     this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+    this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

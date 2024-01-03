@@ -5,6 +5,8 @@ export const analyticsConstants = {
     RegionIds: 'regionIds',
     LocationIds: 'locationIds',
     DepartmentIds: 'departmentIds',
+    startDate: 'startDate',
+    endDate: 'endDate',
     StartDate: 'StartDate',    
     EndDate: 'EndDate',
     StartDateFrom: 'StartDateFrom',
