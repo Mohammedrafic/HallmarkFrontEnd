@@ -169,7 +169,7 @@ export const CardTitleforExport = (scheduleItem: DaySchedules): string => {
 export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilters): ScheduleInt.EmployeesFilters => {
   const { 
     startDate, endDate, departmentIds, locationIds, regionIds, isAvailablity,
-    isUnavailablity, isOnlySchedulatedCandidate, startTime, endTime,
+    isUnavailablity, isOnlySchedulatedCandidate, startTime, endTime,employeeSortCategory
   } = filters;
 
   return {
@@ -184,6 +184,7 @@ export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilter
     isOnlySchedulatedCandidate : isOnlySchedulatedCandidate || false,
     startTime : startTime || null,
     endTime : endTime || null,
+    employeeSortCategory:employeeSortCategory||null
   };
 };
 

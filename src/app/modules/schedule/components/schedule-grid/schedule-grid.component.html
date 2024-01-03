@@ -33,13 +33,13 @@
         </div>
       </div>
 <!--      TODO: uncomment when sorting is implemented-->
-<!--      <button-->
+     <!-- <button-->
 <!--        ejs-button-->
 <!--        appHideBeforeSyncfusionLoad-->
 <!--        cssClass="e-outline sorting-btn"-->
 <!--      >-->
-<!--        <app-custom-icon name="sorting" class="sorting-icon"></app-custom-icon>-->
-<!--      </button>-->
+        <!-- <app-custom-icon name="sorting" class="sorting-icon"></app-custom-icon> -->
+<!--      </button> -->
     </div>
     <div class="right">
       <ng-container *ngIf="activePeriod !== monthPeriod; else monthDatePicker">
@@ -80,9 +80,14 @@
     <table *ngIf="scheduleData?.items?.length; else emptyTable">
       <thead>
         <tr>
-          <th class="table-title candidates-head-cell fixed fixed--left fixed--top">
+          <th class="table-title candidates-head-cell fixed fixed--left fixed--top first-tabel-cell">
+           <div class="header-icon">
+           <div class="header-text">
             <span>{{ employeesTitle }}</span>
             <span class="e-badge e-badge-success e-badge-pill align-text">{{ scheduleData?.totalCount || 0 }}</span>
+           </div>
+            <app-custom-icon name="sorting" *ngIf="!isEmployee" (click)="clickSort()" class="sorting-icon"></app-custom-icon>            
+           </div>
           </th>
           <ng-container *ngIf="activePeriod !== monthPeriod; else monthRange">
             <th

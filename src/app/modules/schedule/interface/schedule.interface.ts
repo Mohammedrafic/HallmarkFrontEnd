@@ -44,6 +44,7 @@ export interface ScheduleCandidate {
   fullName?: string;
   workCommitmentText?: string;
   isOnHold: boolean;
+  employeeId:number;
 }
 
 export interface LtaAssignment {
@@ -185,6 +186,7 @@ export interface ScheduleFilters {
   endTime? : Time | string | null;
   pageNumber?: number;
   pageSize?: number;
+  employeeSortCategory?:EmployeeSortCategory|null;
 }
 
 export interface ScheduleFiltersConfig {
@@ -240,6 +242,7 @@ export interface EmployeesFilters {
   isUnavailablity: boolean;
   startTime: Time | string | null;
   endTime: Time | string | null;
+  employeeSortCategory: EmployeeSortCategory|null;
 }
 
 export interface DatesByWeekday {
@@ -379,3 +382,22 @@ export interface ScheduleAttributes {
   meal : boolean;
 }
 
+
+
+export interface GetEmployeeWorkCommitment {
+id:number;
+name:string
+}
+
+export interface SortCriteria
+{
+   columnName :string
+   sortOrder :string
+   
+}
+
+export interface EmployeeSortCategory
+{
+   sortCriterias :SortCriteria[];
+   workCommitments :string[];
+}
