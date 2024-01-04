@@ -67,6 +67,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
   }
 
   public onGetCandidatesList(event: CandidateListEvent): void {
+    this.orderManagementService.HandleDeployedClick(event.includeDeployed ?? false);
     this.orderManagementService.excludeDeployed = event.excludeDeployed;
     this.orderManagementService.updateEmployeeToggleState({
       isAvailable: event.isAvailable,
