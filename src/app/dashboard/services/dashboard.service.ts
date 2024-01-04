@@ -714,7 +714,7 @@ export class DashboardService {
       return { dateFrom, dateTo };
     }
   private getAgencytimesheetsummary(filter: DashboartFilterDto): Observable<AgencyTImesheetsummaryModel[]> {
-    const desiredOrder = ["Incomplete", "Missing", "Pending Approval (Time sheet)", "Pending Approval (Miles)"];
+    const desiredOrder = ["Incomplete", "Missing", "Pending Approval(Time sheet)", "Pending Approval(Miles)"];
 
     return this.httpClient.post<AgencyTImesheetsummaryModel[]>(`${this.baseUrl}/TimesheetSummary`, { ...filter })
       .pipe(
