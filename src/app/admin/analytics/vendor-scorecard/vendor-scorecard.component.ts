@@ -605,7 +605,7 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
   public onFilterClearAll(): void {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
+    startDate.setDate(startDate.getDate() - 60);
     this.VendorReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.VendorReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
     this.VendorReportForm.get(VendorScorecardReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
