@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 
 import { BaseObservable } from '@core/helpers';
 import { GlobalWindow } from '@core/tokens';
@@ -51,6 +51,8 @@ export class OrderManagementService extends DestroyableDirective {
   private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
   private readonly orderFromAnotherSystem: BaseObservable<OrderLinkDetails | null> =
     new BaseObservable<OrderLinkDetails | null>(null);
+
+  private currentClearToStartVal$: BehaviorSubject<any> = new BehaviorSubject<null>(null);
 
   constructor(
     private fb: FormBuilder,
@@ -245,4 +247,13 @@ export class OrderManagementService extends DestroyableDirective {
 
     return null;
   }
+
+  public getCurrentClearToStartVal(): Observable<any> {
+    return this.currentClearToStartVal$.asObservable();
+  }
+
+  public setCurrentClearToStartVal(name: any): void {
+    this.currentClearToStartVal$.next(name);
+  }
+
 }

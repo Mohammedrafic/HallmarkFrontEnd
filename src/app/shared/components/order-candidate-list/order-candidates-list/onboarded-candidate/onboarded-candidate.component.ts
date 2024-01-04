@@ -23,7 +23,7 @@ import {
   OPTION_FIELDS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ApplicantStatus, IRPOrderPosition, Order, OrderCandidateJob, OrderCandidatesList, clearToStartDataset } from '@shared/models/order-management.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { formatDate, formatNumber } from '@angular/common';
@@ -37,6 +37,7 @@ import {
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   SaveClearToStart,
+  SaveClearToStartSucceeded,
   sendOnboardCandidateEmailMessage,
   SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
@@ -52,6 +53,7 @@ import {
   DELETE_CONFIRM_TITLE,
   DEPLOYED_CANDIDATE,
   deployedCandidateMessage,
+  GRID_CONFIG,
   ONBOARD_CANDIDATE,
   onBoardCandidateMessage,
   OrganizationalHierarchy,
@@ -265,7 +267,13 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.observeCandidateJob();
     this.observeStartDate();
     this.subscribeOnJobUpdate();
-    this.clearedToStart = this.candidate && this.candidate.clearToStart ? this.candidate.clearToStart : false;
+    this.orderManagementService.getCurrentClearToStartVal().pipe(takeUntil(this.unsubscribe$)).subscribe(val=>{
+      if(val != null){
+        this.clearedToStart = val;
+      }else{
+        this.clearedToStart = this.candidate && this.candidate.clearToStart ? this.candidate.clearToStart : false;
+      }
+    });
     if(this.candidate && positionIdStatuses.includes(this.candidate.status)){
       this.clearedToStartCheck();
     }else if(this.candidate && !this.candidate.status && this.candidate.candidateStatus && positionIdStatuses.includes(this.candidate.candidateStatus)){
@@ -952,5 +960,11 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.clearToStartDataset.jobId = this.candidate.jobId ? this.candidate.jobId : this.candidateJob?.jobId;
     this.clearToStartDataset.organizationId = this.candidate.organizationId;
     this.store.dispatch(new SaveClearToStart(this.clearToStartDataset));
+    this.actions$.pipe(ofActionDispatched(SaveClearToStartSucceeded), take(1))
+                  .subscribe(() => {
+                    this.orderManagementService.setCurrentClearToStartVal(event.checked);
+                    this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());                    
+                  });
+
   }
 }

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { capitalize } from 'lodash';
 import { combineLatest, filter, map, merge, mergeMap, Observable, of, Subject, switchMap, take, takeUntil, } from 'rxjs';
@@ -27,6 +27,7 @@ import {
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   SaveClearToStart,
+  SaveClearToStartSucceeded,
   sendOnboardCandidateEmailMessage,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
@@ -41,6 +42,7 @@ import {
   CandidateADDRESSRequired,
   CandidateDOBRequired,
   CandidatePHONE1Required,
+  GRID_CONFIG,
   ONBOARD_CANDIDATE,
   onBoardCandidateMessage,
   OrganizationalHierarchy,
@@ -572,9 +574,15 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
               if(this.candidate && positionIdStatuses.includes(this.candidate.status)){
                  this.clearedToStartCheck();
               }
-              if(this.candidate){
-                this.clearedToStart = this.candidate.clearToStart ? this.candidate.clearToStart : false;
-              }
+              this.orderManagementService.getCurrentClearToStartVal().pipe(takeUntil(this.destroy$)).subscribe(val=>{
+                if(val != null){
+                  this.clearedToStart = val;
+                }else{
+                  if(this.candidate){
+                    this.clearedToStart = this.candidate.clearToStart ? this.candidate.clearToStart : false;
+                  }
+                }
+              });
               if (candidate) {
                 return candidate;
               } else {
@@ -1100,5 +1108,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.clearToStartDataset.jobId = this.candidate?.jobId ? this.candidate.jobId : this.candidateJob?.jobId;
     this.clearToStartDataset.organizationId = this.candidate?.organizationId;
     this.store.dispatch(new SaveClearToStart(this.clearToStartDataset));
+    this.action$.pipe(ofActionDispatched(SaveClearToStartSucceeded), take(1))
+                  .subscribe(() => {
+                    this.orderManagementService.setCurrentClearToStartVal(event.checked);
+                    this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()); 
+                    
+                  });
   }
 }

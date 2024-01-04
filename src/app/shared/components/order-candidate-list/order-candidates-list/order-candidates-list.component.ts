@@ -196,6 +196,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   public onEdit(data: OrderCandidatesList & { index: string }): void {
+    this.orderManagementService.setCurrentClearToStartVal(null);
     this.selectedIndex = Number(data.index);
     this.candidate = { ...data };
     this.getDeployedCandidateOrders();

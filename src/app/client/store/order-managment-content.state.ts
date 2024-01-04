@@ -1570,7 +1570,8 @@ export class OrderManagementContentState {
   ): Observable<any | Observable<void>> {
     return this.orderManagementService.saveClearToStart(payload).pipe(
       tap((payload) => {
-        dispatch(new SaveClearToStartSucceeded(payload));
+        dispatch(new SaveClearToStartSucceeded(true));
+        return payload;
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Orders were not imported'))))
     );

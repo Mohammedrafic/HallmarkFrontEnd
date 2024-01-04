@@ -1513,6 +1513,7 @@ public RedirecttoIRPOrder(order:Order)
       this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
       this.openChildDialog.next(false);
       this.orderPositionSelected$.next({ state: false });
+      this.orderManagementService.setCurrentClearToStartVal(null);
       this.openDetails.next(true);
       this.selectedRowRef = event;
       this.selectedRowIndex = event.rowIndex || null;
@@ -1910,6 +1911,7 @@ public RedirecttoIRPOrder(order:Order)
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
     this.selectedDataRow = order as any;
     this.orderPositionSelected$.next({ state: true, index });
+    this.orderManagementService.setCurrentClearToStartVal(null);
     this.openChildDialog.next([order, candidate]);
     this.store.dispatch(new GetAvailableSteps(order.organizationId, candidate.jobId));
     this.cd$.next(true);
