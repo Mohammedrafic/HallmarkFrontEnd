@@ -626,7 +626,6 @@ export class VendorScorecardComponent implements OnInit, OnDestroy {
     this.regionsList = this.masterRegionsList;
     this.locationsList = this.masterLocationsList;
     this.departmentsList = this.masterDepartmentsList;
-    debugger;
   }
   public onFilterApply(): void {
     // if (this.selectedOrganizations.length == 0) {
