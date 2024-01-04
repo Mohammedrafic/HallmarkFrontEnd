@@ -29,6 +29,7 @@
 }
 
 .button-container {
+  justify-content: flex-end;
   .reject-button {
     margin-right: 12px;
   }
@@ -42,6 +43,15 @@
     .dropdown {
       display: none;
     }
+  }
+  .switch{
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    margin-right: 10px;
+  }
+  .dropdown-width{
+    width: 35%;
   }
 }
 
@@ -124,6 +134,9 @@
 ::ng-deep{
   .e-confirm-dialog.e-control.e-dialog.e-popup.unsaved-changes-dialog {
     width: 470px !important;
+  }
+  body.light .e-switch-wrapper.e-switch-disabled .e-switch-inner{
+    opacity: initial !important;
   }
 }
 

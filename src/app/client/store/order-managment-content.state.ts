@@ -87,7 +87,9 @@ import {
   GetOrderBillRateDetailSucceeded,
   GetParentOrderById,
   GetIrpOrderExtensionCandidates,
-  GetJobDistributionValues
+  GetJobDistributionValues,
+  SaveClearToStart,
+  SaveClearToStartSucceeded
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -1543,5 +1545,18 @@ export class OrderManagementContentState {
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       }));
+  }
+
+  @Action(SaveClearToStart)
+  SaveClearToStart(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: SaveClearToStart
+  ): Observable<any | Observable<void>> {
+    return this.orderManagementService.saveClearToStart(payload).pipe(
+      tap((payload) => {
+        dispatch(new SaveClearToStartSucceeded(payload));
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Orders were not imported'))))
+    );
   }
 }

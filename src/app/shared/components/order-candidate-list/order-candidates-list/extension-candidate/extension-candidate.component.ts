@@ -25,6 +25,7 @@ import {
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
+  SaveClearToStart,
   sendOnboardCandidateEmailMessage,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
@@ -60,6 +61,7 @@ import { Comment } from '@shared/models/comment.model';
 import {
   AcceptJobDTO,
   ApplicantStatus,
+  clearToStartDataset,
   IrpOrderCandidate,
   Order,
   OrderCandidateJob,
@@ -89,6 +91,7 @@ import { CandidateState } from '@agency/store/candidate.state';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { positionIdStatuses } from '@agency/candidates/add-edit-candidate/add-edit-candidate.constants';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -179,6 +182,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public payRateSetting = CandidatePayRateSettings;
   public selectedApplicantStatus: ApplicantStatus | null = null;
   public isCandidatePayRateVisible: boolean;
+  public isEnableClearedToStartForAcceptedCandidates:boolean = false;
+  public isClearedToStartEnable:boolean = true;
+  public clearToStartDataset:clearToStartDataset = new clearToStartDataset();
   public canCreateOrder: boolean;
 
   public applicantStatusEnum = ApplicantStatusEnum;
@@ -188,6 +194,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public candidateAddressRequiredValue = '';
   public agencyId: number | undefined;
   public orderManagementPagerState: OrderManagementPagerState | null;
+  public clearedToStart:boolean = false;
 
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
@@ -519,14 +526,20 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     if(this.activeSystem == undefined && !this.isAgency){
       this.activeSystem = this.activeSystems;
     }
-        const state$ = this.isAgency ? this.orderCandidatePage$ : (this.activeSystem === OrderManagementIRPSystemId.IRP ? this.getIrpCandidatesforExtension$ : this.clientOrderCandidatePage$);
-          this.candidate$ = state$.pipe(
+    const state$ = this.isAgency ? this.orderCandidatePage$ : (this.activeSystem === OrderManagementIRPSystemId.IRP ? this.getIrpCandidatesforExtension$ : this.clientOrderCandidatePage$);
+     this.candidate$ = state$.pipe(
             filter(Boolean),
             takeUntil(this.destroy$),
             map((res) => {
               const items = res?.items || this.candidateOrder?.items;
               const candidate = items?.find((candidate) => candidate.candidateJobId);
               this.candidate = candidate;
+              if(this.candidate && positionIdStatuses.includes(this.candidate.status)){
+                 this.clearedToStartCheck();
+              }
+              if(this.candidate){
+                this.clearedToStart = this.candidate.clearToStart ? this.candidate.clearToStart : false;
+              }
               if (candidate) {
                 return candidate;
               } else {
@@ -644,6 +657,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             readonly: !this.isAgency,
             isRedirectFromOrder: true,
             isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
+            candidateJobId:this.candidate?.candidateJobId,
+            organizationId:this.candidateJob?.organizationId,
+            clearedToStart:this.clearedToStart,
           };
     window.localStorage.setItem('navigationState', JSON.stringify(state));
     this.router.navigate([url, this.candidate?.candidateId], {
@@ -979,6 +995,26 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
   }
 
+  private clearedToStartCheck():void {
+    if(this.candidate && this.candidate.organizationId && this.candidate.candidateJobId){
+      this.isEnableClearedToStartForAcceptedCandidates = false;
+      this.isClearedToStartEnable =  this.candidate.status == ApplicantStatusEnum.Accepted ? false : true;
+
+      this.settingService
+        .getViewSettingKey(
+          OrganizationSettingKeys.EnableClearedToStartForAcceptedCandidates,
+          OrganizationalHierarchy.Organization,
+          this.candidate.organizationId,
+          this.candidate.organizationId,
+          false,
+          this.candidate.candidateJobId
+        ).pipe(takeUntil(this.destroy$))
+        .subscribe(({ EnableClearedToStartForAcceptedCandidates }) => {
+          this.isEnableClearedToStartForAcceptedCandidates = JSON.parse(EnableClearedToStartForAcceptedCandidates);
+        });
+    }
+  }
+
   private adjustCandidatePayRateField(): void {
     const candidatePayRateControl = this.form.get('candidatePayRate');
     setTimeout(() => {
@@ -1008,5 +1044,13 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.CanOrganizationEditOrdersIRP = CanOrganizationEditOrdersIRP;
       this.CanOrganizationViewOrdersIRP = CanOrganizationViewOrdersIRP;
     });
+  }
+
+  public onSwitcher(event: { checked: boolean }): void {
+    this.clearedToStart = event.checked;
+    this.clearToStartDataset.clearToStart = event.checked;
+    this.clearToStartDataset.jobId = this.candidate?.jobId ? this.candidate.jobId : this.candidateJob?.jobId;
+    this.clearToStartDataset.organizationId = this.candidate?.organizationId;
+    this.store.dispatch(new SaveClearToStart(this.clearToStartDataset));
   }
 }

@@ -68,7 +68,8 @@ export enum OrganizationSettingKeys {
   AllowDuplicateClockIdforOrganization,
   MandatorySpecialProjectDetails,
   MarkZeroDollarInvoicetoPaidOnApproval,
-  AutoRejectOtherEmployeesWhenFilled
+  EnableClearedToStartForAcceptedCandidates,
+  AutoRejectOtherEmployeesWhenFilled,
 }
 
 export enum OrganizationalHierarchy {

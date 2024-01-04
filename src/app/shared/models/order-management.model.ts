@@ -329,6 +329,8 @@ export type OrderCandidatesList = {
   availabilityOverlap?: OrderAvailabilityOverlap;
   partnershipStatus: PartnershipStatus;
   suspentionDate: string;
+  jobId?: number;
+  clearToStart?:boolean | null;
 };
 
 export interface WorkflowStepType {
@@ -1051,4 +1053,10 @@ export interface OrderAuditHistory{
     creationDateTo: null | string;
     distributedOnFrom: null | string;
     distributedOnTo: null | string;
+  }
+
+  export class clearToStartDataset{
+    jobId: number | undefined;
+    organizationId: number | undefined;
+    clearToStart: boolean
   }

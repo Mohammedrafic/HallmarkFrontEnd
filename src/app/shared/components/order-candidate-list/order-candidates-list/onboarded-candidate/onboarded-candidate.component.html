@@ -1,7 +1,7 @@
 <section class="container">
   <section class="header-container" *ngIf="candidate">
     <div class="e-card-header">
-      <div class="e-card-header-caption candidat-status">
+      <div class="e-card-header-caption candidat-status w-50">
           <h3 class="e-card-title candidate-title">
             {{candidate?.lastName}}, {{candidate?.firstName}}
             <i-feather name="briefcase" class="icon deployed-icon" *ngIf="candidate?.deployedCandidateInfo && !isOnBoarded"></i-feather>
@@ -20,7 +20,11 @@
         </div>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap input-readonly" *ngIf="!isRejected && !isCancelled">
+        <div class="input-group switch" *ngIf="isEnableClearedToStartForAcceptedCandidates">
+          <ejs-switch id="switcher" class="switch"  (change)="onSwitcher($event)" [checked]="clearedToStart" [disabled]="isClearedToStartEnable"></ejs-switch>
+          <label class="switch-label" for="switcher"><span>Cleared to Start</span></label>
+        </div>
+        <div class="input-group dropdown bootstrap input-readonly"  [ngClass]="{'dropdown-width': isEnableClearedToStartForAcceptedCandidates }" *ngIf="!isRejected && !isCancelled">
           <ejs-dropdownlist
             [allowFiltering]="true"
             [fields]="optionFields"

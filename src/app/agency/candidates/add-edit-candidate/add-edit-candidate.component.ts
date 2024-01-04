@@ -12,7 +12,7 @@ import { SelectNavigation } from '@shared/components/candidate-details/store/can
 import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
 import { getCandidatePositionId, getOrderPublicId } from
   "@shared/components/order-candidate-list/order-candidate-list.utils";
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 import { CreatedCandidateStatus } from '@shared/enums/status';
 import { CredentialStorageFacadeService } from "@agency/services/credential-storage-facade.service";
@@ -51,6 +51,7 @@ import { JobDistributionMasterSkills } from '@shared/models/associate-organizati
 import { AppState } from 'src/app/store/app.state';
 import { AlertIdEnum } from "@admin/alerts/alerts.enum";
 import { SetLastSelectedOrganizationAgencyId } from "src/app/store/user.actions";
+import { SettingsViewService } from "@shared/services/settings-view.service";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -92,6 +93,10 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     return !!this.orderId && !!this.candidateStatus;
   }
 
+  public isEnableClearedToStartForAcceptedCandidates$:Subject<boolean> = new Subject<boolean>();
+  public isClearedToStartEnable:boolean = true;
+  public clearedToStart:boolean = false;
+
   @Select(CandidateState.isCandidateCreated)
   public isCandidateCreated$: Observable<boolean>;
 
@@ -115,6 +120,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     private location: Location,
     private agencySettingsService: AgencySettingsService,
     private cd: ChangeDetectorRef,
+    private settingService: SettingsViewService,
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
   ) {
     super(store);
@@ -532,6 +538,26 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
         if (positionIdStatuses.includes(this.candidateStatus)) {
           this.orderOrPositionId = getCandidatePositionId(response.organizationPrefix, response.publicId, response.positionId);
           this.orderOrPositionTitle = 'Position';
+          const navigationStateString = this.globalWindow.localStorage.getItem('navigationState');
+          const navigationState = navigationStateString ? JSON.parse(navigationStateString) : null;
+
+          if(navigationState){
+            this.isEnableClearedToStartForAcceptedCandidates$.next(false);
+            this.isClearedToStartEnable =  this.candidateStatus == ApplicantStatus.Accepted && navigationState.readonly? false : true;
+            this.clearedToStart = navigationState.clearedToStart;
+            this.settingService
+              .getViewSettingKey(
+                OrganizationSettingKeys.EnableClearedToStartForAcceptedCandidates,
+                OrganizationalHierarchy.Organization,
+                navigationState.organizationId,
+                navigationState.organizationId,
+                false,
+                navigationState.candidateJobId
+              ).pipe(takeUntil(this.componentDestroy()))
+              .subscribe(({ EnableClearedToStartForAcceptedCandidates }) => {
+                this.isEnableClearedToStartForAcceptedCandidates$.next(JSON.parse(EnableClearedToStartForAcceptedCandidates));
+              });
+          }
         } else {
           this.orderOrPositionId = getOrderPublicId(response.organizationPrefix, response.publicId);
           this.orderOrPositionTitle = 'Order';

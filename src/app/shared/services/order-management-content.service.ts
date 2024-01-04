@@ -11,6 +11,7 @@ import {
   ApplicantStatus,
   AuditLogPayload,
   CandidateCancellationReason,
+  clearToStartDataset,
   CreateOrderDto,
   EditOrderDto,
   IrpCandidatesParams,
@@ -624,5 +625,9 @@ export class OrderManagementContentService {
 
     public getJobDistributionValues(payload: JobDistributionfilters): Observable<OrgStructureDto> {
       return this.http.post<OrgStructureDto>('/api/OrganizationSettings/GetOrganizationDistributionvalue', payload);
+     }
+
+     public saveClearToStart(payload: clearToStartDataset): Observable<any> {
+      return this.http.post<clearToStartDataset>('/api/AppliedCandidates/UpdateClearToStart', payload);
      }
 }
