@@ -877,7 +877,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
   private subscribeOnVMSCandidate(): void {
     this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
-      if(this.isOrganization && this.order?.extensionFromId === null && this.activeSystem === OrderManagementIRPSystemId.VMS){
+      if(this.isOrganization && this.activeSystem === OrderManagementIRPSystemId.VMS){
         this.candidateJob = orderCandidateJob;
         if (orderCandidateJob) {
           this.getExtensions();

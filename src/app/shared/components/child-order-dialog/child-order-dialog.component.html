@@ -80,7 +80,7 @@
             </button>
           </div>
         </div>
-        <div class="candidate-message" *ngIf="showAddExtension && !disableAddExtension && isAgencySuspended">
+        <div class="candidate-message" *ngIf="showAddExtension && !disableAddExtension && isAgencySuspended && activeSystem !== OrderManagementIRPSystemId.IRP">
           <i-feather name="info" class="icon"></i-feather>
           {{ getPartnershipMessage }}
         </div>
