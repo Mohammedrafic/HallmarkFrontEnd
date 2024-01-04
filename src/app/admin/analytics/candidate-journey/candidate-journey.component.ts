@@ -5,7 +5,7 @@ import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, Subject, distinctUntilChanged, takeUntil, takeWhile } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -205,7 +205,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       this.onFilterLocationChangedHandler();
       this.onFilterSkillCategoryChangedHandler();
 
-      this.user?.businessUnitType == BusinessUnitType.Hallmark || BusinessUnitType.MSP ? this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == (BusinessUnitType.Hallmark || BusinessUnitType.MSP) ? this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
 
@@ -353,7 +353,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
-    this.bussinessControl.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$)).subscribe((data) => {
+    this.bussinessControl.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((data) => {
       this.candidateJourneyForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       this.selectedOrganizations = [];
       //if (data != null && typeof data === 'number' && data != this.previousOrgId) {
