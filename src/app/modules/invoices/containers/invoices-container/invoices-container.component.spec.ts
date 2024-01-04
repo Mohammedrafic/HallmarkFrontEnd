@@ -39,6 +39,7 @@ import { UserState } from 'src/app/store/user.state';
 
 import { InvoicesContainerComponent } from './invoices-container.component';
 import { Organisation } from '@shared/models/visibility-settings.model';
+import { ToggleRowExpansionHeaderCellService } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.service';
 
 class ActivatedRouteStub {
   get snapshot() {
@@ -126,6 +127,10 @@ describe('InvoicesContainerComponent', () => {
     'InvoicesService',
     ['getCurrentTableIdxStream', 'setCurrentSelectedIndexValue', 'setNextValue', 'createPaymentRecords']
   );
+  const toggleServiceSpy: jasmine.SpyObj<ToggleRowExpansionHeaderCellService> = jasmine.createSpyObj(
+    'toggleService',
+    ['handleDetailsEvent']
+  );
   const invoicesContainerServiceSpy: jasmine.SpyObj<InvoicesContainerService> = jasmine.createSpyObj(
     'InvoicesContainerService',
     ['getTabConfig', 'getRowData', 'getGridOptions', 'getColDefsByTab', 'getAllTabId']
@@ -164,6 +169,7 @@ describe('InvoicesContainerComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: InvoicesService, useValue: invoicesServiceSpy },
+        { provide: ToggleRowExpansionHeaderCellService, useValue: toggleServiceSpy},
         { provide: InvoicesContainerService, useValue: invoicesContainerServiceSpy },
         { provide: InvoicePrintingService, useValue: invoicePrintingServiceSpy },
         { provide: InvoicesApiService, useValue: invoicesApiServiceSpy },

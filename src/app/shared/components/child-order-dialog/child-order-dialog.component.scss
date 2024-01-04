@@ -198,3 +198,9 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
     color: $supportive-red-00;
   }
 }
+
+.local-candidate-message {
+  @include candidateMessage;
+  margin-bottom: 14px;
+  margin-top: 0;
+}

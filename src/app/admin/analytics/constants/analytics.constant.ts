@@ -40,6 +40,7 @@ export const analyticsConstants = {
     opcredFlag: 'opcredFlag',
     IsOptionalRequred:'IsOptionalRequred',
     Period: 'period',
+    businessunitName: 'businessunitName',
   }
 }
 

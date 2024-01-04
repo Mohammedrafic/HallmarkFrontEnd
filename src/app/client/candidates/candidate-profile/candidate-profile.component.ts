@@ -18,6 +18,8 @@ import { UserState } from 'src/app/store/user.state';
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { ModalActions } from '@shared/models/confirm-modal-events.model';
+import { ConfirmEventType } from '@shared/enums/confirm-modal-events.enum';
 
 @Component({
   selector: 'app-candidate-profile',
@@ -127,14 +129,15 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
   }
 
   private profileStatusOnHoldConfirmation(): Observable<void | CandidateModel> {
-    return this.confirmService.confirm(EMPLOYEE_ON_HOLD_WARNING, {
+    return this.confirmService.confirmActions(EMPLOYEE_ON_HOLD_WARNING, {
       title: 'Confirm',
       okButtonLabel: 'Yes',
       cancelButtonLabel: 'No',
       okButtonClass: '',
     }).pipe(
       take(1),
-      tap((removeSchedules: boolean) => this.removeSchedules = removeSchedules),
+      filter((removeSchedules: ModalActions) => removeSchedules.action !== ConfirmEventType.CLOSE),
+      tap((removeSchedules: ModalActions) => this.removeSchedules = removeSchedules.action === ConfirmEventType.YES),
       switchMap(() => this.saveCandidate()),
     );
   }

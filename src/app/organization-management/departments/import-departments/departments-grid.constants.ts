@@ -7,7 +7,8 @@ import { ImportedOrder } from '@shared/models/imported-order.model';
 import { ImportedLocation } from '@shared/models/location.model';
 
 // eslint-disable-next-line max-lines-per-function
-export const DepartmentsColumns = (isIRPEnabled: boolean, isInvoiceDepartmentIdFieldShow: boolean,
+export const DepartmentsColumns = (
+  isIRPFlagEnabled: boolean, isOrganizationIRP: boolean, isOrganizationVMS: boolean, isInvoiceDepartmentIdFieldShow: boolean,
   data: ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder> | null): ColDef[] => {
   let result = [
     {
@@ -75,7 +76,7 @@ export const DepartmentsColumns = (isIRPEnabled: boolean, isInvoiceDepartmentIdF
     });
   }
 
-  if (isIRPEnabled) {
+  if (isIRPFlagEnabled && isOrganizationIRP && isOrganizationVMS) {
     result.push({
       field: 'includeInIRP',
       width: 150,
@@ -84,7 +85,7 @@ export const DepartmentsColumns = (isIRPEnabled: boolean, isInvoiceDepartmentIdF
     });
   }
 
-  if (isIRPEnabled) {
+  if (isIRPFlagEnabled && isOrganizationIRP) {
     const records = data?.succesfullRecords.length && data.succesfullRecords || data?.errorRecords;
 
     // Find record which has longest skills array and create coldefs based on it's length with generic field name. 

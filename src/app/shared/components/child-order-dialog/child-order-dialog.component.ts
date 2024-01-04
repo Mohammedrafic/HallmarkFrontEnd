@@ -877,7 +877,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
   private subscribeOnVMSCandidate(): void {
     this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
-      if(this.isOrganization && this.order?.extensionFromId === null && this.activeSystem === OrderManagementIRPSystemId.VMS){
+      if(this.isOrganization && this.activeSystem === OrderManagementIRPSystemId.VMS){
         this.candidateJob = orderCandidateJob;
         if (orderCandidateJob) {
           this.getExtensions();
@@ -913,6 +913,16 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
      }
 
+  private getBillRate(billRates: BillRate[], startDate?: Date): BillRate | null {
+    const regularRate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
+      billRates, startDate, false
+    );
+    const regularLocalRate = this.billRatesSyncService.getBillRateForSync(
+      billRates, startDate, true
+    );
+    return regularRate ?? regularLocalRate;
+  }
+  
   private setAcceptForm({
     order: {
       hourlyRate,
@@ -940,10 +950,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         ? candidateBillRate
         : offeredBillRate;
     const orderDate = this.order?.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate;
+    const bilRateValue = 
+      this.getBillRate(this.candidateJob?.billRates || [], DateTimeHelper.setCurrentTimeZone(orderDate as string));
 
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
-      offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
+      offeredBillRate: PriceUtils.formatNumbers(bilRateValue?.rateHour || hourlyRate),
       candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
       locationName,
       departmentName,

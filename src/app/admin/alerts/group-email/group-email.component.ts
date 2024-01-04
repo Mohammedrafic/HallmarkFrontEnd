@@ -381,7 +381,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.emailTo = data.toList == null ? "" : data.toList;
     this.groupEmailTemplateForm.emailCc = data.ccList == null ? "" : data.ccList;
     this.groupEmailTemplateForm.businessUnitType = data.businessUnitType;
-    if(data.businessUnitType === BusinessUnitType.Agency){
+    if(data.businessUnitType === BusinessUnitType.MSP){
       this.groupEmailTemplateForm.businessUnit = data.selectedBussinessUnitIds;
     }
     else{
