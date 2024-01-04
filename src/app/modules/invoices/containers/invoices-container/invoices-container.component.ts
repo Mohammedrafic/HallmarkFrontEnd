@@ -214,6 +214,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private ngZone: NgZone,
     private invoiceApiService: InvoicesApiService,
     private filterService: FilterService,
+    private toggleService: ToggleRowExpansionHeaderCellService,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     @Inject(DOCUMENT) private document: Document,
     store: Store,
@@ -281,6 +282,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchForPreservedFilters();
     this.getuserPermission();
     this.subscriptionOfPendingInvoices();
+    this.watchForShowDetailsEvent();
   }
 
   ngAfterViewInit(): void {
@@ -398,6 +400,13 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       });
   }
 
+  public watchForShowDetailsEvent(){
+    this.toggleService.handleDetailsEvent.pipe(
+      takeUntil(this.componentDestroy())).subscribe((showdetails) => {
+        this.isExpandedGrid = showdetails.Details;
+        this.resetFilters(true);
+    })
+  }
 
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
