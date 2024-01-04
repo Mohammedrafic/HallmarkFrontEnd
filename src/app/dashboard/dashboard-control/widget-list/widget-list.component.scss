@@ -7,13 +7,26 @@
   padding: 0 !important;
 
     .widget-container {
-      background-color: $secondary-dark-blue-50;
+      background-color: var(--background);
       padding: 16px 24px;
+
+      ::ng-deep {
+        td.e-active {
+          background-color: $primary-active-blue;
+        }
+
+        .e-table {
+          tr[role='row']:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell),
+          .e-frozenhover {
+            background-color: $primary-active-blue-70 !important;
+          }
+        }
+      }
 
       .e-mastertext {
         font-size: 14px;
         line-height: 20px;
-        color: $secondary-dark-blue-20;
+        color: var(--text);
         margin-bottom: 4px;
       }
 
@@ -36,7 +49,7 @@
         display: none;
       }
     }
-  
+
   .e-card-header {
     margin: 0;
   }

@@ -78,24 +78,25 @@ export const HelpNavigationLinks = (
 ): Record<string, string | Record<string, string>> => {
   if (!isAgency && isIrp && !isVms) {
     return {
-      'dashboard': 'Topics_IRP/Getting_Started_IRP.html',
-      'candidates': 'Topics_IRP/Employees.html',
+      'dashboard': '/Topics_IRP/Getting_Started_IRP.html',
+      'candidates': '/Topics_IRP/Employees.html',
       'add': {
-        'candidates': 'Topics_IRP/Employees.html',
-        'order-management': 'Topics_IRP/Create_order.html',
+        'candidates': '/Topics_IRP/Employees.html',
+        'order-management': '/Topics_IRP/Create_order.html',
       },
       'edit': {
-        'candidates': 'Topics_IRP/Employees.html',
-        'order-management': 'Topics_IRP/Order_Management_IRP.html',
+        'candidates': '/Topics_IRP/Employees.html',
+        'order-management': '/Topics_IRP/Order_Management_IRP.html',
       },
-      'scheduling': 'Topics_IRP/Scheduling.html',
-      'order-management': 'Topics_IRP/Order_Management_IRP.html',
-      'analytics': 'Topics_IRP/Analytics.html',
-      'security': 'Topics_IRP/Administration_IRP.html',
-      'user-list': 'Topics_IRP/User_List_IRP.html',
-      'alerts': 'Topics_IRP/Communication.html',
-      'group-email': 'Topics_IRP/Group_Email_IRP.html',
-      'profile': 'Topics_IRP/Organization_Profile_IRP.html',
+      'scheduling': '/Topics_IRP/Scheduling.html',
+      'order-management': '/Topics_IRP/Order_Management_IRP.html',
+      'analytics': '/Topics_IRP/Analytics.html',
+      'security': '/Topics_IRP/Administration_IRP.html',
+      'user-list': '/Topics_IRP/User_List_IRP.html',
+      'alerts': '/Topics_IRP/Communication.html',
+      'group-email': '/Topics_IRP/Group_Email_IRP.html',
+      'alerts-template': '/Topics_IRP/Administration_IRP.html',
+      'profile': '/Topics_IRP/Organization_Profile_IRP.html',
     };
   }
 
@@ -121,28 +122,33 @@ export const HelpNavigationLinks = (
       'profile': '/Topics_Org/Organization_Profile.html',
       'document-library': '/Topics_Org/Document_Library.html',
       'analytics': '/Topics_Org/Analytics.html',
-      'alerts': 'Topics_Org/Communication.html',
+      'alerts': '/Topics_Org/Communication.html',
+      'alerts-template': '/Topics_Org/Administration.html',
+      'dnr-details': '/Topics_Org/Do_Not_Return.html',
     });
   }
 
   if (!isAgency && isIrp && isVms) {
     if (isIrpHelp) {
       return ({
-        'candidates': 'Topics_IRP/Employees.html',
+        'dashboard': '/Topics_IRP/Getting_Started_IRP.html',
+        'candidates': '/Topics_IRP/Employees.html',
         'add': {
-          'candidates': 'Topics_IRP/Employees.html',
-          'order-management': 'Topics_IRP/Create_order.html',
+          'candidates': '/Topics_IRP/Employees.html',
+          'order-management': '/Topics_IRP/Create_order.html',
         },
         'edit': {
-          'candidates': 'Topics_IRP/Employees.html',
-          'order-management': 'Topics_IRP/Order_Management_IRP.html',
+          'candidates': '/Topics_IRP/Employees.html',
+          'order-management': '/Topics_IRP/Order_Management_IRP.html',
         },
-        'scheduling': 'Topics_IRP/Scheduling.html',
-        'order-management': 'Topics_IRP/Order_Management_IRP.html',
+        'scheduling': '/Topics_IRP/Scheduling.html',
+        'order-management': '/Topics_IRP/Order_Management_IRP.html',
+        'user-list': '/Topics_IRP/User_List_IRP.html',
       });
     }
 
     return ({
+      'dashboard': '/Topics_Org/Dashboard.html',
       'order-management': '/Topics_Org/Order_management.html',
       'add': {
         'order-management': '/Topics_Org/Create_order.html',
@@ -152,9 +158,19 @@ export const HelpNavigationLinks = (
         'candidates': '/Topics_Org/Candidate_assignment.html',
       },
       'candidate-details': '/Topics_Org/Candidate_assignment.html',
+      'candidates': '/Topics_Org/Candidate_assignment.html',
       'associate-list': '/Topics_Org/Associated_agencies.html',
       'timesheets': '/Topics_Org/Timesheets.html',
       'invoices': '/Topics_Org/Invoices.html',
+      'user-list': '/Topics_Org/User_List.html',
+      'security': '/Topics_Org/Administration.html',
+      'group-email': '/Topics_Org/Group_Email.html',
+      'profile': '/Topics_Org/Organization_Profile.html',
+      'document-library': '/Topics_Org/Document_Library.html',
+      'analytics': '/Topics_Org/Analytics.html',
+      'alerts': '/Topics_Org/Communication.html',
+      'dnr-details': '/Topics_Org/Do_Not_Return.html',
+      'alerts-template': '/Topics_Org/Administration.html',
     });
   }
 

@@ -1,0 +1,30 @@
+<div class="scheduled_integrations">
+    <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+    <ng-template #header>
+      <div class="">
+        <h3 class="scheduled_integrations_title">Scheculed Integrations</h3>
+      </div>  
+    </ng-template>
+    <ng-template #OrgChart>
+      
+      <div class="widget" *ngIf="ScheduledIntegrationsListData$ | async as datalist"> 
+        <!-- <div class="widget" *ngIf="ScheduledIntegrationsListDatas" >  -->
+         <div class="widget widget_cus" *ngFor="let data of datalist.interfacedata">  
+            <div class="row flex-container">         
+                <div class="scheduled_integrations_icon">
+                  <app-custom-icon name="organization" class="icon"></app-custom-icon>                    
+                </div> 
+                     
+                <div class="scheduled_integrations_tap">
+                  <h3 class="orgname">{{data.organizationName}} </h3>
+                  <p class="hours-rn"> {{data.runTime | date: "dd-MM-yyyy HH:mm:ss" }}</p>  
+                </div> 
+            </div>
+            
+            </div>      
+          </div> 
+      
+    </ng-template>
+    </app-widget-wrapper>
+    <div class="scheduled_integrations_Link">View Today's Schedule</div>
+</div>  

@@ -1,8 +1,8 @@
 import { ListOfSkills } from '@shared/models/skill.model';
-import { ApplicantStatus } from '../../../enums/applicant-status.enum';
-import { ExportedFileType } from '../../../enums/exported-file-type';
-import { CandidateStatus } from '../../../enums/status';
-import { PageOfCollections } from '../../../models/page.model';
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { CandidateStatus } from '@shared/enums/status';
+import { PageOfCollections } from '@shared/models/page.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 
 export type CandidateRow = {
@@ -41,7 +41,7 @@ export type IRPCandidate = {
   departmentName?:string;
   sourceId?:number;
   recruiterId?:number
-  
+
 }
 
 export interface CandidateListRequest {
@@ -52,7 +52,8 @@ export interface CandidateListRequest {
   skillsIds: number[];
   regionsNames: string[];
   tab: number;
-  candidateName: string | null;
+  firstNamePattern: string | null;
+  lastNamePattern: string | null;
   includeDeployedCandidates: boolean;
   candidateId?: string | null;
   locationIds?: number[];
@@ -73,7 +74,8 @@ export interface CandidateListRequest {
 }
 
 export type CandidateListFilters = {
-  candidateName?: string | null;
+  firstNamePattern?: string | null;
+  lastNamePattern?: string | null;
   profileStatuses?: CandidateStatus[];
   skillsIds?: number[];
   regionsNames?: string[];
@@ -87,6 +89,7 @@ export type CandidateListFilters = {
   startDate?: string | null;
   endDate?: string | null;
   credType? : number[];
+  orderBy?: string;
   expiry? : {
     startDate?: string | null;
     endDate?: string | null;
@@ -111,7 +114,8 @@ export interface CandidateListFiltersColumn {
   profileStatuses: FilterColumn;
   skillsIds?: FilterColumn;
   regionsNames?: FilterColumn;
-  candidateName?: CandidateNameFilterColumn;
+  firstNamePattern?: CandidateNameFilterColumn;
+  lastNamePattern?: CandidateNameFilterColumn;
   candidateId?: CandidateNameFilterColumn;
   locationIds?: FilterColumn;
   departmentIds?: FilterColumn;

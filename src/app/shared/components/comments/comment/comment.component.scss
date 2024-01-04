@@ -71,3 +71,16 @@
     width: 100%;
   }
 }
+
+.search-comment{
+  display: block !important;
+  max-width: 170px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-comment:hover{
+  overflow: visible; 
+  white-space: normal;
+}

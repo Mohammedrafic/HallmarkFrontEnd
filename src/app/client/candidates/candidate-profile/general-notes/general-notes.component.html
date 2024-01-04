@@ -5,6 +5,7 @@
   [rowSelection]="rowSelection"
   [totalRecordsCount]="(generalNotes$ | async)?.length!"
   [showUpScrollButton]="false"
+  [tooltipInteraction]="tooltipInteraction"
 >
   <button
     ejs-dropdownbutton
@@ -18,6 +19,9 @@
       <span class="btn-label">Export</span>
       <i-feather name="upload" class="icon"></i-feather>
     </div>
+  </button>
+  <button ejs-button  [disabled]="!(userPermissions$ | async)?.[userPermissions.ManageNotes]"  action-button (click)="openImportDialog()" class="e-outline">
+    <div class="button-import-container">Import<i-feather name="download" class="icon"></i-feather></div>
   </button>
   <button
     action-button
@@ -39,3 +43,4 @@
   [targetElement]="targetElement">
   <app-add-edit-note #addEditNoteComponent></app-add-edit-note>
 </app-side-dialog>
+<app-import-employee-general-note [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-employee-general-note>

@@ -13,9 +13,10 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateListState } from '@shared/components/candidate-list/store/candidate-list.state';
 import { Classifications, DefaultOptionFields, SkillFields } from "./candidate-general-info.constants";
 import { CandidateGeneralInfoService } from "./candidate-general-info.service";
-import { ssnValidator } from '../../../../shared/validators/ssn.validator';
+import { ssnValidator } from '@shared/validators/ssn.validator';
 import { datepickerMask } from '@shared/constants';
 import { AppState } from 'src/app/store/app.state';
+import { asteriskValidator } from '@shared/validators/asterisk.validator';
 
 @Component({
   selector: 'app-candidate-general-info',
@@ -99,9 +100,9 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
 
   static createFormGroup(): FormGroup {
     return new FormGroup({
-      firstName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
-      middleName: new FormControl(null, [Validators.maxLength(10)]),
-      lastName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
+      firstName: new FormControl(null, [Validators.required, Validators.maxLength(50), asteriskValidator()]),
+      middleName: new FormControl(null, [Validators.maxLength(10), asteriskValidator()]),
+      lastName: new FormControl(null, [Validators.required, Validators.maxLength(50), asteriskValidator()]),
       dob: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
       classification: new FormControl(null),
       candidateProfileSkills: new FormControl(null, [Validators.required]),

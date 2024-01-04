@@ -41,6 +41,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
   @Input() areAgencyActionsAllowed: boolean;
   @Input() userPermission: Permission;
   @Input() isMobileLoginOn: boolean;
+  @Input() disableNonlinkedagency: boolean;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('endDate') endDate: DatePickerComponent;

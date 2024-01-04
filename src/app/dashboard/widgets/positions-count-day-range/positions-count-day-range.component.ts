@@ -1,5 +1,4 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
-import { activePositionsLegendDisplayText } from '../../constants/active-positions-legend-palette';
 import { PositionsCountByDayRangeDataset } from '../../models/active-positions-dto.model';
 import { DASHBOARD_FILTER_STATE } from '@shared/constants';
 import { Store } from '@ngxs/store';
@@ -26,8 +25,6 @@ export class PositionsCountDayRangeComponent implements OnInit {
     x: 0,
     y: 0,
   };
-
-  public readonly activePositionsLegend: typeof activePositionsLegendDisplayText = activePositionsLegendDisplayText;
 
   constructor(private store: Store,private readonly dashboardService: DashboardService) { }
 

@@ -118,6 +118,7 @@ export const initOrderManagementFilterColumns = () => ({
     valueField: 'statusText',
     valueId: 'status',
   },
+  reOrderDate: { type: ControlTypes.Date, valueType: ValueType.Text },
   candidateStatuses: {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
@@ -155,7 +156,8 @@ export const initOrderManagementFilterColumns = () => ({
   creationDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
   distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
   distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
-  candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+  firstNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
+  lastNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
   projectTypeIds: {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,

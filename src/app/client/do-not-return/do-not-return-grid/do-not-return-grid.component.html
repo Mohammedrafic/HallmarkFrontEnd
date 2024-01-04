@@ -91,7 +91,7 @@
           </div>
       </div>
     </div>
-    
+
     <div class="input-container bootstrap" [hidden]="allOrganizations.length == 1">
       <label>Organization<span class="required">*</span></label>
       <div class="input-group">
@@ -120,28 +120,28 @@
         <div class="input-container bootstrap">
           <label>First Name<span class="required">*</span></label>
           <div class="input-group">
-            <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="firstName" id="fName" 
+            <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="firstName" id="fName"
              maxlength="50" [disable]="isBlock ? null : true"></app-input>
           </div>
         </div>
         <div class="input-container">
           <label>Middle Name</label>
           <div class="input-group">
-            <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="middleName" id="mName"  
+            <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="middleName" id="mName"
                  maxlength="10" [disable]="isBlock ? null : true"></app-input>
           </div>
         </div>
         <div class="input-container">
           <label>Last Name<span class="required">*</span></label>
           <div class="input-group">
-            <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="lastName" id="lName" 
+            <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="lastName" id="lName"
                maxlength="50" [disable]="isBlock ? null : true"></app-input> <!--  -->
           </div>
         </div>
       </div>
     </div>
 
-    <div class="input-container">      
+    <div class="input-container">
       <app-datepicker
           [formGroupInstance]="doNotReturnFormGroup" [max]="today"  id="dob" controlName="dob" label="Date of Birth"  (blur)='onDOBBlur($event)'
           [enabled]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? true : false : (isEdit && isBlock) ? true : false"></app-datepicker>
@@ -150,7 +150,7 @@
       <div class="input-container bootstrap f-grow-2">
         <label>SSN</label>
         <div class="input-group">
-          <input  appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()" 
+          <input  appValidateWithMessage formControlName="ssn" class="e-input" type="text" mask='{{maskSSNPattern}}' (focus)="onSSNFocus()" (blur)="onSSNBlur()"
               [attr.disabled]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? null : true : (isEdit && isBlock) ? null : true" />
         </div>
       </div>
@@ -160,7 +160,7 @@
       <app-input [formGroupInstance]="doNotReturnFormGroup" maxlength="200" controlName="candidateEmail" id="email"  [disable]="true"
                 [disable]="this.doNotReturnFormGroup.get('isExternal')?.value == 'true' ? isBlock ? null : true : (isEdit && isBlock) ? null : true" label="Email"></app-input>
     </div>
-    
+
     <div class="form-elemet">
       <div class="group">
         <div class="input-container calendar">
@@ -216,7 +216,7 @@
         </ejs-dropdownlist>
       </div>
     </div>
-   
+
     <div class="switch">
       <ejs-switch id="filterswitcher" (change)="onFilterSwitcher($event);" [checked]="isFilterBlock"></ejs-switch>
       <label for="filterswitcher" class="switch-text"> {{isFilterBlock ? "Blocked" : "Unblocked"}}</label>
@@ -224,24 +224,17 @@
     <div class="form-elemet">
       <div class="group">
         <div class="input-container bootstrap">
-          <label>First Name</label>
+          <label>Candidate First Name</label>
           <div class="input-group">
-            <app-input [formGroupInstance]="doNotReturnFilterForm" maxlength="200" controlName="firstName" id="fName" 
+            <app-input [formGroupInstance]="doNotReturnFilterForm" maxlength="200" controlName="firstNamePattern" id="fName"
              maxlength="50"></app-input>
           </div>
         </div>
         <div class="input-container">
-          <label>Middle Name</label>
+          <label>Candidate Last Name</label>
           <div class="input-group">
-            <app-input [formGroupInstance]="doNotReturnFilterForm" maxlength="200" controlName="middleName" id="mName"  
-                 maxlength="10"></app-input>
-          </div>
-        </div>
-        <div class="input-container">
-          <label>Last Name</label>
-          <div class="input-group">
-            <app-input [formGroupInstance]="doNotReturnFilterForm" maxlength="200" controlName="lastName" id="lName" 
-               maxlength="50"></app-input> <!-- [disable]="(isEdit) ? null : true" -->
+            <app-input [formGroupInstance]="doNotReturnFilterForm" maxlength="200" controlName="lastNamePattern" id="lName"
+               maxlength="50"></app-input>
           </div>
         </div>
       </div>

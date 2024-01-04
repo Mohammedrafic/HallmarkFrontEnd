@@ -88,7 +88,8 @@ form{
   border-bottom: 1px solid gray !important;
 }
 .hours-rn{
-  background: gainsboro;
+  background: var(--bg-widget);
+  color: var(--secondary-text);
   padding: 4px 2px;
   border-radius: 20px;
   width: 100%;
@@ -98,6 +99,7 @@ form{
   margin-bottom: 0;
 }
 .targetcount {
+  color: var(--secondary-text) !important;
   display: flex;
   justify-content: right;
 }

@@ -25,6 +25,7 @@ const CommonFields: CommonFormConfig[] = [
   { field: 'skillIds' },
   { field: 'candidateStatuses' },
   { field: 'orderStatuses' },
+  { field: 'reorderStatuses' },
   { field: 'candidatesCountFrom' },
   { field: 'candidatesCountTo' },
   { field: 'jobTitle' },
@@ -32,7 +33,8 @@ const CommonFields: CommonFormConfig[] = [
   { field: 'creationDateTo' },
   { field: 'distributedOnFrom' },
   { field: 'distributedOnTo' },
-  { field: 'candidateName' },
+  { field: 'firstNamePattern' },
+  { field: 'lastNamePattern' },
   { field: 'projectTypeIds' },
   { field: 'projectNameIds' },
   { field: 'poNumberIds' },
@@ -54,6 +56,7 @@ const PerDiemFilterFormConfig: CommonFormConfig[] = [
   ...CommonFields,
   { field: 'openPositions' },
   { field: 'orderLocked' },
+  { field: 'reOrderDate' },
 ];
 
 const PermPlacementFilterFormConfig: CommonFormConfig[] = [

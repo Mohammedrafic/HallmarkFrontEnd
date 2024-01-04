@@ -137,6 +137,17 @@
                           [isLoading]="isLoading"
                           [timeSelection]="timeSelection" [isDarkTheme]="isDarkTheme"
                           [description]="widgetDescriptionEnum.BILL_RATE_BY_SKILL_CATEGORY"></app-bill-rate-widget>
+          <app-org-widget *ngSwitchCase="widgetTypeEnum.MISSING_TIMESHEETS"
+                          [chartData]="widgetsData?.[widgetTypeEnum.MISSING_TIMESHEETS]"
+                          [isLoading]="isLoading"
+                          [agencyTimesheet]="true"
+                          [description]="widgetDescriptionEnum.MISSING_TIMESHEETS"
+                          [isDarkTheme]="isDarkTheme"></app-org-widget>
+          <app-agency-timesheet-summary *ngSwitchCase="widgetTypeEnum.AGENCY_TIMESHEET_SUMMARY"
+                            [chartData]="widgetsData?.[widgetTypeEnum.AGENCY_TIMESHEET_SUMMARY]" [isLoading]="isLoading"
+                            [description]="widgetDescriptionEnum.AGENCY_TIMESHEET_SUMMARY"
+                            [isDarkTheme]="isDarkTheme"></app-agency-timesheet-summary>
+
 
         </ng-template>
       </e-panel>

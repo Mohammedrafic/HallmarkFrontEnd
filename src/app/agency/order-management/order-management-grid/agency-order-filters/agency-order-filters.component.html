@@ -18,7 +18,7 @@
           [showSelectAll]="true"
           formControlName="organizationIds"
           placeholder="All"
-          [fields]="optionFields"
+          [fields]="isAgencyVisibilityFlagEnabled ? organizationFields : optionFields"
           [allowFiltering]="true"
           [showDropDownIcon]="true"
           [changeOnBlur]="false"
@@ -150,7 +150,8 @@
       </div>
     </div>
     <div class="input-container">
-      <label>Order Status</label>
+      <label *ngIf="activeTab !== AgencyOrderManagementTabs.PerDiem">Order Status</label>
+      <label *ngIf="activeTab === AgencyOrderManagementTabs.PerDiem">Open Per Diem Status</label>
       <div class="input-group multiselect">
         <ejs-multiselect
           #orderStatusFilter
@@ -166,6 +167,40 @@
             (click)="orderStatusSelect()"
         >
         </ejs-multiselect>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-container">
+      <div class="input-group multiselect">
+        <label>Re-Order Status</label>
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="reorderStatuses"
+          placeholder="All"
+          [fields]="statusFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.reorderStatuses.dataSource"
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-container calendar" *ngIf="activeTab === AgencyOrderManagementTabs.PerDiem">
+      <label for="reOrderDate">Re-Order Date</label>
+      <div class="input-group datepicker">
+        <ejs-datepicker
+          id="reOrderDate"
+          class="datepicker"
+          [format]="formatDate"
+          [placeholder]="placeholderDate"
+          [enableMask]="true"
+          [maskPlaceholder]="datepickerMask"
+          formControlName="reOrderDate"
+        >
+        </ejs-datepicker>
       </div>
     </div>
   </div>
@@ -248,11 +283,17 @@
     </div>
     </div>
     </div>
-  <div>
+  <div class="row">
     <div class="input-container">
-      <label>Candidate Name</label>
+      <label>Candidate First Name</label>
       <div class="input-group">
-        <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
+        <input class="e-input" type="text" maxlength="50" formControlName="firstNamePattern" />
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Candidate Last Name</label>
+      <div class="input-group">
+        <input class="e-input" type="text" maxlength="50" formControlName="lastNamePattern" />
       </div>
     </div>
   </div>
@@ -299,7 +340,7 @@
     </div>
   </div>
   <div>
-    <div *ngIf="activeTab !== AgencyOrderManagementTabs.PermPlacement" class="input-container">
+    <div *ngIf="activeTab !== AgencyOrderManagementTabs.PermPlacement && activeTab !== AgencyOrderManagementTabs.PerDiem" class="input-container">
       <label for="numberOfPositions"># of Positions</label>
       <div class="input-group">
         <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />

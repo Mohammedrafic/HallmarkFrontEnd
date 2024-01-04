@@ -93,7 +93,7 @@
                       {{ item.title }} <span *ngIf="item.required" class="required">*</span>
                     </label>
                     <div class="input-group datepicker bootstrap">
-                      <ejs-datepicker
+                      <ejs-datepicker *ngIf="selectedOrder?.extensionFromId == null"
                         class="datepicker"
                         [format]="dateFormat"
                         [placeholder]="'MM/DD/YYYY'"
@@ -101,6 +101,17 @@
                         appValidateWithMessage
                         [enableMask]="true"
                         [maskPlaceholder]="dateMask"
+                      ></ejs-datepicker>
+
+                      <ejs-datepicker *ngIf="selectedOrder?.extensionFromId != null"
+                        class="datepicker"
+                        [format]="dateFormat"
+                        [placeholder]="'MM/DD/YYYY'"
+                        [formControlName]="item.field"
+                        appValidateWithMessage
+                        [enableMask]="true"
+                        [maskPlaceholder]="dateMask"
+                        [min]="selectedOrder.jobStartDate"
                       >
                       </ejs-datepicker>
                     </div>
@@ -357,4 +368,22 @@
       </div>
     </div>
   </div>
+</section>
+
+<section class="bootstrap">
+  <ejs-toast
+    class="error-toast"
+    #toastObj
+    showCloseButton="true"
+    [newestOnTop]="false"
+    [position]="{ X: 'Center', Y: 'Top' }"
+    width="330"
+  >
+    <ng-template #title>
+      <div>
+        <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+        <div>Error</div>
+      </div>
+    </ng-template>
+  </ejs-toast>
 </section>

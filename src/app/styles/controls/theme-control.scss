@@ -6,6 +6,7 @@ body.light {
   --info-background: #{$secondary-dark-blue-50};
   --bg-default: #{$white};
   --bg-container: #{$background};
+  --bg-widget: #{$white};
   --bg-sub-row: #{$white};
   --bg-upload-area: #{$primary-active-blue-90};
   --bg-disable-upload-area: #{$secondary-dark-blue-50};
@@ -26,6 +27,7 @@ body.light {
   --input-border-color: #{$secondary-dark-blue-40};
   --bg-input-field-disabled: #{$secondary-dark-blue-50};
   --menu-item-hover: #{$secondary-dark-blue-50};
+  --selected-list-item: #{$secondary-dark-blue-45-1};
 
   --border-drop-area: #{$secondary-dark-blue-40};
   --grid-row-border: #{$grid-row-border};
@@ -36,6 +38,7 @@ body.light {
   --dialog-border: #{$secondary-dark-blue-45};
   --separator: #{$secondary-dark-blue-45};
   --devider: #{$secondary-dark-blue-40};
+  --list-item-border: #{$grid-row-border};
 
   --icon-color: #{$secondary-dark-blue-10};
 
@@ -53,6 +56,7 @@ body.light {
   --selected-date-range-color: #{$white};
   --checkbox-background: #{$white};
   --chechbox-corder-color: #{$secondary-dark-blue-30};
+  --disabled-tab-background: #{$secondary-dark-blue-50};
 
   --shadow: #{$secondary-black-25};
   --redonly-text: #{$secondary-dark-blue-30};
@@ -67,6 +71,7 @@ body.dark {
   --info-background: #{$widget-dark-tooltip};
   --bg-default: #{$sidebar-background};
   --bg-container: #{$bg-grey-100};
+  --bg-widget: #{$midnight-express};
   --bg-sub-row: #{$grid-detail-row-bgcolor};
   --bg-upload-area: #{$widget-dark-tooltip};
   --bg-disable-upload-area: #{$secondary-dark-blue-15};
@@ -87,6 +92,7 @@ body.dark {
   --input-border-color: #{$secondary-dark-blue-15};
   --bg-input-field-disabled: #{$bg-gray-200};
   --menu-item-hover: #{$primary-active-blue-70};
+  --selected-list-item: #{$primary-active-blue};
 
   --border-drop-area: #{$secondary-dark-blue-50};
   --grid-row-border: #{$sidebar-background};
@@ -97,6 +103,7 @@ body.dark {
   --dialog-border: #{$secondary-dark-blue-10-2};
   --separator: #{$secondary-dark-blue-10-2};
   --devider: #{$secondary-dark-blue-15};
+  --list-item-border: #{$secondary-dark-blue-10-2};
   --checkbox-background: #{$secondary-dark-blue-10-2};
   --chechbox-corder-color: #{$secondary-dark-blue-40};
 
@@ -114,6 +121,7 @@ body.dark {
   --selector-title: #{$white};
   --disabled-drop-area-text: #{$white};
   --selected-date-range-color: #{$black};
+  --disabled-tab-background: #{$grid-detail-row-bgcolor};
 
   --shadow: #{$secondary-dark-blue-10-2};
   --redonly-text: #{$icewind-dale};

@@ -83,7 +83,9 @@ export const SettingsAppliedToPermissions: string[] = [
   'LimitNumberOfCandidateanAgencycansubmitToaPosition',
   'OrganizationCanCarryClockIDFromParent',
   'AllowDuplicateClockIdforOrganization',
-  'EnableClearedToStartForAcceptedCandidates'
+  'EnableClearedToStartForAcceptedCandidates',
+  'SplitReportedTimeOnBillRateEffectiveDate',
+  'TimeLimitforManagerReviewEmail'
 ];
 
 export const DisabledSettingsByDefault = [
@@ -112,6 +114,7 @@ export const DisabledSettingsByDefault = [
   'MarkZeroDollarInvoicetoPaidOnApproval',
   'MandatorySpecialProjectDetails',
   'SplitReportedTimeOnBillRateEffectiveDate',
+  'TimeLimitforManagerReviewEmail',
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {
@@ -165,11 +168,6 @@ export const DropdownFields: FieldSettingsModel = {
   text: 'value',
   value: 'key',
 };
-export const RejectedReasonsFields: FieldSettingsModel = {
-  text: 'reason',
-  value: 'id',
-};
-
 export const OrganizationSystems = {
   IRP: false,
   VMS: false,

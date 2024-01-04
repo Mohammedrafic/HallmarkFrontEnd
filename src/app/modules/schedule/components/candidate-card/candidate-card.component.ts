@@ -20,7 +20,6 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { UserState } from 'src/app/store/user.state';
-import { AppState } from 'src/app/store/app.state';
 import { Store } from '@ngxs/store';
 import { Router } from '@angular/router';
 import { GlobalWindow } from '@core/tokens';
@@ -34,11 +33,6 @@ import { GlobalWindow } from '@core/tokens';
 
 export class CandidateCardComponent implements OnInit, OnChanges {
   isMobileScreen: any;
-
-
-  isAgency: any;
-  order: any;
-  orderManagementPagerState: any;
 
   @Input() set candidate(schedule: ScheduleModel) {
     this.candidateData = PrepareCandidate(schedule.candidate);
@@ -84,14 +78,11 @@ export class CandidateCardComponent implements OnInit, OnChanges {
   }
 
   public onViewNavigation(data: any): void {
-
-
     if(this.isMobileScreen){
       return;
     }
-    const user = this.store.selectSnapshot(UserState.user);
 
-    const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const user = this.store.selectSnapshot(UserState.user);
     const url =
       user?.businessUnitType === BusinessUnitType.Organization ? 'client/candidates/edit' : 'client/candidates/edit';
         if (user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP) {

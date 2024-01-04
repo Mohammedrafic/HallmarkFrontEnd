@@ -9,6 +9,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import {
+  cancelCandidateJobforIRP,
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
   GetRejectReasonsForOrganisation,
@@ -34,12 +35,13 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus, ConfigurationVa
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderType } from '@shared/enums/order-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
-import { CandidatesStatusText } from '@shared/enums/status';
+import { CandidatesStatusText, CandidateStatus } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
 import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList, } from '@shared/models/order-management.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import PriceUtils from '@shared/utils/price.utils';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -54,6 +56,7 @@ import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { canceldto } from '../../interfaces/order-candidate.interface';
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -70,9 +73,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
 
+  @Select(OrderManagementState.availableSteps)
+  agencyApplicantStatuses$: Observable<ApplicantStatus[]>;
+
   @Input() openEvent: Subject<boolean>;
   @Input() candidate: OrderCandidatesList;
   @Input() isAgency = false;
+  @Input() isHallmarkMspUser = false;
   @Input() isTab = false;
   @Input() dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob) {
@@ -115,7 +122,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   get isBillRatePending(): boolean {
     return (
       [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard, CandidatStatus.Rejected]
-      .includes(this.currentCandidateApplicantStatus) && !this.isAgency);
+      .includes(this.currentCandidateApplicantStatus) && (!this.isAgency ||
+        (this.isHallmarkMspUser && this.currentCandidateApplicantStatus === CandidatStatus.Rejected)));
   }
 
   get isOfferedBillRate(): boolean {
@@ -184,6 +192,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     private orderCandidateListViewService: OrderCandidateListViewService,
     private cdr: ChangeDetectorRef,
     private commentsService: CommentsService,
+    private billRatesSyncService: BillRatesSyncService,
     private permissionService : PermissionService
   ) {
     super();
@@ -217,6 +226,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
     if (statusId && status) {
       this.handleOnboardedCandidate(status);
+    }else if(this.orderCandidateJob.applicantStatus.applicantStatus==ApplicantStatusEnum.OnBoarded)
+    {
+      this.updateOrganisationCandidateJob(false,this.orderCandidateJob.applicantStatus)
     }
   }
 
@@ -251,53 +263,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       }
     }
 
-    const value = this.acceptForm.getRawValue();
-    const applicantStatus: ApplicantStatus = this.getNewApplicantStatus();
-
-    let actualDate;
-
-    if (this.orderCandidateJob.order.orderType !== OrderType.ReOrder
-      && applicantStatus.applicantStatus === CandidatStatus.OnBoard) {
-        actualDate = {
-          actualStartDate: this.orderCandidateJob.reOrderDate,
-          actualEndDate: this.orderCandidateJob.reOrderDate,
-        };
-    } else if (this.orderCandidateJob.order.orderType !== OrderType.ReOrder) {
-      actualDate = {
-          actualStartDate: this.orderCandidateJob.actualStartDate,
-          actualEndDate: this.orderCandidateJob.actualEndDate,
-      };
-    } else {
-      actualDate = this.setCorrectActualDates(
-        this.orderCandidateJob.reOrderDate as string,
-        value.shiftStartTime,
-        value.shiftEndTime);
-    }
-
-    this.store.dispatch(
-      new UpdateAgencyCandidateJob({
-        organizationId: this.orderCandidateJob.organizationId,
-        jobId: this.orderCandidateJob.jobId,
-        orderId: this.orderCandidateJob.orderId,
-        nextApplicantStatus: applicantStatus,
-        candidateBillRate: value.candidateBillRate,
-        offeredBillRate: value.hourlyRate ? value.hourlyRate : null,
-        requestComment: value.comments,
-        ...actualDate,
-        clockId: this.orderCandidateJob.clockId,
-        guaranteedWorkWeek: this.orderCandidateJob.guaranteedWorkWeek,
-        allowDeployWoCredentials: false,
-        billRates: this.orderCandidateJob.billRates,
-        offeredStartDate: this.orderCandidateJob.offeredStartDate,
-        candidatePayRate: value.candidatePayRate,
-      })
-    );
+    this.updateAgencyCandidateJob();
   }
 
   public onJobStatusChange(event: {
     itemData: { applicantStatus: ApplicantStatusEnum; statusText: string; isEnabled: boolean };
   }): void {
-    if (!!event.itemData) {
+    if (event.itemData) {
       event.itemData?.isEnabled
         ? this.handleOnboardedCandidate(event.itemData)
         : this.store.dispatch(new ShowToast(MessageTypes.Error, SET_READONLY_STATUS));
@@ -355,6 +327,24 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.jobStatusControl.reset();
   }
 
+  public cancelledCandidatefromIRP(cancelCandidateDto : canceldto): void {
+    if(this.candidateJob){
+      this.store.dispatch(
+        new cancelCandidateJobforIRP({
+          organizationId : this.candidateJob.organizationId,
+          jobId : this.candidateJob.jobId,
+          createReplacement: false,
+          actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
+          cancellationReasonId: cancelCandidateDto.jobCancellationReason
+        })
+      );
+      this.onCloseDialog();
+    }
+  }
+
+
+
+
   public onReject(): void {
     this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation(SystemType.VMS));
     this.openRejectDialog.next(true);
@@ -382,9 +372,11 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
             billRates: rates,
             billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.orderCandidateJob.candidatePayRate,
+            deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
           })
         ).pipe(takeUntil(this.destroy$))
         .subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
           this.deleteUpdateFieldInRate();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
         });
@@ -505,11 +497,39 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     } else if (status.applicantStatus === ApplicantStatusEnum.Cancelled) {
       this.openCandidateCancellationDialog.next();
     } else {
-      this.updateOrganizationCandidateJob(status);
+      this.updateCandidateJob(status);
     }
   }
 
-  private updateOrganizationCandidateJob(status: ApplicantStatus): void {
+  private updateOrganisationCandidateJob(isCandidateRevert: boolean, status: ApplicantStatus): void {
+    const value = this.acceptForm.getRawValue();
+    const actualDates = this.setCorrectActualDates(
+      this.orderCandidateJob.reOrderDate as string,
+      value.shiftStartTime,
+      value.shiftEndTime);
+    this.store
+    .dispatch(
+      new UpdateOrganisationCandidateJob({
+        organizationId: this.orderCandidateJob.organizationId,
+        orderId: this.orderCandidateJob.orderId,
+        jobId: this.orderCandidateJob.jobId,
+        skillName: value.skillName,
+        offeredBillRate: isCandidateRevert ? this.orderCandidateJob?.candidateBillRate : value.hourlyRate,
+        candidateBillRate: value.candidateBillRate,
+        billRates: this.orderCandidateJob.billRates,
+        clockId: value.clockId,
+        ...actualDates,
+        candidatePayRate: value.candidatePayRate,
+        nextApplicantStatus: {
+          applicantStatus: status.applicantStatus,
+          statusText: status.statusText,
+        },
+      })
+    ).pipe(takeUntil(this.destroy$))
+    .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
+  }
+
+  private updateCandidateJob(status: ApplicantStatus): void {
     this.acceptForm.markAllAsTouched();
     /**
      * Due to the fact that rejected candidate disabled form has fields valid, invalid set to false by angular,
@@ -518,32 +538,60 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     const isCandidateRevert = this.orderCandidateJob.applicantStatus.applicantStatus === ApplicantStatusEnum.Rejected;
 
     if ((this.acceptForm.valid || isCandidateRevert) && this.orderCandidateJob && status) {
-      const value = this.acceptForm.getRawValue();
-      const actualDates = this.setCorrectActualDates(
+      this.updateCandidateJobHandler(isCandidateRevert, status);
+    }
+  }
+
+  private updateCandidateJobHandler(isCandidateRevert: boolean, status: ApplicantStatus): void {
+    if (this.isAgency) {
+      this.updateAgencyCandidateJob();
+    } else {
+      this.updateOrganisationCandidateJob(isCandidateRevert, status);
+    }
+  }
+
+  private updateAgencyCandidateJob(): void {
+    const value = this.acceptForm.getRawValue();
+    const applicantStatus: ApplicantStatus = this.getNewApplicantStatus();
+
+    let actualDate;
+
+    if (this.orderCandidateJob.order.orderType !== OrderType.ReOrder
+      && applicantStatus.applicantStatus === CandidatStatus.OnBoard) {
+        actualDate = {
+          actualStartDate: this.orderCandidateJob.reOrderDate,
+          actualEndDate: this.orderCandidateJob.reOrderDate,
+        };
+    } else if (this.orderCandidateJob.order.orderType !== OrderType.ReOrder) {
+      actualDate = {
+          actualStartDate: this.orderCandidateJob.actualStartDate,
+          actualEndDate: this.orderCandidateJob.actualEndDate,
+      };
+    } else {
+      actualDate = this.setCorrectActualDates(
         this.orderCandidateJob.reOrderDate as string,
         value.shiftStartTime,
         value.shiftEndTime);
-
-      this.store
-        .dispatch(
-          new UpdateOrganisationCandidateJob({
-            organizationId: this.orderCandidateJob.organizationId,
-            orderId: this.orderCandidateJob.orderId,
-            jobId: this.orderCandidateJob.jobId,
-            skillName: value.skillName,
-            offeredBillRate: isCandidateRevert ? this.orderCandidateJob?.candidateBillRate : value.hourlyRate,
-            candidateBillRate: value.candidateBillRate,
-            billRates: this.orderCandidateJob.billRates,
-            ...actualDates,
-            candidatePayRate: value.candidatePayRate,
-            nextApplicantStatus: {
-              applicantStatus: status.applicantStatus,
-              statusText: status.statusText,
-            },
-          })
-        ).pipe(takeUntil(this.destroy$))
-        .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
     }
+
+    this.store.dispatch(
+      new UpdateAgencyCandidateJob({
+        organizationId: this.orderCandidateJob.organizationId,
+        jobId: this.orderCandidateJob.jobId,
+        orderId: this.orderCandidateJob.orderId,
+        nextApplicantStatus: applicantStatus,
+        candidateBillRate: value.candidateBillRate,
+        offeredBillRate: value.hourlyRate ? value.hourlyRate : null,
+        requestComment: value.comments,
+        ...actualDate,
+        clockId: this.orderCandidateJob.clockId,
+        guaranteedWorkWeek: this.orderCandidateJob.guaranteedWorkWeek,
+        allowDeployWoCredentials: false,
+        billRates: this.orderCandidateJob.billRates,
+        offeredStartDate: this.orderCandidateJob.offeredStartDate,
+        candidatePayRate: value.candidatePayRate,
+      })
+    );
   }
 
   private subscribeOnUpdateCandidateJobSucceed(): Observable<void> {
@@ -554,7 +602,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   private subscribeOnApplicantStatusesChanges(): Observable<ApplicantStatus[]> {
-    return this.applicantStatuses$.pipe(
+    return (this.isAgency ? this.agencyApplicantStatuses$ : this.applicantStatuses$).pipe(
       filter((statuses: ApplicantStatus[]) => !!statuses),
       tap((statuses: ApplicantStatus[]) => {
         this.defaultApplicantStatuses = this.candidate?.status !== CandidatStatus.OnBoard ?
@@ -609,6 +657,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         this.canReject && this.canOffer && this.canOnboard && this.acceptForm.get('hourlyRate')?.enable();
         this.acceptForm.get('candidateBillRate')?.disable();
         break;
+      case !this.isAgency && CandidatStatus.OnBoard:
+      this.enabledisableAcceptform()
+      break;
       case CandidatStatus.OfferedBR:
       case CandidatStatus.OnBoard:
       case CandidatStatus.Rejected:
@@ -729,5 +780,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
       this.canCreateOrder = canCreateOrder;
     });
+  }
+  private enabledisableAcceptform()
+  {
+    if(!this.isAgency)
+    { this.acceptForm.get('candidateBillRate')?.disable();
+      this.acceptForm.get('hourlyRate')?.disable();
+      this.acceptForm.get('clockId')?.enable();
+    }
   }
 }

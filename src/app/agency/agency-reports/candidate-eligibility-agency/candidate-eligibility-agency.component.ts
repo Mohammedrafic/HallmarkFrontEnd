@@ -45,10 +45,10 @@ import { AgencyCandidateEligibilityConstants } from '../constants/agency-reports
 })
 export class CandidateEligibilityAgencyComponent implements OnInit, OnDestroy {
   public paramsData: any = {
-    "AgenciesParamAFTS": "",
-    "OrganizationParamMSR": "",
-    "CandidateNameParamMSR": "",
-    "JobIdParamMSR": "",
+    "AgencyId": "",
+    "CandidateProfileID": "",
+    "OrderId": "",
+    "UserId": "",
   };
   public reportName: LogiReportFileDetails = { name: "/AgencyReports/CandidateEligibility/CandidateEligibility.cls" };
   public catelogName: LogiReportFileDetails = { name: "/AgencyReports/CandidateEligibility/CandidateEligibility.cat" };
@@ -231,6 +231,7 @@ export class CandidateEligibilityAgencyComponent implements OnInit, OnDestroy {
       "AgencyId": this.defaultAgency,
       "CandidateProfileID": candidateName == null || candidateName == "" ? "0" : candidateName.toString(),
       "OrderId": jobId == null || jobId == "" ? 0 : jobId,
+      "UserId": this.user?.id,
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

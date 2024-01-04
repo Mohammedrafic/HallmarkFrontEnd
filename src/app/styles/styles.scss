@@ -624,7 +624,7 @@ body.dark .title, body.dark .contact-name {
   padding: 0% 3%;
   position: sticky;
   top: 0;
-  background: white;
+  background: var(--bg-widget);
   z-index : 99;
 }
 
@@ -637,7 +637,7 @@ body.dark .title, body.dark .contact-name {
   padding: 0% 3%;
   position: sticky;
   top: 0;
-  background: white;
+  background: var(--bg-widget);
   z-index : 99;
 }
 @media screen and (min-width: 0px) and (max-width: 810px)  {
@@ -729,7 +729,7 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 @media screen and (min-width: 0px) and (max-width: 400px) {
   [data-uid="Master Data"],[data-uid="Communication/Document Library"],[data-uid="Administration/Organization Interface "],[data-uid="Administration/Interface Logs"],[data-uid="Organization/Settings"],
   [data-uid="Agency/Reports"],[data-uid="Organization/Scheduling"],[data-uid="Organization Profile"],[data-uid="Reports"],
-  [data-uid="Organization Profile"],[data-uid="Analytics"],[data-uid="Candidate Assignment"],[data-uid="Scheduling"],[data-uid="Settings"],[data-uid="Administration/User List"],[data-uid="Administration/Roles & Permissions"]
+  [data-uid="Organization Profile"],[data-uid="Analytics"],[data-uid="Scheduling"],[data-uid="Settings"],[data-uid="Administration/User List"],[data-uid="Administration/Roles & Permissions"]
   ,body.light .e-btn.noResponsive
   {
     display: none;
@@ -756,4 +756,12 @@ body.dark .schedule-comp th.table-title span, body.dark .schedule-wrapper span.c
 }
 .add-edit-noteform .textarea-wrapper span.error {
   top : unset !important;
+}
+
+body.light .schedule-creation .e-switch-wrapper.e-switch-disabled .e-switch-handle, body.light .e-css.e-switch-wrapper.e-switch-disabled .e-switch-handle{
+  background-color: #b6cefc;
+}
+
+body.light .schedule-creation .e-switch-wrapper.e-switch-disabled:hover .e-switch-handle, body.light .e-css.e-switch-wrapper.e-switch-disabled .e-switch-handle{
+  background-color: #b6cefc;
 }

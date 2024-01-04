@@ -1,13 +1,15 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
   <ng-template #header>
     <div class="app-accumulation-chart__title">
-      <h3 class="widget-header__title">My Tasks</h3>
+      <h3 class="widget-header__title">{{agencyTimesheet ? 'Missing Timesheets ' : 'My Tasks'}}</h3>
     </div>
     <div class="app-widget-wrapper__tooltip" *ngIf="description.length>0">
+      <ejs-tooltip [content]="description" position='TopCenter'>
         <span class="mytooltip">
           <i-feather name="info" id="info"
             [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
         </span>
+      </ejs-tooltip>        
     </div>
 
   </ng-template>
@@ -93,7 +95,7 @@
     </div>
     
     <div class="widget" *ngIf="isAgencyUser">
-      <span class="widget__type" (mousedown)="defineMousePosition($event)">
+      <span class="widget__type" (mousedown)="defineMousePosition($event)" *ngIf="!agencyTimesheet">
           <ul>
             <li>
             </li>
@@ -107,7 +109,7 @@
             <li>
             </li>
           </ul> 
-           <p class="orgname">Timesheet missing - {{missingdata?.organizationName}}</p>
+           <p class="orgname">{{missingdata?.organizationName}}</p>
           <p class="orgcount">{{missingdata?.count}}</p>
       </span>
     </div>

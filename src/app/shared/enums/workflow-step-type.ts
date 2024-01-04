@@ -4,6 +4,13 @@ export enum WorkflowStepType {
   Published = 3,
   Shortlisted = 4,
   Offered = 5,
+  Applied = 6,
   Accepted = 7,
   Onboarded = 8,
+  BillRatePending = 9,
+  OfferedBillRate = 10,
+  Offboard = 11,
+  Cancelled = 12,
+  Rejected = 13,
+  Withdraw = 14,
 }

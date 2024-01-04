@@ -1,0 +1,113 @@
+.analytics-container {
+  display: flex;
+  height: 100%;
+
+  ::ng-deep {
+    .toolbar-header-div {
+      font-size: 24px !important;
+      font-family: 'Open Sans', 'sans-serif';
+      line-height: 32px !important;
+      font-weight: 400 !important;
+      color: var(--text) !important;
+    }
+
+    .toolbar-message-div {
+      line-height: 32px;
+    }
+
+    .app-grid {
+      .ag-header {
+        background-color: var(--bg-default) !important;
+
+        .ag-header-cell-text {
+          font-weight: 700 !important;
+          color: var(--sub-title-2) !important;
+        }
+      }
+
+      .ag-menu, .ag-tabs-header {
+        background-color: var(--bg-default) !important;
+        color: var(--text) !important;
+        box-shadow: none !important;
+      }
+
+      .ag-row-odd,
+      .ag-row,
+      .ag-header {
+        border-bottom: 1px solid var(--grid-header-border) !important;
+        color: var(--text);
+      }
+
+      .ag-paging-panel,
+      .ag-root {
+        border: 1px solid var(--grid-header-border) !important;
+        color: var(--text);
+
+        .ag-paging-button {
+          color: var(--text);
+        }
+      }
+
+      .ag-root {
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+      }
+
+      .ag-paging-panel {
+        border-bottom-left-radius: 14px !important;
+        border-bottom-right-radius: 14px !important;
+      }
+
+      .ag-root,
+      .ag-paging-panel,
+      .ag-side-bar-right,
+      .ag-column-select-list,
+      .ag-row-odd,
+      .ag-row {
+        background-color: var(--bg-default) !important;
+      }
+
+      .ag-side-button,
+      .ag-column-select-list,
+      .ag-icon {
+        color: var(--text);
+      }
+
+      .ag-tool-panel-wrapper {
+        border-color: var(--grid-header-border) !important;
+      }
+
+      .ag-root-wrapper-body {
+        background-color: var(--bg-default) !important;
+      }
+
+      .ag-root {
+        border-top-right-radius: 0 !important;
+        border-bottom: none !important;
+      }
+
+      .ag-side-bar-right {
+        border-left: none;
+        border-bottom: none;
+        border-top: 1px solid var(--grid-header-border);
+        border-right: 1px solid var(--grid-header-border);
+      }
+
+      .ag-column-panel-column-select {
+        border-color: var(--grid-header-border) !important;
+        border-bottom: none;
+        border-top: none;
+      }
+
+      .ag-floating-bottom {
+        border: none;
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .e-arrow-tip {
+    display: none;
+  }
+}

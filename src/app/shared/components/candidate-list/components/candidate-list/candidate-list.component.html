@@ -1,20 +1,22 @@
 <div class="table-container candidate-list-table">
   <ejs-grid #grid
-  [dataSource]="(candidates$ | async)?.items"
-  [allowSelection]="true"
-  [allowPaging]="false"
-  [pageSettings]="pageSettings"
-  [height]="fullScreenGridHeight"
-  [rowHeight]="rowHeight"
-  [enableVirtualization]="false"
-  [resizeSettings]="resizeSettings"
-  [allowSorting]="allowSorting"
-  [allowResizing]="allowResizing"
-  [selectionSettings]="selectionOptions"
-  [enablePersistence]="false"
-  (dataBound)="dataBound()"
-  (rowSelected)="rowSelected($event, grid)"
-  (rowDeselected)="rowDeselected($event, grid)">
+            [dataSource]="(candidates$ | async)?.items"
+            [allowSelection]="true"
+            [allowPaging]="false"
+            [pageSettings]="pageSettings"
+            [height]="fullScreenGridHeight"
+            [rowHeight]="rowHeight"
+            [enableVirtualization]="false"
+            [resizeSettings]="resizeSettings"
+            [allowSorting]="allowSorting"
+            [allowResizing]="allowResizing"
+            [selectionSettings]="selectionOptions"
+            [enablePersistence]="false"
+            (dataBound)="dataBound()"
+            (rowSelected)="rowSelected($event, grid)"
+            (rowDeselected)="rowDeselected($event, grid)"
+            (actionBegin)="actionBegin($event)"
+  >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column textAlign="Right" width="95" *ngIf="isAgency">
@@ -24,8 +26,8 @@
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button
-              [disabled]="!agencyActionsAllowed || data.candidateStatus === candidateStatus.Onboard || !userPermission[userPermissions.CanEditCandidateProfile]"
-              cssClass="e-flat secondary-icon-button enabled-button" (click)="onRemove(data.candidateProfileId)">
+                    [disabled]="!agencyActionsAllowed || data.candidateStatus === candidateStatus.Onboard || !userPermission[userPermissions.CanEditCandidateProfile] || disableNonlinkedagency"
+                    cssClass="e-flat secondary-icon-button enabled-button" (click)="onRemove(data.candidateProfileId)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -38,7 +40,7 @@
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat secondary-icon-button enabled-button"
-              [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id, data.hireDate)">
+                    [disabled]="!userPermission[userPermissions.ManageIrpCandidateProfile]" (click)="onRemove(data.id, data.hireDate)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
             <ng-container *ngIf="data.hasRedFlag">
@@ -55,7 +57,7 @@
         </ng-template>
       </e-column>
       <e-column headerText="Emp ID" field="employeeId" [visible]="false" width="100"></e-column>
-      <e-column field="lastName" [headerText]="!isIRP ? 'Name' : 'Emp Name'" width="200">
+      <e-column field="firstName" [headerText]="!isIRP ? 'Name' : 'Emp Name'" width="200">
         <ng-template #template let-data>
           <div class="name-wrapper">
             <ng-container *ngIf="false">
@@ -69,7 +71,7 @@
                 </ng-template>
               </div>
             </ng-container>
-            {{data.lastName}}, {{data.firstName}} {{data.middleName}}
+            {{data.firstName}} {{data.middleName}} {{data.lastName}}
           </div>
         </ng-template>
       </e-column>
@@ -79,7 +81,7 @@
             <ejs-chiplist class="events-off">
               <e-chips>
                 <e-chip [text]="statusEnum[data.profileStatus] || employeeStatusEnum[data.employeeStatusId]"
-                  [cssClass]="getChipCssClass(statusEnum[data.profileStatus] || data.employeeStatus)">
+                        [cssClass]="getChipCssClass(statusEnum[data.profileStatus] || data.employeeStatus)">
                 </e-chip>
               </e-chips>
             </ejs-chiplist>
@@ -146,7 +148,7 @@
             <ejs-chiplist>
               <e-chips>
                 <e-chip [text]="data.candidateStatus | candidateStatusName"
-                  [cssClass]="data.candidateStatus | candidateStatusName | chipsCssClass"></e-chip>
+                        [cssClass]="data.candidateStatus | candidateStatusName | chipsCssClass"></e-chip>
               </e-chips>
             </ejs-chiplist>
           </div>
@@ -155,7 +157,7 @@
       <e-column headerText="Region" field="candidateProfileRegions">
         <ng-template #template let-data>
           <div *ngFor="let region of data.candidateProfileRegions; trackBy: regionTrackBy">{{ region.regionDescription ||
-            region }}</div>
+          region }}</div>
         </ng-template>
       </e-column>
       <e-column textAlign="Left" field="employeeSourceId" [visible]="false" headerText="Emp Source Id" width="200">
@@ -190,10 +192,19 @@
     <ng-container *ngIf="!isIRP && CandidateFilterFormGroup">
       <div class="bootstrap">
         <div class="input-container">
-          <label *ngIf="isIRP">Employee Name</label>
-          <label *ngIf="!isIRP">Candidate Name</label>
+          <label *ngIf="isIRP">Employee First Name</label>
+          <label *ngIf="!isIRP">Candidate First Name</label>
           <div class="input-group">
-            <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
+            <input class="e-input" type="text" maxlength="50" formControlName="firstNamePattern"/>
+          </div>
+        </div>
+      </div>
+      <div class="bootstrap">
+        <div class="input-container">
+          <label *ngIf="isIRP">Employee Last Name</label>
+          <label *ngIf="!isIRP">Candidate Last Name</label>
+          <div class="input-group">
+            <input class="e-input" type="text" maxlength="50" formControlName="lastNamePattern"/>
           </div>
         </div>
       </div>
@@ -254,17 +265,27 @@
       </div>
     </ng-container>
     <ng-container *ngIf="isIRP && CandidateFilterFormGroup">
-      <div class="bootstrap row">
+      <div class="bootstrap">
         <div class="input-container candidate-id">
           <label>Employee ID</label>
           <div class="input-group">
-            <input class="e-input" type="text" maxlength="10" formControlName="candidateId" />
+            <input class="e-input" type="text" maxlength="10" formControlName="candidateId"/>
           </div>
         </div>
-        <div class="input-container candidate-name">
-          <label>Employee Name</label>
+      </div>
+      <div class="bootstrap">
+        <div class="input-container">
+          <label>Employee First Name</label>
           <div class="input-group">
-            <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
+            <input class="e-input" type="text" maxlength="50" formControlName="firstNamePattern"/>
+          </div>
+        </div>
+      </div>
+      <div class="bootstrap">
+        <div class="input-container">
+          <label>Employee Last Name</label>
+          <div class="input-group">
+            <input class="e-input" type="text" maxlength="50" formControlName="lastNamePattern"/>
           </div>
         </div>
       </div>
@@ -355,7 +376,7 @@
           <label>Hire Date</label>
           <div class="input-group datepicker">
             <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" [enableMask]="true"
-              [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }" formControlName="hireDate">
+                            [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }" formControlName="hireDate">
             </ejs-datepicker>
           </div>
         </div>
@@ -406,8 +427,9 @@
   </form>
 </app-filter-dialog>
 
-<app-export-dialog [columns]="isIRP ? isSourcingEnabled  ? columnsToExportIrpSourcing :  columnsToExportIrp : columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
-  (export)="export($event)"></app-export-dialog>
+<app-export-dialog [columns]="isIRP ? isSourcingEnabled  ? columnsToExportIrpSourcing :  columnsToExportIrp : columnsToExport"
+                   [fileName]="fileName" (cancel)="closeExport()"
+                   (export)="export($event)"></app-export-dialog>
 
 <ejs-dialog
   #inactivationDialog
@@ -431,32 +453,32 @@
 
   <ng-template #content>
     <form
-    [formGroup]="inactivationForm"
-    class="formGroup bootstrap">
-    <div class="input-container">
-      <label for="inactivationReason">Inactivation Reason <span class="required">*</span></label>
-      <div class="input-group dropdown">
-        <ejs-dropdownlist
-          appValidateWithMessage
-          formControlName="inactivationReasonId"
-          [allowFiltering]="true"
-          [fields]="reasonFields"
-          [dataSource]="(inactivationReasons$ | async)?.items"
-        ></ejs-dropdownlist>
+      [formGroup]="inactivationForm"
+      class="formGroup bootstrap">
+      <div class="input-container">
+        <label for="inactivationReason">Inactivation Reason <span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            formControlName="inactivationReasonId"
+            [allowFiltering]="true"
+            [fields]="reasonFields"
+            [dataSource]="(inactivationReasons$ | async)?.items"
+          ></ejs-dropdownlist>
+        </div>
       </div>
-    </div>
-    <div class="input-container">
-      <label for="inactivationReason">Inactivation Date <span class="required">*</span></label>
-      <ejs-datepicker
-        class="datepicker"
-        format="MM/dd/yyyy"
-        placeholder="MM/DD/YYYY"
-        [enableMask]="true"
-        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-        formControlName="inactivationDate">
-          
-      </ejs-datepicker>
-    </div>
+      <div class="input-container">
+        <label for="inactivationReason">Inactivation Date <span class="required">*</span></label>
+        <ejs-datepicker
+          class="datepicker"
+          format="MM/dd/yyyy"
+          placeholder="MM/DD/YYYY"
+          [enableMask]="true"
+          [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+          formControlName="inactivationDate">
+
+        </ejs-datepicker>
+      </div>
     </form>
   </ng-template>
   <ng-template #footerTemplate>

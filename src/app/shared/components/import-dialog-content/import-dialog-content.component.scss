@@ -42,7 +42,7 @@
       .file-uploader {
         display: flex;
 
-        #droparea {
+        .droparea {
           height: 127px;
           width: 100%;
           display: flex;
@@ -233,5 +233,33 @@
     .e-footer-content {
       display: block;
     }
+  }
+
+  .section-header {
+    flex-direction: column;
+  }
+
+  .file-uploader {
+    flex-direction: column;
+  }
+
+  .file-info {
+    margin-left: 0!important;
+  }
+
+  ::ng-deep {
+    .import-dialog {
+      .e-dlg-content {
+        background-color: white!important;
+      }
+    }
+  }
+
+  .header-container {
+    background-color: white!important;
+  }
+
+  .file-uploader-container {
+    background-color: white!important;
   }
 }

@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
@@ -57,8 +58,7 @@ import {
   GetOrganizationSettings,
   GetOrganizationSettingsFilterOptions,
   GetRegions,
-  SaveOrganizationSettings,
-  GetRejectReasons
+  SaveOrganizationSettings
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.model';
@@ -79,16 +79,14 @@ import {
   SettingsFilterCols,
   SettingsSystemFilterCols,
   TextOptionFields,
-  TierSettingsKey,
-  RejectedReasonsFields
+  TierSettingsKey
 } from './settings.constant';
 import {
   ATPRateCalculationPayload,
   AutoGenerationPayload,
   PayPeriodPayload,
   StartsOnPayload,
-  SwitchValuePayload,
-  AutoRejectOtherEmployeesWhenFilledPayload
+  SwitchValuePayload
 } from '@shared/models/settings.interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { mapKeys, camelCase } from 'lodash';
@@ -123,8 +121,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
 
-  @Select(OrganizationManagementState.rejectionReasonsList)
-  rejectionReasonsList$: Observable<RejectReason[]>;
 
   readonly daysOfWeek = Days;
   readonly noOfWeek = Weeks;
@@ -139,7 +135,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   readonly dropdownCheckboxValueDataSource = DropdownCheckboxValueDataSource;
   readonly organizationSettingControlType = OrganizationSettingControlType;
   readonly disabledSettings = DisabledSettingsByDefault;
-  readonly rejectReasonOptionFields = RejectedReasonsFields
 
   organizationSettingsFormGroup: FormGroup;
   regionFormGroup: FormGroup;
@@ -154,7 +149,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   payPeriodFormGroup: FormGroup;
   aTPRateCalculationFormGroup : FormGroup;
   startsOnFormGroup: FormGroup;
-  autoRejectEmployeesWhenFilledFormGroup:FormGroup;
+  startsOnMinDate: Date | null;
 
   dropdownDataSource: OrganizationSettingValueOptions[];
   allRegions: OrganizationRegion[] = [];
@@ -174,7 +169,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   isRequired:boolean=true;
   IsSettingATPRateCalculation:boolean=false;
   IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition: boolean = false;
-  IsSettingKeyAutoRejectEmployeesWhenFilled:boolean=false;
   SettingKeyAutomatedDistributedToVMS: string = '';
   systemButtons: ButtonModel[] = [];
   isEdit = false;
@@ -190,9 +184,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   regularLocalRatesToggleMessage = false;
   dialogHeader = 'Add Settings';
   numericValueLabel = 'Value';
-  isRejectedReasonRequired:boolean=true;
-  rejectedReasons:RejectReason[] | null;
-
 
   private readonly settingsAppliedToPermissions = SettingsAppliedToPermissions;
 
@@ -233,7 +224,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   override ngOnInit(): void {
     super.ngOnInit();
     this.watchForOrgId();
-    this.watchForRejectedReasons();
     this.watchForSettings();
     this.watchForStructure();
     this.watchForFilterOptions();
@@ -243,18 +233,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.watchRegionControlChanges();
     this.watchForSystemControls();
   }
-  private getRejectedReasons() {
-    this.store.dispatch(new GetRejectReasons(SystemType.IRP));
-  }
-  private watchForRejectedReasons(){
-    this.rejectionReasonsList$
-    .pipe(
-      takeUntil(this.unsubscribe$),
-    )
-    .subscribe((data: RejectReason[]) => {
-     this.rejectedReasons=data;
-  });
-}
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -323,7 +301,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == data.settingKey;
     this.IsSettingATPRateCalculation = OrganizationSettingKeys[OrganizationSettingKeys['ATPRateCalculation']].toString() == data.settingKey;
      this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == data.settingKey;
-     this.IsSettingKeyAutoRejectEmployeesWhenFilled=OrganizationSettingKeys[OrganizationSettingKeys['AutoRejectOtherEmployeesWhenFilled']].toString() == data.settingKey;
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
     this.formControlType = data.controlType;
@@ -336,7 +313,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.payPeriodFormGroup.reset();
     this.startsOnFormGroup.reset();
     this.aTPRateCalculationFormGroup.reset();
-    this.autoRejectEmployeesWhenFilledFormGroup.reset();
     this.store.dispatch(new ClearLocationList());
     this.store.dispatch(new ClearDepartmentList());
 
@@ -364,7 +340,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
     this.setFormValidation(data);
   }
-  
+
   openEditSettingDialog(
     data: {
       parentRecord: Configuration,
@@ -388,7 +364,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.IsSettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == parentRecord.settingKey;
     this.IsSettingATPRateCalculation = OrganizationSettingKeys[OrganizationSettingKeys['ATPRateCalculation']].toString() == parentRecord.settingKey;
     this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == parentRecord.settingKey;
-    this.IsSettingKeyAutoRejectEmployeesWhenFilled=OrganizationSettingKeys[OrganizationSettingKeys['AutoRejectOtherEmployeesWhenFilled']].toString() == parentRecord.settingKey;
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
@@ -432,8 +407,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.RegionLocationSettingsMultiFormGroup.touched ||
       this.payPeriodFormGroup.touched ||
       this.startsOnFormGroup.touched ||
-      this.aTPRateCalculationFormGroup.touched||
-      this.autoRejectEmployeesWhenFilledFormGroup.touched)
+      this.aTPRateCalculationFormGroup.touched
+      )
     {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -468,7 +443,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       && this.invoiceAutoGeneratingValid()
       && this.switchedValueForm.valid
       && this.checkboxValueForm.valid
-      && this.autoRejectEmployeesWhenFilledFormGroup.valid
     ) {
       if (this.organizationSettingsFormGroup.valid) {
         this.sendForm();
@@ -627,6 +601,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.configurations = data;
         let settingData = this.getRowsPerPage(adaptedData, this.currentPagerPage);
         settingData.forEach(element => {
+          element.children?.map((ch)=>{
+          if(ch.regionId == null && ch.locationId == null && ch.departmentId==null){
+            ch.isParentRecord=true;
+          }
+        });
           if (element?.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
             element.children?.forEach(e => {
               if (e.regionId == null && e.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
@@ -634,17 +613,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
               }
             });
           }
-          if(element?.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['AutoRejectOtherEmployeesWhenFilled']]){
-            element.children?.forEach(e => {
-              let reason = this.rejectedReasons?this.rejectedReasons.find(x=>x.id == Number(e.displayValue))?.reason:'';
-              e.displayValue = reason ?? e.displayValue;
-            });
-           let reason = this.rejectedReasons?this.rejectedReasons.find(x=>x.id == Number(element.displayValue))?.reason:'';
-           if(reason){
-            element.displayValue = reason;
-           }
-        }
-          
         });
         this.gridDataSource = settingData;
         this.totalDataRecords = adaptedData.length;
@@ -699,9 +667,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       case OrganizationSettingControlType.StartsOnDate:
         dynamicValue = JSON.stringify(this.createStartsOnPayload());
         break;
-        case OrganizationSettingControlType.AutoRejectOtherEmployeesWhenFilled:
-          dynamicValue = JSON.stringify(this.createAutoRejectEmployeeWhenFilledPayload());
-          break;
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
         break;
@@ -772,10 +737,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (this.formControlType === OrganizationSettingControlType.ATPRateCalculation) {
       this.observeATPRateToggleControl();
     }
-    if (this.formControlType === OrganizationSettingControlType.AutoRejectOtherEmployeesWhenFilled) {
-      this.observeAutoRejectEmployeeToggleControl();
-    }
-
     if (validators.length > 0) {
       this.organizationSettingsFormGroup.get('value')?.addValidators(validators);
     } else {
@@ -870,9 +831,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
 
       dynamicValue = SettingsDataAdapter.getParsedValue(valueOptions);
+      const startsOn = dynamicValue.StartsOn || dynamicValue.startsOn;
+      const isEnabled = dynamicValue.IsEnabled || dynamicValue.isEnabled;
+      const startsOnDate = startsOn ? DateTimeHelper.setCurrentTimeZone(startsOn) : null;
+
+      this.startsOnMinDate = startsOnDate;
       this.startsOnFormGroup.setValue({
-        startsOn: dynamicValue.StartsOn ? new Date(dynamicValue.StartsOn) : new Date(),
-        isEnabled: dynamicValue.IsEnabled ? dynamicValue.IsEnabled : false,
+        startsOn: startsOnDate,
+        isEnabled: isEnabled ? isEnabled : false,
       });
     }
 
@@ -881,12 +847,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isATPRateCalculation: true };
 
     }
-    if (this.formControlType === OrganizationSettingControlType.AutoRejectOtherEmployeesWhenFilled) {
-      const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
-      dynamicValue = { ...SettingsDataAdapter.getParsedValue(valueOptions), isAutoRejectOtherEmployeesWhenFilled: true };
-      
-    }
-
     if (dynamicValue?.isCheckboxValue) {
       this.checkboxValueForm.setValue({
         value: dynamicValue.value ? dynamicValue.value : '',
@@ -908,15 +868,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         isEnabled: dynamicValue.isEnabled ? dynamicValue.isEnabled : dynamicValue.IsEnabled ? dynamicValue.IsEnabled : false ,
       });
     }
-    if (dynamicValue?.isAutoRejectOtherEmployeesWhenFilled) {
-      let rejectreason=dynamicValue.RejectedReason === undefined ? dynamicValue.rejectReason :dynamicValue.RejectedReason;
-      this.autoRejectEmployeesWhenFilledFormGroup.setValue({
-        rejectedReason:rejectreason === 0 ? null : rejectreason, 
-        isEnabled: dynamicValue.isEnabled ? dynamicValue.isEnabled : dynamicValue.IsEnabled ? dynamicValue.IsEnabled : false ,
-      });
-    } 
-
-
     this.updateFormOutsideZone(parentData, childData, dynamicValue);
   }
 
@@ -983,7 +934,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.switchedValueForm.reset();
     this.checkboxValueForm.reset();
     this.aTPRateCalculationFormGroup.reset();
-    this.autoRejectEmployeesWhenFilledFormGroup.reset();
     this.setEditMode(false);
     this.isParentEdit = false;
     this.dropdownDataSource = [];
@@ -1052,12 +1002,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       wagePercent:[null],
       costSavings:[null]
     })
-    this.autoRejectEmployeesWhenFilledFormGroup=this.formBuilder.group({
-      isEnabled: [false],
-      rejectedReason:[null],
-    })
-    
-
   }
 
   private getActiveRowsPerPage(): number {
@@ -1089,7 +1033,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.clearFilters();
         this.store.dispatch(new GetOrganizationSettingsFilterOptions());
         this.getSettings();
-        this.getRejectedReasons();
       }),
       switchMap((id: number) => this.store.dispatch(new GetOrganizationById(id))),
       takeUntil(this.unsubscribe$),
@@ -1183,7 +1126,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       || this.organizationSettingKey === OrganizationSettingKeys.OTHours
       || this.organizationSettingKey === OrganizationSettingKeys.AutomatedDistributionToVMS
       || this.organizationSettingKey === OrganizationSettingKeys.TimesheetSubmissionProcess
-      || this.organizationSettingKey === OrganizationSettingKeys.AutoRejectOtherEmployeesWhenFilled) {
+      ) {
       this.departmentFormGroup.get('departmentId')?.disable();
     } else {
       this.departmentFormGroup.get('departmentId')?.enable();
@@ -1222,7 +1165,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private createStartsOnPayload(): StartsOnPayload {
-    return this.startsOnFormGroup.getRawValue();
+    const { startsOn, isEnabled } = this.startsOnFormGroup.getRawValue();
+
+    return {
+      startsOn: formatDate(startsOn, 'yyyy-MM-dd', 'en-US'),
+      isEnabled,
+    };
   }
 
   private createATPRateConfigurationdPayload(): ATPRateCalculationPayload {
@@ -1231,12 +1179,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       benefitPercent: this.aTPRateCalculationFormGroup.controls['benefitPercent'].value,
       wagePercent: this.aTPRateCalculationFormGroup.controls['wagePercent'].value,
       costSavings:this.aTPRateCalculationFormGroup.controls['costSavings'].value,
-    });
-  }
-  private createAutoRejectEmployeeWhenFilledPayload(): AutoRejectOtherEmployeesWhenFilledPayload {
-    return ({
-      isEnabled: !!this.autoRejectEmployeesWhenFilledFormGroup.controls['isEnabled'].value,
-      rejectReason: this.autoRejectEmployeesWhenFilledFormGroup.controls['rejectedReason'].value,
     });
   }
   private observeToggleControl(): void {
@@ -1253,27 +1195,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         }
         this.switchedValueForm.get('value')?.updateValueAndValidity();
       });
-  }
-  private observeAutoRejectEmployeeToggleControl():void{
-    this.autoRejectEmployeesWhenFilledFormGroup.get('isEnabled')?.valueChanges
-    .pipe(
-      takeUntil(this.unsubscribe$)
-    )
-    .subscribe((value: boolean) => {
-      if(value){
-        this.isRejectedReasonRequired=true;
-        this.autoRejectEmployeesWhenFilledFormGroup.get('rejectedReason')?.enable();
-        this.autoRejectEmployeesWhenFilledFormGroup.get('rejectedReason')?.addValidators(Validators.required);
-        this.autoRejectEmployeesWhenFilledFormGroup.get('rejectedReason')?.markAsTouched();
-      }
-      else{
-        this.isRejectedReasonRequired=false;
-        this.autoRejectEmployeesWhenFilledFormGroup.get('rejectedReason')?.disable();
-        this.autoRejectEmployeesWhenFilledFormGroup.get('rejectedReason')?.removeValidators(Validators.required);
-        this.autoRejectEmployeesWhenFilledFormGroup.get('rejectedReason')?.markAsUntouched();
-      }
-      this.autoRejectEmployeesWhenFilledFormGroup.get('rejectedReason')?.updateValueAndValidity();
-    });
   }
   private observeATPRateToggleControl(): void {
     this.aTPRateCalculationFormGroup.get('isEnabled')?.valueChanges
@@ -1591,15 +1512,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         return;
       }
     }
-    else if (this.IsSettingKeyAutoRejectEmployeesWhenFilled) {
-      if (this.autoRejectEmployeesWhenFilledFormGroup.valid) {
-        this.sendForm();
-      } else {
-        this.autoRejectEmployeesWhenFilledFormGroup.markAllAsTouched();
-        return;
-      }
-    }
-     else if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
+    else if (this.IsSettingKeyAvailabiltyOverLap || this.IsSettingKeyCreatePartialOrder) {
       if (this.allLocationsSelected && this.allRegionsSelected) {
         this.organizationHierarchy = OrganizationHierarchy.Organization;
         this.organizationHierarchyId = this.organizationId;
@@ -1629,7 +1542,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       && this.switchedValueForm.valid
       && this.checkboxValueForm.valid
       && this.aTPRateCalculationFormGroup.valid
-      && this.autoRejectEmployeesWhenFilledFormGroup.valid
     ) {
       this.sendForm();
     }
@@ -1745,5 +1657,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.organizationHierarchy = OrganizationHierarchy.Department;
     this.organizationHierarchyId = id;
     this.departmentFormGroup.patchValue({ departmentId: id }, { emitEvent: false, onlySelf: true });
+  }
+  OnDeleteSucceeded(isDeleted: any):void{
+    if(isDeleted){
+      this.getSettings();
+    }
   }
 }

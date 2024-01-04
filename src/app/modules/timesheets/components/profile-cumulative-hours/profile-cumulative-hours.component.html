@@ -88,7 +88,7 @@
           <td class="cumulative-hours-value">
             {{legendItem.cumulativeHours ? (legendItem.cumulativeHours | number : '1.2-2') : '-'}}
           </td>
-          <td class="checkbox-cell">
+          <td class="checkbox-cell bootstrap">
             <ejs-checkbox
                     [checked]="true"
                     (change)="toggleChartCategoryVisibility($event, legendItem)"

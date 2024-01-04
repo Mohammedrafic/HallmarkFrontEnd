@@ -129,11 +129,26 @@
     }
   }
 }
+.header-icon{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.first-tabel-cell {
+  padding-block: 10px !important;
+}
 
 .sorting-icon {
-  width: 16px;
-  height: 16px;
   margin-left: 0 !important;
+  border: 1px solid #3e7fff !important;
+  border-radius: 5px;
+  min-width: 35px;
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .grid-body {

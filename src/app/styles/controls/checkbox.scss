@@ -4,73 +4,59 @@ body.light,
 body.dark {
   .bootstrap {
     .e-checkbox-wrapper {
-      .e-checkbox:focus + .e-frame {
-        box-shadow: none !important;
-        border-color: $grey;
+      &.e-checkbox-disabled {
+        .e-frame {
+          border-color: $secondary-dark-blue-45 !important;
+          background-color: $secondary-dark-blue-40;
 
-        &:hover {
+          &.e-check {
+            background-color: $primary-active-blue-50;
+            border-color: $secondary-dark-blue-45 !important;
+          }
+        }
+      }
+
+      &:hover {
+        .e-frame {
+          background-color: var(--checkbox-background);
           border-color: $primary-active-blue-10;
+
+          &.e-check {
+            background-color: $white;
+            color: $primary-active-blue-10 !important;
+          }
         }
       }
 
       .e-label {
-        color: $secondary-dark-blue-10;
+        color: var(--sub-title);
       }
 
       .e-frame {
+        height: 16px;
+        width: 16px;
+        line-height: 14px;
+        font-size: 9px;
+        box-shadow: none !important;
+        background-color: var(--checkbox-background);
+        border-color: $secondary-dark-blue-40;
         border-radius: 2px;
 
         &.e-check {
           background-color: $primary-active-blue-10;
-        }
-
-        &:hover {
-          border-color: $primary-active-blue-10;
+          border-color: $secondary-dark-blue-45 !important;
+          color: $white;
         }
       }
-    }
-  }
-}
 
-body.dark {
-  .bootstrap {
-    .e-checkbox-wrapper {
       .e-checkbox:focus + .e-frame {
-        border-color: $secondary-dark-blue-30;
-      }
+        background-color: var(--checkbox-background);
+        border-color: $primary-active-blue-10;
 
-      .e-label {
-        color: $secondary-dark-blue-40 !important;
-      }
-
-      .e-frame:not(.e-check) {
-        background-color: $secondary-dark-blue-10-2 !important;
-      }
-
-      .e-frame {
-        border-color: $secondary-dark-blue-30;
-        height: 16px;
-        width: 16px;
-
-        &::before {
-          line-height: 14px;
-        }
-
-        &:hover.e-check,
         &.e-check {
-          border-color: $white !important;
+          background-color: $white;
+          color: $primary-active-blue-10 !important;
         }
-      }
-    }
-
-    .e-checkbox-disabled {
-      .e-icons.e-frame {
-        border-color: $white !important;
-        background-color: $secondary-dark-blue-40 !important;
-      }
-
-      .e-frame.e-check {
-        background-color: $primary-active-blue-70 !important;
       }
     }
   }

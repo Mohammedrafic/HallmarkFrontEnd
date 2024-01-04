@@ -57,5 +57,6 @@ export enum AlertEnum {
    "Expiry Credentials: Weekly Alerts" = 66,
    "Candidate Status Update: Cancelled" = 31,
    "Candidate Level Comments" = 60,
+   "Timesheet Level Comments" = 67,
   }
   

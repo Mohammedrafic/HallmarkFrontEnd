@@ -2,7 +2,7 @@ import { GetBusinessForEmployeeType } from './../../../security/store/security.a
 import { ButtonModel } from '@shared/models/buttons-group.model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, NgZone } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, NgZone, ChangeDetectorRef } from '@angular/core';
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -30,7 +30,7 @@ import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { AlertsEmailTemplateFormComponent } from './alerts-email-template-form/alerts-email-template-form.component';
 import { BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
-import { AlertChannel } from '../alerts.enum';
+import { AlertChannel, AlertIdEnum } from '../alerts.enum';
 import { AlertsSmsTemplateFromComponent } from './alerts-sms-template-from/alerts-sms-template-from.component';
 import { AlertsOnScreenTemplateFormComponent } from './alerts-on-screen-template-form/alerts-on-screen-template-form.component';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -42,7 +42,7 @@ import { GRID_CONFIG, RECORD_ADDED, RECORD_MODIFIED, USER_ALERTS_PERMISSION } fr
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AppState } from '../../../store/app.state';
-import { BUSINESS_UNITS_VALUES_WITH_IRP } from '@shared/constants/business-unit-type-list';
+import { BUSINESS_UNITS_VALUES_WITH_IRP, BUSINESS_UNITS_VALUES_WITH_MSP } from '@shared/constants/business-unit-type-list';
 import { OutsideZone } from '@core/decorators';
 import { DetectActiveSystem, SystemGroupConfig } from '@client/order-management/constants';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
@@ -286,7 +286,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         this.systemGroupConfig = SystemGroupConfig(this.isOrgIRPEnabled, this.isOrgVMSEnabled, this.activeSystem);
         this.adjustBusinessUnitTypeBasedActiveSystem();
       });
-    } else this.isIRPFlagEnabled = false;
+    } else this.isIRPFlagEnabled = false;    
   }
 
   ngOnDestroy(): void {
@@ -315,6 +315,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
+     this.filteredBusinessUnits= BUSINESS_UNITS_VALUES_WITH_MSP
+
     }
     if (user?.businessUnitType !== BusinessUnitType.Hallmark) {
       this.loadSystemButtons();
@@ -327,7 +329,10 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
       );
     this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if (!this.isBusinessFormDisabled) {
-        this.defaultValue = data[0]?.id;
+        this.defaultValue=null
+        setTimeout(() => {
+          this.defaultValue = data[0]?.id;
+        }, 500);
       }
     });
     this.emailTemplateFormGroup = AlertsEmailTemplateFormComponent.createForm();
@@ -388,14 +393,19 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.onEdit(data.rowData);
   }
   public onSmsTemplateEdit(data: any): void {
-    this.alertChannel=AlertChannel.SMS;
-    this.alertTemplateType = AlertChannel[AlertChannel.SMS];
-    this.onEdit(data.rowData);
+    if(data.rowData['alertId']!=AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets'])
+    {  this.alertChannel=AlertChannel.SMS;
+      this.alertTemplateType = AlertChannel[AlertChannel.SMS];
+      this.onEdit(data.rowData);
+    }    
   }
   public onScreenTemplateEdit(data: any): void {
+   if(data.rowData['alertId']!=AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets'])
+    {
     this.alertChannel=AlertChannel.OnScreen;
     this.alertTemplateType = AlertChannel[AlertChannel.OnScreen];
     this.onEdit(data.rowData);
+  }
   }
 
   public onGridReady(params: GridReadyEvent): void {

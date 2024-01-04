@@ -1,7 +1,7 @@
 import { ClearDeployedCandidateOrderInfo, GetCandidateJob,
   GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import {ChangeDetectorRef, Component, Inject, Input, OnInit, ViewChild} from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   GetAvailableSteps,
@@ -50,7 +50,7 @@ import { AlertIdEnum } from '@admin/alerts/alerts.enum';
   templateUrl: './order-candidates-list.component.html',
   styleUrls: ['./order-candidates-list.component.scss'],
 })
-export class OrderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
+export class OrderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit, OnChanges {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('accept') accept: AcceptCandidateComponent;
   @ViewChild('apply') apply: ApplyCandidateComponent;
@@ -105,6 +105,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public commentContainerId = 0;
   public readonly partnershipStatus = PartnershipStatus;
   public showDeployedControl = false;
+  public isOrderClosed = false;
 
   private isOrgIRPEnabled = false;
   private previousSelectedSystemId: OrderManagementIRPSystemId | null;
@@ -176,6 +177,13 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     }
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['orderDetails']?.currentValue) {
+      this.isOrderClosed = this.orderDetails?.status === OrderStatus.Closed
+        || this.orderDetails?.irpOrderMetadata?.status === OrderStatus.Closed;
+    }
+  }
+
   public changeCandidate(isNext: boolean): void {
     const nextIndex = isNext ? this.selectedIndex + 1 : this.selectedIndex - 1;
     const nextCandidate = (this.grid.dataSource as OrderCandidatesList[])[nextIndex];
@@ -217,6 +225,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public onCloseDialog(): void {
     this.clearDeployedCandidateOrderInfo();
     this.sideDialog.hide();
+    this.templateState.next(null);
   }
 
   public openEditCandidateModal(candidate: IrpOrderCandidate): void {
@@ -274,7 +283,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.isAvailable = state.isAvailable;
       this.includeDeployed = state.includeDeployed;
       this.cdr.markForCheck();
-    })
+    });
   }
 
   private getAllEmployeeCancelReasons(): void {
@@ -355,8 +364,10 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   private openDialog(template: any): void {
-    this.templateState.next(template);
-    this.sideDialog.show();
+    if(template){
+      this.templateState.next(template);
+      this.sideDialog.show();
+    }
   }
 
   private checkForAgencyStatus(): void {

@@ -69,7 +69,7 @@ export enum OrganizationSettingKeys {
   MandatorySpecialProjectDetails,
   MarkZeroDollarInvoicetoPaidOnApproval,
   EnableClearedToStartForAcceptedCandidates,
-  AutoRejectOtherEmployeesWhenFilled,
+  TimeLimitforManagerReviewEmail,
 }
 
 export enum OrganizationalHierarchy {

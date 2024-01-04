@@ -23,6 +23,7 @@
     [totalDataRecords]="totalDataRecords"
     (openOverrideSettingDialog)="openOverrideSettingDialog($event)"
     (openEditSettingDialog)="openEditSettingDialog($event)"
+    (DeleteSettingValueSucceded)="OnDeleteSucceeded($event)"
     ></app-configuration-grid>
 </section>
 
@@ -93,7 +94,7 @@
 
     <form [formGroup]="regionFormGroup" *ngIf="isEdit && !(IsSettingKeyOtHours || IsSettingKeyAvailabiltyOverLap || IsSettingKeyCreatePartialOrder ||  IsSettingKeyScheduleOnlyWithAvailability || IsSettingATPRateCalculation) && !IsSettingKeyPayPeriod">
       <div class="input-container bootstrap">
-        <label for="region">Region<span *ngIf="IsSettingKeyAutomatedDistributedToVMS || IsSettingKeyAutoRejectEmployeesWhenFilled" class="required">*</span></label>
+        <label for="region">Region<span *ngIf="IsSettingKeyAutomatedDistributedToVMS" class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist id="region" [allowFiltering]="true" [dataSource]="regions$ | async"
                             [fields]="optionFields" (select)="changeRegion($event)" [enabled]="!isParentEdit"
@@ -325,6 +326,7 @@
           format="MM/dd/yyyy"
           placeholder="MM/DD/YYYY"
           [showClearButton]="false"
+          [min]="startsOnMinDate"
           formControlName="startsOn"
         ></ejs-datepicker>
       </div>
@@ -338,6 +340,9 @@
     </div>
 
     <div class="toggle-message">
+      <div class="toggle-message__item">
+        Only current or future date is available in “Starts On“ date field.
+      </div>
       <div class="toggle-message__item">
         “On” will split Timesheet records into the current Bill Rate record and
         the new Bill Rate record at midnight.
@@ -389,28 +394,6 @@
       <div class="input-group switch">
         <ejs-switch id="switcher" class="switch" formControlName="isEnabled" (change)="disableSettingsValue($event,undefined)"></ejs-switch>
         <label class="switch-label">Turned {{ aTPRateCalculationFormGroup.get('isEnabled')?.value ? 'On' : 'Off' }}</label>
-      </div>
-    </div>
-    </div>
- </form>
-
- <form [formGroup]="autoRejectEmployeesWhenFilledFormGroup"
-    *ngIf="formControlType === organizationSettingControlType.AutoRejectOtherEmployeesWhenFilled">
-  <div class="row">
-    <div class="input-container bootstrap">
-      <label>Rejected Reason <span *ngIf="isRejectedReasonRequired" class="required">*</span></label>
-      <div class="input-group dropdown">
-        <ejs-dropdownlist appValidateWithMessage [allowFiltering]="true" [dataSource]="rejectionReasonsList$ | async"
-                          [fields]="rejectReasonOptionFields" formControlName="rejectedReason">
-        </ejs-dropdownlist>
-      </div>
-    </div>
-   </div>
-   <div class="row">
-    <div class="input-container">
-      <div class="input-group switch">
-        <ejs-switch id="switcher" class="switch" formControlName="isEnabled" (change)="disableSettingsValue($event,undefined)"></ejs-switch>
-        <label class="switch-label">Turned {{ autoRejectEmployeesWhenFilledFormGroup.get('isEnabled')?.value ? 'on' : 'off' }}</label>
       </div>
     </div>
     </div>

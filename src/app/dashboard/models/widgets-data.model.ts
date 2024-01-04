@@ -12,6 +12,7 @@ import { ExpiryDetailsModel } from './expiry.model';
 import { AvailableEmployeeModel } from './available-employee.model';
 import { PositionsCountByDayRangeDataset,OrdersPendingInCustomDataset } from './active-positions-dto.model';
 import { BillRateBySkillCategoryTypeAggregatedModel } from './bill-rate-by-skill-category-type-aggregated.model';
+import { AgencyTImesheetsummaryModel } from './agency-timesheet-summary.models';
 
 export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;
@@ -40,5 +41,7 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.ACTIVE_POSITIONS_INITIAL_EXTENDED]: ChartAccumulation;
   [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : OrdersPendingInCustomDataset;
   [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS_FOR_INITIAL_ORDERS]: ChartAccumulation;
-  [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]:BillRateBySkillCategoryTypeAggregatedModel
+  [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]:BillRateBySkillCategoryTypeAggregatedModel;
+  [WidgetTypeEnum.MISSING_TIMESHEETS]: OrgDetailsInfoModel;
+  [WidgetTypeEnum.AGENCY_TIMESHEET_SUMMARY]: AgencyTImesheetsummaryModel;
 }

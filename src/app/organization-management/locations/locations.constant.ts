@@ -27,6 +27,9 @@ export const LocationExportColumns: ExportColumn[] = [
   { text: 'State', column: 'State' },
   { text: 'Zip', column: 'Zip' },
   { text: 'Contact Person', column: 'ContactPerson' },
+  { text: 'Inactivation Date', column: 'InactivationDate' },
+  { text: 'Reactivation Date', column: 'ReactivationDate' },
+  { text: 'Time Zone', column: 'TimeZone' },
 ];
 
 export const LocationsExportIrpColumns: ExportColumn[] = [
@@ -41,6 +44,9 @@ export const LocationsExportIrpColumns: ExportColumn[] = [
   { text: 'Zip', column: 'Zip' },
   { text: 'Contact Person', column: 'ContactPerson' },
   { text: 'Include in IRP', column: 'IncludeInIRPText'},
+  { text: 'Inactivation Date', column: 'InactivationDate' },
+  { text: 'Reactivation Date', column: 'ReactivationDate' },
+  { text: 'Time Zone', column: 'TimeZone' },
 ];
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';

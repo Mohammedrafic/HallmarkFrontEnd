@@ -88,6 +88,7 @@ import {
   GetParentOrderById,
   GetIrpOrderExtensionCandidates,
   GetJobDistributionValues,
+  cancelCandidateJobforIRP,
   SaveClearToStart,
   SaveClearToStartSucceeded
 } from '@client/store/order-managment-content.actions';
@@ -569,10 +570,10 @@ export class OrderManagementContentState {
   @Action(GetOrderById, { cancelUncompleted: true })
   GetOrderById(
     { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id, options, isIrp }: GetOrderById
+    { id, options, isIrp, system }: GetOrderById
   ): Observable<Order> {
     patchState({ orderDialogOptions: options });
-    return this.orderManagementService.getOrderById(id, isIrp).pipe(
+    return this.orderManagementService.getOrderById(id, isIrp, system).pipe(
       tap((payload) => {
         const groupedCredentials = getGroupedCredentials(payload.credentials ?? payload.reOrderFrom?.credentials);
         payload.groupedCredentials = groupedCredentials;
@@ -1154,6 +1155,21 @@ export class OrderManagementContentState {
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
+
+  @Action(cancelCandidateJobforIRP)
+  cancelCandidateJobforIRP(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: cancelCandidateJobforIRP
+  ): Observable<void> {
+    console.log(payload)
+    return this.orderManagementService.cancelIrpCandidate(payload).pipe(
+      tap(() => {
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new CancelOrganizationCandidateJobSuccess()]);
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+    );
+  }
+
 
   @Action(ApproveOrder)
   ApproveOrder(

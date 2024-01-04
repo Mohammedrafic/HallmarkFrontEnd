@@ -155,9 +155,9 @@ export class DateTimeHelper {
   public static getRange(date: string | Date, startDate: Date,
     rangeOption = DatesRangeType.OneWeek, firstWeekDay: number | null = null, maxDateExist: boolean): string {
     const startWeekDay = formatDate(DateTimeHelper.getDynamicWeekDate(
-      date, true, startDate, rangeOption, firstWeekDay, maxDateExist), 'MM/dd/YYYY', 'en-US');
+      date, true, startDate, rangeOption, firstWeekDay, maxDateExist), 'MM/dd/yyyy', 'en-US');
     const endWeekDay = formatDate(DateTimeHelper.getDynamicWeekDate(
-      date, false, startDate, rangeOption, firstWeekDay, maxDateExist), 'MM/dd/YYYY', 'en-US');
+      date, false, startDate, rangeOption, firstWeekDay, maxDateExist), 'MM/dd/yyyy', 'en-US');
 
     return `${startWeekDay} - ${endWeekDay}`;
   }

@@ -95,6 +95,10 @@ export type AgencyOrderFilteringOptions = {
     status: FilterOrderStatusText;
     statusText: string;
   }[];
+  reorderStatuses: {
+    status: FilterOrderStatusText;
+    statusText: string;
+  }[];
   candidateStatuses: {
     status: number;
     statusText: string;

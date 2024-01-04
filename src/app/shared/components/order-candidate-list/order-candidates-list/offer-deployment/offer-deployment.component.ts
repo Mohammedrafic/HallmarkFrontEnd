@@ -21,6 +21,7 @@ import {
   SET_READONLY_STATUS,
 } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, Observable, of, Subject, take, takeUntil } from 'rxjs';
@@ -177,6 +178,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     private commentsService: CommentsService,
     private changeDetectorRef: ChangeDetectorRef,
     private permissionService : PermissionService,
+    private billRatesSyncService: BillRatesSyncService,
     private orderManagementService: OrderManagementService,
   ) { }
 
@@ -297,10 +299,12 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   billRates: rates,
                   billRatesUpdated: this.checkForBillRateUpdate(rates),
                   candidatePayRate: value.candidatePayRate,
+                  deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
                 })
               ).pipe(
                 takeUntil(this.unsubscribe$)
               ).subscribe(() => {
+                this.billRatesSyncService.resetDeletedBillRateIds();
                 this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
                 if (reloadJob) {
                   this.store.dispatch(
@@ -373,7 +377,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       rejectReason: data.rejectReason,
       yearsOfExperience: data.yearsOfExperience,
       expAsTravelers: data.expAsTravelers,
-      guaranteedWorkWeek: data.applicantStatus.applicantStatus === ApplicantStatusEnum.Applied ? data.guaranteedWorkWeek || data.order.expectedWorkWeek : data.guaranteedWorkWeek, 
+      guaranteedWorkWeek: data.applicantStatus.applicantStatus === ApplicantStatusEnum.Applied ? data.guaranteedWorkWeek || data.order.expectedWorkWeek : data.guaranteedWorkWeek,
       offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate
         || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
       candidatePayRate: data.candidatePayRate,

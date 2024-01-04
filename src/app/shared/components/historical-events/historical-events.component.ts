@@ -1,6 +1,9 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { HistoricalEvent } from '../../models/historical-event.model';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
+
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { merge, Observable, takeUntil } from 'rxjs';
+import { filter } from 'rxjs/operators';
+
 import {
   GetAgencyHistoricalData,
   GetAgencyOrderCandidatesList,
@@ -8,7 +11,6 @@ import {
   GetOrderById,
   ReloadOrderCandidatesLists,
 } from '@agency/store/order-management.actions';
-import { merge, Observable, takeUntil } from 'rxjs';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
@@ -18,8 +20,8 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { OrderCandidatesListPage } from '../../models/order-management.model';
+import { HistoricalEvent } from '../../models/historical-event.model';
 import { DestroyableDirective } from '../../directives/destroyable.directive';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-historical-events',
@@ -45,8 +47,6 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
   candidateListOrg$: Observable<OrderCandidatesListPage>;
 
   public historicalEvents$: Observable<HistoricalEvent[]>;
-  private selectedOrgId: number;
-  private selectedJobId: number;
 
   constructor(private store: Store, private actions$: Actions) {
     super();
@@ -96,12 +96,6 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
   }
 
   private dispatchHistoricalEvents(orgId: number, jobId: number): void {
-    if (this.selectedOrgId === orgId && this.selectedJobId === jobId) {
-      return;
-    } else {
-      this.selectedOrgId = orgId;
-      this.selectedJobId = jobId;
-    }
     if (this.isAgency) {
       this.store.dispatch(new GetAgencyHistoricalData(orgId, jobId));
     } else {

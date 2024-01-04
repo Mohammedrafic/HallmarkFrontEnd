@@ -164,7 +164,7 @@ describe('WorkflowStepsService', () => {
         { id: 4, name: 'Step 4', type: 0 },
         { id: 5, name: 'Step 5', type: 0 },
       ],
-    } as Workflow;
+    } as unknown as Workflow;
 
     const result: Workflow = service.getDefaultWorkflowList(workflow, TypeFlow.applicationWorkflow);
 

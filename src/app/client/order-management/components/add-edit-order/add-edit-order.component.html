@@ -52,6 +52,9 @@
             [billRates]="orderBillRates"
             [isActive]="selectedTab === SelectedTab.BillRates"
             [isOrderPage]="true"
+            [orderId]="order?.id || null"
+            [organizationId]="order?.organizationId || null"
+            [orderType]="orderDetailsFormComponent.orderTypeControlValue"
             (billRatesChanged)="onBillRatesChanged()"
             (hourlyRateSync)="hourlyRateToOrderSync($event)"
           >

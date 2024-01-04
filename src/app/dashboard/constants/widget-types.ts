@@ -28,4 +28,6 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   29: WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM,
   30: WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS_FOR_INITIAL_ORDERS,
   31:WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY,
+  33:WidgetTypeEnum.MISSING_TIMESHEETS,
+  34: WidgetTypeEnum.AGENCY_TIMESHEET_SUMMARY
 };

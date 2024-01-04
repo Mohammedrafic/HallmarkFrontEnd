@@ -44,22 +44,31 @@
               </e-accordionitem>
               <e-accordionitem>
                 <ng-template #header>
-                  <div>Invoice Payment Log</div>
+                  <div>Invoice Payment History</div>
                 </ng-template>
                 <ng-template #content>
-                  <section class="app-grid" *ngIf="!isAgency">
+                  <section class="app-grid">
                     <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                       [gridOptions]="paymentDetailGridOptions" (gridReady)="onPaymentDetail($event)"
                       [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                      *ngIf="!isAgency"></ag-grid-angular>
+                     ></ag-grid-angular>
 
                   </section>
-                  <section class="app-grid" *ngIf="isAgency">
+                </ng-template>
+              </e-accordionitem>
+              <!-- Payment Mode  Log -->
+              <e-accordionitem>
+                <ng-template #header>
+                  <div>Payment Mode History</div>
+                </ng-template>
+                <ng-template #content>
+      
+                  <section class="app-grid">
 
                     <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
-                      [gridOptions]="agencypaymentDetailGridOptions" (gridReady)="onagencyPaymentDetail($event)"
+                      [gridOptions]="checkDetailGridOptions" (gridReady)="onCheckDetail($event)"
                       [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                      *ngIf="isAgency"></ag-grid-angular>
+                     ></ag-grid-angular>
                   </section>
                 </ng-template>
               </e-accordionitem>

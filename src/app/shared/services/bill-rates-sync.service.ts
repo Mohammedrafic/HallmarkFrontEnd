@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
-import { BaseObservable, DateTimeHelper } from '@core/helpers';
+import { BaseObservable } from '@core/helpers';
 import { BillRate, BillRateCalculationType } from '@shared/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BillRatesSyncService {
+  private deletedBillRateIds$ = new BaseObservable<number[]>([]);
+
   private rateFormChanged$ = new BaseObservable<boolean>(false);
 
   public getBillRateForSync(
@@ -20,10 +22,10 @@ export class BillRatesSyncService {
     const sortedBillRates = this.getDESCsortedBillRates(billRates).filter(
       (billRate) => billRate.billRateConfig.id === billRateType
     );
-    
+
     for (const billRate of sortedBillRates) {
       const timeStamp = new Date(billRate.effectiveDate).getTime();
-      if (timeStamp < jobStartDateTimeStamp) {
+      if (timeStamp <= jobStartDateTimeStamp) {
         billRateForSync = billRate;
         break;
       }
@@ -40,6 +42,18 @@ export class BillRatesSyncService {
     this.rateFormChanged$.set(value);
   }
 
+  public addDeletedBillRateId(value: number): void {
+    this.deletedBillRateIds$.set([...this.getDeletedBillRateIds(), value]);
+  }
+
+  public getDeletedBillRateIds(): number[] {
+    return this.deletedBillRateIds$.get();
+  }
+
+  public resetDeletedBillRateIds(): void {
+    this.deletedBillRateIds$.set([]);
+  }
+
   public getFormChangedState(): boolean {
     return this.rateFormChanged$.get();
   }
@@ -48,7 +62,7 @@ export class BillRatesSyncService {
     if(billRates != null){
       return billRates.sort((item1: BillRate, item2: BillRate) => {
         return new Date(item2.effectiveDate).getTime() - new Date(item1.effectiveDate).getTime();
-      });  
+      });
     } else {
       return billRates;
     }

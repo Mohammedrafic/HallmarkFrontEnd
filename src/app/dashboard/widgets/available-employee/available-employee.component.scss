@@ -26,8 +26,8 @@
 }
 .shared-with-grid table th {
     padding: 15px;
-    border-bottom: 2px solid #e5e8ee;
-    color: #757575;
+    border-bottom: 2px solid var(--grid-header-border);
+    color: var(--secondary-text);
     font-size: 12px;
 }
 .shared-with-grid table td {

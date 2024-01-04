@@ -4,7 +4,7 @@ import { SetHeaderState, SetHelpSystem, ShowExportDialog, ShowFilterDialog } fro
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { 
+import {
   AbstractGridConfigurationComponent,
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { TAB_CANDIDATES } from '@client/candidates/candidates-content/candidates.constant';
@@ -41,7 +41,7 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
   public isMobile = false;
   public isSmallDesktop = false;
   public redirectedFromDashboard : any;
-  
+
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
 
   @Select(UserState.lastSelectedOrganizationId)
@@ -157,7 +157,8 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
       skillsIds: [],
       regionsNames: [],
       tab: 0,
-      candidateName: null,
+      firstNamePattern: null,
+      lastNamePattern: null,
       includeDeployedCandidates: false
     };
 

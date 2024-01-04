@@ -22,8 +22,8 @@
     <div class="bell-button" (click)="bellIconClicked()">
       <i-feather name="bell"></i-feather>
 
-      <span class="bell-button__badge" *ngIf="alertsCount<99">{{alertsCount}}</span>
-      <span class="bell-button__badge" *ngIf="alertsCount>99">99+</span>
+      <span class="bell-button__badge" *ngIf="alertsCount <= 99">{{alertsCount}}</span>
+      <span class="bell-button__badge" *ngIf="alertsCount > 99">99+</span>
     </div>
 
     <div class="devider" *ngIf="!(isMobile$ | async) && (userChatConfig$ | async)"></div>
@@ -87,6 +87,8 @@
               #treevalidate
               [fields]="sideBarMenuField"
               (nodeClicked)="toggleSubMenu($event)"
+              (nodeExpanded)="expandSubMenu($event)"
+              (dataBound)="highlightActiveNode($event)"
               [fullRowSelect]="true"
               [loadOnDemand]="false"
             >
@@ -134,12 +136,6 @@
 
       <aside class="secondary-container">
         <section class="misc">
-          <!--section class="edu-faq"> TODO: hidden until implemented
-          <a href="" class="icon-container" (click)="false">
-            <i-feather name="settings" class="icon"></i-feather>
-            <span class="e-text">Settings</span>
-          </a>
-        </!--section-->
         </section>
         <section class="username sidebar-item">
           <div class="header-item header-item__inner" *ngIf="isMobile$ | async">
@@ -240,7 +236,7 @@
         </div>
         <div
           class="alert-content alert-title-header-body-color"
-          (click)="getContentDetails(item.organizationId, item.orderId,item.alertTitle,item.id,item.publicId)"
+          (click)="getContentDetails(item.organizationId, item.orderId,item.alertTitle,item.id,item.publicId,item.timesheetId)"
           [innerHTML]="item.content"
         ></div>
       </section>

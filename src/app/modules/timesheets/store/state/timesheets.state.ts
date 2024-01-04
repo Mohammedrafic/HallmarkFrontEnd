@@ -364,6 +364,7 @@ export class TimesheetsState {
           new TimesheetDetails.ForceUpdateRecord(false),
           new Timesheets.GetAll(),
           new Timesheets.GetTabsCounts(),
+          new TimesheetDetails.UpdateRecordSucceed(),
         ]);
       }),
       catchError((err: HttpErrorResponse) => {

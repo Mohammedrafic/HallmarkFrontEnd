@@ -65,9 +65,6 @@ $headerHeight: 19px;
 
   &__position-chart {
     height: 100%;
-   // padding-left: 0px;
-   // margin-left: -10%;
-   // margin-top: -10px;
   }
 
   &__legend {
@@ -85,7 +82,7 @@ $headerHeight: 19px;
       height: fit-content;
     }
   }
-  
+
 
   .map-chart-legend {
     height: 30%;
@@ -112,7 +109,7 @@ $headerHeight: 19px;
     display: flex;
   }
 
- 
+
 
   .e-tooltip-wrap .e-tip-content {
     font-size: 12px;
@@ -154,7 +151,6 @@ $headerHeight: 19px;
 }
 .with-isLTA{
   margin-top: 10px !important;
- // margin-left: -2px !important;
 }
 .app-widget-wrapper__agency_count, .app-widget-wrapper__RNUtilization-chart{
   overflow-x: hidden;
@@ -188,4 +184,5 @@ $headerHeight: 19px;
 }
 .app-widget-wrapper__legend {
   padding-top: 0 !important;
+  color: var(--secondary-text);
 }

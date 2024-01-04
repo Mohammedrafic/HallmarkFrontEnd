@@ -22,9 +22,7 @@ import { Store } from '@ngxs/store';
 import { UserState } from '../../../store/user.state';
 import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
-import { ShowToast } from 'src/app/store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
-import { CANDIDATE_STATUS, DASHBOARD_FILTER_STATE } from '@shared/constants';
+import { DASHBOARD_FILTER_STATE } from '@shared/constants';
 import { AlertService } from '@shared/services/alert.service';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { OrderStatus } from '@shared/enums/order-management';
@@ -47,18 +45,16 @@ export class AccumulationChartComponent
   @Input() public averageFlag: boolean =false;
   @Input() public averageactiveFlag:boolean=false;
 
-  public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
   public legendData: WidgetLegengDataModel[] = [];
   public totalScore: number = 0;
   public totalval: number = 0;
   public legendPosition: LegendPositionEnum = LegendPositionEnum.Right;
   public datalabel: Object;
-  public ontooltipRender: Function;
 
   public readonly tooltipSettings: TooltipSettingsModel = {
-    enable: true,  
-    template: '<div class="widget-tooltip"><div>${x}</div><b>${tooltip}%</b></div>',       
+    enable: true,
+    template: '<div class="widget-tooltip"><div>${x}</div><b>${tooltip}%</b></div>',
 }
 
   public readonly legendSettings: LegendSettingsModel = { visible: false };
@@ -132,8 +128,9 @@ export class AccumulationChartComponent
         if(this.chartData?.title == "Candidates for Active Positions"){
           this.dashboardService.candidatesForActivePositions$.subscribe(data=>{
             candidatesDataset = data;
-          }); 
+          });
         }else if(this.chartData?.title==="Average Days for Active Candidates in a Status for Initial Orders "){
+          window.localStorage.setItem("orderTypeFromDashboard", JSON.stringify(true));
           this.dashboardService.candidatesavgForActivePositions$.subscribe(data=>{
             candidatesDataset = data;
           });
@@ -141,8 +138,8 @@ export class AccumulationChartComponent
         else{
           this.dashboardService.candidatesOverallStatus$.subscribe(data=>{
             candidatesDataset = data;
-          }); 
-        }        
+          });
+        }
 
         let candidatesChartInfo = candidatesDataset.find((ele:any)=>ele.status == status.label);
         candidatesOrderDataSet.push({"value":OrderStatus.InProgress, "name": PositionTrendTypeEnum.IN_PROGRESS})
@@ -154,9 +151,9 @@ export class AccumulationChartComponent
         }
         window.localStorage.setItem("candidatesOrderStatusListFromDashboard",JSON.stringify(candidatesOrderDataSet));
 
-        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) { 
+        if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
           if(candidatesChartInfo.status!=='Others')
-          {        
+          {
             this.dashboardService.redirectToUrlWithStatus('agency/order-management/',candidatesChartInfo.status);
           }
         }else{
@@ -165,7 +162,7 @@ export class AccumulationChartComponent
             this.dashboardService.redirectToUrlWithStatus('client/order-management/',candidatesChartInfo.status);
           }
         }
-        
+
     }
 
   }
@@ -187,7 +184,7 @@ export class AccumulationChartComponent
     this.filteredChartData$ = this.getFilteredChartData();
     if(this.averageFlag){
       this.tooltipSettings.template = '<div class="widget-tooltip"><div>${x} - <b>${tooltip}</b></div></div>';
-    }    
+    }
   }
 
   public onClickLegend(label: string): void {
@@ -218,15 +215,15 @@ export class AccumulationChartComponent
     this.chartDatachanges = this.chartData;
     this.totalval=0;
     this.chartDatachanges?.chartData.forEach(obj => {
-      this.totalval += obj.value;      
+      this.totalval += obj.value;
     });
     this.chartDatachanges?.chartData.forEach(obj => {
       if(this.averageFlag){
         obj.text = (obj.value&&this.totalval)?(Math.round(obj.value / this.totalval * 100)).toString()+'% <br>'+obj.average+' Positions':"0";
       }else{
         obj.text = (obj.value&&this.totalval)?(Math.round(obj.value / this.totalval * 100)).toString():"0";
-      }      
-    });  
+      }
+    });
 
 
     this.legendData = this.chartData?.chartData as WidgetLegengDataModel[];

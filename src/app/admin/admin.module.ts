@@ -12,6 +12,7 @@ import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-
 import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
+import { ChartModule } from '@syncfusion/ej2-angular-charts'; 
 import {
   Download,
   Upload,
@@ -80,6 +81,14 @@ import { GridPaginationModule } from '@shared/components/grid/grid-pagination/gr
 import { ScrollToTopModule } from '@shared/components/scroll-to-top/scroll-to-top.module';
 import { InterfaceLogSummaryIrpComponent } from './interface-log-summary-irp/interface-log-summary-irp.component';
 import { InterfaceLogSummaryIrpDialogComponent } from './interface-log-summary-irp/interface-log-summary-irp-dialog/interface-log-summary-irp-dialog.component';
+import { OrganizationIntegrationsComponent } from './organization-integrations/organization-integrations.component';
+import { MonthlyIntegrationsComponent } from './organization-integrations/widgets/monthly-integrations/monthly-integrations.component';
+import { IntegrationsState } from './store/integrations.state';
+import { MonthlyIntegrationsFailureComponent } from './organization-integrations/widgets/monthly-integrations-fail/monthly-integrations-fail.component';
+import { NewInterfacesComponent } from './organization-integrations/widgets/new-interfaces/new-interfaces.component';
+import { WidgetWrapperModule } from '../dashboard/widgets/widget-wrapper/widget-wrapper.module';
+import { GetRecentRunListComponent } from './organization-integrations/widgets/get-recent-run-list/get-recent-run-list.component';
+import { ScheduledIntegrationsComponent } from './organization-integrations/widgets/scheduled-integrations/scheduled-integrations.component';
 
 const sidebarIcons = {
   Download,
@@ -121,7 +130,13 @@ const sidebarIcons = {
     OrgInterfaceDialogComponent,
     OrgInterfaceConfigurationComponent,
     InterfaceLogSummaryIrpComponent,
-    InterfaceLogSummaryIrpDialogComponent
+    InterfaceLogSummaryIrpDialogComponent,
+    OrganizationIntegrationsComponent,
+    MonthlyIntegrationsComponent,
+    MonthlyIntegrationsFailureComponent,
+    NewInterfacesComponent,
+    GetRecentRunListComponent,
+    ScheduledIntegrationsComponent
   ],
     imports: [
         CommonModule,
@@ -169,11 +184,14 @@ const sidebarIcons = {
             ManualInvoiceReasonsState,
             OrganizationManagementState,
             MasterCommitmentState,
-            DonotReturnState
+            DonotReturnState,
+            IntegrationsState
         ]),
         ValidateDirectiveModule,
         GridPaginationModule,
-        ScrollToTopModule,
+      ScrollToTopModule,
+        ChartModule,
+        WidgetWrapperModule
     ],
   providers: [
     ResizeService,

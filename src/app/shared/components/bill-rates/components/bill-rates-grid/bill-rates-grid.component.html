@@ -32,7 +32,12 @@
             <button ejs-button [disabled]="disabledActionMode" cssClass="e-flat primary-icon-button" (click)="onEdit($event, data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" [disabled]="data.isPredefined || disabledActionMode" (click)="onRemove($event, data)">
+            <button
+              ejs-button
+              cssClass="e-flat secondary-icon-button"
+              [disabled]="disabledActionMode || (data.isPredefined && !canDeletePredefinedBillRates)"
+              (click)="onRemove($event, data)"
+            >
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>

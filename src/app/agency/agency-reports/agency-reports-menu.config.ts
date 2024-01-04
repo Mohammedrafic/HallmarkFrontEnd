@@ -29,7 +29,7 @@ export const AGENCYREPORTS_SETTINGS: MenuSettings[] = [
     text: 'User Activity Report',
     id: 5,
     route: './useractivity',
-    permissionKeys: ['CanuseractivityReport'],
+    permissionKeys: ['CanViewAgencyUserActivity'],
 
   },
   {
@@ -39,5 +39,18 @@ export const AGENCYREPORTS_SETTINGS: MenuSettings[] = [
     permissionKeys: ['CanViewAgencyCandidateEligibility'],
 
   },
-  
+  {
+    text: 'Vendor Scorecard ',
+    id: 6,
+    route: './vendor-scorecard',
+    permissionKeys: ['CanViewAgencyVendorScorecard'],
+
+  },
+  {
+    text: 'Timesheet Report ',
+    id: 7,
+    route: './timesheet-report',
+    permissionKeys: ['CanViewAgencyTimesheetReport'],
+
+  },
 ];

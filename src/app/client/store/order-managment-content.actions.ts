@@ -25,6 +25,7 @@ import { Comment } from '@shared/models/comment.model';
 import { ImportedOrder, OrderImportResult } from '@shared/models/imported-order.model';
 import { UpdateRegrateModel } from '@shared/models/update-regrate.model';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { CancelIrpCandidateDto } from '@shared/components/order-candidate-list/interfaces';
 
 export class GetOrders {
   static readonly type = '[order management] Get Orders';
@@ -49,7 +50,7 @@ export class ClearOrders {
 export class GetOrderById {
   static readonly type = '[order management] Get Order By Id';
   constructor(public id: number, public organizationId: number, public options?: DialogNextPreviousOption,
-    public readonly isIrp = false) {}
+    public readonly isIrp = false, public system? : string) {}
 }
 
 export class GetOrderByIdSucceeded {
@@ -102,7 +103,7 @@ export class GetIrpOrderCandidates {
 }
 
 export class GetIrpOrderExtensionCandidates {
-  static readonly type = '[order management] Get IRP order Candidates';
+  static readonly type = '[order management] Get ExtensionIRP order Candidates';
 
   constructor(
     public orderId: number,
@@ -305,6 +306,11 @@ export class RejectCandidateJob {
 export class CancelOrganizationCandidateJob {
   static readonly type = '[organizationManagement] Cancel Candidate Job';
   constructor(public payload: CandidateCancellation) {}
+}
+
+export class cancelCandidateJobforIRP {
+  static readonly type = '[organizationManagement] Cancel Candidate Job for IRP';
+  constructor(public payload: CancelIrpCandidateDto) {}
 }
 
 export class CancelOrganizationCandidateJobSuccess {

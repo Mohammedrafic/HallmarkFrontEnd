@@ -69,9 +69,10 @@
               </ejs-dropdownlist>
             </div>
           </div>
-          <div class="input-container calendar">
+          <div class="input-container calendar bootstrap dropdown-container" >
             <label>Month(s)<span class="required">*</span></label>
-            <div class="input-group dropdown">
+            <div class="input-group dropdown ">
+             
               <!--<ejs-dropdownlist appValidateWithMessage
                     formControlName="month"
                     [fields]="commonFields"
@@ -79,7 +80,7 @@
                     [allowFiltering]="true"
                     placeholder="Month">
   </ejs-dropdownlist>-->
-              <ejs-multiselect mode="CheckBox" formControlName="month" placeholder="All"
+              <ejs-multiselect mode="CheckBox" formControlName="month" placeholder="All" appValidateWithMessage
                                [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="monthList"
                                [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
               </ejs-multiselect>
@@ -89,37 +90,37 @@
       </div>
       <div class="form-elemet">
         <div class="input-container bootstrap">
-          <label>Region</label>
+          <label>Region<span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage placeholder="All"
+            <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage [placeholder]="allOption"
                              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
-                             [fields]="regionFields">
+                             [fields]="regionFields" showSelectAll=true >
             </ejs-multiselect>
           </div>
         </div>
       </div>
       <div class="form-elemet">
         <div class="input-container bootstrap">
-          <label>Location</label>
+          <label>Location<span class="required">*</span></label>
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage
                              [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
-                             [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields">
+                             [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields"  showSelectAll=true >
             </ejs-multiselect>
           </div>
         </div>
       </div>
-      <!--<div class="form-elemet">
+      <div class="form-elemet" style="display:none">
       <div class="input-container bootstrap">
         <label>Department</label>
         <div class="input-group dropdown">
-          <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage placeholder="All"
-                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
-                           [fields]="departmentFields">
+          <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage placeholder="allOption"
+                           [allowFiltering]="true" [showDropDownIcon]="true"   [dataSource]="filterColumns.departmentIds.dataSource"
+                           [fields]="departmentFields"  showSelectAll=true >
           </ejs-multiselect>
         </div>
       </div>
-    </div>-->
+    </div>
       <!--<div class="form-elemet">
       <div class="group">
         <div class="input-container bootstrap">

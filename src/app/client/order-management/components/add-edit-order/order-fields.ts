@@ -88,6 +88,7 @@ const contactToPerm: string[] = [
   ...enumToString(ContactDetails),
   ...enumToString(WorkLocations),
   ...enumToString(SpecialProject),
+  'deletedBillRateIds',
 ];
 
 const openPerDiem: string[] = [
@@ -97,6 +98,7 @@ const openPerDiem: string[] = [
   ...enumToString(ContactDetails),
   ...enumToString(WorkLocations),
   ...enumToString(SpecialProject),
+  'deletedBillRateIds',
 ];
 
 const permPlacement: string[] = [
@@ -107,6 +109,7 @@ const permPlacement: string[] = [
   ...enumToString(ContactDetails),
   ...enumToString(WorkLocations),
   ...enumToString(SpecialProject),
+  'deletedBillRateIds',
 ];
 
 export const orderFieldsConfig = {

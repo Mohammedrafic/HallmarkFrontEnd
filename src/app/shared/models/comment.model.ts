@@ -12,5 +12,7 @@ export class Comment {
   isIRP?:boolean;
   candidateJobId?:number;
   organizationName?:string;
+  bussinessUnitType?:string;
+  searchDate?: string | null;
 }
   

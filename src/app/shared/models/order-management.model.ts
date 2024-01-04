@@ -4,7 +4,7 @@ import { CandidateModel } from '@client/order-management/components/add-edit-reo
 import { ApplicantStatus as CandidateStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { Duration } from '@shared/enums/durations';
 import { JobClassification } from '@shared/enums/job-classification';
-import { OrderStatus } from '@shared/enums/order-management';
+import { OrderStatus, OrderStatusIRP } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
 import { AgencyStatus, CandidatesStatusText, FilterOrderStatusText } from '@shared/enums/status';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
@@ -15,7 +15,6 @@ import { JobDistributionModel } from './job-distribution.model';
 import { IrpPrimarySkill } from './skill.model';
 import { CandidateProfileContactDetail } from './candidate.model';
 import { PartnershipStatus } from '@shared/enums/partnership-settings';
-import { ProfileStatusesEnum } from '@client/candidates/candidate-profile/candidate-profile.constants';
 /**
  * TODO: rework classes with interfaces.
  */
@@ -112,6 +111,7 @@ export interface IRPOrderManagement {
   isTemplate?: boolean;
   templateTitle?:string;
   system:string;
+  extensionFromId?: number | null;
 }
 
 export interface GetOrdersJourney{
@@ -143,7 +143,7 @@ export interface IRPOrderPosition {
   candidateJobId : number;
   candidateProfileId : number;
   candidateStatusValue : number | string;
-  status : number;
+  status : OrderStatusIRP;
   orderPublicId: number | string;
   orderStatus: number | string;
   employeeId: number;
@@ -300,6 +300,8 @@ export interface OrderManagementChild  {
   commentContainerId?: number;
   candidateProfileId? : number;
   guaranteedWorkWeek?:number | string | null;
+  status: OrderStatus;
+  extensionFromId?: number;
 };
 
 export type OrderCandidatesList = {
@@ -329,6 +331,7 @@ export type OrderCandidatesList = {
   availabilityOverlap?: OrderAvailabilityOverlap;
   partnershipStatus: PartnershipStatus;
   suspentionDate: string;
+  cancellationReasonId?: number;
   jobId?: number;
   clearToStart?:boolean | null;
 };
@@ -360,20 +363,23 @@ export type AgencyOrderFilters = {
   organizationIds?: number[];
   orderTypes?: number[];
   orderStatuses?: (string | number)[];
+  reorderStatuses?: (string | number)[];
   jobTitle?: string;
   billRateFrom?: number | null;
   billRateTo?: number | null;
   openPositions?: number | null;
-  jobStartDate?: Date | null;
-  jobEndDate?: Date | null;
+  jobStartDate?: Date | string | null;
+  jobEndDate?: Date | string | null;
   includeReOrders?: boolean;
   annualSalaryRangeFrom?: string | null;
   annualSalaryRangeTo?: string | null;
-  creationDateFrom?: Date | null;
-  creationDateTo?: Date | null;
-  distributedOnFrom?: Date | null;
-  distributedOnTo?: Date | null;
-  candidateName?: string | null;
+  creationDateFrom?: Date | string | null;
+  creationDateTo?: Date | string | null;
+  distributedOnFrom?: Date | string | null;
+  distributedOnTo?: Date | string | null;
+  reOrderDate?: Date | string | null;
+  firstNamePattern?: string | null;
+  lastNamePattern?: string | null;
   projectTypeIds?: number | null;
   projectNameIds?: number | null;
   poNumberIds?: number | null;
@@ -443,6 +449,7 @@ export interface IRPMetaData {
   skillId: number;
   orderOpenDate: Date;
   linkedId: string | null;
+  orderCloseDate: string;
 }
 
 export class Order {
@@ -603,6 +610,7 @@ export interface EditOrderDto extends Omit
   billRates: OrderBillRateDto[];
   deleteDocumentsGuids: string[];
   AllowToUpdateDept?:boolean;
+  deletedBillRateIds?: number[];
 }
 
 export type AcceptJobDTO = {
@@ -625,6 +633,7 @@ export type AcceptJobDTO = {
   availableStartDate?: string | null;
   candidatePayRate: string | null;
   billRatesUpdated?: boolean;
+  deletedBillRateIds?: number[];
 };
 
 export type CandidateProfile = {
@@ -751,9 +760,10 @@ export class OrderFilter {
   billRateFrom?: number | null;
   billRateTo?: number | null;
   openPositions?: number | null;
-  jobStartDate?: Date | null;
-  jobEndDate?: Date | null;
+  jobStartDate?: Date | string | null;
+  jobEndDate?: Date | string | null;
   orderStatuses?: (string | number)[];
+  reOrderDate?: Date | string | null;
   candidateStatuses?: string[];
   reorderCandidateStatuses?:CandidatesStatusText[];
   candidatesCountFrom?: number | null;
@@ -767,11 +777,12 @@ export class OrderFilter {
   templateTitle?: string;
   annualSalaryRangeFrom?: string | null;
   annualSalaryRangeTo?: string | null;
-  creationDateFrom?: Date | null;
-  creationDateTo?: Date | null;
-  distributedOnFrom?: Date | null;
-  distributedOnTo?: Date | null;
-  candidateName?: string | null;
+  creationDateFrom?: Date | string | null;
+  creationDateTo?: Date | string | null;
+  distributedOnFrom?: Date | string | null;
+  distributedOnTo?: Date | string | null;
+  firstNamePattern?: string | null;
+  lastNamePattern?: string | null;
   projectTypeIds?: number | null;
   projectNameIds?: number | null;
   poNumberIds?: number | null;
@@ -1046,6 +1057,13 @@ export interface OrderAuditHistory{
     departmentId?: number;
   }
 
+  export interface JobDistributionvalidation {
+    regionId?: number;
+    locationId?: number;
+    departmentId?: number;
+    jobDistribution?: number[];
+  }
+
   export interface OrderFilterDateList {
     jobStartDate: null | string;
     jobEndDate: null | string;
@@ -1053,6 +1071,12 @@ export interface OrderAuditHistory{
     creationDateTo: null | string;
     distributedOnFrom: null | string;
     distributedOnTo: null | string;
+    reOrderDate: null | string;
+  }
+
+  export interface OrderStatusesList {
+    orderStatuses: string[];
+    reorderStatuses: string[];
   }
 
   export class clearToStartDataset{

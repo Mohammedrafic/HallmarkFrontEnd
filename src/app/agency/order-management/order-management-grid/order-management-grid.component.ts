@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Inject,
   Input,
+  NgZone,
   OnDestroy,
   OnInit,
   Output,
@@ -63,6 +64,7 @@ import {
   AgencyOrderManagementPage,
   Order,
   OrderManagementChild,
+  OrderStatusesList,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -99,6 +101,10 @@ import { GetReOrdersByOrderId, SaveReOrderPageSettings } from
   '@shared/components/order-reorders-container/store/re-order.actions';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { AlertIdEnum } from '@admin/alerts/alerts.enum';
+import { OutsideZone } from '@core/decorators';
+import { SecurityState } from 'src/app/security/store/security.state';
+import { DateTimeHelper } from '@core/helpers';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -148,7 +154,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
   };
-
+  public isAgency:boolean = false;
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public orderPositionSelected$ = new Subject<boolean>();
@@ -159,7 +165,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public filters: AgencyOrderFilters = {
     includeReOrders: true,
   };
-  public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns();
+  public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns(false);
   public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
   public columnsToExport: ExportColumn[];
   public fileName: string;
@@ -179,12 +185,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderId: number | null;
   private redirectFromPerDiem = false;
   private orderManagementPagerState: OrderManagementPagerState | null;
-
   private isAlive = true;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private alertOrderId:number;
   private orderPublicId:string;
+  public isAgencyVisibilityFlagEnabled = false;
+  public isRedirectedFromDashboard : boolean;
 
   constructor(
     private store: Store,
@@ -196,12 +203,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     @Inject(GlobalWindow) protected readonly globalWindow : WindowProxy & typeof globalThis,
     private orderManagementService: OrderManagementService,
     private cd: ChangeDetectorRef,
+    private readonly ngZone: NgZone,
+    private router: Router
   ) {
     super();
+    const routerState = this.router.getCurrentNavigation()?.extras?.state;
+    this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
     this.listenRedirectFromExtension();
   }
 
   ngOnInit(): void {
+    this.isAgencyVisibilityFlagEnabled = this.store.selectSnapshot(SecurityState.isAgencyVisibilityFlagEnabled);
+    this.filterColumns = AgencyOrderFiltersComponent.generateFilterColumns(this.isAgencyVisibilityFlagEnabled);
     this.getAlertOrderId();
     this.onOrderPreviewChange();
     this.onAgencyChange();
@@ -210,7 +223,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onReloadOrderCandidatesLists();
     this.onExportSelectedSubscribe();
     this.idFieldName = 'orderId';
-
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe((value: string) => {
       if (value.length >= 2) {
         this.OrderFilterFormGroup.controls['jobTitle'].setValue(value);
@@ -300,9 +312,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.openDetailsTab = true;
       }
     }
-
-      
-
   }
 
   public override customExport(): void {
@@ -358,10 +367,35 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.gridWithChildRow.selectRow(index);
       }
     }
-    
+
+    if (this.selectedReOrder) {
+      const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedReOrder.selected.order);
+      if (rowIndex !== -1) {
+        this.focusToRowWithoutSelect(rowIndex);
+        this.scrollToSelectedReorder();
+      }
+    }
+
     this.openPerDiemDetails();
     this.openMyAgencyTabWithCandidate();
     this.contentLoadedHandler(this.cd);
+  }
+
+  private applyDashboardFilters(): AgencyOrderFilters {
+    const filters = {} as AgencyOrderFilters;
+    filters.orderStatuses=this.orderStatus;
+    filters.candidateStatuses=this.candidateStatuses;
+    const dashboardFilterState = this.globalWindow.localStorage.getItem('dashboardFilterState') || 'null';
+    const items = JSON.parse(dashboardFilterState) as FilteredItem[] || [];
+    items.forEach((item: FilteredItem) => {
+      const filterKey = item.column as keyof AgencyOrderFilters;
+      if (filterKey in filters) {
+        (filters[filterKey] as number[]).push(item.value);
+      } else {
+        (filters[filterKey] as number[]) = [item.value];
+      }
+    });
+    return filters;
   }
 
   private openMyAgencyTabWithCandidate(): void {
@@ -428,8 +462,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public setDefaultFilters(statuses: string[]): void {
-    if (this.orderManagementPagerState?.filters) { // apply preserved filters by redirecting back from the candidate profile
+  public setDefaultFilters(orderStatusesList: OrderStatusesList): void {
+    if (this.orderManagementPagerState?.filters) {
+      // apply preserved filters by redirecting back from the candidate profile
       this.filters = { ...this.orderManagementPagerState?.filters };
       this.patchFilterForm(!!this.filters?.regionIds?.length);
       this.prepopulateFilterFormStructure();
@@ -447,7 +482,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const filterState = { ...state, orderStatuses };
       const filterFormConfig = GetAgencyFilterFormConfig(this.selectedTab);
       this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
-      if(this.Organizations != null){
+      if(this.Organizations != null && this.Organizations.length > 0){
         this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.Organizations]);
         this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
       }
@@ -457,13 +492,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       }
       if(this.candidateStatuses != null && this.candidateStatuses.length > 0){
         this.clearFilters();
-        this.setDefaultStatuses(statuses, true);
+        this.setDefaultStatuses(orderStatusesList, true);
       }
       if(this.ltaOrder){
         this.clearFilters();
       }
-      this.patchFilterForm(!!this.filters?.regionIds?.length);
-      this.prepopulateFilterFormStructure();
+        if(this.isAgencyVisibilityFlagEnabled){
+          this.patchFilterForm();
+          this.prepopulateAgencyFilterFormStructure();
+        }else{
+          this.patchFilterForm(!!this.filters?.regionIds?.length);
+          this.prepopulateFilterFormStructure();
+        }
+
       this.dispatchNewPage();
       return;
     }
@@ -478,9 +519,28 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.redirectFromPerDiem = false;
       selectedOrderAfterRedirect && this.selectedTab && this.dispatchNewPage();
     } else {
-      this.setDefaultStatuses(statuses, preservedFiltes.dispatch);
+      this.setDefaultStatuses(orderStatusesList, preservedFiltes.dispatch);
     }
     this.cd.detectChanges();
+  }
+
+  private prepopulateAgencyFilterFormStructure(): void {
+    if (this.filters.regionIds) {
+      this.OrderFilterFormGroup.get('regionIds')?.setValue([...this.filters.regionIds]);
+    }
+    if (this.filters.locationIds) {
+      this.OrderFilterFormGroup.get('locationIds')?.setValue([...this.filters.locationIds]);
+    }
+    if (this.filters.departmentsIds) {
+      this.OrderFilterFormGroup.get('departmentsIds')?.setValue([...this.filters.departmentsIds]);
+    }
+    if(this.Organizations.length > 0){
+      this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
+      this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+    }else if(this.filters.organizationIds){
+      this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.filters.organizationIds]);
+    }
+    this.generateFilterChips();
   }
 
   private prepopulateFilterFormStructure(): void {
@@ -509,7 +569,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       });
   }
 
-  private setDefaultStatuses(statuses: string[], setDefaultFilters: boolean): void {
+  private setDefaultStatuses(orderStatusesList: OrderStatusesList, setDefaultFilters: boolean): void {
     if(this.ltaOrder){
       this.clearFilters();
     }
@@ -526,9 +586,20 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const statuse = this.filterColumns.orderStatuses.dataSource.filter((f: FilterOrderStatusText) =>
         Status.includes(f)
       );
+
+      const filteredReorderStatuses = orderStatusesList.reorderStatuses?.filter((status: string) => {
+        return [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled].includes(status as FilterOrderStatusText)
+      });
+
       setTimeout(() => {
+        if (this.selectedTab === AgencyOrderManagementTabs.PerDiem) {
+          const reorderStatuses = orderStatusesList.reorderStatuses.length ? orderStatusesList.reorderStatuses : filteredReorderStatuses;
+          this.OrderFilterFormGroup.get('reorderStatuses')?.setValue(reorderStatuses);
+          this.filters.reorderStatuses = reorderStatuses;
+        }
+
         if(!this.ltaOrder) {
-            this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : statuses);
+            this.OrderFilterFormGroup.get('orderStatuses')?.setValue(this.orderStatus.length > 0 ? this.orderStatus : orderStatusesList.orderStatuses);
             this.filters.orderStatuses = this.orderStatus.length > 0 ? this.orderStatus : statuse;
           }
             this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
@@ -580,6 +651,25 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private dispatchNewPage(): void {
+    if(this.isRedirectedFromDashboard){
+      this.filters = this.applyDashboardFilters();
+      if(this.ltaOrder){
+        this.filters.ltaOrder = this.ltaOrder;
+      }
+      if(this.Organizations.length > 0){
+        this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
+        this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
+      }else{
+        this.Organizations = this.filters.organizationIds && this.filters.organizationIds?.length > 0 ? this.filters.organizationIds : this.Organizations;
+        this.OrderFilterFormGroup.get('organizationIds')?.setValue(this.filters.organizationIds);
+      }
+      this.OrderFilterFormGroup.get('regionIds')?.setValue(this.filters.regionIds);
+      this.OrderFilterFormGroup.get('locationIds')?.setValue(this.filters.locationIds);
+      this.OrderFilterFormGroup.get('departmentsIds')?.setValue(this.filters.departmentsIds);
+      this.OrderFilterFormGroup.get('skillIds')?.setValue(this.filters.skillIds);
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+      this.filteredItems$.next(this.filteredItems.length);
+    }
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     this.filters.orderBy = this.orderBy;
     switch (this.selectedTab) {
@@ -633,6 +723,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     this.checkSelectedChildrenItem();
     this.cd.detectChanges();
+    this.isRedirectedFromDashboard=false;
   }
 
   public onGridCreated(): void {
@@ -793,7 +884,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     super.onSubrowAllToggle();
   }
 
-  // Filter
   public onFilterClose() {
     this.patchFilterForm();
   }
@@ -854,19 +944,22 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       billRateTo: this.filters.billRateTo || null,
       openPositions: this.filters.openPositions || null,
       jobStartDate: this.filters.jobStartDate || null,
+      reOrderDate: this.filters.reOrderDate || null,
       jobEndDate: this.filters.jobEndDate || null,
       candidateStatuses: this.filters.candidateStatuses || [],
       candidatesCountFrom: this.filters.candidatesCountFrom || null,
       candidatesCountTo: this.filters.candidatesCountTo || null,
       organizationIds: this.filters.organizationIds || [],
       orderStatuses: this.filters.orderStatuses || [],
+      reorderStatuses: this.filters.reorderStatuses || [],
       annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
       annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null,
       creationDateFrom: this.filters.creationDateFrom || null,
       creationDateTo: this.filters.creationDateTo || null,
       distributedOnFrom: this.filters.distributedOnFrom || null,
       distributedOnTo: this.filters.distributedOnTo || null,
-      candidateName: this.filters.candidateName || null,
+      firstNamePattern: this.filters.firstNamePattern || null,
+      lastNamePattern: this.filters.lastNamePattern || null,
       projectTypeIds: this.filters.projectTypeIds || null,
       projectNameIds: this.filters.projectNameIds || null,
       poNumberIds: this.filters.poNumberIds || null,
@@ -929,14 +1022,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.filters.orderPublicId = this.filters.orderPublicId?.toUpperCase() || null;
       this.filters.billRateFrom = this.filters.billRateFrom || null;
       this.filters.billRateTo = this.filters.billRateTo || null;
-      this.filters.jobStartDate = this.filters.jobStartDate || null;
-      this.filters.jobEndDate = this.filters.jobEndDate || null;
       this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
       this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
+      this.filters.reOrderDate = this.filters.reOrderDate || null;
       this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
       this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
       this.filters.openPositions = this.filters.openPositions || null;
       this.filters.regionIds = this.filters.regionIds || [];
+      this.convertFilteredDates();
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       this.dispatchNewPage();
       this.store.dispatch(new ShowFilterDialog(false));
@@ -947,7 +1040,23 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.store.dispatch(new ShowFilterDialog(false));
     }
   }
-  // End - Filter
+
+  private convertFilteredDates(): void {
+    this.filters.jobStartDate = this.filters.jobStartDate ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.jobStartDate)) : null;
+    this.filters.jobEndDate = this.filters.jobEndDate ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.jobEndDate)) : null;
+    this.filters.creationDateFrom = this.filters.creationDateFrom ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.creationDateFrom)) : null;
+    this.filters.creationDateTo = this.filters.creationDateTo ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.creationDateTo)) : null;
+    this.filters.distributedOnFrom = this.filters.distributedOnFrom ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.distributedOnFrom)) : null;
+    this.filters.distributedOnTo = this.filters.distributedOnTo ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.distributedOnTo)) : null;
+    this.filters.reOrderDate = this.filters.reOrderDate ?
+      DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(this.filters.reOrderDate)) : null;
+  }
 
   private listenRedirectFromExtension(): void {
     this.orderManagementAgencyService.orderId$
@@ -989,6 +1098,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.clearSelection(this.gridWithChildRow);
         this.previousSelectedOrderId = null;
         this.orderManagementPagerState = null;
+        this.selectedReOrder = null;
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
@@ -1051,6 +1161,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       )
       .subscribe(() => {
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        this.store.dispatch(new GetOrderById(this.selectedOrder.orderId as number, this.selectedOrder.organizationId));
         this.getCandidatesList(this.selectedOrder);
       });
   }
@@ -1128,5 +1239,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       .subscribe(() => {
         this.store.dispatch(new SaveReOrderPageSettings(pageNumber, pageSize, true));
       });
+  }
+
+  private focusToRowWithoutSelect(rowIndex: number): void {
+    const row = this.gridWithChildRow.getRowByIndex(rowIndex);
+    row.scrollIntoView(true);
+    this.gridWithChildRow.detailRowModule.expand(rowIndex);
+  }
+
+  @OutsideZone
+  private scrollToSelectedReorder(): void {
+    setTimeout(() => {
+      this.gridWithChildRow.element.querySelector('.reorder-row.selected')?.scrollIntoView(true);
+    }, 300);
   }
 }

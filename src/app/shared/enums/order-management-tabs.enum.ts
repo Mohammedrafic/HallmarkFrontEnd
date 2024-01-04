@@ -1,8 +1,8 @@
 export enum OrganizationOrderManagementTabs {
   AllOrders = 'All Orders',
   PerDiem = 'Per Diem',
-  PermPlacement = 'Perm Placement',
   ReOrders = 'Re-Orders',
+  PermPlacement = 'Perm Placement',
   Incomplete = 'Incomplete',
   OrderTemplates = 'Order Templates',
 }
@@ -35,8 +35,8 @@ export enum AgencyOrderManagementTabs {
   OtherAgencies = 'Other Agencies',
   AllAgencies = 'All Agencies',
   PerDiem = 'Per Diem',
-  PermPlacement = 'Perm Placement',
   ReOrders = 'Re-Orders',
+  PermPlacement = 'Perm Placement',
 }
 
 export const orderLockList: { name: string; id: any }[] = [

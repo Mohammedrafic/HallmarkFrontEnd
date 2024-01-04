@@ -39,7 +39,7 @@ export interface PayPeriodPayload {
 
 export interface StartsOnPayload {
   isEnabled: boolean;
-  startsOn: Date;
+  startsOn: string;
 }
 
 export interface ATPRateCalculationPayload {
@@ -47,8 +47,4 @@ export interface ATPRateCalculationPayload {
   benefitPercent: number | null;
   wagePercent: number| null;
   costSavings: number| null;
-}
-export interface AutoRejectOtherEmployeesWhenFilledPayload {
-  isEnabled: boolean;
-  rejectReason: number | null;
 }

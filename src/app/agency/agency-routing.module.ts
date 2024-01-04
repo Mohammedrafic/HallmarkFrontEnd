@@ -12,6 +12,7 @@ import { PendingChangesGuard } from '@shared/guards/pending-changes.guard';
 import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
 import { AssociateListComponent } from '@shared/components/associate-list/associate-list.component';
 import { NotificationResolver } from '@core/resolvers/notification.resolver';
+import { AgencyVisibilityFlagResolverService } from '@core/resolvers/agency-visibility-flag.resolver';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -26,6 +27,7 @@ const routes: Routes = [
           isOrganizationArea: true,
           isAgencyArea: true,
         },
+        resolve:[AgencyVisibilityFlagResolverService],
       },
       {
         path: 'organization',
@@ -58,6 +60,7 @@ const routes: Routes = [
         data: {
           isAgencyArea: true,
         },
+        resolve:[AgencyVisibilityFlagResolverService],
       },
       {
         path: 'candidates',
@@ -107,6 +110,10 @@ const routes: Routes = [
         },
       },
       {
+        path: 'timesheets/notification/:notificationId',
+        resolve: [NotificationResolver],
+      },
+      {
         path: 'invoices',
         loadChildren: () => import('../modules/invoices/invoices.module').then((m) => m.InvoicesModule),
         data: {
@@ -124,6 +131,7 @@ const routes: Routes = [
         data: {
           isAgencyArea: true,
         },
+        resolve:[AgencyVisibilityFlagResolverService],
       },
       {
         path: 'order-management/notification/:notificationId',

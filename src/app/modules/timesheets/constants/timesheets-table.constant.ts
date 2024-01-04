@@ -207,7 +207,8 @@ const contactEmailsColumnMapping = {
 };
 
 export const DefaultFilterColumns: FilterColumns = {
-  searchTerm: defaultInputMapping,
+  firstNamePattern: defaultInputMapping,
+  lastNamePattern: defaultInputMapping,
   orderIds: defaultInputMapping,
   statusIds: defaultColumnMapping,
   skillIds: skillsColumnMapping,

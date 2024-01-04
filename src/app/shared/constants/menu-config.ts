@@ -125,7 +125,7 @@ export const MENU_CONFIG: any = {
     26: {
       // Reports
       icon: 'pie-chart',
-      route: 'agency/reports/financial-timesheet-report',
+      route: 'agency/reports',
     },
     28: {
       // Associated Organizations
@@ -534,6 +534,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics',
     },
+    130: {
+      // IRP Reports
+      icon: '',
+      route: '/admin/organization-integrations',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -637,7 +642,7 @@ export const MENU_CONFIG: any = {
     26: {
       // Reports
       icon: 'pie-chart',
-      route: 'agency/reports/financial-timesheet-report',
+      route: 'agency/reports',
     },
     27: {
       // Settings
@@ -1596,7 +1601,7 @@ export const MENU_CONFIG: any = {
     26: {
       // Reports
       icon: 'pie-chart',
-      route: 'agency/reports/financial-timesheet-report',
+      route: 'agency/reports',
     },
     27: {
       // Settings

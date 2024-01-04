@@ -154,6 +154,16 @@
         </ng-container>
       </form>
     </div>
+    <app-comments-irp
+    *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId"
+    [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP"
+    [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
+    [comments]="comments"
+    [commentContainerId]="candidateCommentContainerId"
+    [candidateJobId]="candidateJobId"
+    [useBackground]="true"
+    [externalCommentConfiguration]="externalCommentConfiguration"
+  ></app-comments-irp>
 
     <div *ngIf="showATPform && isTurnedOn">
       <form [formGroup]="AtpCalcForm" class="atpcalc-form">
@@ -208,17 +218,6 @@
           </div>
         </div>
       </form>
-      <app-comments-irp
-        *ngIf="CanOrganizationViewOrdersIRP && candidateCommentContainerId"
-        [CanOrganizationViewOrdersIRP] ="CanOrganizationViewOrdersIRP"
-        [CanOrganizationEditOrdersIRP]="CanOrganizationEditOrdersIRP"
-        [comments]="comments"
-        [commentContainerId]="candidateCommentContainerId"
-        [candidateJobId]="candidateJobId"
-        [useBackground]="true"
-        [externalCommentConfiguration]="externalCommentConfiguration"
-      ></app-comments-irp>
-
       <div class="class_table">
         <table>
           <thead>

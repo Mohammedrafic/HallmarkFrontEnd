@@ -86,8 +86,14 @@ import {
   InactivationEvent,
 } from '../../types/candidate-list.model';
 import {
-  CandidatesExportCols, CandidatesTableFilters, filterColumns,
-  IrpCandidateExportCols, IRPCandidates, IRPFilterColumns, IrpSourcingCandidateExportCols, VMSCandidates,
+  CandidatesExportCols,
+  CandidatesTableFilters,
+  filterColumns,
+  IrpCandidateExportCols,
+  IRPCandidates, IRPFilterColumns,
+  IrpSourcingCandidateExportCols,
+  ProfileStatusField,
+  VMSCandidates,
 } from './candidate-list.constants';
 import { CandidateListScroll } from './candidate-list.enum';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -99,6 +105,7 @@ import { CredentialTypeFilter } from '@shared/models/credential.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { endTimeValidator } from '@shared/validators/date.validator';
+
 @Component({
   selector: 'app-candidate-list',
   templateUrl: './candidate-list.component.html',
@@ -115,7 +122,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Select(CandidateListState.IRPCandidates)
   private _IRPCandidates$: Observable<IRPCandidateList>;
-
 
   @Select(RejectReasonState.sourcingReasons)
   public sourcing$: Observable<any>;
@@ -166,7 +172,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() public userPermission: Permission;
   @Input() public isIRP: boolean;
   @Input() public redirectedFromDashboard: boolean;
-
+  @Input() public disableNonlinkedagency:boolean;
   @Input()
   public set tab(tabIndex: number) {
     if (!isNil(tabIndex)) {
@@ -189,7 +195,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public columnsToExport = CandidatesExportCols;
   public columnsToExportIrp = IrpCandidateExportCols;
   public columnsToExportIrpSourcing = IrpSourcingCandidateExportCols;
-  public exportUsers$ = new Subject<ExportedFileType>();
   public defaultFileName: string;
   public fileName: string;
   public selectionOptions: SelectionSettingsModel = {
@@ -259,6 +264,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.getSourcingConfig();
   }
 
+
   ngOnDestroy(): void {
     this.isAlive = false;
     this.unsubscribe$.next();
@@ -312,7 +318,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
             this.filters.profileStatuses = this.filters.profileStatuses || [];
             this.filters.regionsNames = this.filters.regionsNames || [];
             this.filters.skillsIds = this.filters.skillsIds || [];
-            this.filters.candidateName = this.filters.candidateName || null;
+            this.filters.firstNamePattern = this.filters.firstNamePattern || null;
+            this.filters.lastNamePattern = this.filters.lastNamePattern || null;
             this.filters.expiry = {
               type: this.filters.credType || [],
               startDate: this.filters.startDate ? DateTimeHelper.setUtcTimeZone(
@@ -344,7 +351,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.filters.profileStatuses = this.filters.profileStatuses || [];
         this.filters.regionsNames = this.filters.regionsNames || [];
         this.filters.skillsIds = this.filters.skillsIds || [];
-        this.filters.candidateName = this.filters.candidateName || null;
+        this.filters.firstNamePattern = this.filters.firstNamePattern || null;
+        this.filters.lastNamePattern = this.filters.lastNamePattern || null;
         this.filters.hireDate = this.filters.hireDate ? DateTimeHelper.setUtcTimeZone(this.filters.hireDate) : null,
           this.filters.expiry = {
             type: this.filters.credType || [],
@@ -372,7 +380,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public dataBound(): void {
     this.grid.hideScroll();
-    this.contentLoadedHandler();
+    this.contentLoadedHandler(this.cd);
     this.createScrollSubscription();
     this.checkScroll();
   }
@@ -381,6 +389,15 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.currentPage = 1;
     this.pageSize = event;
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+  }
+
+  public override updatePage(clearedFilters?: boolean): void {
+    const isProfileStatus = this.orderBy?.split(' ')[0];
+
+    if (isProfileStatus === ProfileStatusField) {
+      this.filters.orderBy = this.orderBy;
+      this.dispatchNewPage();
+    }
   }
 
   public changePageNumber(page: number): void {
@@ -505,7 +522,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       inactivationReasonId: data.inactivationReasonId,
       createReplacement: !!data.createReplacement,
     };
-    
+
     this.store.dispatch(new CandidateListActions.DeleteIRPCandidate(dto));
     this.inactivationData = { id: null, hireDate: null};
     this.cancelInactivation();
@@ -556,7 +573,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       skillsIds: this.filters.skillsIds!,
       regionsNames: this.filters.regionsNames!,
       tab: this.activeTab ?? 0,
-      candidateName: this.filters.candidateName!,
+      firstNamePattern: this.filters.firstNamePattern!,
+      lastNamePattern: this.filters.lastNamePattern!,
       candidateId: this.filters.candidateId!,
       locationIds: this.filters.locationIds!,
       departmentIds: this.filters.departmentIds!,
@@ -583,13 +601,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return (
       candidates &&
       candidates.map((candidate: CandidateRow) => {
-        if (candidate.candidateProfileSkills.length > 2) {
-          // const [first, second] = candidate.candidateProfileSkills;
-          // candidate = {
-          //   ...candidate,
-          //   candidateProfileSkills: [first, second, { skillDescription: '...' }],
-          // };
-        }
         if (candidate.candidateProfileRegions.length > 2) {
           const [first, second] = candidate.candidateProfileRegions;
           candidate = {
@@ -607,14 +618,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return (
       candidates &&
       candidates.map((candidate: IRPCandidate) => {
-        if (candidate.employeeSkills?.length > 2) {
-          // const [first, second] = candidate.employeeSkills;
-          // candidate = {
-          //   ...candidate,
-          //   employeeSkills: [first, second, '...'],
-          // };
-        }
-
         return candidate;
       })
     );
@@ -814,7 +817,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
           this.filterColumns.credType.dataSource = credentialtypes;
         }
       });
-    
+
   }
 
   private subscribeOnExportAction(): void {

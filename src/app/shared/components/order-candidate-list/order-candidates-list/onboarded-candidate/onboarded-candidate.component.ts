@@ -15,6 +15,7 @@ import {
 } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { distinctUntilChanged, filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
@@ -29,6 +30,7 @@ import { formatDate, formatNumber } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
+  cancelCandidateJobforIRP,
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
   GetRejectReasonsForOrganisation,
@@ -81,6 +83,7 @@ import { OrderManagementService } from '@client/order-management/components/orde
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 import { UserPermissions } from '@core/enums/user.permissions.enum';
 import { SystemType } from '@shared/enums/system-type.enum';
+import { canceldto } from '../../interfaces/order-candidate.interface';
 import { SettingsViewService } from '@shared/services';
 import { positionIdStatuses } from '@agency/candidates/add-edit-candidate/add-edit-candidate.constants';
 
@@ -166,6 +169,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public CanOrganizationEditOrdersIRP: boolean;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public commentContainerId: number;
+  irpdata: any;
 
   public clearedToStart:boolean = false;
 
@@ -232,6 +236,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef,
     private permissionService: PermissionService,
+    private billRatesSyncService: BillRatesSyncService,
     private orderManagementService: OrderManagementService,
     private settingService: SettingsViewService,
   ) {
@@ -349,8 +354,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         jobId: this.candidateJob.jobId,
         jobCancellationDto,
         candidatePayRate: this.candidateJob.candidatePayRate,
-      }));
-      this.updateDetails.emit();
+      })).pipe(
+        take(1),
+      ).subscribe(() => {
+        this.updateDetails.emit();
+      });
+
     }
   }
 
@@ -358,6 +367,23 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.jobStatusControl.reset();
     this.selectedApplicantStatus = null;
   }
+
+  public cancelledCandidatefromIRP(cancelCandidateDto : canceldto): void {
+    if(this.candidateJob){
+      this.store.dispatch(
+        new cancelCandidateJobforIRP({
+          organizationId : this.candidateJob.organizationId,
+          jobId : this.candidateJob.jobId,
+          createReplacement: false,
+          actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
+          cancellationReasonId: cancelCandidateDto.jobCancellationReason
+
+        })
+      );
+      this.updateDetails.emit();
+    }
+  }
+
 
   public onClose(): void {
     if (this.form.dirty) {
@@ -401,10 +427,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             billRates: rates,
             billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.candidateJob.candidatePayRate,
+            deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
           })
         ).pipe(
           takeUntil(this.unsubscribe$)
         ).subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
           this.updateDetails.emit();
           this.deleteUpdateFieldInRate();
@@ -421,10 +449,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.order.jobStartDate,
         this.order.jobEndDate
       );
-      if(endDate){
+      if (endDate && !isNaN(endDate.getTime())) {
         const dateWithoutZone = DateTimeHelper.setUtcTimeZone(endDate);
 
-        this.form.patchValue({ endDate: DateTimeHelper.setCurrentTimeZone(dateWithoutZone) });  
+        this.form.patchValue({ endDate: DateTimeHelper.setCurrentTimeZone(dateWithoutZone) });
       }
     }
   }
@@ -489,6 +517,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   private onAccept(): void {
     if (!this.form.errors && this.candidateJob) {
+      if(this.activeSystems === OrderManagementIRPSystemId.IRP){
+        this.form.get("candidateBillRate")?.setValue(this.irpdata);
+      }
       this.shouldChangeCandidateStatus()
         .pipe(take(1))
         .subscribe((isConfirm) => {

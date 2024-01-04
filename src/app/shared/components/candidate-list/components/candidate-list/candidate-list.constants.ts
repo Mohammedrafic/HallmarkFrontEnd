@@ -1,9 +1,10 @@
 import { ProfileStatuses } from '@client/candidates/candidate-profile/candidate-profile.constants';
 import { ExportColumn } from '@shared/models/export.model';
-import { ControlTypes, ValueType } from '../../../../enums/control-types.enum';
-import { CandidateStatusOptions } from '../../../../enums/status';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { CandidateStatusOptions } from '@shared/enums/status';
 import { CandidateListFilters, CandidateListFiltersColumn } from '../../types/candidate-list.model';
 
+export const ProfileStatusField: string = 'profileStatus';
 export const filterColumns: CandidateListFiltersColumn = {
   regionsNames: {
     type: ControlTypes.Multiselect,
@@ -26,7 +27,8 @@ export const filterColumns: CandidateListFiltersColumn = {
     valueField: 'name',
     valueId: 'id',
   },
-  candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+  firstNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
+  lastNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
   credType : {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,
@@ -44,7 +46,8 @@ export const IRPFilterColumns: CandidateListFiltersColumn = {
     valueField: 'name',
     valueId: 'id',
   },
-  candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+  firstNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
+  lastNamePattern: { type: ControlTypes.Text, valueType: ValueType.Text },
   candidateId: { type: ControlTypes.Text, valueType: ValueType.Text },
   locationIds: {
     type: ControlTypes.Multiselect,
@@ -213,7 +216,8 @@ export const IRPCandidates = [
 ];
 
 export const CandidatesTableFilters: CandidateListFilters = {
-  candidateName: null,
+  firstNamePattern: null,
+  lastNamePattern: null,
   profileStatuses: [],
   regionsNames: [],
   skillsIds: [],

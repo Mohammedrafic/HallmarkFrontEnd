@@ -24,7 +24,9 @@ export class CandidateProfileService {
     private generalNotesService: GeneralNotesService
   ) {}
 
-  public saveCandidateProfile(candidateId: number, createReplacement?: boolean): Observable<CandidateModel> {
+  public saveCandidateProfile(
+    candidateId: number, createReplacement?: boolean, removeSchedules?: boolean
+  ): Observable<CandidateModel> {
     let { value } = this.candidateProfileForm.candidateForm;
     // Employee ID may be disabled (during sourcing), which prevents passing the value.
     // We still need the value, so spread the raw value
@@ -40,6 +42,10 @@ export class CandidateProfileService {
 
     if (createReplacement) {
       payload.createReplacement = true;
+    }
+
+    if (removeSchedules) {
+      payload.removeSchedules = true;
     }
 
     return this.http[candidateId ? 'put' : 'post']<CandidateModel>(endpoint, payload).pipe(
@@ -61,9 +67,9 @@ export class CandidateProfileService {
   }
 
   public saveCandidate(
-      file: Blob | null, candidateId: number, createReplacement?: boolean
+      file: Blob | null, candidateId: number, createReplacement?: boolean, removeSchedules?: boolean
     ): Observable<void | CandidateModel> {
-      return this.saveCandidateProfile(candidateId, createReplacement).pipe(
+      return this.saveCandidateProfile(candidateId, createReplacement, removeSchedules).pipe(
         mergeMap((candidate) => {
           this.candidateProfileForm.populateHoldEndDate(candidate);
           this.candidateProfileForm.tabUpdate$.next(candidate.id);

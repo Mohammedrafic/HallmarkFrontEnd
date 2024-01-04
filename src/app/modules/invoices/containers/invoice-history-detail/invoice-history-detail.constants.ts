@@ -3,12 +3,9 @@ import { DateTimeHelper } from "@core/helpers";
 import { ColumnDefinitionModel } from "@shared/components/grid/models";
 
 import { PaymentMode } from "../../enums";
+import { formatCurrency } from "@angular/common";
 
 
-const paymentModeOptions = {
-    [PaymentMode.Check]: 'check',
-    [PaymentMode.Electronic]: 'electronic',
-};
 export const InvoiceAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel[] => {
     return [
 
@@ -87,7 +84,7 @@ export const InvoiceAuditHistoryTableColumnsDefinition = (): ColumnDefinitionMod
 
         {
             headerName: 'MODIFIED DATE',
-            field: 'jsonData.lastModifiedAt',
+            field: 'modifiedOn',
             minWidth: 100,
             filter: 'agDateColumnFilter',
             valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY HH:mm'),
@@ -106,72 +103,6 @@ export const InvoiceAuditHistoryTableColumnsDefinition = (): ColumnDefinitionMod
 
     ];
 };
-
-export const paymentAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel[] => {
-    return [
-        {
-            headerName: 'CHECK ID',
-            field: 'checkId',
-            minWidth: 100,
-            filter: true,
-            sortable: true,
-            resizable: true
-        },
-
-        {
-            headerName: 'PAYMENT',
-            field: 'payment',
-            minWidth: 100,
-            filter: true,
-            sortable: true,
-            resizable: true
-        },
-
-        {
-            headerName: 'Organization',
-            field: 'organizationName',
-            minWidth: 100,
-            filter: true,
-            sortable: true,
-            resizable: true
-        },
-
-
-        {
-            headerName: 'PAYMENT DATE',
-            field: 'paymentDate',
-            minWidth: 100,
-            filter: 'agDateColumnFilter',
-            valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY HH:mm'),
-            sortable: true,
-            resizable: true
-        },
-        {
-            headerName: 'MODIFIED DATE',
-            field: 'lastModifiedAt',
-            minWidth: 100,
-            filter: 'agDateColumnFilter',
-            valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY HH:mm'),
-            sortable: true,
-            resizable: true
-        },
-
-
-
-        {
-            headerName: 'MODIFIED By',
-            field: 'lastModifiedName',
-            minWidth: 100,
-            filter: true,
-            sortable: true,
-            resizable: true
-        },
-
-
-
-    ];
-};
-
 
 
 export const agencyInvoiceAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel[] => {
@@ -252,7 +183,7 @@ export const agencyInvoiceAuditHistoryTableColumnsDefinition = (): ColumnDefinit
 
         {
             headerName: 'MODIFIED DATE',
-            field: 'jsonData.lastModifiedAt',
+            field: 'modifiedOn',
             minWidth: 100,
             filter: 'agDateColumnFilter',
             valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY HH:mm'),
@@ -272,64 +203,127 @@ export const agencyInvoiceAuditHistoryTableColumnsDefinition = (): ColumnDefinit
     ];
 };
 
-export const agencypaymentAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel[] => {
+export const paymentAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel[] => {
     return [
+   
         {
-            headerName: 'CHECK ID',
-            field: 'checkId',
+            headerName: 'PAYMENT DATE',
+            field: 'jsonData.paymentDate',
             minWidth: 100,
-            filter: true,
+            filter: 'agDateColumnFilter',
+            valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY'),
             sortable: true,
             resizable: true
         },
-
         {
             headerName: 'PAYMENT',
-            field: 'payment',
-            minWidth: 100,
-            filter: true,
-            sortable: true,
-            resizable: true
-        },
-        {
-            headerName: 'PAYMENT MODE',
-            field: 'paymentMode',
-            minWidth: 100,
+            field: 'jsonData.payment',
+            minWidth: 80,
             filter: true,
             sortable: true,
             resizable: true,
-            valueFormatter: (params: ValueFormatterParams) => paymentModeOptions[params.value as PaymentMode],
+            valueFormatter: (params: ValueFormatterParams) => formatCurrency(params.value, 'en', '$'),
 
         },
         {
-            headerName: 'Refernce Number',
-            field: 'referenceNumber',
+            headerName: 'is Deleted',
+            field: 'jsonData.isDeleted',
+            minWidth: 80,
+            filter: true,
+            sortable: true,
+            resizable: true,
+            valueFormatter: (params: ValueFormatterParams) => {
+                if (params.value) {
+                    return 'Yes';
+                }
+                return 'No';
+            },
+        },
+        {
+            headerName: 'Change Type',
+            field: 'changeType',
             minWidth: 100,
             filter: true,
             sortable: true,
             resizable: true
         },
-
         {
-            headerName: 'Organization',
-            field: 'organizationName',
-            minWidth: 100,
-            filter: true,
-            sortable: true,
-            resizable: true
-        },
-
-
-        {
-            headerName: 'PAYMENT DATE',
-            field: 'paymentDate',
+            headerName: 'MODIFIED DATE',
+            field: 'modifiedOn',
             minWidth: 100,
             filter: 'agDateColumnFilter',
             valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY HH:mm'),
             sortable: true,
             resizable: true
         },
+        {
+            headerName: 'MODIFIED By',
+            field: 'modifiedByName',
+            minWidth: 100,
+            filter: true,
+            sortable: true,
+            resizable: true
+        },
 
+
+
+    ];
+};
+
+
+export const checkAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel[] => {
+    return [
+
+
+        {
+            headerName: 'Check DATE',
+            field: 'jsonData.date',
+            minWidth: 100,
+            filter: 'agDateColumnFilter',
+            valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY'),
+            sortable: true,
+            resizable: true
+        },
+
+        {
+            headerName: 'PAYMENT MODE',
+            field: 'jsonData.paymentModeText',
+            minWidth: 100,
+            filter: true,
+            sortable: true,
+            resizable: true,
+        },
+        {
+            headerName: 'Reference Number',
+            field: 'jsonData.number',
+            minWidth: 100,
+            filter: true,
+            sortable: true,
+            resizable: true
+        },
+        {
+            headerName: 'Is Refund',
+            field: 'jsonData.isRefund',
+            minWidth: 100,
+            filter: true,
+            sortable: true,
+            resizable: true,
+            valueFormatter: (params: ValueFormatterParams) => {
+                if (params.value) {
+                    return 'Yes';
+                }
+                return 'No';
+            },
+        },
+  
+        {
+            headerName: 'Change Type',
+            field: 'changeType',
+            minWidth: 100,
+            filter: true,
+            sortable: true,
+            resizable: true
+        },
 
         {
             headerName: 'MODIFIED DATE',
@@ -340,9 +334,6 @@ export const agencypaymentAuditHistoryTableColumnsDefinition = (): ColumnDefinit
             sortable: true,
             resizable: true
         },
-
-
-
         {
             headerName: 'MODIFIED By',
             field: 'modifiedByName',

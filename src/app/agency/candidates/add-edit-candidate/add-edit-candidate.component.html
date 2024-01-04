@@ -68,6 +68,7 @@
       <ng-template #content>
         <app-experience-grid
           [readonlyMode]="readonlyMode"
+          [disableNonlinkedagency]="disableNonlinkedagency"
           [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed"
           [userPermission]="userPermission"
           [isMobileLoginOn]="!isNavigatedFromOrganizationArea && isMobileLoginOn"
@@ -83,6 +84,7 @@
       <ng-template #content>
         <app-education-grid
           [readonlyMode]="readonlyMode"
+          [disableNonlinkedagency]="disableNonlinkedagency"
           [areAgencyActionsAllowed]="!isMobileLoginOn && agencyActionsAllowed"
           [userPermission]="userPermission"
           [isMobileLoginOn]="!isNavigatedFromOrganizationArea && isMobileLoginOn"
@@ -104,6 +106,7 @@
           [userPermission]="userPermission"
           [isMobileLoginOn]="!isNavigatedFromOrganizationArea && isMobileLoginOn"
           [reloadCredentials]="reloadCredentials$"
+          [disableNonlinkedagency]="disableNonlinkedagency"
           [isEnableClearedToStartForAcceptedCandidates$]="isEnableClearedToStartForAcceptedCandidates$"
           [isClearedToStartEnable]="isClearedToStartEnable"
           [clearedToStart]="clearedToStart"
@@ -137,7 +140,7 @@
       id="saveCandidateDetails"
       #saveCandidateDetails
       [isPrimary]="true"
-      [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]"
+      [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile] || disableNonlinkedagency"
       (click)="save()"
     >
       Save

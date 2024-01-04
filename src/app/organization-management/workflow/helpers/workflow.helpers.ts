@@ -7,7 +7,7 @@ import {
 } from '@shared/models/workflow.model';
 import { WorkflowMappingGet, WorkflowMappingPage } from '@shared/models/workflow-mapping.model';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
-import { WorkflowTabNames } from '@organization-management/workflow/workflow-mapping/constants';
+import { PriorityMultipleStep, WorkflowTabNames } from '@organization-management/workflow/workflow-mapping/constants';
 import { Applicability, TypeFlow } from '@organization-management/workflow/enumns';
 
 export const GetSelectedCardIndex = (workflowDetails: WorkflowWithDetails[], cardId: number): number => {
@@ -90,17 +90,7 @@ export const UpdateFiltersApplicability = (filters: WorkflowFilters): WorkflowFi
 };
 
 export const hasDuplicateSteps = (steps: Step[]): boolean => {
-  const stepList = new Set();
-
-  for (const item of steps) {
-    if (item.hasOwnProperty('order') && stepList.has(item.order)) {
-      return true;
-    }
-
-    stepList.add(item.order);
-  }
-
-  return false;
+  return steps.some((step: Step) => step.hasOwnProperty('order') && step?.order === PriorityMultipleStep);
 }
 
 export const CreateNextStepStatusField = (
@@ -116,6 +106,7 @@ export const CreateNextStepStatusField = (
       multiple: hasDuplicateStep && (item.name === 'Shortlisted' || item.name === 'Offered') ? 'Multiple' : null,
       nextStepStatus: array[index + 1]?.status,
       nextStepId: isApplicantIrpWorkflow ? array[index + 1]?.id : null,
+      roleFieldDataSourceType: isApplicantIrpWorkflow ? array[index + 1]?.type : item.type,
     };
   });
 }

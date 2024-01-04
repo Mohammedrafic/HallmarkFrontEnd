@@ -60,7 +60,7 @@ export class CandidateListComponent implements OnInit, OnDestroy {
     //,"DateRangeCL": ""
 
 
-    
+
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateList/CandidateList.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateList/CandidateList.cat" };
@@ -233,7 +233,7 @@ export class CandidateListComponent implements OnInit, OnDestroy {
 
 
   private initForm(): void {
-    
+
     this.candidateListForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators]),
@@ -305,10 +305,10 @@ export class CandidateListComponent implements OnInit, OnDestroy {
 
     let currentDate = new Date(Date.now());
 
-    
 
 
-    
+
+
 
     this.paramsData =
     {
@@ -320,11 +320,11 @@ export class CandidateListComponent implements OnInit, OnDestroy {
       "AgencyCL": agencyIds.length == 0 ? "null" : agencyIds.join(","),
       "SearchByCL": searchBy?.toString(),
       "SkillCL": skillIds.length == 0 ? "null" : skillIds.join(","),
-      "CandidateNameCL": candidateNameValue,
+      "CandidateNameCL": candidateNameValue.toString(),
       "IsExactMatchCL": isExactMatch,
 
        "InActiveInCompleteCL": inActiveInComplete == true ? "2" : "1",
-      "organizationNameCL": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "organizationNameCL": this.filterColumns.businessIds?.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
       //"reportPulledMessageMSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
       "reportPulledMessageCL": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
 

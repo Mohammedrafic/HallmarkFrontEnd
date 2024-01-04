@@ -13,7 +13,7 @@ import { ImportedBillRate } from '@shared/models';
 import { CandidateImportRecord } from '@shared/models/candidate-profile-import.model';
 import { ImportedOrder } from '@shared/models/imported-order.model';
 import { N_SUCCESS_RECORDS, N_FAILED_RECORDS } from '@shared/constants';
-import { EmployeeImportSaveResult } from '@shared/models/imported-employee';
+import { EmployeeGeneralImportSaveResult, EmployeeImportSaveResult } from '@shared/models/imported-employee';
 
 type ImportModel = ImportedLocation[]
   & ImportedDepartment[]
@@ -59,11 +59,14 @@ export abstract class AbstractImport extends DestroyableDirective implements OnI
     this.store.dispatch(new this.action.saveImportResult(value));
   }
 
+  public saveEmployeeGeneralNoteImportResult(value: EmployeeGeneralImportSaveResult): void {
+    this.store.dispatch(new this.action.saveImportResult(value));
+  }
   public uploadImportFile(file: Blob): void {
     this.store.dispatch(new this.action.uploadFile(file));
   }
 
-  private subscribeOnFileActions(): void {
+  subscribeOnFileActions(): void {
     this.actions$
       .pipe(takeUntil(this.destroy$), ofActionSuccessful(this.action.uploadFileSucceeded.instance))
       .subscribe((result: { payload: ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder> }) => {

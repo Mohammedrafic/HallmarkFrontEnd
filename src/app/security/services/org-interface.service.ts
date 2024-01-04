@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ExportPayload } from '@shared/models/export.model';
-import { InterfaceLogSummaryDetails, InterfaceLogSummaryIRPPage, LogInterfacePage, LogTimeSheetHistoryPage, OrgInterfacePage } from '@shared/models/org-interface.model';
+import { EmpGeneralNoteImportDetails, InterfaceLogSummaryDetails, InterfaceLogSummaryIRPPage, LogInterfacePage, LogTimeSheetHistoryPage, OrgInterfacePage } from '@shared/models/org-interface.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -137,7 +137,34 @@ export class OrgInterfaceService {
       public exportEmployeeImport(payload: ExportPayload): Observable<Blob> {
         return this.http.post(`/api/InterfaceLogSummaryIRP/export`, payload, { responseType: 'blob' });
       }
+
+          
+        /**
+   * Get the list of Log Employee import  by InterfaceId
+   * @param InterfaceId
+   * @param PageNumber
+   * @param PageSize
+   *
+   * @return OrgInterfacePage
+   */
+        public GetEmpGeneralNoteImportDetails(
+          interfaceLogSummaryID: number ,
+          statusType:number,
+          PageNumber: number,
+          PageSize: number,
+        ): Observable<EmpGeneralNoteImportDetails[]> {
+          return this.http.post<EmpGeneralNoteImportDetails[]>(`/api/InterfaceLogSummaryIRP/getEmpGeneralNoteImportDetails`, { interfaceLogSummaryID, statusType,PageNumber, PageSize });
+        }
   
+           /**
+     * Export the list of Employee Import Data by ExportPayload
+     * @param ExportPayload
+     *
+     * @return Blob
+     */
+      public exportEmpGeneralNoteImport(payload: ExportPayload): Observable<Blob> {
+        return this.http.post(`/api/InterfaceLogSummaryIRP/export/EmpGeneralNoteDetails`, payload, { responseType: 'blob' });
+      }
 }
 
 

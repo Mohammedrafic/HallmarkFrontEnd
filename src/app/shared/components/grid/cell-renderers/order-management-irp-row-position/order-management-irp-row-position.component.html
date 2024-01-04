@@ -4,7 +4,7 @@
       *ngFor="let data of row.rowsSource; trackBy:trackById"
       (click)="selectRow($event, data)"
       class="custom-row">
-      <ng-container *ngFor="let cell of colDefs[row.system]; trackBy:trackByField">
+      <ng-container *ngFor="let cell of colDefs[data.system]; trackBy:trackByField">
         <div
           [ngStyle]="{
            width: cell.width + 'px',
@@ -30,7 +30,7 @@
 
             <ng-container *ngSwitchCase="'candidateStatus' || 'orderStatus'">
               <ng-container *ngIf="data[cell?.field || ''] as cellValue">
-                <div [class]="cell?.cellClass" (click)="onClickChip(data, cellValue, row.system)">
+                <div [class]="cell?.cellClass" (click)="onClickChip(data, cellValue, data.system)">
                   <ejs-chiplist>
                     <e-chips>
                       <e-chip [text]="cellValue" [cssClass]="(cellValue | chipsCssClass)"></e-chip>
@@ -41,7 +41,7 @@
             </ng-container>
 
             <ng-container *ngSwitchCase="'system'">
-              <ng-container *ngIf="row.system === vmsSystem && isBothSystemsEnabled; else defaultCell">
+              <ng-container *ngIf="data.system === vmsSystem && isBothSystemsEnabled; else defaultCell">
                 <p class="custom-cell__value custom-cell__link" (click)="navigateToPositionDetails(data)">
                   {{ data[cell?.field || ''] }}
                 </p>
@@ -55,14 +55,14 @@
             </ng-container>
 
             <ng-container *ngSwitchCase="'actualStartDate'">
-              <ng-container *ngIf="row.system === irpSystem && params.data.orderType === 3">
+              <ng-container *ngIf="data.system === irpSystem && params.data.orderType === 3">
                 <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
               <h3 class="custom-cell__title">{{ cell.headerName }}</h3>
               </ng-container>
             </ng-container>
 
             <ng-container *ngSwitchCase="'actualEndDate'">
-              <ng-container *ngIf="row.system === irpSystem && params.data.orderType === 3">
+              <ng-container *ngIf="data.system === irpSystem && params.data.orderType === 3">
                 <p class="custom-cell__value">{{ data[cell?.field || ''] }}</p>
               <h3 class="custom-cell__title">{{ cell.headerName }}</h3>
               </ng-container>

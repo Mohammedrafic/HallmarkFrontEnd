@@ -36,4 +36,5 @@ export interface CandidateModel {
   generalNotes: GeneralNotesModel[],
   isOnHoldSetManually: boolean,
   createReplacement?: boolean,
+  removeSchedules?: boolean,
 }

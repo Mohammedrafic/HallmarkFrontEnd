@@ -219,6 +219,9 @@
     <app-bill-rates #billRates
                     [billRates]="billRatesData"
                     [isActive]="true"
+                    [candidateJobId]="candidateJob?.jobId || null"
+                    [organizationId]="candidateJob?.organizationId || null"
+                    [orderType]="candidateJob?.order?.orderType"
                     [readOnlyMode]="isReadOnlyBillRates"
                     (billRatesChanged)="onBillRatesChanged()">
     </app-bill-rates>

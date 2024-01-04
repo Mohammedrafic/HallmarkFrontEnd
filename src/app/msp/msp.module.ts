@@ -46,12 +46,8 @@ import {
   Copy,
 } from 'angular-feather/icons';
 import { AddEditMspComponent } from './add-edit-msp/add-edit-msp.component';
-import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
 import { AddEditMSPService } from './services/msp-addedit.service';
 import { AdminState } from '@admin/store/admin.state';
-import {
-
-} from 'angular-feather/icons';
 import { AdminRoutingModule } from '@admin/admin-routing.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CredentialListModule } from '@shared/components/credentials-list/credential-list.module';

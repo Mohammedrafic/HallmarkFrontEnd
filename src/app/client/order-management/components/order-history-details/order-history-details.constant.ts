@@ -193,7 +193,7 @@ export const OrderAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
       resizable: true
     },
     {
-      headerName: 'MODIFIED DATE',
+      headerName: 'Modified Date & Time',
       field: 'modifiedOn',
       minWidth: 100,
       filter: 'agDateColumnFilter',
@@ -222,7 +222,7 @@ export const OrderAuditHistoryTableColumnsDefinition = (): ColumnDefinitionModel
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy') as string
+        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy HH:mm') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,
@@ -334,7 +334,7 @@ export const OrderCredentialAuditHistoryTableColumnsDefinition = (): ColumnDefin
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy') as string
+        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy HH:mm') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,
@@ -499,7 +499,7 @@ export const OrderBillRatesAuditHistoryTableColumnsDefinition = (): ColumnDefini
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy') as string
+        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy HH:mm') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,
@@ -601,7 +601,7 @@ export const OrderContactAuditHistoryTableColumnsDefinition = (): ColumnDefiniti
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy') as string
+        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy HH:mm') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,
@@ -686,7 +686,7 @@ export const OrderWorkLocationAuditHistoryTableColumnsDefinition = (): ColumnDef
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy') as string
+        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy HH:mm') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,
@@ -762,7 +762,7 @@ export const OrderJobDistributionAuditHistoryTableColumnsDefinition = (): Column
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy') as string
+        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy HH:mm') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,
@@ -827,7 +827,7 @@ export const OrderClassificationAuditHistoryTableColumnsDefinition = (): ColumnD
         inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       },
       cellRenderer: (params: ICellRendererParams) => {
-        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy') as string
+        const str = GridValuesHelper.formatDate(params.data.modifiedOn, 'MM/dd/yyyy HH:mm') as string
         return str?.length > 0 ? str : "";
       },
       sortable: true,

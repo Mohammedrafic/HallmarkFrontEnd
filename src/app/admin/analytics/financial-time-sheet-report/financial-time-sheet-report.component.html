@@ -33,15 +33,15 @@
         <label>Organization Name<span class="required">*</span></label>
         <div class="input-group dropdown">
           <!-- <ejs-dropdownlist appValidateWithMessage
-                            formControlName="businessIds"
-                            [fields]="organizationFields"
-                            [dataSource]="filterColumns.businessIds.dataSource"
-                            [allowFiltering]="true"
-                            placeholder="Business"> 
-          </ejs-dropdownlist> -->
+                          formControlName="businessIds"
+                          [fields]="organizationFields"
+                          [dataSource]="filterColumns.businessIds.dataSource"
+                          [allowFiltering]="true"
+                          placeholder="Business">
+        </ejs-dropdownlist> -->
           <ejs-multiselect mode="CheckBox" formControlName="businessIds" placeholder="Business"
-            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.businessIds.dataSource"
-            [fields]="organizationFields" [selectAllText]='allOption' showSelectAll=true>
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.businessIds.dataSource"
+                           [fields]="organizationFields" [selectAllText]='allOption' showSelectAll=true>
           </ejs-multiselect>
         </div>
       </div>
@@ -51,8 +51,8 @@
         <label>Region</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="regionIds" appValidateWithMessage placeholder="All"
-            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
-            [fields]="regionFields" [enabled]="bussinessControl?.value.length == 1">
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.regionIds.dataSource"
+                           [fields]="regionFields" [enabled]="bussinessControl?.value.length == 1">
           </ejs-multiselect>
         </div>
       </div>
@@ -62,8 +62,8 @@
         <label>Location</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="locationIds" appValidateWithMessage
-            [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
-            [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields" [enabled]="bussinessControl?.value.length == 1">
+                           [placeholder]="allOption" [allowFiltering]="true" [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.locationIds.dataSource" [fields]="locationFields" [enabled]="bussinessControl?.value.length == 1">
           </ejs-multiselect>
         </div>
       </div>
@@ -73,8 +73,8 @@
         <label>Department</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="departmentIds" appValidateWithMessage placeholder="All"
-            [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
-            [fields]="departmentFields" [enabled]="bussinessControl?.value.length == 1">
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.departmentIds.dataSource"
+                           [fields]="departmentFields" [enabled]="bussinessControl?.value.length == 1">
           </ejs-multiselect>
         </div>
       </div>
@@ -85,17 +85,17 @@
           <label>Skill Category</label>
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="skillCategoryIds" placeholder="All"
-              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillCategoryIds.dataSource"
-              [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillCategoryIds.dataSource"
+                             [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container bootstrap">
           <label>Skills</label>
           <div class="input-group dropdown">
-            <ejs-multiselect mode="CheckBox" formControlName="skillIds"  placeholder="All"
-              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillIds.dataSource"
-              [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+            <ejs-multiselect mode="CheckBox" formControlName="skillIds" placeholder="All"
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillIds.dataSource"
+                             [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
@@ -105,18 +105,18 @@
       <div class="group">
         <div class="input-container bootstrap">
           <label>Candidate Name</label>
-          <div class="input-group dropdown">          
-            <ejs-autocomplete formControlName="candidateName"  [dataSource]="filterColumns.candidateName.dataSource" 
-             filterType='StartsWith' [fields]='candidateNameFields'
-                    [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
+          <div class="input-group dropdown">
+            <ejs-autocomplete formControlName="candidateName" [dataSource]="filterColumns.candidateName.dataSource"
+                              filterType='StartsWith' [fields]='candidateNameFields'
+                              [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
           </div>
         </div>
         <div class="input-container bootstrap">
           <label>Candidate Status</label>
           <div class="input-group dropdown">
-            <ejs-multiselect mode="CheckBox" formControlName="candidateStatuses"  placeholder="All"
-              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.candidateStatuses.dataSource"
-              [fields]="candidateStatusesFields" [selectAllText]='allOption' showSelectAll=true>
+            <ejs-multiselect mode="CheckBox" formControlName="candidateStatuses" placeholder="All"
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.candidateStatuses.dataSource"
+                             [fields]="candidateStatusesFields" [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
@@ -124,11 +124,25 @@
     </div>
     <div class="form-elemet">
       <div class="group">
+        <div class="input-container bootstrap">
+          <label>Period</label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist (change)="selectPeriod($event)" formControlName="period" appValidateWithMessage placeholder="All"
+                              [allowFiltering]="true" [dataSource]="periodList"
+                              [fields]="periodFields" showSelectAll=true>
+            </ejs-dropdownlist>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-elemet">
+      <div class="group">
         <div class="input-container calendar">
           <label>Start Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-              appValidateWithMessage formControlName="startDate">
+                            appValidateWithMessage formControlName="startDate" [enabled]="financialTimesheetReportForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
         </div>
@@ -136,8 +150,9 @@
           <label>End Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-              appValidateWithMessage formControlName="endDate"
-              [min]="financialTimesheetReportForm.controls['startDate'].value">
+                            appValidateWithMessage formControlName="endDate"
+                            [min]="financialTimesheetReportForm.controls['startDate'].value"
+                            [enabled]="financialTimesheetReportForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
         </div>
@@ -148,18 +163,18 @@
         <div class="input-container bootstrap">
           <label>Order Type</label>
           <div class="input-group dropdown">
-              <ejs-multiselect mode="CheckBox" formControlName="orderTypes"  placeholder="All"
-              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.orderTypes.dataSource"
-              [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+            <ejs-multiselect mode="CheckBox" formControlName="orderTypes" placeholder="All"
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.orderTypes.dataSource"
+                             [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container bootstrap">
           <label>Position Status</label>
           <div class="input-group dropdown">
-            <ejs-multiselect mode="CheckBox" formControlName="jobStatuses"  placeholder="All"
-              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.jobStatuses.dataSource"
-              [fields]="jobStatusesFields" [selectAllText]='allOption' showSelectAll=true>
+            <ejs-multiselect mode="CheckBox" formControlName="jobStatuses" placeholder="All"
+                             [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.jobStatuses.dataSource"
+                             [fields]="jobStatusesFields" [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
@@ -167,28 +182,28 @@
     </div>
     <div class="form-elemet">
       <div class="group">
-      <div class="input-container dropdown">
-        <label>Position Id</label>
-        <div class="input-group">
-          <input class="e-input"
-                 type="text"
-                 appValidateWithMessage
-                 maxlength="50"
-                 formControlName="jobId" />
+        <div class="input-container dropdown">
+          <label>Position Id</label>
+          <div class="input-group">
+            <input class="e-input"
+                   type="text"
+                   appValidateWithMessage
+                   maxlength="50"
+                   formControlName="jobId" />
+          </div>
         </div>
-      </div>
-      <div class="input-container bootstrap">
-        <label>Report Type<span class="required">*</span></label>
-        <div class="input-group dropdown">
-          <ejs-dropdownlist appValidateWithMessage
-                            formControlName="accrualReportTypes"
-                            [fields]="accrualReportTypeFields"
-                            [dataSource]="filterColumns.accrualReportTypes.dataSource"
-                            [allowFiltering]="true"
-                            placeholder="">
-          </ejs-dropdownlist>
+        <div class="input-container bootstrap">
+          <label>Report Type<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist appValidateWithMessage
+                              formControlName="accrualReportTypes"
+                              [fields]="accrualReportTypeFields"
+                              [dataSource]="filterColumns.accrualReportTypes.dataSource"
+                              [allowFiltering]="true"
+                              placeholder="">
+            </ejs-dropdownlist>
+          </div>
         </div>
-      </div>
       </div>
     </div>
     <div class="form-elemet">
@@ -203,7 +218,7 @@
                    formControlName="invoiceID" />
           </div>
         </div>
-        <div class="input-container bootstrap"  *ngIf="financialTimesheetReportForm.controls['accrualReportTypes'].value==0">
+        <div class="input-container bootstrap" *ngIf="financialTimesheetReportForm.controls['accrualReportTypes'].value==0">
           <div class="input-group dropdown">
 
           </div>

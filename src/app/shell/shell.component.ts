@@ -10,16 +10,17 @@ import {
 import { NavigationEnd, Router, RouterEvent, Event } from '@angular/router';
 
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import {
   ContextMenuComponent,
   MenuItemModel,
+  NodeExpandEventArgs,
   NodeSelectEventArgs,
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, filter, map, merge, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, filter, map, merge, of, switchMap, take, takeUntil } from 'rxjs';
 
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderManagementService,
@@ -61,8 +62,9 @@ import { HeaderState } from '@shared/models/header-state.model';
 import { HelpNavigationService } from '@shared/services';
 import { IsMspAreaStateModel } from '@shared/models/is-msp-area-state.model';
 import { DomainLinks } from '@shared/models/help-site-url.model';
-import { GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+import { findItemInArrayTree } from './helpers/menu.helper';
 import { GetOrganizationById } from '@admin/store/admin.actions';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-shell',
@@ -161,21 +163,16 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   public showHelpIButton = false;
 
   private isClosingSearch = false;
-  private isContactOpen = false;
   private profileData: MenuItemModel[] = [];
   private activeMenuItemData: MenuItem;
   private isFirstLoad: boolean;
   private sideBarMenu: MenuItem[];
-  private faBan = faBan as IconDefinition;
   private userLogin: { firstName: string; lastName: string };
-  private addFormButton: HTMLElement;
-  private cancelFormButton: HTMLElement;
   private canManageOtherUserNotifications: boolean;
   private canManageNotificationTemplates: boolean;
-  private isDialogOpen = false;
   private permissions: CurrentUserPermission[] = [];
   private orderMenuItems: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
-  private irpVmsHelpSiteUrl = 'https://eiiohelp.einsteinii.org/';
+  private user: User;
 
   scrollData:boolean = false;
   loadMoreCotent:string = '';
@@ -249,6 +246,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
           }
 
         });
+    this.user = this.store.selectSnapshot(UserState.user) as User;
+    if (this.user.businessUnitType === BusinessUnitType.Organization) {
+      this.getOrganization();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -281,6 +282,15 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     }
   }
 
+  public highlightActiveNode(event: { data: MenuItem[] }): void {
+    if (event.data.length) {
+      const menuItem = findItemInArrayTree(event.data, this.router.url);
+      if (menuItem) {
+        this.tree.selectedNodes = [menuItem.anch];
+      }
+    }
+  }
+
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
 
@@ -290,21 +300,10 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
       this.sidebar.isOpen = isDocked;
     });
 
-
     this.isFirstLoad$
     .pipe(takeUntil(this.componentDestroy()))
     .subscribe((isFirstLoad) => {
       this.isFirstLoad = isFirstLoad;
-      if (isFirstLoad) {
-        // TODO: Should be decided after Login: CLIENT_SIDEBAR_MENU, ADMIN_SIDEBAR_MENU etc.
-        // const currentConfiguration = CLIENT_SIDEBAR_MENU;
-        // const activeMenuItem = currentConfiguration.find(item => item.isActive);
-        //
-        // if (activeMenuItem) {
-        //   this.route.navigate([activeMenuItem.route]);
-        //   this.tree.selectedNodes = [activeMenuItem.title];
-        // }
-      }
     });
   }
 
@@ -315,6 +314,13 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   toggleSidebar(): void {
     this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
     this.tree.collapseAll();
+  }
+
+  public expandSubMenu(args: NodeExpandEventArgs): void {
+    const selectedNode = this.tree.getTreeData(args.node)[0];
+    if (selectedNode) {
+      this.highlightActiveNode({ data: selectedNode['children'] as MenuItem[]});
+    }
   }
 
   toggleSubMenu(args: NodeSelectEventArgs): void {
@@ -416,17 +422,26 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
   }
 
   onGetHelp(): void {
-    this.userService
-    .getHelpSiteUrl()
-    .pipe(
-      take(1),
-    )
-    .subscribe((links: DomainLinks) => {
-      const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-      this.helpService.navigateHelpPage(appArea?.isAgencyArea, links);
-    });
-
-
+    if (this.user.businessUnitType === BusinessUnitType.Hallmark) {
+      this.getOrganization()
+      .pipe(
+        switchMap(() => this.userService.getHelpSiteUrl()),
+        take(1),
+      )
+      .subscribe((links: DomainLinks) => {
+        const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+        this.helpService.navigateHelpPage(appArea?.isAgencyArea, links);
+      });
+    } else {
+      this.userService.getHelpSiteUrl()
+      .pipe(
+        take(1),
+      )
+      .subscribe((links: DomainLinks) => {
+        const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+        this.helpService.navigateHelpPage(appArea?.isAgencyArea, links);
+      });
+    }
   }
 
   toggleChatDialog(): void {
@@ -518,7 +533,7 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     this.store.dispatch(new ShowCustomSideDialog(true));
   }
 
-  getContentDetails(businessUnitId?: number,orderId?: number,title?:string,alertId?:number,publicId?:string): void {
+  getContentDetails(businessUnitId?: number,orderId?: number,title?:string,alertId?:number,publicId?:string,timesheetId?:number): void {
     if (businessUnitId) {
         this.alertSideBarCloseClick();
         window.localStorage.setItem("BussinessUnitID",JSON.stringify(businessUnitId));
@@ -541,7 +556,9 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
     if(publicId){
       window.localStorage.setItem("OrderPublicId",JSON.stringify(publicId));
     }
-
+    if(timesheetId){
+      window.localStorage.setItem("TimesheetId",JSON.stringify(timesheetId));
+    }
   }
 
   private getAlertsForUser(): void {
@@ -843,5 +860,22 @@ export class ShellPageComponent extends Destroyable implements OnInit, OnDestroy
 
   private navigateToEmployeeProfile(): void {
     this.router.navigate(['employee/profile/information']);
+  }
+
+  private getOrganization(): Observable<void> {
+    const user = this.store.selectSnapshot(UserState.user) as User;
+    const lastSelectedOrgId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId) as number;
+    const appArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+    const isOrgArea = appArea.isOrganizationArea
+    || (!appArea.isAgencyArea && !appArea.isOrganizationArea);
+
+    if (user.businessUnitType === BusinessUnitType.Hallmark && isOrgArea && lastSelectedOrgId) {
+      return this.store.dispatch(new GetOrganizationById(lastSelectedOrgId));
+    } else if (user.businessUnitType != BusinessUnitType.Agency && appArea.isOrganizationArea) {
+      const id = user.businessUnitId as number;
+      return this.store.dispatch(new GetOrganizationById(id));
+    }
+
+    return of(undefined as void);
   }
 }

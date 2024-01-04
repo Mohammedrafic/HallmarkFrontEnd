@@ -1,0 +1,17 @@
+<div class="bor-rad" *ngIf="monthlyIntegrationRuns$ | async as monthlyIntegration">
+  <h3 class="h3Title">{{monthlyIntegration.title}}</h3>
+  <ejs-chart 
+             [chartArea]="chartArea"
+             [primaryXAxis]="isDarkTheme ? primaryXAxisDarkTheme : primaryXAxis"
+             [primaryYAxis]="isDarkTheme ? primaryYAxisDarkTheme : primaryYAxis"
+             [legendSettings]="legendSettings"
+             [tooltip]="isDarkTheme ? tooltipDarkSettings : tooltipSettings"
+             class="app-active-positions-initial-extended__component"
+             [background]="isDarkTheme ? 'var(--chart-dark-bg)' : 'var(--chart-light-bg)'">
+    <e-series-collection>
+      <e-series [dataSource]="monthlyIntegration.chartData" type='StackingColumn' xName='label' yName='value' [fill]="'var(--primary-active-blue-10)'" columnWidth=0.5> </e-series>
+    </e-series-collection>
+  </ejs-chart>
+</div>
+
+

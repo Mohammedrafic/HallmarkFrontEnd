@@ -13,13 +13,15 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content">
-        <div class="input-group dropdown bootstrap" *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length">
-          <ejs-dropdownlist [fields]="optionFields"
-                            [dataSource]="(applicantStatuses$ | async)"
-                            [itemTemplate]="itemTemplate"
-                            [allowFiltering]="true"
-                            placeholder="Select Status"
-                            (select)="setRevertedStatus($event)">
+        <div class="input-group dropdown bootstrap" *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length && this.agencyCanRevert ">
+          <ejs-dropdownlist
+            #statusSelect
+            [fields]="optionFields"
+            [dataSource]="(applicantStatuses$ | async)"
+            [itemTemplate]="itemTemplate"
+            [allowFiltering]="true"
+            placeholder="Select Status"
+            (select)="setRevertedStatus($event)">
             <ng-template #itemTemplate let-data>
               <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
             </ng-template>
@@ -27,7 +29,7 @@
         </div>
         <div *ngIf="!isCancelled" class="status-actions">
           <button
-            *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length"
+            *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length && this.agencyCanRevert"
             ejs-button
             [isPrimary]="true"
             [disabled]="!revertStatusSelected"

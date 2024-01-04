@@ -9,7 +9,7 @@ import { Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
-import { RejectReasonService } from '@shared/services/reject-reason.service';
+
 
 import {
   ClearAssignedSkillsByOrganization,
@@ -144,7 +144,9 @@ import {
   BulkUpdateDepartmentsucceeded,
   BulkUpdateDepartmentFailed,
   BulkUpdateDepartment,
-  GetRejectReasons
+  DeleteOrganizationSettingsValues,
+  DeleteOrganizationSettingsValuesSucceeded
+  
 } from './organization-management.actions';
 import { BulkDepartmentAction, Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
 import { ImportedRegion, Region, regionFilter, regionsPage } from '@shared/models/region.model';
@@ -204,7 +206,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import { ImportedBillRate } from '@shared/models';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.model';
 
 interface DropdownOption {
   id: number;
@@ -261,7 +262,6 @@ export interface OrganizationManagementStateModel {
   filteringAssignedSkillsByOrganization: ListOfSkills[];
   credentialSettingPage: CredentialPage | null;
   bulkupdateskills:BulkUpdateAssignedSkill[] | null;
-  rejectionReasonsList: RejectReason[] | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -321,8 +321,7 @@ export interface OrganizationManagementStateModel {
     assignedSkillsByOrganization: [],
     filteringAssignedSkillsByOrganization: [],
     credentialSettingPage: null,
-    bulkupdateskills:null,
-    rejectionReasonsList: null
+    bulkupdateskills:null   
   },
 })
 @Injectable()
@@ -525,11 +524,6 @@ export class OrganizationManagementState {
     return state.loctionTypes;
   }
   
-  @Selector()
-  static rejectionReasonsList(state: OrganizationManagementStateModel): RejectReason[] | null {
-    return state.rejectionReasonsList;
-  }
-
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
@@ -541,8 +535,8 @@ export class OrganizationManagementState {
     private skillGroupService: SkillGroupService,
     private organizationSettingsService: OrganizationSettingsService,
     private nodatimeService: NodatimeService,
-    private billRatesService: BillRatesService,
-    private rejectReasonService:RejectReasonService
+    private billRatesService: BillRatesService
+   
   ) {}
 
   @Action(SetGeneralStatesByCountry)
@@ -700,7 +694,7 @@ export class OrganizationManagementState {
               MessageTypes.Error,
               'Department has ' +
                 statues +
-                ' Orders please re-assign or close them before inactivating the Department.'
+                ' Orders and Timesheets please re-assign or close them before inactivating the Department.'
             )
           );
         }
@@ -1018,7 +1012,7 @@ export class OrganizationManagementState {
               MessageTypes.Error,
               'Location has ' +
                 statues +
-                ' Orders please re-assign or close them before inactivating the Location.'
+                ' Orders and Timesheets please re-assign or close them before inactivating the Location.'
             )
           );
         }
@@ -1278,7 +1272,7 @@ export class OrganizationManagementState {
         const errorObj = error.error;
         const statues = JSON.parse(errorObj.errors.IncompleteOpenOrdersExist);
         if (errorObj.errors?.IncompleteOpenOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has '+ statues +' Orders please re-assign or close them before inactivating the Skill.'));
+          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has '+ statues +' Orders and Timesheets please re-assign or close them before inactivating the Skill.'));
         }
         if (errorObj.errors?.InProgressOrdersExist) {
           return dispatch(new SaveLocationConfirm());
@@ -1979,16 +1973,18 @@ export class OrganizationManagementState {
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Regions were not imported'))))
     );
   }
-  @Action(GetRejectReasons)
-  GetRejectReasonsForOrganisation(
-    { patchState}: StateContext<OrganizationManagementStateModel>,
-    { systemType }: GetRejectReasons
-    ): Observable<RejectReasonPage> {
-    return this.rejectReasonService.getAllRejectReasons(systemType).pipe(
-      tap((reasons) => {
-        patchState({ rejectionReasonsList: reasons.items });
-        return reasons;
-      })
+  @Action(DeleteOrganizationSettingsValues)
+  DeleteOrganizationSettingValue(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { settingValueId}: DeleteOrganizationSettingsValues
+  ): Observable<any> {
+    return this.organizationSettingsService.deleteOrganizationSettingValues(settingValueId).pipe(
+      tap((payload) => {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+        dispatch(new DeleteOrganizationSettingsValuesSucceeded());
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => of(dispatch(new ShowToast(MessageTypes.Error, error.error)))),
     );
   }
 }

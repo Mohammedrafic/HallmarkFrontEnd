@@ -30,6 +30,7 @@ import { Penalty } from '@shared/models/penalty.model';
 import {
   ClearCandidateCancellationReason,
   GetCandidateCancellationReason,
+  GetRejectReasonsForOrganisation,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { DateTimeHelper } from '@core/helpers';
@@ -37,6 +38,14 @@ import { OrderType } from '@shared/enums/order-type';
 import { DefaultMaxDate, DefaultMinDate } from '@shared/constants';
 
 import { CandidateCancellationDialogService } from './candidate-cancellation-dialog.service';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { EditIrpCandidateService } from '../order-candidate-list/edit-irp-candidate/services';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
+import { PageOfCollections } from '@shared/models/page.model';
+import { CancelEmployeeReasons } from '@shared/models/reject-reason.model';
+import { GetCancelEmployeeReason } from '@organization-management/store/reject-reason.actions';
+import { canceldto } from '../order-candidate-list/interfaces';
 
 interface DataSourceObject<T> {
   text: string;
@@ -58,9 +67,13 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
 
   @Output() submitCandidateCancellation = new EventEmitter<JobCancellation>();
   @Output() cancelCandidateCancellation = new EventEmitter<void>();
+  @Output() cancelledCandidateforIRP = new EventEmitter<canceldto>();
 
   @Select(OrderManagementContentState.getCandidateCancellationReasons)
   private candidateCancellationReasons$: Observable<CandidateCancellationReason[] | null>;
+
+  @Select(RejectReasonState.getCancelEmployeeReasons)
+  public reasons$: Observable<PageOfCollections<CancelEmployeeReasons>>;
 
   public form: FormGroup;
   public isReasonSelected = false;
@@ -74,7 +87,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     text: 'text',
     value: 'value',
   };
-
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public ReasonOptionFields = {
     text: 'name',
     value: 'id',
@@ -85,18 +98,30 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   public isReorder = false;
 
   private predefinedPenalties: Penalty | null;
-
-  constructor(
+  activeSystem: any;
+  currentPage: number = 1;
+  pageSize: number = 100;
+  actualEndDate: string;
+  cancelcandidate: Observable<void>;
+constructor(
     private cd: ChangeDetectorRef,
     private orderService: OrderManagementContentService,
     private cancellationDialogService: CandidateCancellationDialogService,
-    private store: Store
+    private store: Store,
+    private orderManagementService: OrderManagementService,
+    private editIrpCandidateService: EditIrpCandidateService,
   ) {
     super();
   }
 
   public ngOnInit(): void {
+    this.activeSystem = this.orderManagementService.getOrderManagementSystem();
+    this.getRejectedReasons();
     this.onOpenEvent();
+  }
+
+  protected getRejectedReasons(): void {
+    this.store.dispatch(new GetCancelEmployeeReason(this.currentPage, this.pageSize));
   }
 
   public cancel(): void {
@@ -112,7 +137,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
 
   public submit(): void {
     this.form.markAllAsTouched();
-    if (this.form.valid) {
+    if (this.form.valid || this.activeSystem !== OrderManagementIRPSystemId.IRP) {
       const { jobCancellationReason, penaltyCriteria,  rate, hours, actualEndDate } = this.form.getRawValue();
 
       this.submitCandidateCancellation.emit({
@@ -122,6 +147,16 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
         rate,
         hours,
       });
+      this.form.reset();
+      this.candidateCancellationDialog.hide();
+    } else if(this.activeSystem === OrderManagementIRPSystemId.IRP && this.form.get("actualEndDate")?.value !== null){
+      const { jobCancellationReason, actualEndDate } = this.form.getRawValue();
+      if(this.candidateJob){
+          this.cancelledCandidateforIRP.emit({
+            actualEndDate: actualEndDate ? DateTimeHelper.setUtcTimeZone(actualEndDate) : null,
+            jobCancellationReason,
+        })
+      }
       this.form.reset();
       this.candidateCancellationDialog.hide();
     }
@@ -141,7 +176,11 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
         switchMap(() => this.candidateCancellationReasons$),
         takeUntil(this.destroy$)
       ).subscribe((cancellationReasons) => {
-        this.reasons = cancellationReasons ?? [];
+        if(this.activeSystem === OrderManagementIRPSystemId.IRP){
+           this.reasons = this.editIrpCandidateService.createReasonsOptionsforCancel(this.editIrpCandidateService.getCancelEmployeeReasons()) ?? [];
+        } else {
+          this.reasons = cancellationReasons ?? [];
+        }
         this.cd.markForCheck();
       });
   }
@@ -155,17 +194,19 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     this.form?.get('jobCancellationReason')?.valueChanges.pipe(
       takeUntil(this.destroy$)
     ).subscribe((value: JobCancellationReason) => {
-      this.isReasonSelected = !!(value || value === JobCancellationReason.LTACancellationOnBehalfOfOrganization);
-      if (this.isReasonSelected && this.candidateJob) {
-        this.form?.get('penaltyCriteria')?.setValue(null);
-        this.predefinedPenalties = null;
-        this.orderService.getPredefinedPenalties(this.candidateJob, value).pipe(
-          takeUntil(this.destroy$)
-        ).subscribe((data) => {
-          this.predefinedPenalties = data;
-          this.form?.get('penaltyCriteria')?.setValue(data.penaltyCriteria);
-        });
-      }
+      if(this.activeSystem !== OrderManagementIRPSystemId.IRP){
+        this.isReasonSelected = !!(value || value === JobCancellationReason.LTACancellationOnBehalfOfOrganization);
+        if (this.isReasonSelected && this.candidateJob) {
+          this.form?.get('penaltyCriteria')?.setValue(null);
+          this.predefinedPenalties = null;
+          this.orderService.getPredefinedPenalties(this.candidateJob, value).pipe(
+            takeUntil(this.destroy$)
+          ).subscribe((data) => {
+            this.predefinedPenalties = data;
+            this.form?.get('penaltyCriteria')?.setValue(data.penaltyCriteria);
+          });
+        }
+      }      
       this.cd.markForCheck();
     });
 

@@ -10,6 +10,7 @@ import { UserService } from '@shared/services/user.service';
 
 @Component({
   selector: 'app-analytics',
+  styleUrls: ['./analytics.component.scss'],
   templateUrl: './analytics.component.html',
 })
 export class AnalyticsComponent implements OnInit, OnDestroy {
@@ -29,7 +30,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 
   flattenChildren(items: any[]): any[] {
     let flattenedItems: any[] = [];
-    items.forEach(item => {
+    items?.forEach(item => {
       // Push the current item to the flattened array
       flattenedItems.push({ text: item.title, id: item.id, route: item.route ? item.route : '' });
 
@@ -61,14 +62,14 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
           let analyticsMenuItem = menu.menuItems.filter((item: MenuItem) => item.id == AnalyticsMenuId);
           const menuFilter = analyticsMenuItem[0].children;
           const menuId = window.localStorage.getItem("menuId");
-          if (menuId!=='undefined' && menuId!=null) {
+          if (menuId!=='undefined' && menuId!=='null') {
             const item = this.findItemById(menuFilter, Number(menuId));
             const flattenedMenuItems = this.flattenChildren(item?.children);
             this.sideMenuConfig = flattenedMenuItems;
           } else {
             const routeToFind = this.router.url;
             const topLevelParentId = this.findTopLevelParentId(menuFilter, routeToFind);
-  
+
             if (topLevelParentId !== null) {
               const item = this.findItemById(menuFilter, Number(topLevelParentId));
               const flattenedMenuItems = this.flattenChildren(item.children);
@@ -78,10 +79,10 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
                this.router.navigate(['/']);
            }
           }
-        
+
       }
 
-  
+
       if (this.router.url == '/analytics') {
         const menuId = localStorage.getItem("menuId")
         const route = (Number(menuId) === VMSReportsMenuId) ? this.findFirstNonEmptyRoute(this.sideMenuConfig) : this.sideMenuConfig[0].route
@@ -117,7 +118,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
     }
     return null;
   }
-  
+
   findItemById(data: any, id: number): any {
     return data.find((item: { id: number; }) => item.id === id);
   }

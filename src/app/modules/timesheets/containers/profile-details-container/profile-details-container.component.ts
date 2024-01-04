@@ -80,6 +80,7 @@ import { TimesheetsState } from '../../store/state/timesheets.state';
 import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
 import { AppState } from 'src/app/store/app.state';
 import { Comment } from '@shared/models/comment.model';
+import { AlertIdEnum } from '@admin/alerts/alerts.enum';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -172,6 +173,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private jobId: number;
 
   public commentContainerId = 0;
+  public openEvent:boolean = false;
 
 
   @Select(TimesheetsState.orderComments)
@@ -246,7 +248,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   navigateTheAttachment$: Subject<number> = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   sideBar:boolean = false;
-
+  expandedItem:boolean = false;
 
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
@@ -308,6 +310,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   }
 
   public selectTab(selectEvent: SelectingEventArgs): void {
+    let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
+    this.expandedItem = false;
     if (!this.isChangesSaved && (this.slectingindex !== selectEvent.selectedIndex)) {
       this.confirmService.confirm(TimesheetConfirmMessages.confirmTabChange, {
         title: 'Unsaved Progress',
@@ -324,6 +328,14 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             this.tabs.select(selectEvent.previousIndex);
           }
 
+          if((AlertIdEnum[AlertIdEnum['Timesheet Level Comments']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()){
+            this.tabs.select(0);
+            window.localStorage.setItem("TimesheetId", JSON.stringify(0));
+            window.localStorage.setItem("OrderPublicId", JSON.stringify(""));
+            window.localStorage.setItem("alertTitle", JSON.stringify(""));
+            this.expandedItem = true;
+          }
+
           this.cd.detectChanges();
         });
     } else {
@@ -332,7 +344,13 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       if (this.currentTab === 'details') {
         this.previewAttachemnt = false;
       }
-
+      if((AlertIdEnum[AlertIdEnum['Timesheet Level Comments']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()){
+        this.tabs.select(0);
+        window.localStorage.setItem("TimesheetId", JSON.stringify(0));
+        window.localStorage.setItem("OrderPublicId", JSON.stringify(""));
+        window.localStorage.setItem("alertTitle", JSON.stringify(""));
+        this.expandedItem = true;
+      }
       this.cd.detectChanges();
     }
   }
@@ -597,6 +615,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(take(1))
       .subscribe(() => {
         this.candidateDialog.hide();
+        this.openEvent = false;
         if (this.isTimeSheetChanged) {
           this.refreshGrid();
         }
@@ -612,7 +631,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       this.timesheetDetailsApiService.getTimesheetHistoricalEvents(this.isAgency, this.timesheetId, this.organizationId)
         .pipe(take(1))
         .subscribe((events: TimesheetHistoricalEvent[]) => {
-          this.historicalEvents = events;
+          this.historicalEvents = this.timesheetDetailsService.getSortedHistoricalEvents(events);
           this.cd.markForCheck();
         });
     }
@@ -802,6 +821,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       )
       .subscribe(() => {
         this.candidateDialog?.show();
+        this.openEvent = true;
       });
   }
 

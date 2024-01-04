@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -39,7 +40,7 @@ import { ReOrderPage } from '@shared/components/order-reorders-container/interfa
   templateUrl: './preview-order-dialog.component.html',
   styleUrls: ['./preview-order-dialog.component.scss'],
 })
-export class PreviewOrderDialogComponent extends AbstractPermission implements OnInit, OnChanges, OnDestroy {
+export class PreviewOrderDialogComponent extends AbstractPermission implements OnInit, OnDestroy {
   @Input() order: AgencyOrderManagement;
   @Input() openEvent: Subject<boolean>;
   @Input() orderPositionSelected$: Subject<boolean>;
@@ -82,7 +83,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
   public readonly reasonClosure = {
     orderClosureReason: 'Candidate Rejected',
   } as Order;
-
+  public isOpen:boolean = false;
   public get showRejectInfo(): boolean {
     return !!(
       this.currentOrder?.status === OrderStatus.Closed &&
@@ -104,7 +105,8 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   constructor(private chipsCssClass: ChipsCssClass,
               protected override store: Store,
-              private commentsService: CommentsService,) {
+              private commentsService: CommentsService,
+              private cd: ChangeDetectorRef) {
     super(store);
   }
 
@@ -114,7 +116,7 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   public get getTitle(): string {
     return (
-      (this.isReOrder ? `Re-Order ID ` : `Order ID `) + `${this.order?.organizationPrefix}-${this.order?.publicId}`
+      (this.isReOrder ? `Re-Order ` : `Order `) + `${this.order?.organizationPrefix}-${this.order?.publicId}`
     );
   }
 
@@ -124,12 +126,6 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
     this.subsToSelectedOrder();
     this.subscribeOnOrderCandidatePage();
     this.checkForAgencyStatus();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.chipList && changes['order']?.currentValue) {
-      this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
-    }
   }
 
   override ngOnDestroy(): void {
@@ -149,11 +145,19 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
 
   private subsToSelectedOrder(): void {
     this.selectedOrder$
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(
+        filter((order) => !!order),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe((order) => {
         this.currentOrder = order;
         this.currentOrder && this.getOrderComments();
         this.isClosedOrder = this.currentOrder?.status === OrderStatus.Closed;
+        this.chipList.cssClass = this.chipsCssClass.transform(this.currentOrder.statusText);
+        this.chipList.text = this.currentOrder.statusText.toUpperCase();
+        this.chipList.refresh();
+        this.chipList.ngAfterViewInit();
+        this.cd.detectChanges();
       });
   }
 
@@ -242,9 +246,11 @@ export class PreviewOrderDialogComponent extends AbstractPermission implements O
         windowScrollTop();
         this.sideDialog.show();
         disabledBodyOverflow(true);
+        this.isOpen = true;
       } else {
         this.sideDialog.hide();
         disabledBodyOverflow(false);
+        this.isOpen = false;
       }
     });
   }

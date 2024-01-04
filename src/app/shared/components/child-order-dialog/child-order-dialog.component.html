@@ -26,11 +26,11 @@
                   ></e-chip>
                 </e-chips>
               </ejs-chiplist>
-              <ejs-chiplist #chipList class="events-off" *ngIf="order?.status && activeSystem === OrderManagementIRPSystemId.IRP">
+              <ejs-chiplist #chipList class="events-off" *ngIf="candidateirp?.status && activeSystem === OrderManagementIRPSystemId.IRP">
                 <e-chips>
                   <e-chip
-                    [text]="orderStatusText[order.status]"
-                    [cssClass]="orderStatusText[order.status] | chipsCssClass"
+                    [text]="CandidatesStatusText[candidateirp.status]"
+                    [cssClass]="CandidatesStatusText[candidateirp.status] | chipsCssClass"
                   ></e-chip>
                 </e-chips>
               </ejs-chiplist>
@@ -41,7 +41,7 @@
               *ngIf="!isAgency"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
-              [disabled]="disableAddExtension || isAgencySuspended"
+              [disabled]="disableAddExtension || isAgencySuspended || (isdisabledExtension && activeSystem === OrderManagementIRPSystemId.VMS)"
               text="Add Extension"
             ></app-button>
             <button
@@ -140,7 +140,7 @@
                       <app-onboarded-candidate
                         *ngIf="!isReorderType"
                         [candidate]="$any(candidate)"
-                        [irpCandidate]="$any(irpCandidates)"
+                        [irpCandidate]="$any(candidateirp)"
                         [isTab]="true"
                         appUnsavedForm
                         (closeModalEvent)="onClose()"
@@ -366,6 +366,9 @@
       <ng-template #editBillRates>
         <app-bill-rates
           [billRates]="candidateJob?.billRates || []"
+          [candidateJobId]="candidateJob?.jobId || null"
+          [organizationId]="candidateJob?.organizationId || null"
+          [orderType]="candidateJob?.order?.orderType"
           [isActive]="true"
           (billRatesChanged)="onBillRatesChanged($event)"
         >
@@ -380,6 +383,7 @@
   [candidateJob]="candidateJob"
   (submitCandidateCancellation)="cancelCandidate($event)"
   (cancelCandidateCancellation)="resetStatusesFormControl()"
+  (cancelledCandidateforIRP)="cancelledCandidatefromIRP($event)"
 ></app-candidate-cancellation-dialog>
 
 <ng-template #actionButtons>

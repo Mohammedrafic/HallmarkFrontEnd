@@ -34,8 +34,6 @@ import { AbstractPermission } from '@shared/helpers/permissions';
 import { OrderManagementIrpCandidateSystem } from './order-management-irp-row-position.enum';
 import { OrderManagementIrpRowCandidatesAdapter } from './order-management-irp-row-position.adapter';
 import { OrderManagementIRPRowPositionService } from './order-management-irp-row-position.service';
-import { CandidatesStatusText } from '@shared/enums/status';
-import { ApplicantStatusIRP } from '@shared/enums/applicant-status.enum';
 
 @TakeUntilDestroy
 @Component({
@@ -75,6 +73,16 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
       takeUntil(this.componentDestroy()),
     ).subscribe((candidatePositions: IRPCandidateForPosition[]) => {
       this.displayRows = candidatePositions;
+      const result = [
+        {rowsSource: []}
+      ];
+      this.displayRows.forEach((item) => {
+        result[0].rowsSource = result[0].rowsSource.concat(item.rowsSource);
+      });
+      result[0].rowsSource = result[0].rowsSource.sort((a : any, b : any) =>
+        a.positionId.localeCompare(b.positionId)
+      );
+      this.displayRows = result;
       this.cdr.detectChanges();
     });
   }
@@ -102,9 +110,7 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
   }
 
   public onClickChip(cellData: IRPOrderPosition, string: string | number, system : string){
-    if(string === ApplicantStatusIRP.OnBoard || string === CandidatesStatusText.Onboard){
       this.service.HandleStatusChangeClick(this.params.data,cellData, system)
-    }
   }
 
   navigateToPositionDetails(data: OrderInfo): void {

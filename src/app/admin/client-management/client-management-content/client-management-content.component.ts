@@ -265,6 +265,7 @@ export class ClientManagementContentComponent
       .subscribe((screen) => {
         this.isMobile = screen.isMobile;
         this.isSmallDesktop = screen.isDesktopSmall;
+        this.cd.markForCheck();
       });
   }
 }

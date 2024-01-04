@@ -212,11 +212,6 @@ export class SettingsDataAdapter {
           displayValue=SettingsDataAdapter
           .geATPRateCalculationdisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
           break;
-          case OrganizationSettingControlType.AutoRejectOtherEmployeesWhenFilled:
-            displayValue=SettingsDataAdapter
-            .getAutoRejectEmployeeWhenFilleddisplayValue(SettingsDataAdapter.getParentSettingValue(setting, orgSystems.IRP));
-            break;
-
       default:
         displayValue = '';
     }
@@ -311,7 +306,7 @@ export class SettingsDataAdapter {
         displayValue = SettingsDataAdapter.getMultiselectDisplayValue(child.value);
         break;
       case OrganizationSettingControlType.Select:
-        displayValue = child.value[0]?.text;
+        displayValue = child.value ? child.value[0]?.text : '';
         break;
       case OrganizationSettingControlType.Text:
         displayValue = child.value;
@@ -325,9 +320,6 @@ export class SettingsDataAdapter {
       case OrganizationSettingControlType.SwitchedValue:
         displayValue = SettingsDataAdapter.getSwitchedDisplayValue(child.parsedValue);
         break;
-        case OrganizationSettingControlType.AutoRejectOtherEmployeesWhenFilled:
-          displayValue = SettingsDataAdapter.getAutoRejectEmployeeWhenFilleddisplayValue(child.value);
-          break;
       default:
         displayValue = '';
     }
@@ -384,15 +376,8 @@ export class SettingsDataAdapter {
 
     return result;
   }
-  private static getAutoRejectEmployeeWhenFilleddisplayValue(value: string): string {
-    const items = SettingsDataAdapter.getParsedValue(value);
-    const reason=items.rejectReason? items.rejectReason : items.RejectedReason;
-    const result=reason === 0 ? items.isEnabled?CheckboxValue.Yes : CheckboxValue.No : reason;
-    return result;
-  }
-
-  private static getStartsOnDateDisplayValue(value: { IsEnabled: boolean, StartsOn: string }): CheckboxValue {
-    const result = value?.IsEnabled ? CheckboxValue.Yes : CheckboxValue.No;
+  private static getStartsOnDateDisplayValue(value: { IsEnabled?: boolean, isEnabled?: string }): CheckboxValue {
+    const result = value?.IsEnabled || value?.isEnabled ? CheckboxValue.Yes : CheckboxValue.No;
 
     return result;
   }

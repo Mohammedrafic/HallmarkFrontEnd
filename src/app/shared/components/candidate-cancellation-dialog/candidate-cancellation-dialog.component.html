@@ -12,7 +12,8 @@
     <section class="header-container">
       <div class="e-card-header">
         <div class="e-card-header-caption">
-          <h3 class="e-card-title">Cancel Candidate</h3>
+          <h3 class="e-card-title" *ngIf="activeSystem !== OrderManagementIRPSystemId.IRP">Cancel Candidate</h3>
+          <h3 class="e-card-title" *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Cancel Employee</h3>
         </div>
       </div>
     </section>
@@ -32,7 +33,7 @@
           ></ejs-dropdownlist>
         </div>
       </div>
-      <div class="dropdown-container bootstrap">
+      <div class="dropdown-container bootstrap" *ngIf="activeSystem !== OrderManagementIRPSystemId.IRP">
         <label>Penalty Criteria<span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist

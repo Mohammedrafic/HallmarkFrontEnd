@@ -16,9 +16,14 @@
     <ng-container right>
       <div *ngIf="isAgency" class="bootstrap agency-multiSelect">
           <div class="input-container">
-            <ejs-multiselect  id="regionIds" mode="CheckBox" [formControl]="organizationMultiSelectControl"
-              placeholder="All" [fields]="unitOrganizationsFields" [allowFiltering]="true" [showDropDownIcon]="true"
+            <ejs-multiselect  id="regionIds" mode="CheckBox" [formControl]="organizationMultiSelectControl" *ngIf="isAgencyVisibilityFlagEnabled"
+              placeholder="All" [fields]="unitAgencyOrganizationsFields" [allowFiltering]="true" [showDropDownIcon]="true"
               [dataSource]="agencyOrganizations$ | async" [selectAllText]='allOption'
+              [showSelectAll]="true" tabindex="2">
+            </ejs-multiselect>
+            <ejs-multiselect  id="regionIds" mode="CheckBox" [formControl]="organizationMultiSelectControl" *ngIf="!isAgencyVisibilityFlagEnabled"
+              placeholder="All" [fields]="unitOrganizationsFields" [allowFiltering]="true" [showDropDownIcon]="true"
+              [dataSource]="organizations$ | async" [selectAllText]='allOption'
               [showSelectAll]="true" tabindex="2">
             </ejs-multiselect>
         </div>
@@ -34,12 +39,6 @@
       </div>
       <div class="buttons-group invoiceheader" [class.top-margin]="!isAgency">
         <div class="buttons-container">
-          <div class="e-checkbox-wrapper e-css" _ngcontent-yyg-c377="">
-            <input class="e-checkselectall" style="height:19px;width:33px;margin-top:11px;"_ngcontent-yyg-c377="" type="checkbox" aria-label="checkbox" 
-                   value="ShowDetails"                 
-                   (click)="toggleField($event)"/>
-             <span class="e-label" style="color: #3e7fff !important;font-size: 16px; margin-bottom: 10px;" _ngcontent-yyg-c377=""> Show Details</span>
-            </div>
           <button ejs-button  [disabled]="noorgSelection"
                   appHideBeforeSyncfusionLoad
                   cssClass="e-outline button-filter button--no-wrap button-only-icon"
@@ -222,7 +221,7 @@
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>
 
-<app-invoices-filters-dialog [selectedTabId]="selectedTabId" [agencyOrganizations]="agencyOrganizationIds"
+<app-invoices-filters-dialog [selectedTabId]="selectedTabId"
                              (appliedFiltersAmount)="changeFiltersAmount($event)"
                              (resetFilters)="resetFilters()"
                              (updateTableByFilters)="updateTableByFilters($event)">

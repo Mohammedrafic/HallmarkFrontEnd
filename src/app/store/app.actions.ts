@@ -49,6 +49,11 @@ export class ShowFilterDialog {
   constructor(public isDialogShown: boolean) { }
 }
 
+export class ShowSchduleSortFilterDialog {
+  static readonly type = '[app] Set Schdule Filter Dialog Showing state';
+  constructor(public isDialogShown: boolean) { }
+}
+
 export class ShowExportDialog {
   static readonly type = '[app] Set Export Dialog Showing state';
   constructor(public isDialogShown: boolean) { }
