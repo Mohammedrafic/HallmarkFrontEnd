@@ -539,6 +539,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/admin/organization-integrations',
     },
+    131: {
+      // User Visibility
+      icon: '',
+      route: '/analytics/user-visibility',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -1486,6 +1491,11 @@ export const MENU_CONFIG: any = {
     // IRP Reports
     icon: '',
     route: '/analytics',
+  },
+  131: {
+    // User Visibility
+    icon: '',
+    route: '/analytics/user-visibility',
   },
   },
 

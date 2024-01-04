@@ -41,7 +41,7 @@ import { TimesheetReportComponent } from './timesheet-report/timesheet-report.co
     CandidateEligibilityAgencyComponent,
     VendorScorecardComponent,
     TimesheetReportComponent
-  ],
+    ],
   imports: [
     CommonModule,   
     SharedModule,
