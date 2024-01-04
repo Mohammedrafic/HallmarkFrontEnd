@@ -725,8 +725,12 @@ export class SendGroupEmailComponent
           } else {
             this.store.dispatch(new GetBusinessByUnitType(value));
             this.businessData$.pipe(distinctUntilChanged(),takeWhile(() => this.isAlive)).subscribe((data) => {
-              if(this.businessUnit != undefined)
+              if(this.businessUnit != undefined && value === BusinessUnitType.Agency){
+                this.groupEmailTemplateForm.controls['businesses'].setValue([this.businessUnit]);
+              }
+              else{
                 this.groupEmailTemplateForm.controls['business'].setValue(this.businessUnit);
+              }
             });
           }
         }
