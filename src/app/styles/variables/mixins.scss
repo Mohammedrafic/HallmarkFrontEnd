@@ -249,7 +249,7 @@
     &:has(.replacement-checkbox) {
       justify-content: space-between;
     }
-    
+
     .bootstrap.replacement-checkbox {
       ::ng-deep {
         ejs-checkbox {
@@ -284,7 +284,7 @@
 
   .e-card-header {
     line-height: 24px;
-    
+
     h3 {
       font-size: 24px;
       font-weight: 700;
@@ -305,4 +305,12 @@
       }
     }
   }
+}
+
+@mixin scheduleTooltipContainer {
+  margin: 0 !important;
+  font-family: 'Open Sans', 'sans-serif';
+  font-size: 11px;
+  line-height: 16px;
+  @include with-ellipsis;
 }
