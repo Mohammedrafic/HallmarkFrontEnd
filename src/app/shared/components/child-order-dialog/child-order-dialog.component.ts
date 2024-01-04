@@ -913,6 +913,16 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
      }
 
+  private getBillRate(billRates: BillRate[], startDate?: Date): BillRate | null {
+    const regularRate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
+      billRates, startDate, false
+    );
+    const regularLocalRate = this.billRatesSyncService.getBillRateForSync(
+      billRates, startDate, true
+    );
+    return regularRate ?? regularLocalRate;
+  }
+  
   private setAcceptForm({
     order: {
       hourlyRate,
@@ -940,10 +950,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         ? candidateBillRate
         : offeredBillRate;
     const orderDate = this.order?.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate;
+    const bilRateValue = 
+      this.getBillRate(this.candidateJob?.billRates || [], DateTimeHelper.setCurrentTimeZone(orderDate as string));
 
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
-      offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
+      offeredBillRate: PriceUtils.formatNumbers(bilRateValue?.rateHour || hourlyRate),
       candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
       locationName,
       departmentName,

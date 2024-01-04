@@ -284,6 +284,10 @@
 <ng-template #acceptFormSection>
   <section class="container onboarded-candidate-container">
     <section class="header-container">
+      <div class="local-candidate-message" *ngIf="candidateJob?.isLocal">
+        <i-feather name="info" class="icon"></i-feather>
+        Local Candidate
+      </div>
       <div class="e-card-header">
         <div class="e-card-header-caption candidate-status">
           <h3 class="e-card-title candidate-title">{{ candidate?.lastName }}, {{ candidate?.firstName }}</h3>
