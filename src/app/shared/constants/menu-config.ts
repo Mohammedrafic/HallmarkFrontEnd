@@ -540,7 +540,7 @@ export const MENU_CONFIG: any = {
       route: '/admin/organization-integrations',
     },
     131: {
-      // department-spend-and-hours-report
+      // User Visibility
       icon: '',
       route: '/analytics/user-visibility',
     },
@@ -1493,7 +1493,7 @@ export const MENU_CONFIG: any = {
     route: '/analytics',
   },
   131: {
-    // department-spend-and-hours-report
+    // User Visibility
     icon: '',
     route: '/analytics/user-visibility',
   },
