@@ -92,6 +92,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     }
     store.dispatch(new SetHeaderState({ title: 'Schedule Management', iconName: 'calendar' }));
     this.store.dispatch(new SetHelpSystem(true));
+    this.scheduleFiltersService.setActiveScheduleTimePeriod(DatesRangeType.TwoWeeks);
   }
 
   public override ngOnInit(): void {
@@ -414,6 +415,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
 
   activePeriod(activePeriod: DatesRangeType): void {
     this.activeTimePeriod = activePeriod;
+    this.scheduleFiltersService.setActiveScheduleTimePeriod(activePeriod||DatesRangeType.TwoWeeks);
   }
 
   public exportTable() {

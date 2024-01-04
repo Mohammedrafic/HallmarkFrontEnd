@@ -123,7 +123,8 @@ export class DepartmentService {
 
   prepareImportRecordsWithSkills(data: ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder>):
   ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder> {
-    this.createSkillsProps(data.succesfullRecords || data.errorRecords);
+    this.createSkillsProps(data.succesfullRecords);
+    this.createSkillsProps(data.errorRecords);
 
     return data;
   }
@@ -131,16 +132,23 @@ export class DepartmentService {
   // Create additional skills props for corresponding coldefs
   private createSkillsProps(data: ImportedDepartment[]): void {
     data.forEach((record) => {
+      const skillFileds: string[] = [];
       if (record.primarySkills && record.primarySkills.length) {
         record.primarySkills.forEach((skillName, index) => {
           record[`primarySkill${index}`] = skillName;
+          skillFileds.push(`primarySkill${index}`);
         });
       }
 
       if (record.secondarySkills && record.secondarySkills.length) {
         record.secondarySkills.forEach((skillName, index) => {
           record[`secondarySkill${index}`] = skillName;
+          skillName && skillFileds.push(`secondarySkill${index}`);
         });
+      }
+
+      if (record.errorProperties.find(item => item === 'SecondarySkills' || item === 'PrimarySkills')) {
+        record.errorProperties.push(...skillFileds);
       }
     });
   }

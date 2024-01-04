@@ -477,6 +477,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     if(this.selectedApplicantStatus){
       this.saveHandler({ itemData: this.selectedApplicantStatus });
     }
+    else{
+      this.updateAgencyCandidateJob(this.candidateJob.applicantStatus);
+    }
   }
 
   public onStatusChange(event: { itemData: ApplicantStatus }): void {
@@ -910,7 +913,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         extensionEndDate: this.getDateString(extensionEndDate),
         offeredBillRate: formatNumber(CheckNumberValue(this.candidateJob.offeredBillRate), 'en-US', '0.2-2'),
         comments: this.candidateJob.requestComment,
-        guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
+        guaranteedWorkWeek:this.candidateJob.applicantStatus.applicantStatus === ApplicantStatusEnum.Offered ? this.candidateJob.guaranteedWorkWeek || this.candidateJob.order.expectedWorkWeek : this.candidateJob.guaranteedWorkWeek,
         clockId: this.candidateJob.clockId,
         allowDeployCredentials: this.candidateJob.allowDeployCredentials,
         rejectReason: this.candidateJob.rejectReason,
@@ -954,6 +957,13 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.form.get('clockId')?.enable();
       this.form.get('actualStartDate')?.enable();
       this.form.get('actualEndDate')?.enable();
+      this.form.get('guaranteedWorkWeek')?.enable();
+
+    }
+    if(this.isOffered && !this.isAgency)
+    {
+      this.form.get('guaranteedWorkWeek')?.enable();
+      this.form.get('clockId')?.enable();
     }
     this.changeDetectorRef.markForCheck();
   }

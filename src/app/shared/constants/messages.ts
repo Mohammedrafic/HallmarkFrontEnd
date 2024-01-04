@@ -127,6 +127,7 @@ export const REASON_WARNING = 'Please select a System for Reason';
 export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Do you want to update Employee Skills? It may have impact on Schedule and Orders.';
 export const IRP_DEPARTMENT_CHANGE_WARNING = 'Do you want to provide that change? It may cause deleting future schedules and canceling Employee from orders.';
 export const EMPLOYEE_INACTIVATED_WARNING = 'Do you want to inactivate the employee?';
+export const EMPLOYEE_ON_HOLD_WARNING = 'Do you want to delete all shifts for On Hold period?';
 export const addAvailabilityToStart = 'Add Availability to start Scheduling';
 export const CommitmentOverlapMessage = 'Are you sure you want assign new Work Commitment? It may have impact on existing schedules and orders';
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { BaseObservable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
@@ -26,6 +26,7 @@ import {
   ScheduleFilterStructure,
 } from '../interface';
 
+import * as ScheduleInt from '../interface';
 @Injectable()
 export class ScheduleFiltersService {
   deletedInlineChip: Subject<ChipDeleteEventType> = new Subject();
@@ -33,11 +34,16 @@ export class ScheduleFiltersService {
   private readonly scheduleFiltersData: BaseObservable<ScheduleFiltersData> = new BaseObservable(InitScheduleFiltersData);
   private readonly employeeOrganizationStructure: BaseObservable<OrganizationStructure>
     = new BaseObservable(InitEmployeeOrganizationStructure);
+    
   allDepartments: DropdownOption[];
   firstDepartment: OrganizationDepartment;
   getallDepartments: any;
   public fieldsWithAllToggle = ['regionIds', 'locationIds', 'departmentIds'];
 
+  getEmpWorkCommitments=new BehaviorSubject<string[]>([]); 
+ public activeSchedulePeriod:string;
+
+  public SelectedPreservedFilters:  ScheduleInt.ScheduleFilters;
   constructor(private readonly fb: FormBuilder) {}
 
   createScheduleFilterForm(): FormGroup {
@@ -141,6 +147,30 @@ export class ScheduleFiltersService {
   getDeleteInlineChipStream(): Observable<ChipDeleteEventType> {
     return this.deletedInlineChip.asObservable();
   }
+
+  setEmpWorkCommitmentsData(event:string[]):void{
+    this.getEmpWorkCommitments.next(event);
+  }
+
+  getEmpWorkCommitmentsData() {
+    return this.getEmpWorkCommitments.asObservable();;
+  }
+  
+  setActiveScheduleTimePeriod(event:string):void{
+    this.activeSchedulePeriod=event;
+  }
+
+  getActiveScheduleTimePeriod() {
+    return this.activeSchedulePeriod;
+  }
+  setSelectedPreservedFilters(event:ScheduleInt.ScheduleFilters):void{
+    this.SelectedPreservedFilters=event;
+  }
+
+  getSelectedPreservedFilters() :ScheduleInt.ScheduleFilters{
+    return this.SelectedPreservedFilters;
+  }
+  
 
   getScheduleFiltersData(): ScheduleFiltersData {
     return this.scheduleFiltersData.get();
