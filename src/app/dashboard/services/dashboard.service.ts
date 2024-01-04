@@ -713,11 +713,14 @@ export class DashboardService {
       const dateTo =  DateTimeHelper.setUtcTimeZone(new Date(new Date(today.getFullYear(), today.getMonth(), 0)));
       return { dateFrom, dateTo };
     }
+  private getAgencytimesheetsummary(filter: DashboartFilterDto): Observable<AgencyTImesheetsummaryModel[]> {
+    const desiredOrder = ["Incomplete", "Missing", "Pending Approval (Time sheet)", "Pending Approval (Miles)"];
 
-    private getAgencytimesheetsummary(filter: DashboartFilterDto) : Observable<AgencyTImesheetsummaryModel[]> {
-      return this.httpClient.post<AgencyTImesheetsummaryModel[]>(`${this.baseUrl}/TimesheetSummary`, { ...filter }).pipe(
-        map((data)=> data)
-      )
-    }
+    return this.httpClient.post<AgencyTImesheetsummaryModel[]>(`${this.baseUrl}/TimesheetSummary`, { ...filter })
+      .pipe(
+        map(response => desiredOrder.map(name => response.find(item => item.name === name)!))
+      );
+  }
+    
  
 }
