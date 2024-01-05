@@ -48,6 +48,15 @@ ejs-chiplist.e-control.e-chip-list {
         background-color: $supportive-orange;
       }
     }
+    &.e-rejected,
+    &.e-rejected:hover {
+      background-color: $supportive-saddleBrown;
+      color: $white;
+
+      &.e-focused {
+        background-color: $supportive-saddleBrown;
+      }
+    }
 
     &.e-default,
     &.e-default:hover {

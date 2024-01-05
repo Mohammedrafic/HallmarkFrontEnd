@@ -57,7 +57,6 @@ export const STATUS_COLOR_GROUP = {
     'withdraw',
     'Cancelled',
     'cancelled',
-    TIMETHEETS_STATUSES.REJECTED,
     TIMETHEETS_STATUSES.ARCHIVED,
   ], // hard gray
   'e-pending': ['pending', 'Pending', 'offered', TIMETHEETS_STATUSES.MISSING, 'deleted', 'Terminated'], // red
@@ -71,6 +70,7 @@ export const STATUS_COLOR_GROUP = {
   ], // purple
   'e-filled': ['filled', 'Filled', 'onboarded', 'onboard'], // light blue
   'e-awaiting': ['not applied', 'Not Applied'], // gray
+  'e-rejected': [TIMETHEETS_STATUSES.REJECTED.toString(),'Rejected'],//saddle Brown
 };
 
 export enum AgencyStatus {
