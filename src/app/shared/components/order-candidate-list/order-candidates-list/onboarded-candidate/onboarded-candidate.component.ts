@@ -49,6 +49,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
 import {
+  CLEAR_START_ON,
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DEPLOYED_CANDIDATE,
@@ -303,7 +304,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           this.candidate.candidateJobId ? this.candidate.candidateJobId : this.candidate.jobId
         ).pipe(takeUntil(this.unsubscribe$))
         .subscribe(({ EnableClearedToStartForAcceptedCandidates }) => {
-          console.log('clearedToStartCheck value',EnableClearedToStartForAcceptedCandidates);
           this.isEnableClearedToStartForAcceptedCandidates = JSON.parse(EnableClearedToStartForAcceptedCandidates);
         });
     }
@@ -956,6 +956,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   public onSwitcher(event: { checked: boolean }): void {
     this.clearedToStart = event.checked;
+    if(event.checked){
+      this.store.dispatch(new ShowToast(MessageTypes.Success, CLEAR_START_ON));
+    }
     this.clearToStartDataset.clearToStart = event.checked;
     this.clearToStartDataset.jobId = this.candidate.jobId ? this.candidate.jobId : this.candidateJob?.jobId;
     this.clearToStartDataset.organizationId = this.candidate.organizationId;

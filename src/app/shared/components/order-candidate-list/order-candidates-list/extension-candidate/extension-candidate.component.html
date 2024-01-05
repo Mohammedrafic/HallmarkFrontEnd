@@ -13,14 +13,13 @@
       </div>
 
       <div class="e-card-content button-container" >
-        <div class="input-group switch" *ngIf="isEnableClearedToStartForAcceptedCandidates  && !isAgency">
-          <ejs-switch id="switcher" class="switch"  (change)="onSwitcher($event)" [checked]="clearedToStart" [disabled]="isClearedToStartEnable"></ejs-switch>
+        <div class="input-group switch" *ngIf="isEnableClearedToStartForAcceptedCandidates">
+          <ejs-switch id="switcher" class="switch"  (change)="onSwitcher($event)" [checked]="clearedToStart" [disabled]="isClearedToStartEnable || isAgency"></ejs-switch>
           <label class="switch-label" for="switcher"><span>Cleared to Start</span></label>
         </div>
         <ng-container *ngIf="!isRejected && !isCancelled">
-          <div class="input-group dropdown bootstrap" [ngClass]="{'dropdown-width': isEnableClearedToStartForAcceptedCandidates }">
-            <ejs-dropdownlist
-              *ngIf="!isAgency"
+          <div class="input-group dropdown bootstrap" [ngClass]="{'dropdown-width': isEnableClearedToStartForAcceptedCandidates }"  *ngIf="!isAgency">
+            <ejs-dropdownlist             
               [allowFiltering]="true"
               [fields]="optionFields"
               [dataSource]="applicantStatuses"

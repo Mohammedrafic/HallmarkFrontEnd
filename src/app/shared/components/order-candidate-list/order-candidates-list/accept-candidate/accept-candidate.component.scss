@@ -25,6 +25,13 @@
     margin-left: 8px;
   }
 
+  .switch{
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    padding-left: 10px;
+  }
+
   .content-container {
     display: flex;
     margin-top: 24px;
@@ -154,5 +161,15 @@
 
   .e-primary {
     margin-left: 10px;
+  }
+}
+
+
+::ng-deep{
+  body.light .e-switch-wrapper.e-switch-disabled .e-switch-inner{
+    opacity: initial !important;
+  }
+  .e-switch-wrapper.e-wrapper{
+    margin-right: 0.5rem !important;
   }
 }

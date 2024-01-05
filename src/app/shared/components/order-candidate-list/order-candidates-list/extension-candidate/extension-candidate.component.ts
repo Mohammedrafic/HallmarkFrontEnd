@@ -42,6 +42,7 @@ import {
   CandidateADDRESSRequired,
   CandidateDOBRequired,
   CandidatePHONE1Required,
+  CLEAR_START_ON,
   GRID_CONFIG,
   ONBOARD_CANDIDATE,
   onBoardCandidateMessage,
@@ -1104,6 +1105,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   public onSwitcher(event: { checked: boolean }): void {
     this.clearedToStart = event.checked;
+    if(event.checked){
+      this.store.dispatch(new ShowToast(MessageTypes.Success, CLEAR_START_ON));
+    }
     this.clearToStartDataset.clearToStart = event.checked;
     this.clearToStartDataset.jobId = this.candidate?.jobId ? this.candidate.jobId : this.candidateJob?.jobId;
     this.clearToStartDataset.organizationId = this.candidate?.organizationId;

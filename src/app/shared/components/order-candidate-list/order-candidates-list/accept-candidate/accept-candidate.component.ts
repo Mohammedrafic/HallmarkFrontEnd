@@ -25,6 +25,9 @@ import {
   DEPLOYED_CANDIDATE,
   CandidatePHONE1Required,
   CandidateADDRESSRequired,
+  OrganizationSettingKeys,
+  OrganizationalHierarchy,
+  CLEAR_START_ON,
 } from '@shared/constants';
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { RejectReason } from '@shared/models/reject-reason.model';
@@ -32,9 +35,9 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList, RegularRatesData } from '@shared/models/order-management.model';
+import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList, RegularRatesData, clearToStartDataset } from '@shared/models/order-management.model';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
   GetAgencyAvailableSteps,
@@ -59,6 +62,9 @@ import { formatNumber } from '@angular/common';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { DropDownListComponent, SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
+import { SettingsViewService } from '@shared/services';
+import { positionIdStatuses } from '@agency/candidates/add-edit-candidate/add-edit-candidate.constants';
+import { ReloadOrganisationOrderCandidatesLists, SaveClearToStart, SaveClearToStartSucceeded } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -120,6 +126,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public comments: Comment[] = [];
   public agencyCanRevert: boolean;
   private statusSelect: DropDownListComponent;
+
+  public isEnableClearedToStartForAcceptedCandidates:boolean = false;
+  public isClearedToStartEnable:boolean = true;
+  public clearToStartDataset:clearToStartDataset = new clearToStartDataset();
+  public clearedToStart:boolean = false;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
@@ -209,6 +220,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private changeDetectionRef: ChangeDetectorRef,
     private permissionService: PermissionService,
     private orderManagementService: OrderManagementService,
+    private settingService: SettingsViewService,
   ) {
     this.createForm();
   }
@@ -224,6 +236,44 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.patchForm();
     this.subscribeOnReasonsList();
     this.subscribeOnSuccessRejection();
+    this.clearToStartCheck();
+  }
+
+  clearToStartCheck(){
+    this.orderManagementService.getCurrentClearToStartVal().pipe(takeUntil(this.unsubscribe$)).subscribe(val=>{
+      if(val != null){
+        this.clearedToStart = val;
+      }else{
+        this.clearedToStart = this.candidate && this.candidate.clearToStart ? this.candidate.clearToStart : false;
+      }
+    });
+    if(this.candidate && positionIdStatuses.includes(this.candidate.status)){
+      this.clearedToStartCheck();
+    }else if(this.candidate && !this.candidate.status && this.candidate.candidateStatus && positionIdStatuses.includes(this.candidate.candidateStatus)){
+      this.clearedToStartCheck();
+    }else{
+      this.isEnableClearedToStartForAcceptedCandidates = false;
+    }
+  }
+
+  private clearedToStartCheck():void {
+    if(this.candidate && this.candidate.organizationId && (this.candidate.candidateJobId || this.candidate.jobId)){
+      this.isEnableClearedToStartForAcceptedCandidates = false;
+      this.isClearedToStartEnable =  this.candidate.status ? this.candidate.status == ApplicantStatusEnum.Accepted ? false : true : this.candidate.candidateStatus == ApplicantStatusEnum.Accepted ? false : true;
+
+      this.settingService
+        .getViewSettingKey(
+          OrganizationSettingKeys.EnableClearedToStartForAcceptedCandidates,
+          OrganizationalHierarchy.Organization,
+          this.candidate.organizationId,
+          this.candidate.organizationId,
+          false,
+          this.candidate.candidateJobId ? this.candidate.candidateJobId : this.candidate.jobId
+        ).pipe(takeUntil(this.unsubscribe$))
+        .subscribe(({ EnableClearedToStartForAcceptedCandidates }) => {
+          this.isEnableClearedToStartForAcceptedCandidates = JSON.parse(EnableClearedToStartForAcceptedCandidates);
+        });
+    }
   }
 
   ngOnDestroy(): void {
@@ -625,5 +675,22 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     if (this.statusSelect) {
       this.statusSelect.value = null as unknown as number;
     }
+  }
+
+  public onSwitcher(event: { checked: boolean }): void {
+    this.clearedToStart = event.checked;
+    if(event.checked){
+      this.store.dispatch(new ShowToast(MessageTypes.Success, CLEAR_START_ON));
+    }
+    this.clearToStartDataset.clearToStart = event.checked;
+    this.clearToStartDataset.jobId = this.candidate.jobId ? this.candidate.jobId : this.candidateJob?.jobId;
+    this.clearToStartDataset.organizationId = this.candidate.organizationId;
+    this.store.dispatch(new SaveClearToStart(this.clearToStartDataset));
+    this.actions$.pipe(ofActionDispatched(SaveClearToStartSucceeded), take(1))
+                  .subscribe(() => {
+                    this.orderManagementService.setCurrentClearToStartVal(event.checked);
+                    this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());                    
+                  });
+
   }
 }
