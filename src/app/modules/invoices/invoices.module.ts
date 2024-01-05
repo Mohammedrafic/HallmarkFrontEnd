@@ -86,7 +86,7 @@ import { InvoicesFiltersService } from './services/invoices-filters.service';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 import { InvoiceGridExportComponent } from './components/invoice-grid-export/invoice-grid-export.component';
 import { InvoiceHistoryDetailComponent } from './containers/invoice-history-detail/invoice-history-detail.component';
-
+import { ToggleRowExpansionHeaderCellService } from './components/grid-icon-cell/toggle-row-expansion-header-cell.service';
 @NgModule({
   declarations: [
     InvoicesContainerComponent,
@@ -176,6 +176,7 @@ import { InvoiceHistoryDetailComponent } from './containers/invoice-history-deta
     InvoiceAgencyResolver,
     InvoicesPermissionHelper,
     InvoicesFiltersService,
+    ToggleRowExpansionHeaderCellService,
     {
       provide: AddDialogHelperService,
       useClass: AddInvoiceService,

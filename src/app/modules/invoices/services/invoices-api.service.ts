@@ -38,7 +38,7 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { GetQueryParams } from '@core/helpers/functions.helper';
 import { AgencyInvoicesGridTab, InvoicesAggregationType, OrganizationInvoicesGridTab } from '../enums';
-import { InvoiceAuditLogPayload, Invoicebase, agencyInvoicebase } from '../interfaces/invoice-auditlog.interface';
+import { InvoiceAuditLogPayload, Invoicebase, InvoicecheckAuditHistory, InvoicepaymentAuditHistory, agencyInvoicebase } from '../interfaces/invoice-auditlog.interface';
 
 @Injectable()
 export class InvoicesApiService {
@@ -247,4 +247,16 @@ export class InvoicesApiService {
     const url = "/api/Audit/agencyInvoiceAuditHistory"
     return this.http.post<agencyInvoicebase[]>(url, payload);
    }
+
+   //Payemnt audit history
+   public getPayemntAuditHistory(payload: InvoiceAuditLogPayload,isagency:boolean): Observable<InvoicepaymentAuditHistory[]> {
+    const url = isagency ? "/api/Audit/agencyInvoicePaymentAuditHistory" : "/api/Audit/organizationInvoicePaymentAuditHistory";
+    return this.http.post<InvoicepaymentAuditHistory[]>(url, payload);
+   }
+
+      //Check audit history
+      public getCheckAuditHistory(payload: InvoiceAuditLogPayload,isagency:boolean): Observable<InvoicecheckAuditHistory[]> {
+        const url = isagency ? "/api/Audit/agencyInvoiceCheckAuditHistory" : "/api/Audit/organizationInvoiceCheckAuditHistory";
+        return this.http.post<InvoicecheckAuditHistory[]>(url, payload);
+       }
 }

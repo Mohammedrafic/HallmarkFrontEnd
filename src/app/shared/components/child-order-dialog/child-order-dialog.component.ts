@@ -23,6 +23,7 @@ import {
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { AbstractPermission } from "@shared/helpers/permissions";
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 
 import {
   AccordionComponent,
@@ -81,7 +82,7 @@ import {
   CandidatStatus,
 } from '@shared/enums/applicant-status.enum';
 import { MessageTypes } from '@shared/enums/message-types';
-import { OrderStatus } from '@shared/enums/order-management';
+import { OrderStatus, OrderStatusIRP } from '@shared/enums/order-management';
 import { IrpOrderType, OrderType } from '@shared/enums/order-type';
 import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
@@ -151,18 +152,14 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public get activeSystem() {
     return this._activeSystem;
   }
- 
+
   @Input() public set activeSystem(val: any) {
     this._activeSystem = val;
-    if(this._activeSystem === OrderManagementIRPSystemId.IRP){
-      this.subscribeOnCandidates();
-    } else {
-      this.subscribeOnCandidateJob();
-    }
   }
 
   @Input() orderComments: Comment[] = [];
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild, string] | null>;
+  @Input() closeEvent: Subject<[AgencyOrderManagement, OrderManagementChild, string] | null>;
   @Output() saveEmitter = new EventEmitter<void>();
   @Output() updateOrderData = new EventEmitter<{ order: OrderManagement, candidate: OrderManagementChild }>();
 
@@ -324,6 +321,16 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     return this.candidateJob?.partnershipStatus === PartnershipStatus.Suspended;
   }
 
+  get isdisabledExtension(): boolean {
+    if(this.order?.extensionFromId != null && this.candidate?.extensionFromId != null){
+      return true;
+    }else if(this.candidate?.extensionFromId && this.order?.extensionFromId == null){
+      return this.extensions?.length > 0 ? true : false;
+    }else{
+      return false;
+    }
+  }
+
   get getPartnershipMessage(): string {
     return `Partnership with Agency is suspended on ${DateTimeHelper.formatDateUTC(
       this.candidateJob?.suspentionDate as string, 'MM/dd/yyyy')}. You cannot add extensions.`;
@@ -342,6 +349,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     private changeDetectorRef: ChangeDetectorRef,
     private childOrderDialogService: ChildOrderDialogService,
     private settingService: SettingsViewService,
+    private billRatesSyncService: BillRatesSyncService,
     private orderManagementService : OrderManagementService
   ) {
     super(store);
@@ -363,12 +371,11 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.extensions = extensions.filter((extension: Order) => extension.id !== this.order?.id);
         this.isLastExtension = !this.extensions.map((ex) => ex.extensionFromId).includes(this.order?.id);
       });
-      if(this.activeSystem === OrderManagementIRPSystemId.IRP){
-        this.subscribeOnCandidates();
-      } else {
-        this.subscribeOnCandidateJob();
-      }
+    this.subscribeOnVMSCandidate();
+    this.subscribeOnCandidateJob();
+    this.subscribeOnCandidates();
     this.onOpenEvent();
+    this.onCloseEvent();
     this.subscribeOnSelectedOrder();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeOnPermissions();
@@ -395,14 +402,15 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         );
       }
     } 
-    const irpcandidate = changes["irpCandidates"]?.currentValue;
+    const irpcandidate = changes["candidateirp"]?.currentValue;
     if(irpcandidate){
-      this.setCloseOrderButtonStateforIRP();      
+      this.setCloseOrderButtonStateforIRP(irpcandidate);      
       this.setAddExtensionBtnState(irpcandidate);
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(
-          this.orderStatusText[changes['irpCandidates'].currentValue.orderStatus]
+          this.CandidatesStatusText[changes['candidateirp'].currentValue.status]
         );
+        this.chipList.text = this.CandidatesStatusText[changes['candidateirp'].currentValue.statusName];
       }
 
     }
@@ -419,10 +427,13 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       !!this.order?.orderCloseDate;
   }
 
-  public setCloseOrderButtonStateforIRP(): void {
+  public setCloseOrderButtonStateforIRP(irpCandidate: IRPOrderPosition): void {
     this.disabledCloseButtonforIRP =
-      !!this.irpCandidates?.positionClosureReasonId ||
-      !!this.order?.orderCloseDate ;
+      !!irpCandidate?.positionClosureReasonId ||
+      !!this.order?.orderCloseDate || 
+      irpCandidate?.status === OrderStatusIRP.Cancelled || 
+      irpCandidate?.status === OrderStatusIRP.Offboard || 
+      !!irpCandidate?.closeDate;
   }
 
   public closeOrder(order: MergedOrder): void {
@@ -522,10 +533,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
             billRates: rates,
             billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.candidateJob.candidatePayRate,
+            deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
           })
         )
         .pipe(takeWhile(() => this.isAlive))
         .subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
           this.deleteUpdateFieldInRate();
         });
@@ -616,11 +629,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
   }
 
-  public getExtensionsforIRP(): void {
-    if (!this.irpCandidates?.candidateJobId) {
-      return;
-    }
-    this.store.dispatch(new GetOrganizationExtensions(this.irpCandidates.candidateJobId as number, this.order?.id));
+  public getExtensionsforIRP(irpCandidate: IRPOrderPosition): void {
+    this.store.dispatch(new GetOrganizationExtensions(irpCandidate.candidateJobId as number, this.order?.id));
   }
 
   public updateGrid(): void {
@@ -632,7 +642,11 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   public onSave(): void {
     if (this.isCancelled) {
       this.updateOrganisationCandidateJob();
-    } else {
+    }else if(this.candidateJob?.applicantStatus.applicantStatus==CandidatStatus.OnBoard && this.selectedApplicantStatus?.applicantStatus !== ApplicantStatusEnum.Cancelled)
+    {
+      this.updateOrganisationCandidateonboardJob()
+    } 
+    else {
       this.saveHandler({ itemData: this.selectedApplicantStatus });
     }
   }
@@ -679,7 +693,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
           createReplacement: false,
           actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
           cancellationReasonId: cancelCandidateDto.jobCancellationReason
-        
+
         })
       );
       this.updateDetails();
@@ -800,6 +814,14 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
   }
 
+  private onCloseEvent(): void {
+    this.closeEvent?.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+      if(data === null){
+        this.closeSideDialog();
+      }
+    });
+  }
+
   private onOpenEvent(): void {
     this.openEvent.pipe(
       filter((data) => {
@@ -853,30 +875,32 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       });
     }
   }
-
+  private subscribeOnVMSCandidate(): void {
+    this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
+      if(this.isOrganization && this.activeSystem === OrderManagementIRPSystemId.VMS){
+        this.candidateJob = orderCandidateJob;
+        if (orderCandidateJob) {
+          this.getExtensions();
+          this.getComments();
+          this.setAcceptForm(orderCandidateJob);
+        }
+      }
+  });
+  }
   private subscribeOnCandidates(): void {
     this.getIrpCandidatesforExtension$.pipe(takeWhile(() => this.isAlive)).subscribe((irpCandidates) => {
-      if(irpCandidates){
-        irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidateirp?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
-        this.setCloseOrderButtonStateforIRP();
-        this.getExtensionsforIRP();
-        this.getCommentsforIRP();
+      if(this.isOrganization && this.activeSystem !== OrderManagementIRPSystemId.VMS){
+        if(irpCandidates && this.candidate?.candidateProfileId){
+          irpCandidates.items.filter(data => (data.candidateJobId !== null && this.candidate?.candidateProfileId === data.candidateProfileId) ? this.irpCandidates = data : "");
+          this.setCloseOrderButtonStateforIRP(this.irpCandidates);
+          this.getExtensionsforIRP(this.irpCandidates);
+          this.getCommentsforIRP();
+        }
       }
     });
   }
 
   private subscribeOnCandidateJob(): void {
-    if (this.isOrganization) {
-        this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
-          this.candidateJob = orderCandidateJob;
-          if (orderCandidateJob) {
-            this.getExtensions();
-            this.getComments();
-            this.setAcceptForm(orderCandidateJob);
-          }
-          this.changeDetectorRef.detectChanges();
-        });  
-      }
     if (this.isAgency) {
       this.agencyCandidatesJob$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
         this.candidateJob = orderCandidateJob;
@@ -889,6 +913,16 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     }
      }
 
+  private getBillRate(billRates: BillRate[], startDate?: Date): BillRate | null {
+    const regularRate: BillRate | null = this.billRatesSyncService.getBillRateForSync(
+      billRates, startDate, false
+    );
+    const regularLocalRate = this.billRatesSyncService.getBillRateForSync(
+      billRates, startDate, true
+    );
+    return regularRate ?? regularLocalRate;
+  }
+  
   private setAcceptForm({
     order: {
       hourlyRate,
@@ -916,10 +950,12 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         ? candidateBillRate
         : offeredBillRate;
     const orderDate = this.order?.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate;
+    const bilRateValue = 
+      this.getBillRate(this.candidateJob?.billRates || [], DateTimeHelper.setCurrentTimeZone(orderDate as string));
 
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
-      offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
+      offeredBillRate: PriceUtils.formatNumbers(bilRateValue?.rateHour || hourlyRate),
       candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
       locationName,
       departmentName,
@@ -954,6 +990,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       case !this.isAgency && CandidatStatus.BillRatePending:
         this.acceptForm.get('hourlyRate')?.enable();
         this.acceptForm.get('candidateBillRate')?.disable();
+        break;
+      case CandidatStatus.OnBoard:
+         this.enabledisableAcceptform()
         break;
       case CandidatStatus.OfferedBR:
       case CandidatStatus.OnBoard:
@@ -1046,7 +1085,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private getMissingCredentialsRequestBody(): MissingCredentialsRequestBody {
     return {
       orderId: this.order.orderId || this.order.id,
-      candidateProfileId: this.irpCandidates?.candidateProfileId || this.candidate.candidateId,
+      candidateProfileId: this.candidate.candidateId || this.irpCandidates?.candidateProfileId || this.candidate.candidateProfileId as number,
       validateForDate: DateTimeHelper.setInitHours(
         DateTimeHelper.setUtcTimeZone(addDays(this.candidateJob?.actualEndDate ? this.candidateJob?.actualEndDate : this.candidate?.actualEndDate as string, 1) as Date)
       ),
@@ -1100,5 +1139,56 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   private checkForBillRateUpdate(rates: BillRate[]): boolean {
     return rates.some((rate) => !!rate.isUpdated);
+  }
+  private updateOrganisationCandidateonboardJob(): void {
+    const value = this.acceptForm.getRawValue();
+    const candidateJob = {
+      actualStartDate: this.candidateJob?.actualStartDate,
+      actualEndDate: this.candidateJob?.actualEndDate,
+      billRates: this.candidateJob?.billRates,
+      orderId: this.candidateJob?.orderId as number,
+      organizationId: this.candidateJob?.organizationId as number,
+      jobId: this.candidateJob?.jobId as number,
+      candidateBillRate: value.candidateBillRate,
+      candidatePayRate: value.candidatePayRate,
+      offeredBillRate: value.offeredBillRate,
+      clockId: value.clockId,
+      skillName: value.skillName,
+      nextApplicantStatus: {
+        applicantStatus: ApplicantStatus.OnBoarded,
+        statusText:"Onboard",
+      },
+    };
+    this.store.dispatch(new UpdateOrganisationCandidateJob(candidateJob)).pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.closeSideDialog()
+        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+      }
+      )
+  }
+  private enabledisableAcceptform()
+  {
+    if(!this.isAgency)
+    { this.acceptForm.get('candidateBillRate')?.disable();
+      this.acceptForm.get('hourlyRate')?.disable();
+      this.acceptForm.get('clockId')?.enable();
+    }
+  }
+  private setCorrectActualDates(initDate: string, shiftStartTime: Date, shiftEndTime: Date) {
+    if (shiftStartTime > shiftEndTime) {
+      const formatedInitDate = DateTimeHelper.setUtcTimeZone(initDate);
+      const endDate = new Date(new Date(new Date(formatedInitDate).setDate(new Date(formatedInitDate)
+      .getDate() + 1)).setHours(0, 0, 0));
+
+      return {
+        actualStartDate: DateTimeHelper.setUtcTimeZone(initDate),
+        actualEndDate: DateTimeHelper.setUtcTimeZone(endDate),
+      };
+    }
+
+    return {
+      actualStartDate: DateTimeHelper.setUtcTimeZone(initDate),
+      actualEndDate: DateTimeHelper.setUtcTimeZone(initDate),
+    };
   }
 }

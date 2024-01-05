@@ -518,7 +518,8 @@
 
 <app-import-departments
   [dialogEvent]="importDialogEvent"
-  [isOrgUseIRPAndVMS]="isOrgUseIRPAndVMS"
+  [isOrganizationIRP]="isIRPEnabled"
+  [isOrganizationVMS]="isVMSEnabled"
   [isInvoiceDepartmentIdFieldShow]="isInvoiceDepartmentIdFieldShow"
   (reloadItemsList)="updatePage()">
 </app-import-departments>

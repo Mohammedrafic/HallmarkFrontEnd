@@ -173,6 +173,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   private jobId: number;
 
   public commentContainerId = 0;
+  public openEvent:boolean = false;
 
 
   @Select(TimesheetsState.orderComments)
@@ -326,7 +327,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
             this.slectingindex = selectEvent.previousIndex;
             this.tabs.select(selectEvent.previousIndex);
           }
-          
+
           if((AlertIdEnum[AlertIdEnum['Timesheet Level Comments']].trim()).toLowerCase() == (alertTitle.trim()).toLowerCase()){
             this.tabs.select(0);
             window.localStorage.setItem("TimesheetId", JSON.stringify(0));
@@ -614,6 +615,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(take(1))
       .subscribe(() => {
         this.candidateDialog.hide();
+        this.openEvent = false;
         if (this.isTimeSheetChanged) {
           this.refreshGrid();
         }
@@ -629,7 +631,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       this.timesheetDetailsApiService.getTimesheetHistoricalEvents(this.isAgency, this.timesheetId, this.organizationId)
         .pipe(take(1))
         .subscribe((events: TimesheetHistoricalEvent[]) => {
-          this.historicalEvents = events;
+          this.historicalEvents = this.timesheetDetailsService.getSortedHistoricalEvents(events);
           this.cd.markForCheck();
         });
     }
@@ -819,6 +821,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       )
       .subscribe(() => {
         this.candidateDialog?.show();
+        this.openEvent = true;
       });
   }
 

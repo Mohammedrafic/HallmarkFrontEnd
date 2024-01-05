@@ -51,6 +51,7 @@ export class OrderManagementService extends DestroyableDirective {
   private readonly updatedCandidate: BaseObservable<boolean> = new BaseObservable<boolean>(false);
   private readonly orderFromAnotherSystem: BaseObservable<OrderLinkDetails | null> =
     new BaseObservable<OrderLinkDetails | null>(null);
+  public handleIncludeDeployedEvent: Subject<{checked : boolean}> = new Subject<{checked : boolean}>();
 
   constructor(
     private fb: FormBuilder,
@@ -98,13 +99,15 @@ export class OrderManagementService extends DestroyableDirective {
       creationDateTo: new FormControl(null),
       distributedOnFrom: new FormControl(null),
       distributedOnTo: new FormControl(null),
-      candidateName: new FormControl(null),
+      firstNamePattern: new FormControl(null),
+      lastNamePattern: new FormControl(null),
       projectTypeIds: new FormControl(null),
       projectNameIds: new FormControl(null),
       poNumberIds: new FormControl(null),
       contactEmails: new FormControl(null),
       irpOnly: new FormControl(false),
       reorderStatuses: new FormControl([]),
+      reOrderDate: new FormControl(null),
       shiftIds: new FormControl([]),
       shift: new FormControl([]),
       orderLocked: new FormControl(null),
@@ -230,6 +233,11 @@ export class OrderManagementService extends DestroyableDirective {
     }
 
     return null;
+  }
+
+
+  public HandleDeployedClick(checked : boolean): void {
+      this.handleIncludeDeployedEvent.next({checked});
   }
 
   private getIRPOrderType(tab: OrderManagementIRPTabsIndex): IrpOrderType | null {

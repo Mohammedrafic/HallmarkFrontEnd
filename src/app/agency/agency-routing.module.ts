@@ -27,6 +27,7 @@ const routes: Routes = [
           isOrganizationArea: true,
           isAgencyArea: true,
         },
+        resolve:[AgencyVisibilityFlagResolverService],
       },
       {
         path: 'organization',
@@ -107,6 +108,10 @@ const routes: Routes = [
           isOrganizationArea: false,
           isAgencyArea: true,
         },
+      },
+      {
+        path: 'timesheets/notification/:notificationId',
+        resolve: [NotificationResolver],
       },
       {
         path: 'invoices',

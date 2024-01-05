@@ -8,3 +8,7 @@ export class IntegrationFilterDto {
 export class IntegraionFailFilterDto{
   public organizationFilter: FilteredDataByOrganizationId[];
 }
+
+export class ScheduledIntegrationsFilterDto {
+  public organizationFilter: FilteredDataByOrganizationId[];
+}

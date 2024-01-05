@@ -64,6 +64,7 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { PendingApprovalInvoice } from '../../interfaces';
+import { ToggleRowExpansionHeaderCellService } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.service';
 
 @Component({
   selector: 'app-invoices-container',
@@ -202,6 +203,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public noorgSelection:boolean = false;
   public addManualInvoiceDisable:boolean = false;
   public isAgencyVisibilityFlagEnabled = false;
+  public isExpandedGrid : boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -212,6 +214,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     private ngZone: NgZone,
     private invoiceApiService: InvoicesApiService,
     private filterService: FilterService,
+    private toggleService: ToggleRowExpansionHeaderCellService,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     @Inject(DOCUMENT) private document: Document,
     store: Store,
@@ -279,6 +282,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.watchForPreservedFilters();
     this.getuserPermission();
     this.subscriptionOfPendingInvoices();
+    this.watchForShowDetailsEvent();
   }
 
   ngAfterViewInit(): void {
@@ -396,15 +400,14 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       });
   }
 
-  isExpandedGrid = false;
-  public toggleField(event:any):void 
-  { 
-    this.isExpandedGrid=false;
-    if(event.target.checked){
-    this.isExpandedGrid=true;
-    }
-    this.resetFilters(true);
+  public watchForShowDetailsEvent(){
+    this.toggleService.handleDetailsEvent.pipe(
+      takeUntil(this.componentDestroy())).subscribe((showdetails) => {
+        this.isExpandedGrid = showdetails.Details;
+        this.resetFilters(true);
+    })
   }
+
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
@@ -601,7 +604,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public changeMultiSelection(nodes: RowNode[]): void {
     if (nodes.length) {
-      if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords || this.selectedTabIdx === OrganizationInvoicesGridTab.Manual )
+      if(this.selectedTabIdx === OrganizationInvoicesGridTab.PendingRecords || (!this.isAgency && this.selectedTabIdx === OrganizationInvoicesGridTab.Manual) )
       this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.id);  
       else
         this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);

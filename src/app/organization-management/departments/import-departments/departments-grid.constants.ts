@@ -1,9 +1,16 @@
 import { ColDef } from "@ag-grid-community/core";
 
 import { GridErroredCellComponent } from "@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component";
+import { ImportedDepartment } from '@shared/models/department.model';
+import { ImportResult } from '@shared/models/import.model';
+import { ImportedOrder } from '@shared/models/imported-order.model';
+import { ImportedLocation } from '@shared/models/location.model';
 
-export const DepartmentsColumns = (isIRPEnabled: boolean, isInvoiceDepartmentIdFieldShow: boolean): ColDef[] => {
-  const result = [
+// eslint-disable-next-line max-lines-per-function
+export const DepartmentsColumns = (
+  isIRPFlagEnabled: boolean, isOrganizationIRP: boolean, isOrganizationVMS: boolean, isInvoiceDepartmentIdFieldShow: boolean,
+  data: ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder> | null): ColDef[] => {
+  let result = [
     {
       field: 'orgName',
       width: 150,
@@ -69,13 +76,51 @@ export const DepartmentsColumns = (isIRPEnabled: boolean, isInvoiceDepartmentIdF
     });
   }
 
-  if (isIRPEnabled) {
+  if (isIRPFlagEnabled && isOrganizationIRP && isOrganizationVMS) {
     result.push({
       field: 'includeInIRP',
       width: 150,
       headerName: 'INCLUDE IN IRP',
       cellRenderer: GridErroredCellComponent,
     });
+  }
+
+  if (isIRPFlagEnabled && isOrganizationIRP) {
+    const records = data?.succesfullRecords.length && data.succesfullRecords || data?.errorRecords;
+
+    // Find record which has longest skills array and create coldefs based on it's length with generic field name. 
+    if (records) {
+      const primarySkillLength = records
+      .filter((record) => !!record.primarySkills.length)
+      .map((record) => record.primarySkills?.length);
+      const secondarySkillLength = records
+      .filter((record) => !!record.secondarySkills?.length)
+      .map((record) => record.secondarySkills?.length);
+  
+      if (primarySkillLength && primarySkillLength.length) {
+        const longestLengthSkillsIndex = primarySkillLength.indexOf(Math.max(...primarySkillLength));
+        const cols = records[longestLengthSkillsIndex].primarySkills.map((skillName, index) => ({
+          field: `primarySkill${index}`,
+          width: 180,
+          headerName: 'Primary Skill',
+          cellRenderer: GridErroredCellComponent,
+        }));
+    
+        result = result.concat(cols as []);
+      }
+  
+      if (secondarySkillLength) {
+        const longestLengthSkillsIndex = secondarySkillLength.indexOf(Math.max(...secondarySkillLength));
+        const cols = records[longestLengthSkillsIndex].secondarySkills.map((skillName, index) => ({
+          field: `secondarySkill${index}`,
+          width: 180,
+          headerName: 'Secondary Skill',
+          cellRenderer: GridErroredCellComponent,
+        }));
+    
+        result = result.concat(cols as []);
+      }
+    }
   }
 
   return result;

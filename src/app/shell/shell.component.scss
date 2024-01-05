@@ -312,7 +312,7 @@
   }
 
   .sidebar-item {
-    border-bottom: 1px solid $secondary-dark-blue-45-1;
+    border-bottom: 1px solid $secondary-dark-blue-10-2;
 
     &:hover {
       background-color: $secondary-dark-blue-10-1;
@@ -446,7 +446,7 @@
   box-sizing: border-box;
   height: 100%;
   padding: 24px 10px;
-  background-color: $secondary-dark-blue-40;
+  background-color: var(--devider);
   background-clip: content-box;
 
   &::before {
@@ -534,6 +534,8 @@
   }
   @media #{$max-mobile} {
     right: 25px;
+    bottom: 15px;
+    left: 10px;
   }
 }
 

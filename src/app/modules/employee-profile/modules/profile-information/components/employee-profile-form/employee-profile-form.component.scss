@@ -27,10 +27,7 @@
 
 ::ng-deep {
   & .schedule-custom-tooltip-container {
-    margin: 0 !important;
-    font-family: 'Open Sans', 'sans-serif';
-    font-size: 11px;
-    line-height: 16px;
+    @include scheduleTooltipContainer;
   }
 
   app-tooltip-container {

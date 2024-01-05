@@ -15,6 +15,7 @@ import {
 } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { distinctUntilChanged, filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
@@ -225,6 +226,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef,
     private permissionService: PermissionService,
+    private billRatesSyncService: BillRatesSyncService,
     private orderManagementService: OrderManagementService,
   ) {
     super();
@@ -317,7 +319,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       ).subscribe(() => {
         this.updateDetails.emit();
       });
-     
+
     }
   }
 
@@ -335,7 +337,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           createReplacement: false,
           actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
           cancellationReasonId: cancelCandidateDto.jobCancellationReason
-        
+
         })
       );
       this.updateDetails.emit();
@@ -385,10 +387,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             billRates: rates,
             billRatesUpdated: this.checkForBillRateUpdate(rates),
             candidatePayRate: this.candidateJob.candidatePayRate,
+            deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
           })
         ).pipe(
           takeUntil(this.unsubscribe$)
         ).subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
           this.updateDetails.emit();
           this.deleteUpdateFieldInRate();
@@ -405,10 +409,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         this.order.jobStartDate,
         this.order.jobEndDate
       );
-      if(endDate){
+      if (endDate && !isNaN(endDate.getTime())) {
         const dateWithoutZone = DateTimeHelper.setUtcTimeZone(endDate);
 
-        this.form.patchValue({ endDate: DateTimeHelper.setCurrentTimeZone(dateWithoutZone) });  
+        this.form.patchValue({ endDate: DateTimeHelper.setCurrentTimeZone(dateWithoutZone) });
       }
     }
   }

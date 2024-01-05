@@ -143,7 +143,9 @@ import {
   BulkDeleteDepartmentFailed,
   BulkUpdateDepartmentsucceeded,
   BulkUpdateDepartmentFailed,
-  BulkUpdateDepartment
+  BulkUpdateDepartment,
+  DeleteOrganizationSettingsValues,
+  DeleteOrganizationSettingsValuesSucceeded
   
 } from './organization-management.actions';
 import { BulkDepartmentAction, Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
@@ -692,7 +694,7 @@ export class OrganizationManagementState {
               MessageTypes.Error,
               'Department has ' +
                 statues +
-                ' Orders please re-assign or close them before inactivating the Department.'
+                ' Orders and Timesheets please re-assign or close them before inactivating the Department.'
             )
           );
         }
@@ -1010,7 +1012,7 @@ export class OrganizationManagementState {
               MessageTypes.Error,
               'Location has ' +
                 statues +
-                ' Orders please re-assign or close them before inactivating the Location.'
+                ' Orders and Timesheets please re-assign or close them before inactivating the Location.'
             )
           );
         }
@@ -1270,7 +1272,7 @@ export class OrganizationManagementState {
         const errorObj = error.error;
         const statues = JSON.parse(errorObj.errors.IncompleteOpenOrdersExist);
         if (errorObj.errors?.IncompleteOpenOrdersExist) {
-          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has '+ statues +' Orders please re-assign or close them before inactivating the Skill.'));
+          return dispatch(new ShowToast(MessageTypes.Error, 'Skill has '+ statues +' Orders and Timesheets please re-assign or close them before inactivating the Skill.'));
         }
         if (errorObj.errors?.InProgressOrdersExist) {
           return dispatch(new SaveLocationConfirm());
@@ -1969,6 +1971,20 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Regions were not imported'))))
+    );
+  }
+  @Action(DeleteOrganizationSettingsValues)
+  DeleteOrganizationSettingValue(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { settingValueId}: DeleteOrganizationSettingsValues
+  ): Observable<any> {
+    return this.organizationSettingsService.deleteOrganizationSettingValues(settingValueId).pipe(
+      tap((payload) => {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+        dispatch(new DeleteOrganizationSettingsValuesSucceeded());
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => of(dispatch(new ShowToast(MessageTypes.Error, error.error)))),
     );
   }
 }

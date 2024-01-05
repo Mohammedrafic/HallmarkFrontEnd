@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { DOCUMENT, Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime, Subject } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, debounceTime, Subject, take } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction, FilterPageName } from '@core/enums';
@@ -37,7 +37,7 @@ import { BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import * as Interfaces from '../../interface';
 import * as PreservedFilters from 'src/app/store/preserved-filters.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
-
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -113,6 +113,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public user: any;
   organizations: AgencyDataSourceItem[];
   public isAgencyVisibilityFlagEnabled = false;
+  public orderTypeId: any;
+  isRedirectedFromDashboard: boolean;
 
   constructor(
     private store: Store,
@@ -151,6 +153,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
     this.document.defaultView?.localStorage.setItem('BussinessUnitID', JSON.stringify(''));
 
+    this.isRedirectedFromDashboard = this.routerState?.['redirectedFromDashboard'] || false;
+
     this.onOrganizationChangedHandler();
     this.startOrganizationWatching();
     this.startFiltersWatching();
@@ -164,10 +168,18 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           this.rowSelected({rowIndex:filterTimesheetIndex,data:filterTimesheet});
           this.timesheetId = 0;
           this.orderPublicId = '';
-        }  
+        }
       }
     })
+    this.orderTypeId = JSON.parse(localStorage.getItem('OrderType') || '"0"') as number;
 
+    if(this.orderTypeId==OrderType.ReOrder)
+    {
+      const filter={ orderTypeId:this.orderTypeId}
+      this.updateTableByFilters(filter);
+    }
+  
+    
   }
 
   public override ngOnDestroy() {
@@ -304,13 +316,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
     idStream
       .pipe(
-        debounceTime(600),
         filter((id) => !!id),
         switchMap(() => {
           return this.store.dispatch(new PreservedFilters.GetPreservedFiltersByPage(this.getPageName()));
         }),
         switchMap(() => this.preservedFiltersByPageName$),
         filter(({ dispatch }) => dispatch),
+        debounceTime(600),
         tap((filters) => {
           this.filters = filters.state;
         }),
@@ -325,7 +337,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.timesheetsFilters$
       .pipe(
         filter(Boolean),
-        debounceTime(300),
+        debounceTime(600),
         filter((filters) => (this.isAgency ? !isNaN(filters.organizationId as number) : true)),
         switchMap(() => this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()])),
         takeUntil(this.componentDestroy())
@@ -358,54 +370,51 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       .dispatch(new Timesheets.GetOrganizationsForAgency(this.user.id))
       .pipe(
         switchMap(() => this.agencyOrganizations$.pipe(filter((res: AgencyDataSourceItem[]) => !!res.length))),
-        takeUntil(this.componentDestroy())
+        take(1)
       )
       .subscribe((res) => {
         this.organizations= res.filter((item)=> item.regions.length>0)
         const orgId = this.routerState?.["condition"] === "setOrg"
-        ? this.routerState?.["orderStatus"]
-        : this.getOrganizationIdFromState() || this.organizations[0].organizationId as number;
-        this.store.dispatch(new Timesheets.SelectOrganization(orgId));
-        this.organizationControl.setValue(orgId, { emitEvent: false });    
-
-        this.store.dispatch([
-          new Timesheets.UpdateFiltersState(
-            {
-              organizationId: orgId,
-              ...this.filters,
-            },
-            this.activeTabIdx !== 0
-          ),
-          new Timesheets.GetFiltersDataSource(),
-        ]);
+                      ? this.routerState?.["orderStatus"]
+                      : this.getOrganizationIdFromState() || this.organizations[0].organizationId as number;
+        this.timeSheetBasedonOrg(orgId);
       });
     }else{
       this.store
       .dispatch(new Timesheets.GetOrganizations())
       .pipe(
         switchMap(() => this.organizations$.pipe(filter((res: DataSourceItem[]) => !!res.length))),
-        takeUntil(this.componentDestroy())
+        take(1)
       )
       .subscribe((res) => {
         const orgId = this.routerState?.["condition"] === "setOrg"
-          ? this.routerState?.["orderStatus"]
-          : this.getOrganizationIdFromState() || res[0].id;
-
-        this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
-        this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });    
-
-        this.store.dispatch([
-          new Timesheets.UpdateFiltersState(
-            {
-              organizationId: this.isAgency && (this.businessUnitId ?? 0) > 0 ? this.businessUnitId : orgId,
-              ...this.filters,
-            },
-            this.activeTabIdx !== 0
-          ),
-          new Timesheets.GetFiltersDataSource(),
-        ]);
+                      ? this.routerState?.["orderStatus"]
+                      : this.getOrganizationIdFromState() || res[0].id;
+        this.timeSheetBasedonOrg(orgId);
       });
     }
+  }
+
+  private timeSheetBasedonOrg(orgId:any): void{
+    this.store.dispatch(new Timesheets.SelectOrganization((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId));
+    this.organizationControl.setValue((this.isAgency && (this.businessUnitId??0)>0)?this.businessUnitId: orgId, { emitEvent: false });
+    const statusIds = this.tabConfig[this.activeTabIdx].value;
+    const filters=this.filters;
+    const updatedFilters = {
+      ...this.filters,
+      statusIds: statusIds
+    }
+    const finalresult=this.isRedirectedFromDashboard ? updatedFilters : filters;
+    this.store.dispatch([
+      new Timesheets.UpdateFiltersState(
+        {
+          organizationId: this.isAgency && (this.businessUnitId ?? 0) > 0 ? this.businessUnitId : orgId,
+          ...finalresult
+        },
+        this.activeTabIdx !== 0
+      ),
+      new Timesheets.GetFiltersDataSource(),
+    ]);
   }
 
   private getOrganizationIdFromState(): number | null {

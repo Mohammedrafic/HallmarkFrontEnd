@@ -66,6 +66,7 @@ import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { sum } from 'lodash';
+import { AgencyTImesheetsummaryModel } from '../models/agency-timesheet-summary.models';
 
 @Injectable()
 export class DashboardService {
@@ -101,6 +102,8 @@ export class DashboardService {
     [WidgetTypeEnum.ORDERS_PENDING_IN_CUSTOM] : (filters: DashboartFilterDto) => this.getOrdersPendingInCustomStatus(filters),
     [WidgetTypeEnum.AVERAGE_DAYS_FOR_ACTIVE_CANDIDATES_IN_A_STATUS_FOR_INITIAL_ORDERS]: (filters: DashboartFilterDto) => this.getAvergaeDayActivecandidateStatusWidgetData(filters),
     [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getSkillCategoryByTypes(filters, timeSelection),
+    [WidgetTypeEnum.MISSING_TIMESHEETS]: (filters: DashboartFilterDto) => this.getAgencyTimesheetWidgetdata(filters),
+    [WidgetTypeEnum.AGENCY_TIMESHEET_SUMMARY]: (filters: DashboartFilterDto) => this.getAgencytimesheetsummary(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -439,6 +442,13 @@ export class DashboardService {
       map((data)=> data)
     )
   }
+  
+  private getAgencyTimesheetWidgetdata(filter: DashboartFilterDto) : Observable<OrgDetailsInfoModel> {
+    return this.httpClient.post<any>(`${this.baseUrl}/organizationpendingtimesheetcounts`, { ...filter }).pipe(
+      map((data)=> data)
+    )
+  }
+  
   private getAgencyPositionCount(filter: DashboartFilterDto) : Observable<AgencyPositionModel[]> {
     return this.httpClient.post<AgencyPositionModel[]>(`${this.baseUrl}/getOpenAndInprogressOpenPositions`, { ...filter }).pipe(
       map((data)=> data)
@@ -703,5 +713,14 @@ export class DashboardService {
       const dateTo =  DateTimeHelper.setUtcTimeZone(new Date(new Date(today.getFullYear(), today.getMonth(), 0)));
       return { dateFrom, dateTo };
     }
+  private getAgencytimesheetsummary(filter: DashboartFilterDto): Observable<AgencyTImesheetsummaryModel[]> {
+    const desiredOrder = ["Incomplete", "Missing", "Pending Approval(Time sheet)", "Pending Approval(Miles)"];
+
+    return this.httpClient.post<AgencyTImesheetsummaryModel[]>(`${this.baseUrl}/TimesheetSummary`, { ...filter })
+      .pipe(
+        map(response => desiredOrder.map(name => response.find(item => item.name === name)!))
+      );
+  }
+    
  
 }

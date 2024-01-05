@@ -19,19 +19,20 @@ export class ScheduleCardService {
         const orderIDText = item.orderMetadata?.orderPublicId;
         const startTime = DateTimeHelper.formatDateUTC(item.startDate, 'HH:mm');
         const endTime = DateTimeHelper.formatDateUTC(item.endDate, 'HH:mm');
+        const secondarySkill = item.orderMetadata?.secondarySkill ? `- ${item.orderMetadata?.secondarySkill}` : '';
 
         if (isBooking && orderIDText) {
           const attributesText = this.createAttributesTooltipText(item.attributes);
 
           return `${ startTime } - ${ endTime } | ${orderIDText}`
-            + ` | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department }`
+            + ` | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department } ${secondarySkill}`
             + `${attributesText}`;
         }
 
         if (isBooking) {
           const attributesText = this.createAttributesTooltipText(item.attributes);
 
-          return `${ startTime } - ${ endTime } | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department }`
+          return `${ startTime } - ${ endTime } | ${ item.orderMetadata?.location } - ${ item.orderMetadata?.department } ${secondarySkill}`
             + `${attributesText}`;
         }
 

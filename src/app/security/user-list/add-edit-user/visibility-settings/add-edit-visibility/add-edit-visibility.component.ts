@@ -192,7 +192,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
   private subscribeOnOpenEvent(): void {
     this.openEvent.pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.showForm = true;
-      this.store.dispatch(new GetOrganizationsStructureAll(this.createdUser?.id as string)).subscribe(() => {
+      this.store.dispatch(new GetOrganizationsStructureAll(this.createdUser?.id as string, true)).subscribe(() => {
         if (data) {
           this.title = 'Edit';
           this.editVisibility = {

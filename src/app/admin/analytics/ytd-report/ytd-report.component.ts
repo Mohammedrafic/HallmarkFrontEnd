@@ -13,7 +13,7 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetCommonReportFilterOptions, GetLogiReportData, ClearLogiReportState } from '@organization-management/store/logi-report.action';
+import { GetCommonReportFilterOptions, GetLogiReportData, ClearLogiReportState, GetDepartmentsByLocations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -73,6 +73,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     OrganizationIdYT: '',
     RegionIdsYT: '',
     LocationIdsYT: '',
+    departmentIdsYT: '',
     YearYT: '',
     MonthsYT: '',    
     UserIdYT: '',
@@ -102,10 +103,11 @@ export class YtdReportComponent implements OnInit, OnDestroy {
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedLocations: Location[];
 
-  //@Select(LogiReportState.departments)
-  //public departments$: Observable<Department[]>;
-  //isDepartmentsDropDownEnabled: boolean = false;
-  //departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  @Select(LogiReportState.departments)
+  public departments$: Observable<Department[]>;
+  isDepartmentsDropDownEnabled: boolean = false;
+  departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  selectedDepartments: Department[];
 
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
@@ -120,7 +122,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
 
 
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  //selectedDepartments: Department[];
+ 
   //selectedSkillCategories: SkillCategoryDto[];
   //selectedSkills: MasterSkillDto[];
 
@@ -136,7 +138,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
   public bussinessControl: AbstractControl;
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
-  //public departmentIdControl: AbstractControl;
+  public departmentIdControl: AbstractControl;
   //public skillCategoryIdControl: AbstractControl;
   //public skillIdControl: AbstractControl;
 
@@ -144,7 +146,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
 
   public regions: Region[] = [];
   public locations: Location[] = [];
- // public departments: Department[] = [];
+  public departments: Department[] = [];
   public organizations: Organisation[] = [];
   public regionsList: Region[] = [];
   public locationsList: Location[] = [];
@@ -153,7 +155,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultMonth: (number | undefined)[] = [];
-  //public defaultDepartments: (number | undefined)[] = [];
+  public defaultDepartments: (number | undefined)[] = [];
   //public defaultSkillCategories: (number | undefined)[] = [];
   //public defaultOrderTypes: (number | undefined)[] = [];
   //public defaultSkills: (number | undefined)[] = [];
@@ -235,7 +237,7 @@ export class YtdReportComponent implements OnInit, OnDestroy {
         businessIds: new FormControl([Validators.required]),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
-        //departmentIds: new FormControl([]),
+        departmentIds: new FormControl([]),
         //skillCategoryIds: new FormControl([]),
         //skillIds: new FormControl([]),
         year: new FormControl([], [Validators.required]),
@@ -326,11 +328,15 @@ export class YtdReportComponent implements OnInit, OnDestroy {
           };
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.regions = this.regionsList;
+          this.locations = this.locationsList;
+          this.departments = this.departmentsList;
           this.filterColumns.regionIds.dataSource = this.regions;
+          this.defaultRegions =this.regions.map(x=>x.id);
           if (this.isInitialLoad) {
             setTimeout(() => { this.SearchReport() }, 3000);
             this.isInitialLoad = false;
           }
+          this.ytdreportReportForm.get(ytdReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
           this.changeDetectorRef.detectChanges();
         }
         else {
@@ -345,21 +351,26 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     this.regionIdControl = this.ytdreportReportForm.get(ytdReportConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ytdreportReportForm.get(ytdReportConstants.formControlNames.LocationIds)?.setValue([]);
-      /*this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);*/
+      this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);
       this.locations = [];
-     /* this.departments = [];*/
+      this.departments = [];
 
       if (this.regionIdControl.value.length > 0) {
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
         this.filterColumns.locationIds.dataSource = this.locations;
-        //this.departments = this.locations.map(obj => {
-        //  return obj.departments.filter(department => department.locationId === obj.id);
-        //}).reduce((a, b) => a.concat(b), []);
+
+        this.defaultLocations = this.locations.map(x => x.id);
+
+        this.departments = this.locations.map(obj => {
+          return obj.departments.filter(department => department.locationId === obj.id);
+        }).reduce((a, b) => a.concat(b), []);
+
+        this.ytdreportReportForm.get(ytdReportConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
       }
       else {
         this.filterColumns.locationIds.dataSource = [];
         this.ytdreportReportForm.get(ytdReportConstants.formControlNames.LocationIds)?.setValue([]);
-       /* this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);*/
+        this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
@@ -367,21 +378,23 @@ export class YtdReportComponent implements OnInit, OnDestroy {
   public onFilterLocationChangedHandler(): void {
     this.locationIdControl = this.ytdreportReportForm.get(ytdReportConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);
 
-      //if (this.locationIdControl.value.length > 0) {
-      //  this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
-      //  this.filterColumns.departmentIds.dataSource = this.departments;
-      //}
-      //else {
-      //  this.filterColumns.departmentIds.dataSource = [];
-      //  this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);
-      //}
+      if (this.locationIdControl.value.length > 0) {
+        this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
+        this.filterColumns.departmentIds.dataSource = this.departments;
+        this.defaultDepartments = this.departments.map(x => x.id);
+        this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
+      }
+      else {
+        this.filterColumns.departmentIds.dataSource = [];
+        this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);
+      }
     });
-    //this.departmentIdControl = this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds) as AbstractControl;
-    //this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-    //  this.departments = this.departments?.filter((object) => data?.includes(object.id));
-    //});
+    this.departmentIdControl = this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds) as AbstractControl;
+    this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.departments = this.departments?.filter((object) => data?.includes(object.id));
+    });
   }
 
   //public onFilterSkillCategoryChangedHandler(): void {
@@ -415,12 +428,12 @@ export class YtdReportComponent implements OnInit, OnDestroy {
       }
     }
     //let { departmentIds, locationIds, regionIds, skillCategoryIds, skillIds, year, month } = this.ytdreportReportForm.getRawValue();
-    let {locationIds, regionIds, year, month } = this.ytdreportReportForm.getRawValue();
+    let {departmentIds,locationIds, regionIds, year, month } = this.ytdreportReportForm.getRawValue();
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : '';
     locationIds = locationIds.length > 0 ? locationIds.join(",") : '';
     // locationIds.length > 0 ? locationIds.join(",") : (this.locations?.length > 0 ? this.locations.map(x => x.id).join(",") : []);
-   // departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
+   departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : '';
     //departmentIds.length > 0 ? departmentIds.join(",") : (this.departments?.length > 0 ? this.departments.map(x => x.id).join(",") : []);
 
 
@@ -456,7 +469,8 @@ export class YtdReportComponent implements OnInit, OnDestroy {
 
       OrganizationIdYT: this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       RegionIdsYT: regionIds.length == 0 ? '' : regionIds,
-      LocationIdsYT: locationIds.length == 0 ? '' : locationIds,      
+      LocationIdsYT: locationIds.length == 0 ? '' : locationIds,
+      DepartmentIdsYT: departmentIds.length == 0 ? '' : departmentIds,
       YearYT: year,
      // MonthsYT: month,
       MonthsYT: month.length == 0 ? "null" : month.join(","),
@@ -491,13 +505,13 @@ export class YtdReportComponent implements OnInit, OnDestroy {
         valueField: 'name',
         valueId: 'id',
       },
-      //departmentIds: {
-      //  type: ControlTypes.Multiselect,
-      //  valueType: ValueType.Id,
-      //  dataSource: [],
-      //  valueField: 'name',
-      //  valueId: 'id',
-      //},
+      departmentIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
       //skillCategoryIds: {
       //  type: ControlTypes.Multiselect,
       //  valueType: ValueType.Id,
@@ -547,12 +561,12 @@ export class YtdReportComponent implements OnInit, OnDestroy {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    this.ytdreportReportForm.get(ytdReportConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+    this.ytdreportReportForm.get(ytdReportConstants.formControlNames.RegionIds)?.setValue([]);
     this.ytdreportReportForm.get(ytdReportConstants.formControlNames.LocationIds)?.setValue([]);
     let currentDate = new Date();
           this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([currentDate.getMonth() + 1]);
           this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Year)?.setValue(currentDate.getFullYear());
-    //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.ytdreportReportForm.get(ytdReportConstants.formControlNames.DepartmentIds)?.setValue([]);
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
    // this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Year)?.setValue([]);
@@ -560,26 +574,25 @@ export class YtdReportComponent implements OnInit, OnDestroy {
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.setValue([this.defaultMonth]);
    // this.ytdreportReportForm.get(ytdReportConstants.formControlNames.SearchBy)?.setValue([]);
     this.filteredItems = [];
-    this.locations = [];
-    //this.departments = [];
+     this.locations = [];
+   this.departments = [];
     this.filterColumns.locationIds.dataSource = [];
-    //this.filterColumns.departmentIds.dataSource = [];
+    this.filterColumns.departmentIds.dataSource = [];
   }
   public onFilterApply(): void {
     this.ytdreportReportForm.markAllAsTouched();
-    let { regionIds, locationIds,  agingGroupIds } = this.ytdreportReportForm.getRawValue();
+    let { regionIds, locationIds, departmentIds,  agingGroupIds } = this.ytdreportReportForm.getRawValue();
 
     regionIds = regionIds.length > 0 ? regionIds.join(",") : this.regionsList?.length > 0 ? this.regionsList.map(x => x.id).join(",") : "null";
     locationIds = locationIds.length > 0 ? locationIds.join(",") : this.locationsList?.length > 0 ? this.locationsList.map(x => x.id).join(",") : "null";
-    //departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
-
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : this.departmentsList?.length > 0 ? this.departmentsList.map(x => x.id).join(",") : "null";
    /* if (!(regionIds.length > 0 && locationIds.length > 0 && departmentIds.length > 0)) {*/
-    if (!(regionIds.length > 0 && locationIds.length > 0 )) {
+     if (!(regionIds.length > 0 && locationIds.length > 0 )) {
       this.ytdreportReportForm.markAllAsTouched();
       if (this.ytdreportReportForm?.invalid) {
         return;
       }
-    }
+     }
     //this.ytdreportReportForm.get(ytdReportConstants.formControlNames.Month)?.updateValueAndValidity({ emitEvent: false });
     //this.changeDetectorRef.detectChanges();
 

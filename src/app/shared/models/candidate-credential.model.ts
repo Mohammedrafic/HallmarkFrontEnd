@@ -7,7 +7,7 @@ export interface CandidateCredential {
   id?: number;
   candidateProfileId?: number;
   status?: number;
-  completedBy?: string;
+  completedByName?: string;
   completedDate?: string | null;
   masterName?: string;
   masterCredentialId: number;

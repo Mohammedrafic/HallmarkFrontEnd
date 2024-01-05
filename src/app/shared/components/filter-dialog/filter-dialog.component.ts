@@ -1,13 +1,13 @@
 import { takeUntil } from 'rxjs';
 
-import { Component, ContentChild, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ContentChild, EventEmitter, HostListener, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
 import { ShowFilterDialog } from '../../../store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
 import { ChipDeletedEventArgs, DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { ChipDeleteEventType, ChipItem } from '../inline-chips/inline-chips.interface';
+import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 
 @Component({
   selector: 'app-filter-dialog',
@@ -15,6 +15,11 @@ import { ChipDeleteEventType, ChipItem } from '../inline-chips/inline-chips.inte
   styleUrls: ['./filter-dialog.component.scss'],
 })
 export class FilterDialogComponent extends DestroyableDirective implements OnInit {
+  @HostListener('document:keydown.enter', ['$event'])
+  clickEnterKeyPress(): void {
+    this.onFilterClick();
+  }
+
   @ViewChild('filterDialog') filterDialog: DialogComponent;
   @ContentChild('groupedChips') public groupedChips:TemplateRef<HTMLElement>;
   @ContentChild('scheduleChips') public scheduleChips:TemplateRef<HTMLElement>;

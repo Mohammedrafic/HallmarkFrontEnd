@@ -57,10 +57,12 @@ import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { CommonHelper } from '@shared/helpers/common.helper';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { Comment } from '@shared/models/comment.model';
 import {
   AcceptJobDTO,
   ApplicantStatus,
+  CandidateCancellationReason,
   IrpOrderCandidate,
   Order,
   OrderCandidateJob,
@@ -91,6 +93,7 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
 import { SystemType } from '@shared/enums/system-type.enum';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { canceldto } from '../../interfaces/order-candidate.interface';
+import { EditIrpCandidateService } from '../../edit-irp-candidate/services/edit-irp-candidate.service';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -115,15 +118,16 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   activeSystems: OrderManagementIRPSystemId | null;
   CanOrganizationEditOrdersIRP: boolean;
   CanOrganizationViewOrdersIRP: boolean;
+  irpReasonName: string;
   public get activeSystem() {
     return this._activeSystem;
   }
- 
+
   @Input() public set activeSystem(val: any) {
     this._activeSystem = val;
     this.subsToCandidate();
   }
-  
+
   public candidate$: Observable<OrderCandidatesList | null>;
 
   @Select(OrderManagementState.orderCandidatePage)
@@ -184,7 +188,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public isCandidatePayRateVisible: boolean;
   public canCreateOrder: boolean;
   public irpdata : any;
-
+  public reasons: CandidateCancellationReason[] | null;
   public applicantStatusEnum = ApplicantStatusEnum;
   public candidateSSNRequired: boolean;
   public candidateDOBRequired: boolean;
@@ -262,7 +266,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private settingService: SettingsViewService,
     private permissionService: PermissionService,
     private confirmService: ConfirmService,
-    private orderManagementService: OrderManagementService
+    private billRatesSyncService: BillRatesSyncService,
+    private orderManagementService: OrderManagementService,
+    private editIrpCandidateService: EditIrpCandidateService
   ) {
     super();
     this.isAgency = this.router.url.includes('agency');
@@ -278,11 +284,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   ngOnInit(): void {
+    this.createForm();
     this.activeSystems = this.orderManagementService.getOrderManagementSystem();
     this.subscribeOnPermissions();
     this.subsToCandidate();
     this.rejectReasons$ = this.subscribeOnReasonsList();
-    this.createForm();
     this.onRejectSuccess();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeToCandidateJob();
@@ -336,9 +342,14 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         billRates: rates,
         billRatesUpdated: this.checkForBillRateUpdate(rates),
         candidatePayRate: this.candidateJob.candidatePayRate,
+        deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
       };
 
-      this.store.dispatch(new UpdateOrganisationCandidateJob(valueForUpdate));
+      this.store.dispatch(new UpdateOrganisationCandidateJob(valueForUpdate))
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
+        });
       this.deleteUpdateFieldInRate();
     }
   }
@@ -413,7 +424,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           createReplacement: false,
           actualEndDate: cancelCandidateDto.actualEndDate !== null ? cancelCandidateDto.actualEndDate : this.candidateJob.actualEndDate,
           cancellationReasonId: cancelCandidateDto.jobCancellationReason
-        
+
         })
       );
       this.updateDetails.emit();
@@ -465,6 +476,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public onSave(): void {
     if(this.selectedApplicantStatus){
       this.saveHandler({ itemData: this.selectedApplicantStatus });
+    }
+    else{
+      this.updateAgencyCandidateJob(this.candidateJob.applicantStatus);
     }
   }
 
@@ -526,7 +540,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
     if(this.activeSystem == OrderManagementIRPSystemId.IRP){
       this.applicantStatuses = [
-        { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'OnBoard' },
+        { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
         { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancel' },
       ]
     }
@@ -569,6 +583,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             } else {
               this.orgId = this.currentOrder?.organizationId
             }
+            if(this.activeSystem === OrderManagementIRPSystemId.IRP && this.candidate?.cancellationReasonId !== null){
+              this.reasons = this.editIrpCandidateService.createReasonsOptionsforCancel(this.editIrpCandidateService.getCancelEmployeeReasons()) ?? [];
+              const irpReason = this.reasons.filter(item => item.id === this.candidate?.cancellationReasonId);
+              this.irpReasonName = irpReason[0].name;
+           }   
             const candidateJobId = candidate?.candidateJobId;
             const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;
             if (this.orgId && candidateJobId) {
@@ -628,8 +647,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.form?.get('allowDeployCredentials')?.disable();
       this.form?.get('comments')?.disable();
       this.form?.get('allowDeployCredentials')?.disable();
-      this.form?.get('actualStartDate')?.disable();
-      this.form?.get('actualEndDate')?.disable();
       this.form?.get('offeredBillRate')?.disable();
     }
   }
@@ -896,7 +913,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         extensionEndDate: this.getDateString(extensionEndDate),
         offeredBillRate: formatNumber(CheckNumberValue(this.candidateJob.offeredBillRate), 'en-US', '0.2-2'),
         comments: this.candidateJob.requestComment,
-        guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
+        guaranteedWorkWeek:this.candidateJob.applicantStatus.applicantStatus === ApplicantStatusEnum.Offered ? this.candidateJob.guaranteedWorkWeek || this.candidateJob.order.expectedWorkWeek : this.candidateJob.guaranteedWorkWeek,
         clockId: this.candidateJob.clockId,
         allowDeployCredentials: this.candidateJob.allowDeployCredentials,
         rejectReason: this.candidateJob.rejectReason,
@@ -936,11 +953,19 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.form.get('actualEndDate')?.enable();
       this.form.get('allowDeployCredentials')?.enable();
     }
-    if (this.isOnBoard && !this.isAgency) {
+    if ((this.isOnBoard || this.isOffboard) && !this.isAgency) {
       this.form.get('clockId')?.enable();
       this.form.get('actualStartDate')?.enable();
       this.form.get('actualEndDate')?.enable();
+      this.form.get('guaranteedWorkWeek')?.enable();
+
     }
+    if(this.isOffered && !this.isAgency)
+    {
+      this.form.get('guaranteedWorkWeek')?.enable();
+      this.form.get('clockId')?.enable();
+    }
+    this.changeDetectorRef.markForCheck();
   }
 
   private subscribeOnReasonsList(): Observable<RejectReason[]> {
@@ -979,7 +1004,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       .subscribe((data) => {
         if (data.jobId === this.candidate?.candidateJobId) {
           this.resetStatusesFormControl();
-          this.createForm();
           this.patchForm(data);
           this.adjustCandidatePayRateField();
         }

@@ -12,10 +12,10 @@ import { FilterColumns, TimesheetsFilterState } from '../../interface';
 import { UserState } from 'src/app/store/user.state';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-//import { FilteredUser } from '@shared/models/user.model';
 import { AppState } from 'src/app/store/app.state';
-import { FilteredOrderContactPerson } from '../../../../shared/models/order-contactperson.model';
-import { ORDER_CONTACT_DETAIL_TITLES } from '../../../../shared/constants';
+import { FilteredOrderContactPerson } from '@shared/models/order-contactperson.model';
+import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
+import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 
 @Component({
   selector: 'app-timesheets-filter-dialog',
@@ -49,6 +49,7 @@ export class TimesheetsFilterDialogComponent
   public title: string = '';
 
   private activeTab$: Subject<void> = new Subject();
+  timesheetSummary: string;
 
   ngOnInit(): void {
     this.initFormGroup();
@@ -104,10 +105,31 @@ export class TimesheetsFilterDialogComponent
       )
       .subscribe(({ state }) => {
         const timeSheetMissing = JSON.parse(localStorage.getItem('timeSheetMissing') || '""') as string;
-        const orgpendingwidget = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;
+        const orgpendingwidget = JSON.parse(localStorage.getItem('orgpendingwidget') || '""') as string;   
+        const agencyTimesheet = JSON.parse(localStorage.getItem('agencytimeSheetRedire') || '""') as string;   
+
         this.applyPreservedFilters(state);
         if(timeSheetMissing != '' || orgpendingwidget != ''){
           this.clearAllFilters();
+        }
+      
+        this.timesheetSummary=JSON.parse(localStorage.getItem('agencytimeSheetincomplete') || '""') as string;
+        if(this.timesheetSummary !='')
+        {
+          this.formGroup.controls['statusIds'].patchValue([TimesheetStatus.Incomplete]);
+          this.formGroup.markAsDirty();
+          const filter={ statusIds:[TimesheetStatus.Incomplete]}
+           this.applyPreservedFilters(filter);
+          this.applyFilters();
+          window.localStorage.setItem("agencytimeSheetincomplete", JSON.stringify(""));
+        }
+        if(this.isAgency && agencyTimesheet !='')
+        {
+          const filter={ statusIds:[]}
+
+          this.applyPreservedFilters(filter);
+          window.localStorage.setItem("agencytimeSheetRedire", JSON.stringify(""));
+
         }
       });
   }

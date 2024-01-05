@@ -9,23 +9,24 @@ import { RejectReasonState } from '@organization-management/store/reject-reason.
 import { PageOfCollections } from '@shared/models/page.model';
 import {
   CancelEmpGripConfig,
-  CancelEmpPageSettings
+  CancelEmpPageSettings,
 } from '@organization-management/reasons/components/cancel-employee/constants';
 import { PageSettings } from '@organization-management/reasons/components/cancel-employee/interfaces';
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 import {
   GetCancelEmployeeReason,
   RemoveCancelEmployeeReason,
-  SaveCancelEmployeeReason
+  SaveCancelEmployeeReason,
 } from '@organization-management/store/reject-reason.actions';
 import { CancelEmployeeReasonValue } from '@organization-management/reasons/interfaces';
 import { CancelEmployeeReasons } from '@shared/models/reject-reason.model';
+import { CancellationReasonType } from '@organization-management/reasons/enums';
 
 @Component({
   selector: 'app-cancel-employee',
   templateUrl: './cancel-employee.component.html',
   styleUrls: ['./cancel-employee.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CancelEmployeeComponent extends ReasonsComponent {
   @Select(RejectReasonState.getCancelEmployeeReasons)
@@ -58,7 +59,7 @@ export class CancelEmployeeComponent extends ReasonsComponent {
   }
 
   protected getData(): void {
-    this.store.dispatch(new GetCancelEmployeeReason(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetCancelEmployeeReason(this.currentPage, this.pageSize, false, CancellationReasonType.Custom));
   }
 
   public editReasonRecord(data: CancelEmployeeReasonValue): void {

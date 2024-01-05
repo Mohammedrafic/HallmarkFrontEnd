@@ -127,6 +127,7 @@ export const REASON_WARNING = 'Please select a System for Reason';
 export const EMPLOYEE_SKILL_CHANGE_WARNING = 'Do you want to update Employee Skills? It may have impact on Schedule and Orders.';
 export const IRP_DEPARTMENT_CHANGE_WARNING = 'Do you want to provide that change? It may cause deleting future schedules and canceling Employee from orders.';
 export const EMPLOYEE_INACTIVATED_WARNING = 'Do you want to inactivate the employee?';
+export const EMPLOYEE_ON_HOLD_WARNING = 'Do you want to delete all shifts for On Hold period?';
 export const addAvailabilityToStart = 'Add Availability to start Scheduling';
 export const CommitmentOverlapMessage = 'Are you sure you want assign new Work Commitment? It may have impact on existing schedules and orders';
 
@@ -144,7 +145,7 @@ export const UpdateClosedPositionRate = 'Are you sure you want to update the Bil
 export const HaveScheduleBooking =
   'Onboarded Candidate(s) have scheduled Bookings for this LTA Order. Do you like to remove or update them?';
 
-export const N_FAILED_RECORDS = (count: number) => `${count} failed to process.`;
+export const N_FAILED_RECORDS = (count: number) => `${count} records failed to process.`;
 export const N_SUCCESS_RECORDS = (count: number) => `${count} records successfully processed.`;
 export const ExtensionStartDateValidation = 'Extension may not be created with more than a 14 day gap from initial order to extension order.';
 export const YEARANDMONTH_Validation = 'Start Year and month should be less than End year and month';

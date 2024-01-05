@@ -24,7 +24,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chip-css-class/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
+import { IRPOrderPosition, IRPOrderPositionpage, Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import {
@@ -103,7 +103,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Output() editOrderPressed = new EventEmitter<number>();
   @Input() activeIRPtabs: OrderManagementIRPTabsIndex;
   @Input() isOrderDetailsTab: boolean;
-
+  @Input() candidateIRP: IRPOrderPosition;
   // TODO: Delete it when we will have re-open sidebar
   @Output() private reOpenOrderSuccess: EventEmitter<Order> = new EventEmitter<Order>();
 
@@ -139,6 +139,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(ReOrderState.GetReOrdersByOrderId)
   public readonly reOrderList$: Observable<ReOrderPage | null>;
 
+  @Select(OrderManagementContentState.irpCandidatesforExtension)
+  public getIrpCandidatesforExtension$ : Observable<IRPOrderPositionpage>
+
   public readonly isReOrderDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
   candidateOrderPage: OrderCandidatesListPage;
@@ -162,6 +165,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   private secondHasOpenedOnes = false;
   activeSystems: OrderManagementIRPSystemId | null;
+  irpCandidates: IRPOrderPosition;
 
   public get isReOrder(): boolean {
     return !isNil(this.order?.reOrderFromId) && this.order?.reOrderFromId !== 0;
@@ -599,7 +603,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           if (
             selectedOrder?.extensionFromId &&
             order?.items[isOrderPositionSelected.index ?? 0]?.candidateJobId &&
-            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.LongTermAssignment)
+            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.LongTermAssignment) && 
+            this.activeSystem === OrderManagementIRPSystemId.VMS
           ) {
             this.store.dispatch(
               new GetOrganizationExtensions(
@@ -607,6 +612,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
                 selectedOrder.id
               )
             );
+          } else if(this.candidateIRP && this.activeSystem === OrderManagementIRPSystemId.IRP && selectedOrder?.extensionFromId){
+            this.store.dispatch(new GetOrganizationExtensions(this.candidateIRP.candidateJobId as number, selectedOrder.id));
           }
         }
       );

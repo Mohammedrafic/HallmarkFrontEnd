@@ -320,7 +320,7 @@ export class CandidateListComponent implements OnInit, OnDestroy {
       "AgencyCL": agencyIds.length == 0 ? "null" : agencyIds.join(","),
       "SearchByCL": searchBy?.toString(),
       "SkillCL": skillIds.length == 0 ? "null" : skillIds.join(","),
-      "CandidateNameCL": candidateNameValue,
+      "CandidateNameCL": candidateNameValue.toString(),
       "IsExactMatchCL": isExactMatch,
 
        "InActiveInCompleteCL": inActiveInComplete == true ? "2" : "1",

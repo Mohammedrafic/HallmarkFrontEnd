@@ -6,7 +6,7 @@ import { DropdownOption } from '@core/interface';
 import { BillRateCalculationType } from '@shared/models';
 import { Attachment } from '@shared/components/attachments/models/attachment.interface';
 import { TimesheetsModel } from '../store/model/timesheets.model';
-import { RecordFields, RecordsMode, RecordStatus } from '../enums';
+import { RecordFields, RecordsMode, RecordStatus, TimesheetSubmissionStatus } from '../enums';
 
 export interface DialogConfigField {
   title: string;
@@ -110,6 +110,8 @@ export interface RecordValue {
   invoiceId?: number;
   timesheetId?: number;
   type?: BillRateCalculationType;
+  timesheetItemId?: number | null;
+  submission?: TimesheetSubmissionStatus;
 }
 
 export type RecordDto = Omit<RecordValue, 'day'>;

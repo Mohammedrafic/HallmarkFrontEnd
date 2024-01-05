@@ -23,6 +23,7 @@
     [totalDataRecords]="totalDataRecords"
     (openOverrideSettingDialog)="openOverrideSettingDialog($event)"
     (openEditSettingDialog)="openEditSettingDialog($event)"
+    (DeleteSettingValueSucceded)="OnDeleteSucceeded($event)"
     ></app-configuration-grid>
 </section>
 
@@ -325,6 +326,7 @@
           format="MM/dd/yyyy"
           placeholder="MM/DD/YYYY"
           [showClearButton]="false"
+          [min]="startsOnMinDate"
           formControlName="startsOn"
         ></ejs-datepicker>
       </div>
@@ -338,6 +340,9 @@
     </div>
 
     <div class="toggle-message">
+      <div class="toggle-message__item">
+        Only current or future date is available in “Starts On“ date field.
+      </div>
       <div class="toggle-message__item">
         “On” will split Timesheet records into the current Bill Rate record and
         the new Bill Rate record at midnight.

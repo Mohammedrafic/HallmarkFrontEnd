@@ -85,6 +85,10 @@ import { OrganizationIntegrationsComponent } from './organization-integrations/o
 import { MonthlyIntegrationsComponent } from './organization-integrations/widgets/monthly-integrations/monthly-integrations.component';
 import { IntegrationsState } from './store/integrations.state';
 import { MonthlyIntegrationsFailureComponent } from './organization-integrations/widgets/monthly-integrations-fail/monthly-integrations-fail.component';
+import { NewInterfacesComponent } from './organization-integrations/widgets/new-interfaces/new-interfaces.component';
+import { WidgetWrapperModule } from '../dashboard/widgets/widget-wrapper/widget-wrapper.module';
+import { GetRecentRunListComponent } from './organization-integrations/widgets/get-recent-run-list/get-recent-run-list.component';
+import { ScheduledIntegrationsComponent } from './organization-integrations/widgets/scheduled-integrations/scheduled-integrations.component';
 
 const sidebarIcons = {
   Download,
@@ -129,7 +133,10 @@ const sidebarIcons = {
     InterfaceLogSummaryIrpDialogComponent,
     OrganizationIntegrationsComponent,
     MonthlyIntegrationsComponent,
-    MonthlyIntegrationsFailureComponent
+    MonthlyIntegrationsFailureComponent,
+    NewInterfacesComponent,
+    GetRecentRunListComponent,
+    ScheduledIntegrationsComponent
   ],
     imports: [
         CommonModule,
@@ -183,7 +190,8 @@ const sidebarIcons = {
         ValidateDirectiveModule,
         GridPaginationModule,
       ScrollToTopModule,
-        ChartModule
+        ChartModule,
+        WidgetWrapperModule
     ],
   providers: [
     ResizeService,

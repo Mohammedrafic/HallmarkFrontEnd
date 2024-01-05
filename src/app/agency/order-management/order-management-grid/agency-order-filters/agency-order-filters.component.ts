@@ -30,7 +30,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { OrderStatusesList } from '@shared/models/order-management.model';
 
 enum RLDLevel {
   Orginization,
@@ -112,8 +112,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   }
 
   constructor(
-    private store: Store, 
-    private actions$: Actions, 
+    private store: Store,
+    private actions$: Actions,
     private orderManagementAgencyService: OrderManagementAgencyService,
     private cd: ChangeDetectorRef,
   ) {
@@ -127,8 +127,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     if(this.isAgencyVisibilityFlagEnabled){
       this.agencyOrganizations();
       this.isOrganizaionsLoaded$.pipe(takeUntil(this.destroy$)).subscribe((flag) => {
-        if(user && !flag){               
-            this.store.dispatch(new GetOrganizationsStructureAll(user?.id));  
+        if(user && !flag){
+            this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
          }
       });
     }
@@ -165,7 +165,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           }else{
              this.store.dispatch(new GetOrganizationStructure(value));
           }
-            
+
         }
         this.cd.detectChanges();
       })
@@ -249,7 +249,16 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         filter((options) => !!options),
         takeUntil(this.destroy$)
       )
-      .subscribe(({ candidateStatuses, masterSkills, orderStatuses, partneredOrganizations, poNumbers, projectNames, specialProjectCategories }) => {
+      .subscribe(({
+                    candidateStatuses,
+                    masterSkills,
+                    orderStatuses,
+                    partneredOrganizations,
+                    poNumbers,
+                    projectNames,
+                    specialProjectCategories,
+                    reorderStatuses
+                  }) => {
         let statuses = [];
         let candidateStatusesData = [];
         const statusesByDefault = [
@@ -298,6 +307,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         this.filterColumns.skillIds.dataSource = masterSkills;
         this.filterColumns.candidateStatuses.dataSource = candidateStatusesData;
         this.filterColumns.orderStatuses.dataSource = statuses;
+        this.filterColumns.reorderStatuses.dataSource = reorderStatuses;
         this.filterColumns.projectTypeIds.dataSource = specialProjectCategories;
         this.filterColumns.projectNameIds.dataSource = projectNames;
         this.filterColumns.poNumberIds.dataSource = poNumbers;
@@ -318,17 +328,42 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     });
   }
 
+  private getReorderStatusLists(): string[] {
+    if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
+      const reorderStatusList = this.filterColumns.reorderStatuses.dataSource
+        .filter((source: {status: string}) => {
+          return source.status !== FilterOrderStatusText.Closed;
+        }).map((source: {status: string}) => source.status);
+      this.form.get('reorderStatuses')?.setValue(reorderStatusList);
+      return reorderStatusList;
+    }
+
+    return [];
+  }
+
   private setDefaultFilter(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     if (!this.activeTab) {
       return;
     }
     if (!selectedOrderAfterRedirect) {
-      const statuses = this.filterColumns.orderStatuses.dataSource.filter((data:any) => data !== FilterOrderStatusText["Closed"]);
-      this.form.get('orderStatuses')?.setValue(statuses);
-      this.setDefault.emit(statuses);
+      const statusFields: OrderStatusesList = {
+        orderStatuses: [],
+        reorderStatuses: [],
+      }
+
+      const orderStatuses = this.filterColumns.orderStatuses.dataSource.filter((data:any) => data !== FilterOrderStatusText["Closed"]);
+
+      const reorderStatuses = this.getReorderStatusLists();
+      statusFields.reorderStatuses = reorderStatuses;
+      this.form.get('orderStatuses')?.setValue(orderStatuses);
+      statusFields.orderStatuses = orderStatuses;
+      this.setDefault.emit(statusFields);
     } else {
-      this.setDefault.emit([]);
+      this.setDefault.emit({
+        orderStatuses: [],
+        reorderStatuses: [],
+      });
     }
   }
 
@@ -345,8 +380,10 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       candidatesCountFrom: new FormControl(null),
       candidatesCountTo: new FormControl(null),
       orderStatuses: new FormControl([]),
-      jobTitle: new FormControl(null),
+      reorderStatuses: new FormControl([]),
       billRateFrom: new FormControl(null),
+      jobTitle: new FormControl(null),
+      reOrderDate: new FormControl(null),
       billRateTo: new FormControl(null),
       openPositions: new FormControl(null),
       jobStartDate: new FormControl(null),
@@ -357,7 +394,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       creationDateTo: new FormControl(null),
       distributedOnFrom: new FormControl(null),
       distributedOnTo: new FormControl(null),
-      candidateName: new FormControl(null),
+      firstNamePattern: new FormControl(null),
+      lastNamePattern: new FormControl(null),
       projectTypeIds: new FormControl(null),
       projectNameIds: new FormControl(null),
       poNumberIds: new FormControl(null),
@@ -427,11 +465,19 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         valueField: 'statusText',
         valueId: 'status',
       },
+      reorderStatuses: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'statusText',
+        valueId: 'status',
+      },
+      jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobTitle: { type: ControlTypes.Text, valueType: ValueType.Text },
       billRateFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       billRateTo: { type: ControlTypes.Text, valueType: ValueType.Text },
       openPositions: { type: ControlTypes.Text, valueType: ValueType.Text },
-      jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      reOrderDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       annualSalaryRangeFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       annualSalaryRangeTo: { type: ControlTypes.Text, valueType: ValueType.Text },
@@ -439,7 +485,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       creationDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
       distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
       distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
-      candidateName: { type: ControlTypes.TextOrNull, valueType: ValueType.Text },
+      firstNamePattern: { type: ControlTypes.TextOrNull, valueType: ValueType.Text },
+      lastNamePattern: { type: ControlTypes.TextOrNull, valueType: ValueType.Text },
       projectTypeIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,

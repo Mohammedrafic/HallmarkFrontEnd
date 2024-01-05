@@ -26,11 +26,11 @@
                   ></e-chip>
                 </e-chips>
               </ejs-chiplist>
-              <ejs-chiplist #chipList class="events-off" *ngIf="irpCandidates?.status && activeSystem === OrderManagementIRPSystemId.IRP">
+              <ejs-chiplist #chipList class="events-off" *ngIf="candidateirp?.status && activeSystem === OrderManagementIRPSystemId.IRP">
                 <e-chips>
                   <e-chip
-                    [text]="CandidatesStatusText[irpCandidates.status]"
-                    [cssClass]="CandidatesStatusText[irpCandidates.status] | chipsCssClass"
+                    [text]="CandidatesStatusText[candidateirp.status]"
+                    [cssClass]="CandidatesStatusText[candidateirp.status] | chipsCssClass"
                   ></e-chip>
                 </e-chips>
               </ejs-chiplist>
@@ -38,10 +38,10 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="!isAgency && (order?.extensionFromId == null && candidate?.extensionFromId == null)"
+              *ngIf="!isAgency"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
-              [disabled]="disableAddExtension || isAgencySuspended"
+              [disabled]="disableAddExtension || isAgencySuspended || (isdisabledExtension && activeSystem === OrderManagementIRPSystemId.VMS)"
               text="Add Extension"
             ></app-button>
             <button
@@ -80,7 +80,7 @@
             </button>
           </div>
         </div>
-        <div class="candidate-message" *ngIf="showAddExtension && !disableAddExtension && isAgencySuspended">
+        <div class="candidate-message" *ngIf="showAddExtension && !disableAddExtension && isAgencySuspended && activeSystem !== OrderManagementIRPSystemId.IRP">
           <i-feather name="info" class="icon"></i-feather>
           {{ getPartnershipMessage }}
         </div>
@@ -140,7 +140,7 @@
                       <app-onboarded-candidate
                         *ngIf="!isReorderType"
                         [candidate]="$any(candidate)"
-                        [irpCandidate]="$any(irpCandidates)"
+                        [irpCandidate]="$any(candidateirp)"
                         [isTab]="true"
                         appUnsavedForm
                         (closeModalEvent)="onClose()"
@@ -284,6 +284,10 @@
 <ng-template #acceptFormSection>
   <section class="container onboarded-candidate-container">
     <section class="header-container">
+      <div class="local-candidate-message" *ngIf="candidateJob?.isLocal">
+        <i-feather name="info" class="icon"></i-feather>
+        Local Candidate
+      </div>
       <div class="e-card-header">
         <div class="e-card-header-caption candidate-status">
           <h3 class="e-card-title candidate-title">{{ candidate?.lastName }}, {{ candidate?.firstName }}</h3>
@@ -366,6 +370,9 @@
       <ng-template #editBillRates>
         <app-bill-rates
           [billRates]="candidateJob?.billRates || []"
+          [candidateJobId]="candidateJob?.jobId || null"
+          [organizationId]="candidateJob?.organizationId || null"
+          [orderType]="candidateJob?.order?.orderType"
           [isActive]="true"
           (billRatesChanged)="onBillRatesChanged($event)"
         >

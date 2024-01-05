@@ -32,7 +32,7 @@
             <span class="action-link-btn" (click)="downloadTemplate()">Download template</span>
           </div>
           <div class="file-uploader" #fileUploader>
-            <div id="droparea" class="droparea" (click)="browse()">
+            <div #dropArea class="droparea" (click)="browse()">
               <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
             </div>
             <div class="file-info" [class.selected-file]="selectedFile">
@@ -86,7 +86,8 @@
 </ejs-dialog>
 
 <ng-template #importBtn>
-  <button ejs-button cssClass="e-primary action-btn" [disabled]="!enabledImportButton" (click)="onImport()">{{hideImportButton ? 'Validate' :'Import'}}</button>
+  <button ejs-button cssClass="e-primary action-btn" *ngIf="!empImportButton" [disabled]="!enabledImportButton" (click)="onImport()">{{hideImportButton ? 'Validate' :'Import'}}</button>
+  <button ejs-button cssClass="e-primary action-btn" *ngIf="empImportButton"  (click)="onImport()">{{hideImportButton ? 'Validate' :'Import'}}</button>
 </ng-template>
 
 <ejs-dialog

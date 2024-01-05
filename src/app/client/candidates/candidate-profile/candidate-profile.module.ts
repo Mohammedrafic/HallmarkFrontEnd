@@ -32,6 +32,8 @@ import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
+import { ImportEmployeeGeneralNoteComponent } from './general-notes/import-employee-general-note/import-employee-general-note.component';
+import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
 
 @NgModule({
   declarations: [
@@ -44,6 +46,7 @@ import { ValidateDirectiveModule } from '@shared/directives/validate-directive/v
     AddEditNoteComponent,
     GeneralNotesGridCategoryRendererComponent,
     EmployeeGroupMailComponent,
+    ImportEmployeeGeneralNoteComponent,
   ],
   exports: [CandidateDetailsComponent, GeneralNotesComponent],
   imports: [
@@ -70,6 +73,7 @@ import { ValidateDirectiveModule } from '@shared/directives/validate-directive/v
     ValidateDirectiveModule,
     //STORE
     NgxsModule.forFeature([GeneralNoteState]),
+    ImportDialogContentModule
   ],
   providers: [
     CandidateProfileService,

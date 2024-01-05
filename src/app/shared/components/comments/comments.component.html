@@ -1,9 +1,16 @@
 <section class="comments-container" [class.background]="useBackground">
-  <div class="comments-header">
-    <div class="title">Comments</div>
-    <div class="dropdown-container bootstrap">
+  <div class="comments-header"  [ngClass]="isAgencyUser ? 'padr-20' : ''">
+    <div class="title comment-title">
+      Comments
+    </div>
+    <span class="e-input-group-icon" (click)="showSearchBox = true" *ngIf="!showSearchBox">
+      <i-feather name="search" class="icon"></i-feather>
+    </span>
+    <div class="title" *ngIf="showSearchBox" [ngClass]="!isAgencyUser ? 'search-comments' : 'search-comments-agency'">
+        <app-search class="title" placeholder="Search by" (inputKeyUpEnter)="onKeyUpEvent($event)"></app-search>
+    </div>
+    <div class="dropdown-container bootstrap search-dropdown"   *ngIf="!isAgencyUser">
       <ejs-dropdownlist
-        *ngIf="!isAgencyUser"
         [allowFiltering]="true"
         [dataSource]="commentsFilterItems"
         [(value)]="selectedFilter"
@@ -21,7 +28,7 @@
         (onRead)="onRead(comment)"
       ></app-comment>
     </ng-container>
-    <div class="no-comments" *ngIf="!comments?.length">There are no comments to display yet!</div>
+    <div class="no-comments" *ngIf="!commentData?.length">There are no comments to display yet!</div>
   </div>
   <div class="comments-controls">
     <div class="input-group bootstrap">

@@ -180,8 +180,34 @@ export class BillRatesService {
 
     return this.http.get<BillRate[]>(endpoint);
   }
-  
+
   public getCalculatedRates(jobId: number): Observable<BillRate[]> {
     return this.http.get<BillRate[]>(`/api/candidatejobs/${jobId}/billrates`);
+  }
+
+  public canRemoveBillRate(
+    deletedBillRateId: number,
+    organizationId: number | null,
+    orderId: number | null,
+    jobId: number | null
+  ): Observable<boolean> {
+    return this.http.post<boolean>(
+      '/api/BillRates/canDeleteBillRate',
+      { jobId, orderId, organizationId, deletedBillRateId }
+    );
+  }
+
+  public getCandidateBillRateConfigs(JobId: number, OrganizationId: number): Observable<BillRateOption[]> {
+    return this.http.get<BillRateOption[]>(
+      `/api/AppliedCandidates/billRateConfigs/get`,
+      { params: { JobId, OrganizationId } }
+    );
+  }
+
+  public getOrderBillRateConfigs(OrderId: number, OrganizationId: number): Observable<BillRateOption[]> {
+    return this.http.get<BillRateOption[]>(
+      `/api/Orders/billRateConfigs/get`,
+      { params: { OrderId, OrganizationId } }
+    );
   }
 }

@@ -33,11 +33,13 @@ export class VisibilitySettingsComponent extends AbstractGridConfigurationCompon
 
   @Input() set user(user: User | null) {
     this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
+    this.isMspUser = user?.businessUnitType === BusinessUnitType.MSP;
     this.createdUser = user;
     this.userId = this.createdUser?.id as string;
   }
 
   public isAgencyUser = false;
+  public isMspUser = false;
   @Select(SecurityState.userVisibilitySettingsPage)
   public userVisibilitySettingsPage$: Observable<UserVisibilitySettingsPage>;
 

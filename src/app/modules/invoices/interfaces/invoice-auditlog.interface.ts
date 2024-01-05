@@ -1,6 +1,8 @@
 export interface commonInvoiceHistory {
     Invoicebase: Invoicebase[];
-    agencyInvoicebase:agencyInvoicebase[]
+    agencyInvoicebase:agencyInvoicebase[];
+    InvoicecheckAuditHistory:InvoicecheckAuditHistory[];
+    InvoicepaymentAuditHistory:InvoicepaymentAuditHistory[]
 }
 
 export interface InvoiceAuditLogPayload {
@@ -111,3 +113,51 @@ export interface agencypaymentDetails {
     paymentOption: number;
     referenceNumber: string;
 }
+
+export interface InvoicecheckAuditHistory
+{
+historyId: string,
+entityType: string,
+keyValue: string,
+changeType: string,
+modifiedOn: string,
+modifiedBy: string,
+modifiedByName: string,
+jsonData: {
+    id: number,
+    number: string,
+    date: string,
+    paymentMode: number,
+    paymentModeText: string,
+    isRefund: boolean,
+    isDeleted: boolean,
+    createdAt: string,
+    lastModifiedAt: string,
+    organizationName:string
+},
+}
+
+export interface InvoicepaymentAuditHistory
+{
+historyId: string,
+entityType: string,
+keyValue: string,
+changeType: string,
+modifiedOn: string,
+modifiedBy: string,
+modifiedByName: string,
+jsonData: {
+    id: number,
+    invoiceId: number,
+    paymentDate: string,
+    payment: number,
+    organizationId: number,
+    isDeleted: boolean,
+    lastModifiedAt: string,
+    organizationName:string,
+},
+}
+
+
+
+

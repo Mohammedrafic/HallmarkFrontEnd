@@ -6,6 +6,8 @@ import { BillRate, BillRateCalculationType } from '@shared/models';
   providedIn: 'root',
 })
 export class BillRatesSyncService {
+  private deletedBillRateIds$ = new BaseObservable<number[]>([]);
+
   private rateFormChanged$ = new BaseObservable<boolean>(false);
 
   public getBillRateForSync(
@@ -38,6 +40,18 @@ export class BillRatesSyncService {
 
   public setFormChangedState(value: boolean): void {
     this.rateFormChanged$.set(value);
+  }
+
+  public addDeletedBillRateId(value: number): void {
+    this.deletedBillRateIds$.set([...this.getDeletedBillRateIds(), value]);
+  }
+
+  public getDeletedBillRateIds(): number[] {
+    return this.deletedBillRateIds$.get();
+  }
+
+  public resetDeletedBillRateIds(): void {
+    this.deletedBillRateIds$.set([]);
   }
 
   public getFormChangedState(): boolean {

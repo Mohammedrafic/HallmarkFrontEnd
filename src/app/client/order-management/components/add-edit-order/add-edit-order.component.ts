@@ -110,7 +110,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public orderBillRates: BillRate[] = [];
   private manuallyAddedBillRates: BillRate[] = [];
   private unsubscribe$: Subject<void> = new Subject();
-  private order: Order;
+  public order: Order;
   public parentOrder: Order;
   public startDate: Date;
 
@@ -423,11 +423,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
             ...order,
             id: this.orderId,
             deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids,
+            deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
           },
           documents,
           message as string
         )
-      );
+      )
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
+        });
     } else {
       this.store.dispatch(
         new SaveOrder(
@@ -734,10 +739,15 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
             ...order,
             id: this.orderId,
             deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids,
+            deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
           },
           documents
         )
-      );
+      )
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe(() => {
+          this.billRatesSyncService.resetDeletedBillRateIds();
+        });
     } else {
       this.store.dispatch(new SaveOrder(order, documents, this.orderDetailsFormComponent.comments));
     }
@@ -795,7 +805,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     const requiredFields = [regionId, locationId, departmentId, skillId];
     const isRequiredFieldsFilled = !some(isNil, requiredFields);
     const hasSelectedCredentialFlag = this.orderCredentialsService.hasSelectedCredentialFlags(this.orderCredentials);
-    
+
     if (isRequiredFieldsFilled && hasSelectedCredentialFlag) {
       this.isSaveForTemplate = true;
     } else {
@@ -803,7 +813,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const fields = [FieldName.regionId, FieldName.locationId, FieldName.departmentId, FieldName.skillId];
       const invalidFields = fields.filter((field, i) => !requiredFields[i]).join(',\n');
       this.showOrderFormValidationMessage(invalidFields);
-      
+
       if (!this.orderCredentials?.length || !hasSelectedCredentialFlag) {
         this.showCredentialsValidationMessage(!!this.orderCredentials?.length && !hasSelectedCredentialFlag);
       }
@@ -850,7 +860,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
      if (!credentialsValid || !hasSelectedCredentialFlag) {
       this.showCredentialsValidationMessage(!!credentialsValid && !hasSelectedCredentialFlag);
-    }   
+    }
     if (!billRatesValid) {
       this.showBillRatesValidationMessage();
     }
@@ -864,7 +874,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
-      
+
       if(this.orderDetailsFormComponent.isEditMode && this.order?.extensionFromId != null){
         let positionOrder = this.parentOrder?.candidates?.find((current) => current.id == this.order?.candidates?.[0].id);
         if(positionOrder && positionOrder?.actualEndDate){
@@ -878,7 +888,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
            }
         }
       }
-      
+
       const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;
       if (this.needToShowConfirmPopup(order, hourlyRate)) {
         this.showConfirmPopupForZeroRate(order, documents);

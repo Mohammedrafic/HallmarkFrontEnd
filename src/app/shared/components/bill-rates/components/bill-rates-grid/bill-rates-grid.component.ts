@@ -24,6 +24,7 @@ export class BillRatesGridComponent extends AbstractGridConfigurationComponent i
   }
   public readOnly: boolean = false;
   @Input() disabledActionMode: boolean;
+  @Input() canDeletePredefinedBillRates = true;
   @Input() billRatesData: BillRate[];
   @Input() billRateOptions: BillRateOption[];
 

@@ -35,5 +35,6 @@ export const GetOrderFilterDatesInUts = (
     creationDateTo: null,
     distributedOnFrom: null,
     distributedOnTo: null,
+    reOrderDate: null,
   });
 };

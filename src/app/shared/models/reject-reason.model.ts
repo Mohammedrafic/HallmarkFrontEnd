@@ -1,3 +1,4 @@
+import { CancellationReasonType } from '@organization-management/reasons/enums';
 import { OrderClosureReasonType } from '@shared/enums/order-closure-reason-type.enum';
 import { PageOfCollections } from "@shared/models/page.model";
 
@@ -70,6 +71,7 @@ export interface UnavailabilityPaging {
   PageNumber: number;
   PageSize: number;
   GetAll?: boolean;
+  CancellationReasonType?: CancellationReasonType;
 }
 
 export type SourcingReasonPage = PageOfCollections<Sourcing>;

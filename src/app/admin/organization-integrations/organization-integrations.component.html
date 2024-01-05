@@ -1,8 +1,6 @@
-<div style="padding-top: 20px;width:100%;">
-  <section style="float:right;" class="controls-wrapper">
-    <button ejs-button
-            id="filterButton"
-            cssClass="e-outline button-filter">
+<div class="w100 pt20 pb20px">
+  <section class="controls-wrapper floatright">
+    <button ejs-button id="filterButton" cssClass="e-outline button-filter">
       <div class="filter-button-content">
         <span class="e-badge e-badge-success e-badge-pill align-text"></span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
@@ -10,16 +8,35 @@
     </button>
   </section>
 </div>
-<div style="width:100%;display:inline-flex">
-
-
-  <div style="width:48%">
+<div class="w100 displayinflex"> 
+  <div class="w48">
     <app-monthly-integrations></app-monthly-integrations>
+  </div>
+  <div class="w2">
+    &nbsp;
+  </div>
+  <div class="w48">
+    <app-monthly-failure-integrations></app-monthly-failure-integrations>
+  </div>
+</div>
+<div class="w100 displayinflex">
+  <div class="w35">
+    <app-new-interfaces></app-new-interfaces>
   </div>
   <div style="width:2%">
     &nbsp;
   </div>
-  <div style="width:48%">
-    <app-monthly-failure-integrations></app-monthly-failure-integrations>
+  <div style="width: 48%">
+    <app-get-recent-run-list></app-get-recent-run-list>
   </div>
 </div>
+<div class="w100 displayinflex">
+  <!-- <div style="width: 48%">
+    
+  </div>
+  <div style="width:2%">
+    &nbsp;
+  </div> -->
+  <div style="width: 48%">
+    <scheduled-integrations></scheduled-integrations>
+  </div>

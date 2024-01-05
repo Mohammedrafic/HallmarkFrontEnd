@@ -14,6 +14,7 @@ import { ReportsContentComponent } from './reports/reports-content/reports-conte
 import { NotificationResolver } from '@core/resolvers/notification.resolver';
 import { CreateEditOrderResolver } from '@client/order-management/resolvers/create-edit-order.resolver';
 import { MenuGuard } from '@core/guards/menu.guard';
+import { AgencyVisibilityFlagResolverService } from '@core/resolvers/agency-visibility-flag.resolver';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -28,6 +29,7 @@ const routes: Routes = [
           isOrganizationArea: true,
           isAgencyArea: false,
         },
+        resolve:[AgencyVisibilityFlagResolverService],
       },
       {
         path: 'order-management',
@@ -116,6 +118,10 @@ const routes: Routes = [
           isOrganizationArea: true,
           isAgencyArea: false,
         },
+      },
+      {
+        path: 'timesheets/notification/:notificationId',
+        resolve: [NotificationResolver],
       },
       {
         path: 'scheduling',

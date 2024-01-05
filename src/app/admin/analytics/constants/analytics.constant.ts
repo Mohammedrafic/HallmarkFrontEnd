@@ -5,8 +5,14 @@ export const analyticsConstants = {
     RegionIds: 'regionIds',
     LocationIds: 'locationIds',
     DepartmentIds: 'departmentIds',
-    StartDate: 'startDate',
-    EndDate:'endDate',
+    startDate: 'startDate',
+    endDate: 'endDate',
+    StartDate: 'StartDate',    
+    EndDate: 'EndDate',
+    StartDateFrom: 'StartDateFrom',
+    StartDateTo: 'StartDateTo',
+    EndDateFrom: 'EndDateFrom',
+    EndDateTo:'EndDateTo',
     AccrualReportTypes: 'accrualReportTypes',
     SkillCategoryIds: 'skillCategoryIds',
     SkillIds: 'skillIds',
@@ -34,6 +40,7 @@ export const analyticsConstants = {
     opcredFlag: 'opcredFlag',
     IsOptionalRequred:'IsOptionalRequred',
     Period: 'period',
+    businessunitName: 'businessunitName',
   }
 }
 
@@ -87,7 +94,7 @@ export const ytdReportConstants = {
     BusinessIds: 'businessIds',
     RegionIds: 'regionIds',
     LocationIds: 'locationIds',
-    //DepartmentIds: 'departmentIds',
+    DepartmentIds: 'departmentIds',
     //SkillCategoryIds: 'skillCategoryIds',
     //SkillIds: 'skillIds',
     Year: 'year',

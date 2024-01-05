@@ -38,6 +38,7 @@ body.light {
   --dialog-border: #{$secondary-dark-blue-45};
   --separator: #{$secondary-dark-blue-45};
   --devider: #{$secondary-dark-blue-40};
+  --list-item-border: #{$grid-row-border};
 
   --icon-color: #{$secondary-dark-blue-10};
 
@@ -55,6 +56,7 @@ body.light {
   --selected-date-range-color: #{$white};
   --checkbox-background: #{$white};
   --chechbox-corder-color: #{$secondary-dark-blue-30};
+  --disabled-tab-background: #{$secondary-dark-blue-50};
 
   --shadow: #{$secondary-black-25};
   --redonly-text: #{$secondary-dark-blue-30};
@@ -101,6 +103,7 @@ body.dark {
   --dialog-border: #{$secondary-dark-blue-10-2};
   --separator: #{$secondary-dark-blue-10-2};
   --devider: #{$secondary-dark-blue-15};
+  --list-item-border: #{$secondary-dark-blue-10-2};
   --checkbox-background: #{$secondary-dark-blue-10-2};
   --chechbox-corder-color: #{$secondary-dark-blue-40};
 
@@ -118,6 +121,7 @@ body.dark {
   --selector-title: #{$white};
   --disabled-drop-area-text: #{$white};
   --selected-date-range-color: #{$black};
+  --disabled-tab-background: #{$grid-detail-row-bgcolor};
 
   --shadow: #{$secondary-dark-blue-10-2};
   --redonly-text: #{$icewind-dale};

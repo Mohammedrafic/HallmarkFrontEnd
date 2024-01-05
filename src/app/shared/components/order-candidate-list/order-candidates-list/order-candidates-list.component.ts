@@ -225,6 +225,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public onCloseDialog(): void {
     this.clearDeployedCandidateOrderInfo();
     this.sideDialog.hide();
+    this.templateState.next(null);
   }
 
   public openEditCandidateModal(candidate: IrpOrderCandidate): void {
@@ -282,7 +283,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       this.isAvailable = state.isAvailable;
       this.includeDeployed = state.includeDeployed;
       this.cdr.markForCheck();
-    })
+    });
   }
 
   private getAllEmployeeCancelReasons(): void {
@@ -363,8 +364,10 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   private openDialog(template: any): void {
-    this.templateState.next(template);
-    this.sideDialog.show();
+    if(template){
+      this.templateState.next(template);
+      this.sideDialog.show();
+    }
   }
 
   private checkForAgencyStatus(): void {

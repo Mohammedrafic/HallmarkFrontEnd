@@ -1,7 +1,7 @@
 <app-page-toolbar>
   <ng-container left>
     <app-tab-navigation
-      #tabNavigation 
+      #tabNavigation
       appTabsMobileShadow
       class="table-tabs responsive"
       (selectedTab)="tabSelected($event)"
@@ -27,7 +27,7 @@
               id="exportButton"
               cssClass="e-outline button-export"
               [disabled]="!canViewCandidateAssignment"
-            > 
+            >
               <div class="button-export-container">
                 Export <i-feather name="upload" class="icon"></i-feather>
               </div>
@@ -60,7 +60,6 @@
   [items]="filteredItems"
   [count]="(candidates$ | async)?.totalCount"
 >
-
   <app-filters
   #filterco
     [filtersForm]="filtersForm"

@@ -151,10 +151,9 @@
                     </div>
                   </div>
                 </div>
-
-                <div class="d-flex" *ngIf="(isAccepted && !isAgency) || isOnBoard || isOffboard">
+                <div class="d-flex" *ngIf="(isAccepted && !isAgency) || isOnBoard || isOffboard || isOffered">
                   <div class="f-grow-2 flex-width">
-                    <div class="input-container bootstrap flex-width-date" *ngIf="activeSystems !== systemTypes.IRP">
+                    <div class="input-container bootstrap flex-width-date" *ngIf="activeSystems !== systemTypes.IRP || !isOffered">
                       <label class="input-group">Expected Work Week</label>
                       <div class="input-group">
                         <input
@@ -166,7 +165,7 @@
                         />
                       </div>
                     </div>
-                    <div class="d-flex" *ngIf="activeSystems !== systemTypes.IRP">
+                    <div class="d-flex" *ngIf="!isOffered">
                       <div class="input-container bootstrap">
                         <label class="input-group">Actual Start Date</label>
                         <div class="input-group">
@@ -201,7 +200,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="input-container bootstrap"  *ngIf="activeSystems !== systemTypes.IRP">
+                    <div class="input-container bootstrap"  *ngIf="activeSystems !== systemTypes.IRP && !isOffered ">
                       <ejs-checkbox
                         formControlName="allowDeployCredentials"
                         label="Allow deploy w/o credentials"
@@ -237,7 +236,18 @@
                     />
                   </div>
                 </div>
-                <div *ngIf="isCancelled">
+                <div class="input-container bootstrap" *ngIf="activeSystems === systemTypes.IRP && irpReasonName">
+                  <label class="input-group">Reason</label>
+                  <div class="input-group input-readonly">
+                    <input
+                      value="{{irpReasonName}}"
+                      class="e-input"
+                      type="text"
+                      readonly
+                    />
+                  </div>
+                </div>
+                <div *ngIf="isCancelled && activeSystems !== systemTypes.IRP">
                   <div class="input-container bootstrap">
                     <label class="input-group">Reason</label>
                     <div class="input-group input-readonly">
@@ -262,17 +272,19 @@
                       />
                     </div>
                   </div>
-                  <div class="d-flex" *ngIf="!verifyNoPenalty">
-                    <div class="input-container bootstrap">
-                      <label class="input-group">{{ showPercentage ? '% ' : '' }}Rate</label>
-                      <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="rate" class="e-input" type="text" readonly />
+                  <div>
+                    <div class="d-flex" *ngIf="!verifyNoPenalty">
+                      <div class="input-container bootstrap">
+                        <label class="input-group">{{ showPercentage ? '% ' : '' }}Rate</label>
+                        <div class="input-group input-readonly">
+                          <input appValidateWithMessage formControlName="rate" class="e-input" type="text" readonly />
+                        </div>
                       </div>
-                    </div>
-                    <div class="input-container bootstrap" *ngIf="showHoursControl">
-                      <label class="input-group">Hours</label>
-                      <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="hours" class="e-input" type="text" readonly />
+                      <div class="input-container bootstrap" *ngIf="showHoursControl">
+                        <label class="input-group">Hours</label>
+                        <div class="input-group input-readonly">
+                          <input appValidateWithMessage formControlName="hours" class="e-input" type="text" readonly />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -323,6 +335,9 @@
     <ng-template #editBillRates>
       <app-bill-rates
         [billRates]="billRatesData"
+        [candidateJobId]="candidateJob?.jobId || null"
+        [organizationId]="candidateJob?.organizationId || null"
+        [orderType]="candidateJob?.order?.orderType"
         (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)"
         [isActive]="true"
         [isExtension]="!!currentOrder?.extensionFromId"

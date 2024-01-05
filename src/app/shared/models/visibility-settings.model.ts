@@ -10,6 +10,7 @@ export type UserVisibilitySetting = {
   locationName: string;
   departmentId: number;
   departmentName: string;
+  entityName?: string;
   uniqRegionId: string | null;
   uniqLocationId: string | null;
   uniqDepartmentId: string | null;

@@ -117,9 +117,9 @@ export class UsersService {
    * @param userId
    * @return UserVisibilitySettingsPage
    */
-   public getUserVisibilitySettingsOrganisation(userId: string): Observable<Organisation[]> {
+  public getUserVisibilitySettingsOrganisation(userId: string, visibilitySettings: boolean = false): Observable<Organisation[]> {
     return this.http
-      .get<Organisation[]>(`/api/Organizations/structure/All/${userId}`)
+      .get<Organisation[]>(`/api/Organizations/structure/All/${userId}/${visibilitySettings}`)
       .pipe(
         map((organizations) =>
           sortByField(organizations, 'name').map((org) => ({

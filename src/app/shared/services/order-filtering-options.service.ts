@@ -23,6 +23,7 @@ export class OrderFilteringOptionsService {
           partneredOrganizations: 'name',
           candidateStatuses: 'statusText',
           orderStatuses: 'statusText',
+          reorderStatuses: 'statusText',
           masterSkills: 'name',
           poNumbers: 'poNumber',
           projectNames: 'projectName',

@@ -58,6 +58,7 @@ import { UserActivityComponent } from './user-activity/user-activity.component';
 import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/financial-time-sheet-beta.component';
 import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
 import { OrderStatusSummaryComponent } from './order-status-summary/order-status-summary.component';
+import { UserVisibilityComponent } from './user-visibility/user-visibility.component';
 
 const routes: Routes = [
   {
@@ -453,6 +454,13 @@ const routes: Routes = [
       {
         path: 'order-status-summary-report',
         component: OrderStatusSummaryComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'user-visibility',
+        component: UserVisibilityComponent,
         data: {
           isOrganizationArea: true,
         }

@@ -12,6 +12,7 @@ import {
   switchMap,
   takeUntil,
   zip,
+  delay
 } from 'rxjs';
 
 import {
@@ -225,6 +226,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   private subscribeMsps(): void {
     zip(this.msps$)
       .pipe(
+        delay(500),
         filter((value) => {
           const dataExist = Array.isArray(value);
           const valueExists = !!value[0];
