@@ -260,7 +260,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         this.isOrgUser = true;
       }
       if (formValues.businessUnit === BusinessUnitType.Agency)
-        businessUnitId = this.isOrgUser == true ? user?.businessUnitId : formValues.businesses[0]
+        //businessUnitId = this.isOrgUser == true ? user?.businessUnitId : formValues.businesses[0]
+        businessUnitId = formValues.businesses[0]
       if (formValues.businessUnit === BusinessUnitType.Organization)
         businessUnitId = formValues.business == 0 ? null : formValues.business;
       if (formValues.businessUnit === BusinessUnitType.MSP){
