@@ -302,6 +302,7 @@ export interface OrderManagementChild  {
   guaranteedWorkWeek?:number | string | null;
   status: OrderStatus;
   extensionFromId?: number;
+  clearToStart?:boolean | null;
 };
 
 export type OrderCandidatesList = {
