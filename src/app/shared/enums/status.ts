@@ -70,7 +70,7 @@ export const STATUS_COLOR_GROUP = {
   ], // purple
   'e-filled': ['filled', 'Filled', 'onboarded', 'onboard'], // light blue
   'e-awaiting': ['not applied', 'Not Applied'], // gray
-  'e-rejected': [TIMETHEETS_STATUSES.REJECTED.toString(),'Rejected'],//
+  'e-rejected': [TIMETHEETS_STATUSES.REJECTED.toString(),'Rejected'],//saddle Brown
 };
 
 export enum AgencyStatus {
