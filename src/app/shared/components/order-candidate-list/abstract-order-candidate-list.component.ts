@@ -119,6 +119,9 @@ export abstract class AbstractOrderCandidateListComponent extends AbstractPermis
             readonly: !this.isAgency,
             isRedirectFromOrder: true,
             isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
+            candidateJobId:data.candidateJobId,
+            organizationId:data.organizationId,
+            clearedToStart:data.clearToStart,
           };
     this.globalWindow.localStorage.setItem('navigationState', JSON.stringify(state));
     this.router.navigate([url, data.candidateId], {

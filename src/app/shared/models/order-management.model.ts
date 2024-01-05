@@ -332,6 +332,8 @@ export type OrderCandidatesList = {
   partnershipStatus: PartnershipStatus;
   suspentionDate: string;
   cancellationReasonId?: number;
+  jobId?: number;
+  clearToStart?:boolean | null;
 };
 
 export interface WorkflowStepType {
@@ -1075,4 +1077,10 @@ export interface OrderAuditHistory{
   export interface OrderStatusesList {
     orderStatuses: string[];
     reorderStatuses: string[];
+  }
+
+  export class clearToStartDataset{
+    jobId: number | undefined;
+    organizationId: number | undefined;
+    clearToStart: boolean
   }

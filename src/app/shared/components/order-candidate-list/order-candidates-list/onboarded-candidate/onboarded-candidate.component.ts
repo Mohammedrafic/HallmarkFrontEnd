@@ -23,8 +23,8 @@ import {
   OPTION_FIELDS,
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ApplicantStatus, IRPOrderPosition, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ApplicantStatus, IRPOrderPosition, Order, OrderCandidateJob, OrderCandidatesList, clearToStartDataset } from '@shared/models/order-management.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { formatDate, formatNumber } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -36,6 +36,8 @@ import {
   GetRejectReasonsForOrganisation,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
+  SaveClearToStart,
+  SaveClearToStartSucceeded,
   sendOnboardCandidateEmailMessage,
   SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
@@ -51,8 +53,11 @@ import {
   DELETE_CONFIRM_TITLE,
   DEPLOYED_CANDIDATE,
   deployedCandidateMessage,
+  GRID_CONFIG,
   ONBOARD_CANDIDATE,
   onBoardCandidateMessage,
+  OrganizationalHierarchy,
+  OrganizationSettingKeys,
   SEND_EMAIL,
   SET_READONLY_STATUS,
 } from '@shared/constants';
@@ -81,6 +86,8 @@ import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.
 import { UserPermissions } from '@core/enums/user.permissions.enum';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { canceldto } from '../../interfaces/order-candidate.interface';
+import { SettingsViewService } from '@shared/services';
+import { positionIdStatuses } from '@agency/candidates/add-edit-candidate/add-edit-candidate.constants';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -123,6 +130,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() order: Order;
   @Input() reloadOnUpdate = false;
 
+  public isEnableClearedToStartForAcceptedCandidates:boolean = false;
+  public isClearedToStartEnable:boolean = true;
+  public clearToStartDataset:clearToStartDataset = new clearToStartDataset();
   private readonly permissions = UserPermissions;
   public ordersystemId = OrderManagementIRPSystemId;
   public override form: FormGroup;
@@ -162,6 +172,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public commentContainerId: number;
   irpdata: any;
+
+  public clearedToStart:boolean = false;
 
   get isAccepted(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.Accepted;
@@ -228,6 +240,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     private permissionService: PermissionService,
     private billRatesSyncService: BillRatesSyncService,
     private orderManagementService: OrderManagementService,
+    private settingService: SettingsViewService,
   ) {
     super();
     this.createForm();
@@ -254,11 +267,46 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.observeCandidateJob();
     this.observeStartDate();
     this.subscribeOnJobUpdate();
+    this.orderManagementService.getCurrentClearToStartVal().pipe(takeUntil(this.unsubscribe$)).subscribe(val=>{
+      if(val != null){
+        this.clearedToStart = val;
+      }else{
+        this.clearedToStart = this.candidate && this.candidate.clearToStart ? this.candidate.clearToStart : false;
+      }
+    });
+    if(this.candidate && positionIdStatuses.includes(this.candidate.status)){
+      this.clearedToStartCheck();
+    }else if(this.candidate && !this.candidate.status && this.candidate.candidateStatus && positionIdStatuses.includes(this.candidate.candidateStatus)){
+      this.clearedToStartCheck();
+    }else{
+      this.isEnableClearedToStartForAcceptedCandidates = false;
+    }
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private clearedToStartCheck():void {
+    if(this.candidate && this.candidate.organizationId && (this.candidate.candidateJobId || this.candidate.jobId)){
+      this.isEnableClearedToStartForAcceptedCandidates = false;
+      this.isClearedToStartEnable =  this.candidate.status ? this.candidate.status == ApplicantStatusEnum.Accepted ? false : true : this.candidate.candidateStatus == ApplicantStatusEnum.Accepted ? false : true;
+
+      this.settingService
+        .getViewSettingKey(
+          OrganizationSettingKeys.EnableClearedToStartForAcceptedCandidates,
+          OrganizationalHierarchy.Organization,
+          this.candidate.organizationId,
+          this.candidate.organizationId,
+          false,
+          this.candidate.candidateJobId ? this.candidate.candidateJobId : this.candidate.jobId
+        ).pipe(takeUntil(this.unsubscribe$))
+        .subscribe(({ EnableClearedToStartForAcceptedCandidates }) => {
+          console.log('clearedToStartCheck value',EnableClearedToStartForAcceptedCandidates);
+          this.isEnableClearedToStartForAcceptedCandidates = JSON.parse(EnableClearedToStartForAcceptedCandidates);
+        });
+    }
   }
 
   private getComments(): void {
@@ -904,5 +952,19 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.CanOrganizationViewOrdersIRP = CanOrganizationViewOrdersIRP;
       this.CanOrganizationEditOrdersIRP = CanOrganizationEditOrdersIRP;
     });
+  }
+
+  public onSwitcher(event: { checked: boolean }): void {
+    this.clearedToStart = event.checked;
+    this.clearToStartDataset.clearToStart = event.checked;
+    this.clearToStartDataset.jobId = this.candidate.jobId ? this.candidate.jobId : this.candidateJob?.jobId;
+    this.clearToStartDataset.organizationId = this.candidate.organizationId;
+    this.store.dispatch(new SaveClearToStart(this.clearToStartDataset));
+    this.actions$.pipe(ofActionDispatched(SaveClearToStartSucceeded), take(1))
+                  .subscribe(() => {
+                    this.orderManagementService.setCurrentClearToStartVal(event.checked);
+                    this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());                    
+                  });
+
   }
 }

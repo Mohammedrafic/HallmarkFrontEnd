@@ -10,7 +10,7 @@ import {
   Order,
   OrderFilter,
   OrderManagement,
-  OrderManagementFilter,
+  OrderManagementFilter,clearToStartDataset,
 } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
@@ -553,4 +553,16 @@ export class GetOrderWorkLocationDetailSucceeded {
 export class GetJobDistributionValues {
   static readonly type = '[order management] Get Order Job Distribution values';
   constructor(public payload: JobDistributionfilters) {}
+}
+
+export class SaveClearToStart {
+  static readonly type = '[order management] Save Clear To Start';
+  constructor(
+    public payload: clearToStartDataset
+  ) {}
+}
+
+export class SaveClearToStartSucceeded {
+  static readonly type = '[order management] Save Clear To Start Result Succeeded';
+  constructor(public payload: any) {}
 }
