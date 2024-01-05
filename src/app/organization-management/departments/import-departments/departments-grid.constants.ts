@@ -109,7 +109,7 @@ export const DepartmentsColumns = (
         result = result.concat(cols as []);
       }
   
-      if (secondarySkillLength) {
+      if (secondarySkillLength && secondarySkillLength.length) {
         const longestLengthSkillsIndex = secondarySkillLength.indexOf(Math.max(...secondarySkillLength));
         const cols = records[longestLengthSkillsIndex].secondarySkills.map((skillName, index) => ({
           field: `secondarySkill${index}`,
