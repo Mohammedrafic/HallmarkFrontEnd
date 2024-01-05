@@ -134,7 +134,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.groupingInvoiceRecordsIds = event.api.getSelectedRows()
         .map(({ invoiceRecords }: Interfaces.PendingInvoice) =>
           invoiceRecords?.map((record: Interfaces.PendingInvoiceRecord) => record.id)
-        ).flat();
+      ).flat();
+      if (this.groupingInvoiceRecordsIds[0] == undefined || this.groupingInvoiceRecordsIds[0] == null) {
+        const data = event.api.getSelectedRows().map(val => val.invoiceId);
+        this.groupingInvoiceRecordsIds = data[0];
+      }
     },
   };
   public invoiceDetails =new Subject<PendingApprovalInvoice>();
