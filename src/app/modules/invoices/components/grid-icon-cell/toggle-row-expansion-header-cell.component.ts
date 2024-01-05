@@ -50,6 +50,7 @@ export class ToggleRowExpansionHeaderCellComponent extends Destroyable implement
     this.cdr.markForCheck();
     this.expanded = this.checkIfAnyRowExpanded();
     this.toggleRowExpansionService.HandleStatusChangeClick(this.expanded);
+    this.toolTipMessage = this.expanded ? "Hide Details" : "Show Details";
   }
 
   public sort(order: 'asc' | 'desc' | null, event: { shiftKey: boolean }): void {

@@ -102,6 +102,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     }
   }
 
+  @Input() isEnableClearedToStartForAcceptedCandidates$:Subject<boolean> = new Subject<boolean>();
+  @Input() isClearedToStartEnable: boolean = false;
+  @Input() clearedToStart: boolean = false;
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
 
@@ -903,6 +906,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.isOrganizationAgencyArea$.pipe(takeUntil(this.unsubscribe$)).subscribe((area) => {
       this.isOrganizationAgencyArea = area;
     });
+  }
+
+  public onSwitcher(event: { checked: boolean }): void {
+    this.clearedToStart = event.checked;
   }
 
   private watchForCertifiedOnUntilControls(): void {

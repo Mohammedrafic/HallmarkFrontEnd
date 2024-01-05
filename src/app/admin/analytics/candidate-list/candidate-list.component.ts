@@ -47,7 +47,7 @@ export class CandidateListComponent implements OnInit, OnDestroy {
   public paramsData: any = {
     "OrganizationParamCL": "",
     "AgencyCL": "",
-    "SearchByCL" :"",
+    "SearchByCL": "",
     "SkillCL": "",
     "CandidateNameCL": "",
     "BearerParamCL": "",
@@ -173,61 +173,69 @@ export class CandidateListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
-      this.store.dispatch(new ClearLogiReportState());
-      this.orderFilterColumnsSetup();
-      this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
-        if (data != null) {
-          this.isAlive = false;
-          this.filterOptionsData = data;
-          this.filterColumns.skillIds.dataSource = [];
-          this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-
-          this.filterColumns.agencyIds.dataSource = [];
-          this.filterColumns.agencyIds.dataSource = data?.agencies;
-
-          let masterSkills = this.filterOptionsData.masterSkills;
-          let skills = masterSkills.filter((i) => this.defaultSkillCategories?.includes(i.skillCategoryId));
-          this.filterColumns.skillIds.dataSource = skills;
-          this.defaultSkills = skills.map((list) => list.id);
-          this.candidateListForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
-          this.changeDetectorRef.detectChanges();
-
-          this.agencyIdControl = this.candidateListForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
-          let agencyIds = data?.agencies;
-          this.selectedAgencies = agencyIds;
-          this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
-          this.candidateListForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-
-          this.candidateListForm.get(analyticsConstants.formControlNames.SearchBy)?.setValue(0);
-          let {searchBy } = this.candidateListForm.getRawValue();
-          this.selectedSearchByOption = searchBy;
-
-          let a = this.candidateListForm.get(analyticsConstants.formControlNames.SearchBy)?.value;
-
-          if (this.isInitialLoad) {
-             this.SearchReport();
-            this.isInitialLoad = false;
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((orgId: number) => {
+      if (orgId) {
+        this.store.dispatch(new ClearLogiReportState());
+        this.orderFilterColumnsSetup();
+        this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((orgdata: Organisation[]) => {
+          if (orgdata != null && orgdata.length > 0) {
+            this.selectedOrganizations = orgdata;
+            this.paramsData.organizationNameCL = orgdata.find((item: Organisation) => item.organizationId == orgId)?.name;
           }
-        }
-      });
-      this.SetReportData();
-      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
-        if (data.length > 0) {
-          this.logiReportComponent.SetReportData(data);
-        }
-      });
-      this.selectedOrganizationId = data;
+        });
+        this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+          if (data != null) {
+            this.isAlive = false;
+            this.filterOptionsData = data;
+            this.filterColumns.skillIds.dataSource = [];
+            this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
 
-      let businessIdData = [];
-      businessIdData.push(data);
-      let filter: CommonReportFilter = {
-        businessUnitIds: businessIdData
-      };
-      this.store.dispatch(new GetCommonReportFilterOptions(filter));
+            this.filterColumns.agencyIds.dataSource = [];
+            this.filterColumns.agencyIds.dataSource = data?.agencies;
 
-      this.onFilterControlValueChangedHandler();
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.candidateListForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.candidateListForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+            let masterSkills = this.filterOptionsData.masterSkills;
+            let skills = masterSkills.filter((i) => this.defaultSkillCategories?.includes(i.skillCategoryId));
+            this.filterColumns.skillIds.dataSource = skills;
+            this.defaultSkills = skills.map((list) => list.id);
+            this.candidateListForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
+            this.changeDetectorRef.detectChanges();
+
+            this.agencyIdControl = this.candidateListForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
+            let agencyIds = data?.agencies;
+            this.selectedAgencies = agencyIds;
+            this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
+            this.candidateListForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+
+            this.candidateListForm.get(analyticsConstants.formControlNames.SearchBy)?.setValue(0);
+            let { searchBy } = this.candidateListForm.getRawValue();
+            this.selectedSearchByOption = searchBy;
+
+            let a = this.candidateListForm.get(analyticsConstants.formControlNames.SearchBy)?.value;
+
+            if (this.isInitialLoad) {
+              this.SearchReport();
+              this.isInitialLoad = false;
+            }
+          }
+        });
+        this.SetReportData();
+        this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
+          if (data.length > 0) {
+            this.logiReportComponent.SetReportData(data);
+          }
+        });
+        this.selectedOrganizationId = orgId;
+
+        let businessIdData = [];
+        businessIdData.push(orgId);
+        let filter: CommonReportFilter = {
+          businessUnitIds: businessIdData
+        };
+        this.store.dispatch(new GetCommonReportFilterOptions(filter));
+
+        this.onFilterControlValueChangedHandler();
+        this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.candidateListForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.candidateListForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      }
     });
   }
 
@@ -295,7 +303,7 @@ export class CandidateListComponent implements OnInit, OnDestroy {
     let isExactMatch = "0";
 
     var candidateNameValue = this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName);
-    if (candidateNameValue.length > 0 && searchBy==1) {
+    if (candidateNameValue.length > 0 && searchBy == 1) {
       isExactMatch = "1";
     }
     else if (candidateNameValue.length == 0 && candidateName != "null" && candidateName?.length > 0 && searchBy == 1) {
@@ -312,6 +320,7 @@ export class CandidateListComponent implements OnInit, OnDestroy {
 
     this.paramsData =
     {
+      ...this.paramsData,
       "BearerParamCL": auth,
       "BusinessUnitIdParamCL": window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostNameCL": this.baseUrl,
@@ -323,8 +332,8 @@ export class CandidateListComponent implements OnInit, OnDestroy {
       "CandidateNameCL": candidateNameValue.toString(),
       "IsExactMatchCL": isExactMatch,
 
-       "InActiveInCompleteCL": inActiveInComplete == true ? "2" : "1",
-      "organizationNameCL": this.filterColumns.businessIds?.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "InActiveInCompleteCL": inActiveInComplete == true ? "2" : "1",
+      //  "organizationNameCL": this.selectedOrganizations?.find((item: any) => item.organizationId === this.selectedOrganizationId)?.name,
       //"reportPulledMessageMSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
       "reportPulledMessageCL": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
 

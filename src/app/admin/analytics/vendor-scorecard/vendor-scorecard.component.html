@@ -137,7 +137,7 @@
           </div>
         </div>
 
-        <div class="form-elemet">
+        <!-- <div class="form-elemet">
           <div class="input-container bootstrap">
             <label>Period</label>
             <div class="input-group dropdown">
@@ -147,7 +147,7 @@
               </ejs-dropdownlist>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <div class="form-elemet">
           <div class="group">
@@ -156,7 +156,7 @@
               <div class="input-group datepicker">
                 <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                   appValidateWithMessage formControlName="startDate"
-                  [enabled]="VendorReportForm.controls['period'].value=='0'">
+                  >
                 </ejs-datepicker>
               </div>
             </div>
@@ -165,7 +165,7 @@
               <div class="input-group datepicker">
                 <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                   appValidateWithMessage formControlName="endDate" [min]="VendorReportForm.controls['startDate'].value"
-                  [enabled]="VendorReportForm.controls['period'].value=='0'">
+                 >
                 </ejs-datepicker>
               </div>
             </div>

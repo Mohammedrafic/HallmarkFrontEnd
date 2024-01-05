@@ -12,6 +12,10 @@
           </e-chips>
         </ejs-chiplist>
       </div>
+      <div class="input-group switch" *ngIf="isEnableClearedToStartForAcceptedCandidates">
+        <ejs-switch id="switcher" class="switch"  (change)="onSwitcher($event)" [checked]="clearedToStart" [disabled]="isClearedToStartEnable || isAgency"></ejs-switch>
+        <label class="switch-label" for="switcher"><span>Cleared to Start</span></label>
+      </div>
       <div class="e-card-content">
         <div class="input-group dropdown bootstrap" *ngIf="isAgency && !!(applicantStatuses$ | async) && !!(applicantStatuses$ | async)?.length && this.agencyCanRevert ">
           <ejs-dropdownlist

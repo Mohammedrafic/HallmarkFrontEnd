@@ -68,6 +68,7 @@ export enum OrganizationSettingKeys {
   AllowDuplicateClockIdforOrganization,
   MandatorySpecialProjectDetails,
   MarkZeroDollarInvoicetoPaidOnApproval,
+  EnableClearedToStartForAcceptedCandidates,
   TimeLimitforManagerReviewEmail,
 }
 

@@ -8,7 +8,7 @@ import { SharedModule } from '@shared/shared.module';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { NumericTextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
-import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, ChipListModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { CredentialFileViewerModule } from '@shared/components/credential-file-viewer/credential-file-viewer.module';
 import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
@@ -48,6 +48,7 @@ import { FormatBytesModule } from '@shared/pipes/format-bytes/format-bytes.modul
     GridPaginationModule,
     ScrollToTopModule,
     FormatBytesModule,
+    SwitchModule,
   ],
   providers: [CredentialGridService, CredentialStorageService, CredentialStorageFacadeService,
   ],
