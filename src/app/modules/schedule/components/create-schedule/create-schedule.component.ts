@@ -128,11 +128,11 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
   sideBarSettings: BarSettings = SideBarSettings;
   disableRemoveButton = false;
+  isOnHoldScheduleSelected = false;
 
   private readonly customShiftId = -1;
   private shiftControlSubscription: Subscription | null;
   private scheduleShifts: ScheduleShift[] = [];
-  private firstLoadDialog = true;
   private scheduleToBook: ScheduleInt.ScheduleBook | null;
   private unavailabilityToSave: Schedule | null;
 
@@ -160,7 +160,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
   ngOnChanges(changes: SimpleChanges) {
     const candidates: ScheduleCandidate[] = changes['scheduleSelectedSlots']?.currentValue.candidates;
 
-    if (candidates?.length && !this.sideBarSettings.showScheduleForm){
+    if (candidates?.length && !this.sideBarSettings.showScheduleForm) {
       this.sideBarSettings.showScheduleForm = true;
     }
 
@@ -178,6 +178,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     if (this.scheduleOnlyWithAvailability) {
       this.updateScheduleTypesWithPermissionAvailability();
     }
+
+    this.setScheduleFormState();
   }
 
   override ngOnDestroy(): void {
@@ -240,11 +242,9 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
           takeUntil(this.componentDestroy()),
         ).subscribe(() => {
           this.closeSideBar();
-          this.firstLoadDialog = false;
         });
     } else {
       this.closeSideBar();
-      this.firstLoadDialog = false;
     }
   }
 
@@ -356,7 +356,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
     const scheduleDays: ScheduleInt.ScheduleItem[] = [];
     const selectedScheduleDaysIds: number[] = [];
     this.createScheduleService.scheduleData?.forEach(item => item.schedule.forEach(schedule => schedule.daySchedules.forEach(day => scheduleDays.push(day))));
-    this.scheduleSelectedSlots.candidates.forEach(item => item.days?.forEach(day => selectedScheduleDaysIds.push(day.id)))
+    this.scheduleSelectedSlots.candidates.forEach(item => item.days?.forEach(day => selectedScheduleDaysIds.push(day.id)));
     const orientatedShifts = scheduleDays.filter(day => day.attributes?.orientated && selectedScheduleDaysIds.includes(day.id));
     return !!orientatedShifts.length;
   }
@@ -404,7 +404,22 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
         break;
     }
 
+    this.setScheduleFormState();
     this.watchForShiftControl();
+  }
+
+  private isScheduleOnHoldAvailable(): boolean {
+    this.isOnHoldScheduleSelected = 
+      !!this.scheduleSelectedSlots?.candidates.find(candidate => candidate.days.find(day => day.isOnHold));
+    return this.isOnHoldScheduleSelected;
+  }
+
+  private setScheduleFormState(): void {
+    if (this.isScheduleOnHoldAvailable()) {
+      this.scheduleForm?.disable({ emitEvent: false });
+    } else {
+      this.scheduleForm?.enable({ emitEvent: false });
+    }
   }
 
   private setShiftTimeState(): void {

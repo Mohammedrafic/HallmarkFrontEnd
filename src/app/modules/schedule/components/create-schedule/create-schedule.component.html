@@ -20,7 +20,7 @@
       </ejs-tooltip>
       <button
         *ngIf="sideBarSettings.showOpenPositions"
-        [disabled]="!scheduleSelectedSlots.candidates.length"
+        [disabled]="!scheduleSelectedSlots.candidates.length || isOnHoldScheduleSelected"
         (click)="saveSchedule()"
         [isPrimary]="true"
         ejs-button>
@@ -48,7 +48,7 @@
             [label]="type.label"
             [value]="type.value"
             [name]="type.name"
-            [disabled]="type.disabled"
+            [disabled]="type.disabled || isOnHoldScheduleSelected"
           ></ejs-radiobutton>
         </app-tooltip-container>
       </div>

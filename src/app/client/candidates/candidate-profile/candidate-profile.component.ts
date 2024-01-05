@@ -130,7 +130,7 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
 
   private profileStatusOnHoldConfirmation(): Observable<void | CandidateModel> {
     return this.confirmService.confirmActions(EMPLOYEE_ON_HOLD_WARNING, {
-      title: 'Confirm',
+      title: 'Warning',
       okButtonLabel: 'Yes',
       cancelButtonLabel: 'No',
       okButtonClass: '',

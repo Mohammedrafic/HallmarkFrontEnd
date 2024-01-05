@@ -21,6 +21,7 @@ export interface ScheduleDay {
   startTime: string;
   scheduleType: ScheduleType;
   employeeCanEdit: boolean;
+  isOnHold?: boolean;
 }
 
 export interface ScheduleCandidate {
@@ -44,7 +45,7 @@ export interface ScheduleCandidate {
   fullName?: string;
   workCommitmentText?: string;
   isOnHold: boolean;
-  employeeId:number;
+  employeeId: number;
 }
 
 export interface LtaAssignment {
