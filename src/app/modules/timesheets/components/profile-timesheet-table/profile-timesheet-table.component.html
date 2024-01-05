@@ -139,11 +139,25 @@
               Reject
             </button>
           </app-tooltip-container>
-          <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="isApproveBtnEnabled">
+          <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="isApproveBtnEnabled && titleMapper[currentTab] != 'Miles'">
             <button
               ejs-button
               [isPrimary]="true"
               [disabled]="disableAnyAction || actionButtonDisabled || !hasApproveRejectPermissions || noMilesReported"
+              cssClass="spinner-btn privilege"
+              (click)="approve()"
+            >
+              <div #spinner class="spinner-container" *ngIf="loading; else approvetext"></div>
+              <ng-template #approvetext>
+                <span>{{ submitText }}</span>
+              </ng-template>
+            </button>
+          </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!hasApproveRejectPermissions" *ngIf="titleMapper[currentTab] == 'Miles'">
+            <button
+              ejs-button
+              [isPrimary]="true"
+              [disabled]="actionButtonDisabled || !hasApproveRejectPermissions || noMilesReported"
               cssClass="spinner-btn privilege"
               (click)="approve()"
             >
