@@ -838,7 +838,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       const isEnabled = dynamicValue.IsEnabled || dynamicValue.isEnabled;
       const startsOnDate = startsOn ? DateTimeHelper.setCurrentTimeZone(startsOn) : null;
 
-      this.startsOnMinDate = startsOnDate;
+      this.startsOnMinDate = new Date();
       this.startsOnFormGroup.setValue({
         startsOn: startsOnDate,
         isEnabled: isEnabled ? isEnabled : false,
