@@ -33,6 +33,7 @@ export class ToggleRowExpansionHeaderCellComponent extends Destroyable implement
     this.gridApi = params.api;
 
     this.expanded = this.checkIfAnyRowExpanded();
+    this.toolTipMessage = this.expanded ? "Hide Details" : "Show Details";
     this.startTableSortWatching();
   }
 
@@ -47,10 +48,9 @@ export class ToggleRowExpansionHeaderCellComponent extends Destroyable implement
 
     this.gridApi?.forEachNode( (node: RowNode) => node.expanded = !this.expanded);
     this.gridApi?.onGroupExpandedOrCollapsed();
-    this.cdr.markForCheck();
     this.expanded = this.checkIfAnyRowExpanded();
     this.toggleRowExpansionService.HandleStatusChangeClick(this.expanded);
-    this.toolTipMessage = this.expanded ? "Hide Details" : "Show Details";
+    this.cdr.markForCheck();
   }
 
   public sort(order: 'asc' | 'desc' | null, event: { shiftKey: boolean }): void {

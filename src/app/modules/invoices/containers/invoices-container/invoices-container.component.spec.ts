@@ -129,7 +129,7 @@ describe('InvoicesContainerComponent', () => {
   );
   const toggleServiceSpy: jasmine.SpyObj<ToggleRowExpansionHeaderCellService> = jasmine.createSpyObj(
     'toggleService',
-    ['handleDetailsEvent']
+    ['handleDetailsEvent', 'HandleStatusChangeClick']
   );
   const invoicesContainerServiceSpy: jasmine.SpyObj<InvoicesContainerService> = jasmine.createSpyObj(
     'InvoicesContainerService',
