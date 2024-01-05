@@ -433,7 +433,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     } else {
       this.initDefaultSelectedTabId();
     }
-
+    this.toggleService.HandleStatusChangeClick(false);
     this.store.dispatch([
       new Invoices.SetTabIndex(tabIdx),
     ]);
