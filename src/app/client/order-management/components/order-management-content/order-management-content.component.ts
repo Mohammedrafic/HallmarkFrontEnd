@@ -284,6 +284,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   selectedCandidateforIRP: IRPOrderPosition;
   selectedCandidateforIRPorderDetails: IRPOrderPosition;
   DeployedEmployeeConfigValue: boolean;
+  deployedState: boolean;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -673,6 +674,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.watchForOrderFromNotification();
     this.watchForOrderIRPSubRowClickEvent();
     this.subscribeForDeployedEmployees();
+    this.watchForDeployedState();
   }
 
   ngOnDestroy(): void {
@@ -741,6 +743,14 @@ public openIrpSubrowDetails(Order : Order, Data : IRPOrderPosition, system : str
   this.orderPositionSelected$.next({ state: false });
   this.selectedRowRef = Data;
 }
+
+public watchForDeployedState(){
+  this.orderManagementService.handleIncludeDeployedEvent.pipe(
+    takeUntil(this.unsubscribe$)).subscribe(({checked}) => {
+      this.deployedState = checked;
+    });
+  }
+
 
 public watchForOrderFromNotification(){
 	if ((AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim()).toLowerCase() == (this.alertTitle.trim()).toLowerCase()
@@ -1492,6 +1502,7 @@ public RedirecttoIRPOrder(order:Order)
     this.subscribeToCandidateJob(false);
     this.watchForEmployeeToggleState();
     this.subscribeForDeployedEmployees();
+    this.watchForDeployedState();
     if(!this.redirecttovmsfromIRP){
       this.redirecttovmsfromIRP=!this.redirecttovmsfromIRP;
      return;
@@ -1513,6 +1524,7 @@ public RedirecttoIRPOrder(order:Order)
       this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
       this.openChildDialog.next(false);
       this.orderPositionSelected$.next({ state: false });
+      this.orderManagementService.setCurrentClearToStartVal(null);
       this.openDetails.next(true);
       this.selectedRowRef = event;
       this.selectedRowIndex = event.rowIndex || null;
@@ -1910,6 +1922,7 @@ public RedirecttoIRPOrder(order:Order)
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
     this.selectedDataRow = order as any;
     this.orderPositionSelected$.next({ state: true, index });
+    this.orderManagementService.setCurrentClearToStartVal(null);
     this.openChildDialog.next([order, candidate]);
     this.store.dispatch(new GetAvailableSteps(order.organizationId, candidate.jobId));
     this.cd$.next(true);
@@ -2871,7 +2884,7 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.DeployedEmployeeConfigValue ? this.DeployedEmployeeConfigValue : irpIncludeDeploy,
+        this.deployedState !== undefined ? this.deployedState : this.DeployedEmployeeConfigValue,
         ""
       ));
       this.store.dispatch(new GetIrpOrderExtensionCandidates(
@@ -2880,7 +2893,7 @@ public RedirecttoIRPOrder(order:Order)
         GRID_CONFIG.initialPage,
         GRID_CONFIG.initialRowsPerPage,
         this.employeeToggleState?.isAvailable,
-        this.DeployedEmployeeConfigValue ? this.DeployedEmployeeConfigValue : irpIncludeDeploy,
+        this.deployedState !== undefined ? this.deployedState : this.DeployedEmployeeConfigValue,
         ""
       ));
     }

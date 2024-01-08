@@ -261,6 +261,8 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
         billRate: [null, [Validators.required]],
         comments: [null],
         linkedId: [this.order.linkedId, Validators.maxLength(20)],
+        clockId: [null,Validators.maxLength(50)],
+        guaranteedWorkWeek:[null, [Validators.maxLength(50)]]
       });  
     } else {
       this.extensionForm = this.formBuilder.group({
@@ -448,6 +450,8 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       const rate = this.getBillRate(rates, startDateValue);
 
       this.extensionForm.get('billRate')?.patchValue(rate?.rateHour, { emitEvent: false, onlySelf: true });
+      this.extensionForm.get('clockId')?.patchValue(this.candidateJob?.clockId || null);
+      this.extensionForm.get('guaranteedWorkWeek')?.patchValue(this.candidateJob?.guaranteedWorkWeek || null);
       this.candidateRates = rates;
       this.cd.markForCheck();
     });

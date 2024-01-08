@@ -138,9 +138,9 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     pageSize: this.pageSizePager,
   };
   private pageSubject = new Subject<number>();
-  private isIRPEnabled: boolean;
-  private isVMSEnabled: boolean;
 
+  public isVMSEnabled: boolean;
+  public isIRPEnabled: boolean;
   public minReactivateDate: string | null;
   public maxInactivateDate: string | null;
 

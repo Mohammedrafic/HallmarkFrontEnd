@@ -55,6 +55,22 @@
   &.selected {
     background-color: $primary-active-blue-70;
   }
+
+  .clearedToStart{
+    .data{
+      text-align: center;
+      padding-bottom: 2px;
+    }
+    .title{
+      min-width: 120px;
+      margin-bottom: 15px;
+    }
+    ::ng-deep {
+      .custom-progress-bar .bar{
+        background-color : #f9b53e !important
+      }
+    }
+  }
 }
 
 ejs-chiplist.e-control.e-chip-list .e-chip {

@@ -571,7 +571,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.paramsData =
     {
       //"OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "OrganizationParamCJR": this.selectedOrganizations?.length == 0 ? "null" :
+      "OrganizationParamJDSR": this.selectedOrganizations?.length == 0 ? "null" :
         this.selectedOrganizations?.join(","),
       "StartDateParamJDSR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamJDSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),

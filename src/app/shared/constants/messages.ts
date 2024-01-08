@@ -173,3 +173,6 @@ export const Bulk_Delete_Locations = 'Selected Records are deleted';
 
 export const Bulk_Update_Department = 'Selected Records are modified';
 export const Bulk_Delete_Department = 'Selected Records are deleted';
+
+
+export const CLEAR_START_ON = 'Candidate is Cleared to Start';

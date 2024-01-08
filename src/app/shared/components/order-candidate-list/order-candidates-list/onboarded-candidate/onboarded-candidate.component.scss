@@ -5,17 +5,29 @@
 :host {
   overflow-y: auto;
 }
+.w-50{
+  width: 50%;
+}
 
 .header-container {
   .button-container {
     display: flex;
-    gap: 12px;
+    gap: 10px;
 
     @media (max-width: $tablet-min) {
       button:not(.close-button),
       .dropdown {
         display: none;
       }
+    }
+    .switch{
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      padding-left: 10px;
+    }
+    .dropdown-width{
+      width: 35%;
     }
   }
 }
@@ -169,6 +181,12 @@
 ::ng-deep{
   .e-confirm-dialog.e-control.e-dialog.e-popup.unsaved-changes-dialog {
     width: 470px !important;
+  }
+  body.light .e-switch-wrapper.e-switch-disabled .e-switch-inner{
+    opacity: initial !important;
+  }
+  .e-switch-wrapper.e-wrapper{
+    margin-right: 0.5rem !important;
   }
 }
 

@@ -26,7 +26,10 @@ import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
-import { DELETE_CONFIRM_TITLE, RECORD_MODIFIED, RECORDS_ADDED, UNSAVED_TABS_TEXT } from '@shared/constants';
+import { 
+  DELETE_CONFIRM_TITLE, RECORD_MODIFIED, RECORDS_ADDED, 
+  UNSAVED_TABS_TEXT, OrganizationSettingKeys, OrganizationalHierarchy,
+} from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ScheduleShift } from '@shared/models/schedule-shift.model';
@@ -82,7 +85,6 @@ import * as EditSchedule from './edit-schedule.interface';
 import { EditScheduleFormFieldConfig, ShiftTab } from './edit-schedule.interface';
 import { EditScheduleService } from './edit-schedule.service';
 import { SettingsViewService } from '@shared/services';
-import { OrganizationSettingKeys,OrganizationalHierarchy } from '@shared/constants';
 import { UserState } from 'src/app/store/user.state';
 
 
@@ -400,7 +402,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private ifShiftEdited(): boolean {
     return !!(this.isShiftOriented &&
-      (this.scheduleForm.get('departmentId')?.dirty || this.scheduleForm.get('date')?.dirty || this.scheduleForm.get('skillId')?.dirty));
+      (this.scheduleForm.get('departmentId')?.dirty || 
+       this.scheduleForm.get('date')?.dirty || this.scheduleForm.get('skillId')?.dirty));
   }
 
   private updateScheduledShiftHandler(): void {
@@ -649,6 +652,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private selectScheduledItem(schedule: ScheduleItem, scheduleIndex = 0): void {
     const patchData = {} as EditSchedule.ScheduledShiftForm;
+    const isOnHold = this.scheduledItem.schedule.isOnHold;
 
     if (!this.hasInitData) {
       return;
@@ -660,7 +664,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.setEditPermissions();
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Book) {
-      this.scheduleFormConfig = ScheduledShiftFormConfig(this.hasEditPermissions);
+      this.scheduleFormConfig = ScheduledShiftFormConfig(this.hasEditPermissions && !isOnHold);
       this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
       patchData.regionId = this.selectedDaySchedule.orderMetadata?.regionId;
       patchData.orientated = this.selectedDaySchedule.attributes.orientated;
@@ -674,7 +678,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Unavailability) {
-      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.isCreateMode, this.hasEditPermissions);
+      this.scheduleFormConfig = ScheduledUnavailabilityFormConfig(this.isCreateMode, this.hasEditPermissions && !isOnHold);
       this.scheduleForm = this.editScheduleService.createScheduledUnavailabilityForm();
       patchData.unavailabilityReasonId = this.selectedDaySchedule.unavailabilityReasonId;
     }
@@ -682,7 +686,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Availability) {
       this.scheduleFormConfig = this.isEmployee
         ? NewAvailabilityFormConfig(this.isCreateMode, this.hasEditPermissions)
-        : ScheduledAvailabilityFormConfig(this.hasEditPermissions);
+        : ScheduledAvailabilityFormConfig(this.hasEditPermissions && !isOnHold);
       this.scheduleForm = this.isEmployee
         ? this.editScheduleService.createNewAvailabilityForm()
         : this.editScheduleService.createScheduledAvailabilityForm();

@@ -24,6 +24,10 @@
       </e-chips>
     </ejs-chiplist>
   </div>
+  <div class="info clearedToStart" *ngIf="candidat?.clearToStart">
+    <div class="data">Cleared to Start</div>
+    <div class="title"><app-custom-progress-bar [value]="100"></app-custom-progress-bar></div>
+  </div>
   <div class="info" *ngIf="!isAgency; else agencyColumn">
     <div class="data">{{ order.skill || order.skillName || '-' }}</div>
     <div class="title">Skill</div>

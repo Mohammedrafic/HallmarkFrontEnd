@@ -45,11 +45,12 @@ const importConfig = {
   styleUrls: ['./import-departments.component.scss'],
 })
 export class ImportDepartmentsComponent extends AbstractImport implements OnChanges {
-  @Input() isOrgUseIRPAndVMS = false;
+  @Input() isOrganizationIRP = false;
+  @Input() isOrganizationVMS = false;
   @Input() isInvoiceDepartmentIdFieldShow = false;
 
   public columnDefs: ColDef[];
-  public titleImport: string = 'Import Departments';
+  public titleImport = 'Import Departments';
 
   constructor(
     protected override actions$: Actions,
@@ -66,7 +67,9 @@ export class ImportDepartmentsComponent extends AbstractImport implements OnChan
 
   ngOnChanges(): void {
     this.columnDefs = DepartmentsColumns(
-      this.store.selectSnapshot(AppState.isIrpFlagEnabled) && this.isOrgUseIRPAndVMS,
+      this.store.selectSnapshot(AppState.isIrpFlagEnabled),
+      this.isOrganizationIRP,
+      this.isOrganizationVMS,
       this.isInvoiceDepartmentIdFieldShow,
       null,
     );
@@ -78,7 +81,9 @@ export class ImportDepartmentsComponent extends AbstractImport implements OnChan
       .subscribe((result: { payload: ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder> }) => {
         if (result.payload.succesfullRecords.length || result.payload.errorRecords.length) {
           this.columnDefs = DepartmentsColumns(
-            this.store.selectSnapshot(AppState.isIrpFlagEnabled) && this.isOrgUseIRPAndVMS,
+            this.store.selectSnapshot(AppState.isIrpFlagEnabled),
+            this.isOrganizationIRP,
+            this.isOrganizationVMS,
             this.isInvoiceDepartmentIdFieldShow,
             result.payload,
           );
@@ -121,7 +126,7 @@ export class ImportDepartmentsComponent extends AbstractImport implements OnChan
           if (result.payload?.succesfullRecords.length > 0 && result.payload?.errorRecords.length > 0) {
             let message = this.action?.saveImportResultFailAndSucess ? this.action?.saveImportResultFailAndSucess?.message : '';
             message = message.replace('<sn>', result.payload?.succesfullRecords.length.toString());
-            message = message.replace('<fn>', result.payload?.errorRecords.length.toString())
+            message = message.replace('<fn>', result.payload?.errorRecords.length.toString());
             this.store.dispatch(new ShowToast(MessageTypes.Error, message));
             this.reloadItemsList.next();
           } else if (result.payload?.succesfullRecords.length) {

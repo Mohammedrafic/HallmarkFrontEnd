@@ -11,38 +11,44 @@
           </ejs-chiplist>
         </ng-container>
       </div>
-      <div class="e-card-content button-container" *ngIf="!isRejected && !isCancelled">
-        <div class="input-group dropdown bootstrap">
-          <ejs-dropdownlist
-            *ngIf="!isAgency"
-            [allowFiltering]="true"
-            [fields]="optionFields"
-            [dataSource]="applicantStatuses"
-            [formControl]="statusesFormControl"
-            [disabled]="!actionsAllowed"
-            placeholder="Select Status"
-            (select)="onStatusChange($event)"
-          >
-          </ejs-dropdownlist>
+
+      <div class="e-card-content button-container" >
+        <div class="input-group switch" *ngIf="isEnableClearedToStartForAcceptedCandidates">
+          <ejs-switch id="switcher" class="switch"  (change)="onSwitcher($event)" [checked]="clearedToStart" [disabled]="isClearedToStartEnable || isAgency"></ejs-switch>
+          <label class="switch-label" for="switcher"><span>Cleared to Start</span></label>
         </div>
-        <button ejs-button cssClass="e-primary save-button" (click)="onSave()" *ngIf="!isAgency">Save</button>
-        <app-tooltip-container [showToolTip]="!actionsAllowed">
-          <button
-            ejs-button
-            cssClass="e-outline"
-            *ngIf="canAccept"
-            [disabled]="!actionsAllowed"
-            (click)="onReject()"
-            class="reject-button"
-          >
-            Reject
-          </button>
-        </app-tooltip-container>
-        <app-tooltip-container [showToolTip]="!actionsAllowed">
-          <button ejs-button [isPrimary]="true" *ngIf="canAccept" [disabled]="!actionsAllowed" (click)="onAccept()">
-            Accept
-          </button>
-        </app-tooltip-container>
+        <ng-container *ngIf="!isRejected && !isCancelled">
+          <div class="input-group dropdown bootstrap" [ngClass]="{'dropdown-width': isEnableClearedToStartForAcceptedCandidates }"  *ngIf="!isAgency">
+            <ejs-dropdownlist             
+              [allowFiltering]="true"
+              [fields]="optionFields"
+              [dataSource]="applicantStatuses"
+              [formControl]="statusesFormControl"
+              [disabled]="!actionsAllowed"
+              placeholder="Select Status"
+              (select)="onStatusChange($event)"
+            >
+            </ejs-dropdownlist>
+          </div>
+          <button ejs-button cssClass="e-primary save-button" (click)="onSave()" *ngIf="!isAgency">Save</button>
+          <app-tooltip-container [showToolTip]="!actionsAllowed">
+            <button
+              ejs-button
+              cssClass="e-outline"
+              *ngIf="canAccept"
+              [disabled]="!actionsAllowed"
+              (click)="onReject()"
+              class="reject-button"
+            >
+              Reject
+            </button>
+          </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!actionsAllowed">
+            <button ejs-button [isPrimary]="true" *ngIf="canAccept" [disabled]="!actionsAllowed" (click)="onAccept()">
+              Accept
+            </button>
+          </app-tooltip-container>
+        </ng-container>
       </div>
     </div>
     <div class="candidate-message" *ngIf="candidateJob?.isLocal">
