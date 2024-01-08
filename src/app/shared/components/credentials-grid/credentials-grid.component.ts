@@ -869,14 +869,14 @@ private saveCandidateCredentials({
         disableViewDocument:this.disableViewDocument(item),
         showtoolTipmessage:tooltipMessage,
         showDisableEditTooltip:
-          (item.status === this.statusEnum.Reviewed || this.statusEnum.Verified) &&
-          !this.isOrganizationSide,
+          ((item.status === this.statusEnum.Reviewed) &&
+          !this.isOrganizationSide) || ((item.status ===  this.statusEnum.Verified) &&
+          !this.isOrganizationSide)  ,
         disableDelete: this.disableDelete(item),
         credentialTypeName: item.credentialType?.name,
         credentialTypeId: item.credentialType?.id,
       };
     });
-
   }
  private disableViewDocument(item:CandidateCredential):boolean{
   let length= item.credentialFiles==null?0:item.credentialFiles?.length;
