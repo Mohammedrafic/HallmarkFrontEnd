@@ -64,12 +64,12 @@ export class ScheduleGridService {
       dates: new Set<string>().add(date),
     };
 
-    if(schedule) {
+    if (schedule) {
       selectedCandidateSlots = {
         ...selectedCandidateSlots,
         candidate: {
           ...selectedCandidateSlots.candidate,
-          days: this.createDaysForSelectedSlots(candidate.days, schedule.daySchedules),
+          days: this.createDaysForSelectedSlots(candidate.days, schedule.daySchedules, schedule.isOnHold),
         },
       };
     }
@@ -77,11 +77,11 @@ export class ScheduleGridService {
     return selectedCandidateSlots;
   }
 
-  public createDaysForSelectedSlots (days: ScheduleDay[], scheduleDays: ScheduleItem[]): ScheduleDay[] {
-    const createdDays = this.createDays(scheduleDays);
+  public createDaysForSelectedSlots (days: ScheduleDay[], scheduleDays: ScheduleItem[], isOnHold: boolean): ScheduleDay[] {
+    const createdDays = this.createDays(scheduleDays, isOnHold);
 
     if(days?.length) {
-      return this.updateScheduleDays(days, createdDays);
+      return this.updateScheduleDays(days, createdDays, isOnHold);
     }
 
     return createdDays;
@@ -106,11 +106,12 @@ export class ScheduleGridService {
     };
   }
 
-  private updateScheduleDays(days: ScheduleDay[], createdDays: ScheduleDay[]): ScheduleDay[] {
+  private updateScheduleDays(days: ScheduleDay[], createdDays: ScheduleDay[], isOnHold: boolean): ScheduleDay[] {
+    createdDays.map(day => day.isOnHold = isOnHold);
     const daysIds = days.map((day: ScheduleDay) => day.id);
     const hasDuplicate = createdDays.some((createdDay: ScheduleDay) => daysIds.includes(createdDay.id));
 
-    if(hasDuplicate) {
+    if (hasDuplicate) {
       const createdDaysIds = createdDays.map((day: ScheduleDay) => day.id);
       return days.filter((day: ScheduleDay) => !createdDaysIds.includes(day.id));
     }
@@ -118,7 +119,7 @@ export class ScheduleGridService {
     return [...days, ...createdDays];
   }
 
-  private createDays(scheduleDays: ScheduleItem[]): ScheduleDay[] {
+  private createDays(scheduleDays: ScheduleItem[], isOnHold: boolean): ScheduleDay[] {
     return scheduleDays.map((scheduleDay: ScheduleItem) => {
       return {
         id: scheduleDay.id,
@@ -130,6 +131,7 @@ export class ScheduleGridService {
         shiftDate: scheduleDay.date,
         startTime: scheduleDay.startDate,
         employeeCanEdit: scheduleDay.employeeCanEdit,
+        isOnHold: isOnHold,
       };
     });
   }

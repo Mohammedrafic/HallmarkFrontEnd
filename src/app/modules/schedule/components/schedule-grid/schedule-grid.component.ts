@@ -247,10 +247,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
       return;
     }
 
-    if (schedule?.isOnHold) {
-      return;
-    }
-
     if (!schedule?.isDisabled) {
       this.selectDateSlot(date, candidate, schedule);
       this.processCellSelection(candidate, schedule);
@@ -276,7 +272,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         if (schedule) {
           const days = candidateSelectedSlot.candidate?.days ?? candidate.days;
           candidateSelectedSlot.candidate.days =
-            this.scheduleGridService.createDaysForSelectedSlots(days, schedule.daySchedules);
+            this.scheduleGridService.createDaysForSelectedSlots(days, schedule.daySchedules, schedule.isOnHold);
         }
       }
     } else {
@@ -449,7 +445,7 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         filter(() => {
           const { scrollTop, scrollHeight, offsetHeight } = this.scrollArea.nativeElement;
 
-          return scrollTop + offsetHeight >= scrollHeight;
+          return scrollTop + offsetHeight >= scrollHeight - 10;
         }),
         takeUntil(this.componentDestroy()),
       )

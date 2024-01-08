@@ -91,7 +91,7 @@ export class ExtensionSidebarService {
 
   private prepareExtension(extension: ExtensionFormData): ExtensionModel {
     const { orderId, startDate, endDate, billRate, billRates, comments,
-      jobId, durationPrimary, ignoreMissingCredentials, linkedId } = extension || {};
+      jobId, durationPrimary, ignoreMissingCredentials, linkedId, clockId, guaranteedWorkWeek } = extension || {};
 
     return {
       jobId,
@@ -104,6 +104,8 @@ export class ExtensionSidebarService {
       duration: durationPrimary,
       ignoreMissingCredentials,
       linkedId,
+      clockId,
+      guaranteedWorkWeek
     };
   }
 }

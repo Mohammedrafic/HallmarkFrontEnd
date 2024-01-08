@@ -86,6 +86,22 @@
             class="form-line-item-50"
           ></app-input>
         </div>
+        <div class="row">
+          <app-input
+          [formGroupInstance]="extensionForm"
+          controlName="guaranteedWorkWeek"
+          id="guaranteedWorkWeek"
+          label="Expected Work Week"
+          class="form-line-item-50"
+        ></app-input>
+          <app-input
+          [formGroupInstance]="extensionForm"
+          controlName="clockId"
+          id="clockId"
+          label="Clock ID"
+          class="form-line-item-50"
+        ></app-input>
+        </div>
       </form>
 
       <form class="config" *ngIf="system === 'IRP'">

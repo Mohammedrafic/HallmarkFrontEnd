@@ -5,7 +5,7 @@
     <div class="controls">
       <app-tooltip-container [showToolTip]="!isCreateMode && !hasEditPermissions">
         <button
-          [disabled]="!isCreateMode && !hasEditPermissions"
+          [disabled]="!isCreateMode && !hasEditPermissions || scheduledItem.schedule.isOnHold"
           (click)="saveSchedule()"
           [isPrimary]="true"
           ejs-button>
@@ -36,7 +36,7 @@
           <button
             ejs-button
             cssClass="e-outline"
-            [disabled]="scheduleItemType === undefined"
+            [disabled]="scheduleItemType === undefined || scheduledItem.schedule.isOnHold"
             (click)="addNewSchedule()"
           >
             <i-feather name="plus" class="icon"></i-feather>

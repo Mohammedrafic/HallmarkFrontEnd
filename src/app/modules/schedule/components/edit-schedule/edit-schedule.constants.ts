@@ -121,6 +121,7 @@ const scheduledUnavailabilityFormFields = (createMode: boolean, hasPermissions: 
   ];
 };
 
+// eslint-disable-next-line max-lines-per-function
 const scheduledShiftFormFields = (hasPermissions: boolean): EditScheduleFormFieldConfig[] => {
   return [
     ...newAvailabilityFormFields(false, hasPermissions),

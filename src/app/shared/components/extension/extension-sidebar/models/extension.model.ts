@@ -12,6 +12,8 @@ export interface ExtensionModel {
   duration: Duration;
   ignoreMissingCredentials: boolean
   linkedId: string | null;
+  clockId?: string | null;
+  guaranteedWorkWeek?: string | null;
 }
 
 export interface ExtensionFormData extends Omit<ExtensionModel, 'actualStartDate' | 'actualEndDate'> {

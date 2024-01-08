@@ -163,6 +163,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   IsSettingKeyPayPeriod = false;
   separateValuesInSystems = false;
   IsSettingKeyScheduleOnlyWithAvailability: boolean = false;
+  IsAllowDocumentUpload: boolean = false;
   IsSettingKeyAvailabiltyOverLap: boolean = false;
   IsSettingKeyCreatePartialOrder: boolean = false;
   IsSettingKeyAutomatedDistributedToVMS: boolean = false;
@@ -300,6 +301,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.SettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == data.settingKey?data.settingKey:'';
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == data.settingKey;
     this.IsSettingATPRateCalculation = OrganizationSettingKeys[OrganizationSettingKeys['ATPRateCalculation']].toString() == data.settingKey;
+    this.IsAllowDocumentUpload = OrganizationSettingKeys[OrganizationSettingKeys['AllowDocumentUpload']].toString() == data.settingKey;
      this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == data.settingKey;
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
@@ -359,6 +361,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       OrganizationSettingKeys[OrganizationSettingKeys['PayPeriod']].toString() == parentRecord.settingKey;
     this.IsSettingKeyAvailabiltyOverLap = OrganizationSettingKeys[OrganizationSettingKeys['AvailabilityOverLapRule']].toString() == parentRecord.settingKey;
     this.IsSettingKeyScheduleOnlyWithAvailability = OrganizationSettingKeys[OrganizationSettingKeys['ScheduleOnlyWithAvailability']].toString() == parentRecord.settingKey;
+    this.IsAllowDocumentUpload = OrganizationSettingKeys[OrganizationSettingKeys['AllowDocumentUpload']].toString() == parentRecord.settingKey;
     this.setNumericValueLabel(parentRecord.settingKey);
     this.IsSettingKeyCreatePartialOrder = OrganizationSettingKeys[OrganizationSettingKeys['CreatePartialOrder']].toString() == parentRecord.settingKey;
     this.IsSettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == parentRecord.settingKey;
@@ -835,7 +838,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       const isEnabled = dynamicValue.IsEnabled || dynamicValue.isEnabled;
       const startsOnDate = startsOn ? DateTimeHelper.setCurrentTimeZone(startsOn) : null;
 
-      this.startsOnMinDate = startsOnDate;
+      this.startsOnMinDate = new Date();
       this.startsOnFormGroup.setValue({
         startsOn: startsOnDate,
         isEnabled: isEnabled ? isEnabled : false,
@@ -1543,6 +1546,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       && this.checkboxValueForm.valid
       && this.aTPRateCalculationFormGroup.valid
     ) {
+      if (this.IsAllowDocumentUpload)
+      {
+        if(this.organizationHierarchy==undefined && this.organizationHierarchyId==undefined)
+      {
+        this.organizationHierarchy = OrganizationHierarchy.Organization;
+        this.organizationHierarchyId = this.organizationId;
+      }
+      }
       this.sendForm();
     }
      else {
