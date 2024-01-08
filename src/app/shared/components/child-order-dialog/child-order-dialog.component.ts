@@ -269,7 +269,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   get showAddExtension(): boolean {
-    return this.isAddExtensionBtnAvailable && this.isLastExtension;
+    return (this.isAddExtensionBtnAvailable && this.isLastExtension) || (this.activeSystem === OrderManagementIRPSystemId.IRP);
   }
 
   get disableAddExtension(): boolean {
