@@ -17,7 +17,7 @@ import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
 
 import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
   DetailRowService,
@@ -1156,7 +1156,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private onReloadOrderCandidatesLists(): void {
     this.actions$
       .pipe(
-        ofActionSuccessful(ReloadOrderCandidatesLists),
+        ofActionDispatched(ReloadOrderCandidatesLists),
         takeWhile(() => this.isAlive)
       )
       .subscribe(() => {
