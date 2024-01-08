@@ -40,8 +40,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() candidate: OrderCandidatesList;
   @Input() order: any;
-  @Input() isTab: boolean = false;
-  @Input() isAgency: boolean = false;
+  @Input() isTab = false;
+  @Input() isAgency = false;
   @Input() isLocked: boolean | undefined = false;
   @Input() actionsAllowed: boolean;
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
@@ -71,7 +71,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public candidateJob: OrderCandidateJob;
 
   public comments: Comment[] = [];
-  public showComments: boolean = true;
+  public showComments = true;
 
   private unsubscribe$: Subject<void> = new Subject();
   private candidateId: number;
@@ -192,8 +192,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
                 takeUntil(this.unsubscribe$)
               ).subscribe(() => {
                 this.store.dispatch(new ReloadOrderCandidatesLists());
+                this.closeDialog();
               });
-            this.closeDialog();
           }
         });
     }
@@ -222,14 +222,16 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       candidateBillRate: new FormControl(null, [Validators.required]),
       expAsTravelers: new FormControl(0),
       requestComment: new FormControl('', [Validators.maxLength(2000)]),
-      ssn: new FormControl('')
+      ssn: new FormControl(''),
     });
   }
 
   private setFormValue(data: OrderApplicantsInitialData): void {
     this.formGroup.setValue({
       orderId: `${this.order?.organizationPrefix ?? ''}-${this.order?.publicId}`,
-      jobDate: [DateTimeHelper.formatDateUTC(data.jobStartDate, 'MM/dd/yyyy'), DateTimeHelper.formatDateUTC(data.jobEndDate, 'MM/dd/yyyy')],
+      jobDate: [DateTimeHelper.formatDateUTC(
+        data.jobStartDate, 'MM/dd/yyyy'), DateTimeHelper.formatDateUTC(data.jobEndDate, 'MM/dd/yyyy'
+      )],
       orderBillRate: PriceUtils.formatNumbers(data.orderBillRate),
       locationName: data.locationName,
       availableStartDate: DateTimeHelper.formatDateUTC(data.availableStartDate, 'MM/dd/yyyy'),
@@ -285,13 +287,13 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         )
       .subscribe((data: OrderApplicantsInitialData) => {
           if(data.candidatePhone1Required != null){
-            let phone1Configuration = JSON.parse(data.candidatePhone1Required);
+            const phone1Configuration = JSON.parse(data.candidatePhone1Required);
             if(phone1Configuration.isEnabled){
               this.candidatePhone1RequiredValue = phone1Configuration.value;
             }
           }
           if(data.candidateAddressRequired != null){
-            let addressConfiguration = JSON.parse(data.candidateAddressRequired);
+            const addressConfiguration = JSON.parse(data.candidateAddressRequired);
             if(addressConfiguration.isEnabled){
               this.candidateAddressRequiredValue = addressConfiguration.value;
             }

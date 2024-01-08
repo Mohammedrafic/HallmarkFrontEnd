@@ -410,7 +410,7 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
 
   private isScheduleOnHoldAvailable(): boolean {
     this.isOnHoldScheduleSelected = 
-      !!this.scheduleSelectedSlots?.candidates.find(candidate => candidate.days.find(day => day.isOnHold));
+      !!this.scheduleSelectedSlots?.candidates.find(candidate => candidate.days?.find(day => day.isOnHold));
     return this.isOnHoldScheduleSelected;
   }
 

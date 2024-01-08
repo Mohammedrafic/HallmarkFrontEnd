@@ -420,7 +420,7 @@
         <div class="input-container">
           <div class="input-group switch">
             <ejs-switch id="switcher" class="switch" formControlName="value"></ejs-switch>
-            <label class="switch-label">Turned {{ switcherValue }}</label>
+            <label class="switch-label">Turned {{ IsSettingKeyOvertimeCalculation ? switcherValue == 'On' ? 'By Configuration' : 'By Order' : switcherValue }}</label>           
           </div>
         </div>
 

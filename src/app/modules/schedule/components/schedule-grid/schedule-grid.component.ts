@@ -552,8 +552,6 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
   clickSort() {
 
     if (!isEqual(this.scheduleFiltersService.getSelectedPreservedFilters(), this.selectedFilters)) {
-      let existingWorkCommitments: string[] = [];
-      let empWorkCommitments: string[] = [];
       this.scheduleApiService
         .getEmployeeWorkCommitments(
           this.selectedFilters
@@ -561,31 +559,18 @@ export class ScheduleGridComponent extends Destroyable implements OnInit, OnChan
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe((data: string[]) => {
           if (data != null)
-            empWorkCommitments = data;
-          this.scheduleFiltersService.getEmpWorkCommitmentsData().pipe(takeUntil(this.componentDestroy())).subscribe((data: any) => {
-            existingWorkCommitments = data;
-            if (existingWorkCommitments.length == 0) {
-              this.scheduleFiltersService.setEmpWorkCommitmentsData(empWorkCommitments);
-            }
-            else {
-
-              let newWorkCommitments = existingWorkCommitments.filter(f => !empWorkCommitments.includes(f));
-              if (newWorkCommitments != null && newWorkCommitments.length > 0) {
-                existingWorkCommitments = existingWorkCommitments.concat(newWorkCommitments)
-                this.scheduleFiltersService.setEmpWorkCommitmentsData(existingWorkCommitments);
-              }
-            }
-            this.scheduleFiltersService.setSelectedPreservedFilters(this.selectedFilters)
-            this.store.dispatch(new ShowSchduleSortFilterDialog(true));
-            this.cdr.markForCheck();
-          })
-
-
+          this.scheduleFiltersService.setEmpWorkCommitmentsData(data);
+          this.scheduleFiltersService.setSelectedPreservedFilters(this.selectedFilters)
+          this.store.dispatch(new ShowSchduleSortFilterDialog(true));
+          this.cdr.markForCheck();
         });
     }
-    else{
+    else {
       this.store.dispatch(new ShowSchduleSortFilterDialog(true));
       this.cdr.markForCheck();
     }
   }
+
+
 }
+

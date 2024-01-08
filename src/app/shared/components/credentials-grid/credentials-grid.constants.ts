@@ -4,6 +4,8 @@ import { SelectionSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid
 export const AllowedCredentialFileExtensions: string = '.pdf, .jpg, .jpeg, .png';
 
 export const DisableEditMessage = 'Credential in this status cannot be edited';
+export const verifiedDisableEditMessage = 'Verified Credentials cannot be edited';
+
 
 export const CredentialSelectionSettingsModel: SelectionSettingsModel = {
   type: 'Multiple',

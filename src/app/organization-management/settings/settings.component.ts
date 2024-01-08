@@ -170,6 +170,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   isRequired:boolean=true;
   IsSettingATPRateCalculation:boolean=false;
   IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition: boolean = false;
+  IsSettingKeyOvertimeCalculation: boolean = false;
   SettingKeyAutomatedDistributedToVMS: string = '';
   systemButtons: ButtonModel[] = [];
   isEdit = false;
@@ -367,6 +368,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.IsSettingKeyAutomatedDistributedToVMS=OrganizationSettingKeys[OrganizationSettingKeys['AutomatedDistributionToVMS']].toString() == parentRecord.settingKey;
     this.IsSettingATPRateCalculation = OrganizationSettingKeys[OrganizationSettingKeys['ATPRateCalculation']].toString() == parentRecord.settingKey;
     this.IsSettingKeyLimitNumberOfCandidateanAgencycansubmitToaPosition=OrganizationSettingKeys[OrganizationSettingKeys['LimitNumberOfCandidateanAgencycansubmitToaPosition']].toString() == parentRecord.settingKey;
+    this.IsSettingKeyOvertimeCalculation =  OrganizationSettingKeys[OrganizationSettingKeys['OvertimeCalculation']].toString() == parentRecord.settingKey;
     this.enableOtForm();
     this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
@@ -605,16 +607,22 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         let settingData = this.getRowsPerPage(adaptedData, this.currentPagerPage);
         settingData.forEach(element => {
           element.children?.map((ch)=>{
-          if(ch.regionId == null && ch.locationId == null && ch.departmentId==null){
-            ch.isParentRecord=true;
-          }
-        });
+            if(ch.regionId == null && ch.locationId == null && ch.departmentId==null){
+              ch.isParentRecord=true;
+            }
+          });
           if (element?.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
             element.children?.forEach(e => {
               if (e.regionId == null && e.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OTHours']]) {
                 e.hidden = true;
               }
             });
+          }
+          if(element?.settingKey == OrganizationSettingKeys[OrganizationSettingKeys['OvertimeCalculation']]){
+              if(element.displayValue == "Yes") element.displayValue = 'By Configuration'; else element.displayValue = 'By Order';
+              element.children?.forEach(e=>{
+                if(e.displayValue == "Yes") e.displayValue = 'By Configuration'; else e.displayValue = 'By Order';
+              })
           }
         });
         this.gridDataSource = settingData;
