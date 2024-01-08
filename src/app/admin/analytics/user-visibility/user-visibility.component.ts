@@ -189,7 +189,7 @@ export class UserVisibilityComponent extends AbstractGridConfigurationComponent 
         this.businessValue = value;
         this.defaultBusinessValue = this.businessValue[0]?.id
 
-        this.userVisibilityForm.controls['businessunitName'].setValue(this.selectedOrganizations[0].id);
+        // this.userVisibilityForm.controls['businessunitName'].setValue(this.selectedOrganizations[0].id);
 
       });
     this.store.dispatch(new ClearLogiReportState());
@@ -377,7 +377,7 @@ export class UserVisibilityComponent extends AbstractGridConfigurationComponent 
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { businessIds, departmentIds, locationIds,
+    let { businessunitName, departmentIds, locationIds,userName,
       regionIds} = this.userVisibilityForm.getRawValue();
 
 
@@ -391,12 +391,12 @@ export class UserVisibilityComponent extends AbstractGridConfigurationComponent 
     {
       
 
-      "OrganizationIdUV": this.selectedOrganizations?.length == 0 ? businessIds.join(",") :
-        this.selectedOrganizations?.join(","),
+      "OrganizationIdUV": businessunitName.toString(),
       "RegionIdUV": "",
       "LocationIdUV": "",
       "DepartmentIdUV":"",
       "RoleNameUV":"",
+      "UserNameUV":userName,
       // "organizationNameVSR": orgName,
       "reportPulledMekssageVSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
         // "DateRangeParamVSR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
