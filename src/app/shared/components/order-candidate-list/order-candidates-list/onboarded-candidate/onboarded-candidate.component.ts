@@ -290,7 +290,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private clearedToStartCheck():void {
-    if(this.candidate && this.candidate.organizationId && (this.candidate.candidateJobId || this.candidate.jobId)){
+    if(this.candidate && this.candidate.organizationId && (this.candidate.candidateJobId || this.candidate.jobId) && (this.order.orderType == OrderType.LongTermAssignment || this.order.orderType == OrderType.ContractToPerm)){
       this.isEnableClearedToStartForAcceptedCandidates = false;
       this.isClearedToStartEnable =  this.candidate.status ? this.candidate.status == ApplicantStatusEnum.Accepted ? false : true : this.candidate.candidateStatus == ApplicantStatusEnum.Accepted ? false : true;
 

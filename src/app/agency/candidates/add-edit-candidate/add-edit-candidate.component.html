@@ -110,6 +110,7 @@
           [isEnableClearedToStartForAcceptedCandidates$]="isEnableClearedToStartForAcceptedCandidates$"
           [isClearedToStartEnable]="isClearedToStartEnable"
           [clearedToStart]="clearedToStart"
+          (clearToStartValueChange)="onClearToStartValueChange($event)"
         ></app-credentials-grid>
       </ng-template>
     </e-tabitem>

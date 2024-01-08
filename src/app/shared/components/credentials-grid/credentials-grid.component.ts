@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { OutsideZone } from '@core/decorators';
@@ -41,6 +41,7 @@ import { CredentialGridService } from '@agency/services/credential-grid.service'
 import { AbstractGridConfigurationComponent } from
   '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { 
+  CLEAR_START_ON,
   DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADD, RECORD_MODIFIED, RECORD_UNSAVED
 } from '@shared/constants/messages';
 import { optionFields } from '@shared/constants';
@@ -107,6 +108,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() clearedToStart: boolean = false;
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
+  @Output() clearToStartValueChange = new EventEmitter<boolean>();
 
   public readonly statusEnum = CredentialStatus;
   public readonly userPermissions = UserPermissions;
@@ -910,6 +912,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public onSwitcher(event: { checked: boolean }): void {
     this.clearedToStart = event.checked;
+    let flagEvent = true;
+    this.clearToStartValueChange.emit(event.checked);
+    if(this.clearedToStart && flagEvent){
+      this.store.dispatch(new ShowToast(MessageTypes.Success, CLEAR_START_ON));
+      return;
+    }
   }
 
   private watchForCertifiedOnUntilControls(): void {

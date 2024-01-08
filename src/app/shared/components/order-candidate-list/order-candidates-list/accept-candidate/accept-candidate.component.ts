@@ -65,6 +65,7 @@ import { OrderManagementService } from '@client/order-management/components/orde
 import { SettingsViewService } from '@shared/services';
 import { positionIdStatuses } from '@agency/candidates/add-edit-candidate/add-edit-candidate.constants';
 import { ReloadOrganisationOrderCandidatesLists, SaveClearToStart, SaveClearToStartSucceeded } from '@client/store/order-managment-content.actions';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -257,7 +258,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private clearedToStartCheck():void {
-    if(this.candidate && this.candidate.organizationId && (this.candidate.candidateJobId || this.candidate.jobId)){
+    if(this.candidate && this.candidate.organizationId && (this.candidate.candidateJobId || this.candidate.jobId) && (this.order.orderType == OrderType.LongTermAssignment || this.order.orderType ==  OrderType.ContractToPerm)){
       this.isEnableClearedToStartForAcceptedCandidates = false;
       this.isClearedToStartEnable =  this.candidate.status ? this.candidate.status == ApplicantStatusEnum.Accepted ? false : true : this.candidate.candidateStatus == ApplicantStatusEnum.Accepted ? false : true;
 
