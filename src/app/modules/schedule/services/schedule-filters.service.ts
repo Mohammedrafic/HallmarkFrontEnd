@@ -27,6 +27,7 @@ import {
 } from '../interface';
 
 import * as ScheduleInt from '../interface';
+import isEqual from 'lodash/fp/isEqual';
 @Injectable()
 export class ScheduleFiltersService {
   deletedInlineChip: Subject<ChipDeleteEventType> = new Subject();
@@ -149,7 +150,11 @@ export class ScheduleFiltersService {
   }
 
   setEmpWorkCommitmentsData(event:string[]):void{
-    this.getEmpWorkCommitments.next(event);
+    const currentValue = this.getEmpWorkCommitments.getValue();
+    // Check if the new value is different from the current value
+    if (!isEqual(currentValue, event)) {
+      this.getEmpWorkCommitments.next(event);
+    }
   }
 
   getEmpWorkCommitmentsData() {

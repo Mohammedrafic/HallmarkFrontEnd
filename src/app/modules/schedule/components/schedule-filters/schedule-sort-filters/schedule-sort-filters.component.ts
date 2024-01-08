@@ -2,7 +2,7 @@ import { Component, OnInit,  EventEmitter, Input, ContentChild, ViewChild, Templ
 import { Actions, Store, ofActionDispatched } from '@ngxs/store';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import {  takeUntil } from 'rxjs';
+import {  distinctUntilChanged, take, takeUntil } from 'rxjs';
 import {  ShowSchduleSortFilterDialog } from 'src/app/store/app.actions';
 import { ScheduleSortingCategory } from '../../schedule-grid/schedule-sort.constants';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -80,9 +80,8 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
       .pipe(takeUntil(this.destroy$))
       .subscribe((payload: ShowSchduleSortFilterDialog) => {
         if (payload.isDialogShown) {
-          this.scheduleFiltersService.getEmpWorkCommitmentsData().pipe(takeUntil(this.destroy$),).subscribe((data: any) => {
+          this.scheduleFiltersService.getEmpWorkCommitmentsData().pipe(take(1),distinctUntilChanged(),takeUntil(this.destroy$),).subscribe((data: any) => {
             this.empWorkCommitments = data;
-            console.log(data)
             this.sortListCategories()
           });
           this.filterDialog.show();

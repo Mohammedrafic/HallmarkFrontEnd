@@ -209,6 +209,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
     this.filters = this.scheduleFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.scheduleFilterFormGroup, this.filterColumns);
     this.filteredItems = this.filteredItems.filter(filterdata => filterdata.value === true);
+    this.filters.employeeSortCategory =null;
     const chips = this.scheduleFiltersService.createChipsData(this.scheduleFilterFormGroup.getRawValue(), this.filterColumns);
     this.updateScheduleFilter.emit({ filters: this.filters, filteredItems: this.filteredItems, chipsData: chips });
     if (clearPreservedFilters) {
@@ -219,6 +220,7 @@ export class ScheduleFiltersComponent extends Destroyable implements OnInit {
 
   public applyFilter(): void {
     if (this.scheduleFilterFormGroup.valid) {
+      this.filters.employeeSortCategory =null;
       this.setFilters();
       this.store.dispatch([
         new ShowFilterDialog(false),
