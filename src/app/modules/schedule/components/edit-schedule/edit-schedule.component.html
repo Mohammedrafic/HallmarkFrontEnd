@@ -175,7 +175,7 @@
     <div class="checkbox-container bootstrap" *ngIf="selectedDaySchedule?.scheduleType === scheduleType.Book">
       <ejs-checkbox
       [(ngModel)]="isCreateReplacementPerDiemOrder"
-        [disabled]="!hasEditPermissions"
+        [disabled]="!hasEditPermissions || scheduledItem.schedule.isOnHold"
         [formControl]="createPerDiemOrderControl"
         label="Create Per Diem Order"
       ></ejs-checkbox>
