@@ -582,71 +582,109 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return null;
   }
 
-  private saveCredential({
-    status,
-    number,
-    insitute,
-    experience,
-    createdOn,
-    createdUntil,
-    completedDate,
-    rejectReason,
-  }: CandidateCredential): void {
-    if (this.masterCredentialId) {
-      if (createdOn) {
-        createdOn = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdOn));
+  private saveCredential(candidateCredential :CandidateCredential)
+  : void {
+    let VerifyCandidatesCredentialsValidationMessage:string='';
+    if(candidateCredential.status == CredentialStatus.Verified)
+    {
+      if(!this.isIRP && (this.credentialStatus==CredentialStatus.Pending || this.credentialStatus == CredentialStatus.Completed)){
+        VerifyCandidatesCredentialsValidationMessage='This credential has not been reviewed yet. Are you sure you want to Verify?';
       }
-
-      if (createdUntil) {
-        createdUntil = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdUntil));
-      }
-      
-      if (completedDate) {
-        completedDate = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(completedDate));
-      }
-
-      const file = this.getFileToUpload();
-
-      if (this.isOrganizationAgencyArea.isAgencyArea) {
-        this.store.dispatch(
-          new SaveCandidatesCredential(
-            {
-              status,
-              number,
-              insitute,
-              experience,
-              createdOn,
-              createdUntil,
-              completedDate,
-              rejectReason,
-              masterCredentialId: this.masterCredentialId,
-              id: this.credentialId as number,
-              orderId: this.orderId,
-              organizationId: this.organizationId,
-            },
-            file,
-          )
-        );
-      } else {
-        this.store.dispatch(
-          new SaveCandidatesCredential(
-            {
-              candidateProfileId: this.candidateProfileId,
-              masterCredentialId: this.masterCredentialId,
-              id: this.credentialId as number,
-              status,
-              rejectReason,
-              credentialNumber: number,
-              certifiedOn: createdOn,
-              certifiedUntil: createdUntil,
-              completedDate,
-            },
-            file,
-          )
-        );
+      else if(this.credentialStatus==CredentialStatus.Rejected){
+        VerifyCandidatesCredentialsValidationMessage='Are you sure you want to Verify a Rejected credential?';
       }
     }
+    if(VerifyCandidatesCredentialsValidationMessage)
+    {
+      this.confirmService
+      .confirm(VerifyCandidatesCredentialsValidationMessage, {
+        title: 'Confirm',
+        okButtonLabel: 'Yes',
+        okButtonClass: '',
+      })
+      .pipe(
+        filter((confirm) => confirm),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe(() => {
+        this.saveCandidateCredentials({
+          ...candidateCredential,
+        });
+      });
+    }
+    else{
+      this.saveCandidateCredentials({
+        ...candidateCredential,
+      });
+    }
+    
   }
+private saveCandidateCredentials({
+  status,
+  number,
+  insitute,
+  experience,
+  createdOn,
+  createdUntil,
+  completedDate,
+  rejectReason,
+}: CandidateCredential){
+ 
+  if (this.masterCredentialId) {
+    if (createdOn) {
+      createdOn = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdOn));
+    }
+
+    if (createdUntil) {
+      createdUntil = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdUntil));
+    }
+    
+    if (completedDate) {
+      completedDate = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(completedDate));
+    }
+
+    const file = this.getFileToUpload();
+
+    if (this.isOrganizationAgencyArea.isAgencyArea) {
+      this.store.dispatch(
+        new SaveCandidatesCredential(
+          {
+            status,
+            number,
+            insitute,
+            experience,
+            createdOn,
+            createdUntil,
+            completedDate,
+            rejectReason,
+            masterCredentialId: this.masterCredentialId,
+            id: this.credentialId as number,
+            orderId: this.orderId,
+            organizationId: this.organizationId,
+          },
+          file,
+        )
+      );
+    } else {
+      this.store.dispatch(
+        new SaveCandidatesCredential(
+          {
+            candidateProfileId: this.candidateProfileId,
+            masterCredentialId: this.masterCredentialId,
+            id: this.credentialId as number,
+            status,
+            rejectReason,
+            credentialNumber: number,
+            certifiedOn: createdOn,
+            certifiedUntil: createdUntil,
+            completedDate,
+          },
+          file,
+        )
+      );
+    }
+  }
+}
 
   private watchForSearchUpdate(): void {
     merge(

@@ -428,7 +428,7 @@ export class CandidateState {
       }),
       catchError((error: HttpErrorResponse) => {
         dispatch(new SaveCandidatesCredentialFailed());
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail? error.error.detail: getAllErrors(error.error)));
       })
     );
   }
