@@ -116,7 +116,7 @@ import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.const
 import { SearchComponent } from '@shared/components/search/search.component';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import {
-  DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG, ViewOrderIRP_PERMISSION, ViewOrderVMS_PERMISSION
+  DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG, OrganizationSettingKeys, OrganizationalHierarchy, ViewOrderIRP_PERMISSION, ViewOrderVMS_PERMISSION
 } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -261,6 +261,7 @@ import { IrpEmployeeToggleState } from '@shared/components/order-candidate-list/
 import { OrderManagementIRPRowPositionService } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.service';
 import { OrderJobType } from '@shared/enums';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
+import { SettingsViewService } from '@shared/services';
 
 @Component({
   selector: 'app-order-management-content',
@@ -527,6 +528,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
   public filterType: string = 'Contains';
   public orderDetail =new Subject<OrderManagement>();
+  public isEnableClearedToStart:boolean = false;
 
   constructor(
     protected override store: Store,
@@ -550,6 +552,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private ordergridsystemstateservice:OrderGridSystemStateService,
     public orderManagementIRPRowPositionService: OrderManagementIRPRowPositionService,
     private organizationSettingService : OrganizationSettingsService,
+    private settingService: SettingsViewService,
     @Inject(DOCUMENT) private documentEle: Document,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
@@ -675,6 +678,21 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.watchForOrderIRPSubRowClickEvent();
     this.subscribeForDeployedEmployees();
     this.watchForDeployedState();
+    this.checkEnableClearToStart();
+  }
+
+  public checkEnableClearToStart(): void {
+      this.settingService
+          .getViewSettingKey(
+            OrganizationSettingKeys.EnableClearedToStartForAcceptedCandidates,
+            OrganizationalHierarchy.Organization,
+            this.organizationId,
+            this.organizationId,
+            false,
+          ).pipe(takeUntil(this.unsubscribe$))
+            .subscribe(({ EnableClearedToStartForAcceptedCandidates }) => {
+              this.isEnableClearedToStart = JSON.parse(EnableClearedToStartForAcceptedCandidates);
+            });
   }
 
   ngOnDestroy(): void {
@@ -1283,6 +1301,11 @@ public RedirecttoIRPOrder(order:Order)
     this.reorderFilledStatus = false;
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
+        if(this.isEnableClearedToStart){
+            let newCol = { text: 'Cleared to Start', column: 'ClearedToStart' };
+            allOrdersChildColumnsToExport.splice(2, 0, newCol);
+            allOrdersChildColumnsToExport.join();
+        }
         if(this.selectedItems.filter(ele=> ele.orderType == 1).length == this.selectedItems.length){
           this.openregrateupdate = false;
         }
