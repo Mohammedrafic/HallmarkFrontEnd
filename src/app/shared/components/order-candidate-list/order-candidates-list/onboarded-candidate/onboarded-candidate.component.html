@@ -1,7 +1,7 @@
 <section class="container">
   <section class="header-container" *ngIf="candidate">
     <div class="e-card-header">
-      <div class="e-card-header-caption candidat-status w-50">
+      <div class="e-card-header-caption candidat-status w-45">
           <h3 class="e-card-title candidate-title">
             {{candidate?.lastName}}, {{candidate?.firstName}}
             <i-feather name="briefcase" class="icon deployed-icon" *ngIf="candidate?.deployedCandidateInfo && !isOnBoarded"></i-feather>

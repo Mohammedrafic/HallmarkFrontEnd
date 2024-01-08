@@ -99,6 +99,7 @@ import {
   GetOrderComments,
   ClearPredefinedBillRates,
   GetIrpOrderExtensionCandidates,
+  SaveClearToStart,  
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -158,6 +159,7 @@ import {
   OrderManagementChild,
   OrderManagementPage,
   OrdersJourneyPage,
+  clearToStartDataset,
 } from '@shared/models/order-management.model';
 import { Configuration } from '@shared/models/organization-settings.model';
 import {
@@ -527,6 +529,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
   public filterType: string = 'Contains';
   public orderDetail =new Subject<OrderManagement>();
+  public clearToStartDataset:clearToStartDataset = new clearToStartDataset();
 
   constructor(
     protected override store: Store,
@@ -3071,10 +3074,18 @@ public RedirecttoIRPOrder(order:Order)
 
   private getLocationState(): void {
     const locationState = this.location.getState() as
-      { orderId: number, orderManagementPagerState: OrderManagementPagerState };
+      { orderId: number, orderManagementPagerState: OrderManagementPagerState,candidateJobId:number, organizationId:number,clearToStartValue:boolean  };
     this.previousSelectedOrderId = locationState.orderId;
     this.orderManagementPagerState = locationState?.orderManagementPagerState;
     this.pageSize = this.orderManagementPagerState?.pageSize ?? this.pageSize;
+    if(locationState?.clearToStartValue != null){
+      this.clearToStartDataset.clearToStart = locationState?.clearToStartValue;
+      this.clearToStartDataset.jobId = locationState?.candidateJobId;
+      this.clearToStartDataset.organizationId = locationState?.organizationId;
+      this.store.dispatch(new SaveClearToStart(this.clearToStartDataset));
+      this.orderManagementService.setCurrentClearToStartVal(locationState?.clearToStartValue);
+    }
+
     this.cd.markForCheck();
   }
 

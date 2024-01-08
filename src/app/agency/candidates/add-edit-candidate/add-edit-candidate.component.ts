@@ -88,7 +88,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   public customMaskChar : string = '';
   public maskSSNPattern: string = '000-00-0000';
   public maskedSSN: string = '';
-
+  public clearToStartValue: boolean | null = null;
   private filesDetails: Blob[] = [];
   private isInitialUpload = false;
   reloadCredentials$:Subject<boolean> = new Subject<boolean>();
@@ -99,6 +99,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   public isEnableClearedToStartForAcceptedCandidates$:Subject<boolean> = new Subject<boolean>();
   public isClearedToStartEnable:boolean = true;
   public clearedToStart:boolean = false;
+  public organizationId:number;
+  public candidateJobId:number;
 
   @Select(CandidateState.isCandidateCreated)
   public isCandidateCreated$: Observable<boolean>;
@@ -509,7 +511,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
     const selectedTab = this.store.selectSnapshot(CandidateDetailsState.navigationTab);
     switch (true) {
       case location.orderId && !location.isNavigateFromCandidateDetails:
-        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderManagementPagerState: location.orderManagementPagerState } });
+        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId, orderManagementPagerState: location.orderManagementPagerState,candidateJobId:this.candidateJobId, organizationId:this.organizationId,clearToStartValue:this.clearToStartValue } });
         const selectedNavigation = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
         this.store.dispatch(new SelectNavigationTab(selectedNavigation?.current));
         break;
@@ -573,7 +575,8 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
           this.orderOrPositionTitle = 'Position';
           const navigationStateString = this.globalWindow.localStorage.getItem('navigationState');
           const navigationState = navigationStateString ? JSON.parse(navigationStateString) : null;
-
+          this.organizationId = navigationState.organizationId;
+          this.candidateJobId = navigationState.candidateJobId;
           if(navigationState){
             this.isEnableClearedToStartForAcceptedCandidates$.next(false);
             this.isClearedToStartEnable =  this.candidateStatus == ApplicantStatus.Accepted && navigationState.readonly? false : true;
@@ -600,6 +603,10 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
 
   updatedSSNValue(val:string): void {
     this.maskedSSN = val;
+  }
+
+  onClearToStartValueChange(event:boolean): void{
+    this.clearToStartValue = event;
   }
 
   private saveCandidateProfile(candidate: Candidate): void {
