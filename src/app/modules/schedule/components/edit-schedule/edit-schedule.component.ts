@@ -664,7 +664,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.setEditPermissions();
 
     if (this.selectedDaySchedule.scheduleType === ScheduleType.Book) {
-      this.scheduleFormConfig = ScheduledShiftFormConfig(this.hasEditPermissions);
+      this.scheduleFormConfig = ScheduledShiftFormConfig(this.hasEditPermissions && !isOnHold);
       this.scheduleForm = this.editScheduleService.createScheduledShiftForm();
       patchData.regionId = this.selectedDaySchedule.orderMetadata?.regionId;
       patchData.orientated = this.selectedDaySchedule.attributes.orientated;
