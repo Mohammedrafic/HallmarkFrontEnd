@@ -65,6 +65,7 @@ import {
   AllowedCredentialFileExtensions,
   CredentialSelectionSettingsModel,
   DisableEditMessage,
+  verifiedDisableEditMessage,
   StatusFieldSettingsModel,
 } from './credentials-grid.constants';
 import { AddCredentialForm, CredentialFiles, SearchCredentialForm } from './credentials-grid.interface';
@@ -115,6 +116,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public readonly maxFileSize = FileSize.MB_20;
   public readonly orderCredentialId = 0;
   public readonly disableEditMessage = DisableEditMessage;
+  public readonly verifiedDisableEditMessage =verifiedDisableEditMessage
   public readonly statusFieldSettingsModel = StatusFieldSettingsModel;
   public readonly typeFieldSettingsModel = optionFields;
   public dropElement: HTMLElement;
@@ -849,7 +851,6 @@ private saveCandidateCredentials({
     })
   }
   private setDisableAddCredentialButton(): void {
-    console.log(this.areAgencyActionsAllowed,this.isOrgVMSEnabled,this.isOrganizationSide,this.isNavigatedFromCandidateProfile,this.isIRP)
     this.disableAddCredentialButton =
       !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || (this.isOrgVMSEnabled && !this.hasPermissions())
@@ -859,14 +860,16 @@ private saveCandidateCredentials({
 
   private setGridItems(response: CandidateCredentialResponse): void {
     this.gridItems = response?.credentials.items.map((item: CandidateCredential) => {
+      const tooltipMessage = this.displayTooltip(item);
       return {
         ...item,
         credentialFile: item.credentialFiles?.length ? item.credentialFiles[0] : null,
         disableCopy: this.disableCopy(item),
         disableEdit: this.disableEdit(item),
         disableViewDocument:this.disableViewDocument(item),
+        showtoolTipmessage:tooltipMessage,
         showDisableEditTooltip:
-          (item.status === this.statusEnum.Reviewed) &&
+          (item.status === this.statusEnum.Reviewed || this.statusEnum.Verified) &&
           !this.isOrganizationSide,
         disableDelete: this.disableDelete(item),
         credentialTypeName: item.credentialType?.name,
@@ -895,6 +898,7 @@ private saveCandidateCredentials({
       !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || item.id === this.orderCredentialId
       || ((item.status === this.statusEnum.Reviewed) && !this.isOrganizationSide)
+      || ((item.status === this.statusEnum.Verified) && !this.isOrganizationSide)
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
       || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
       );
@@ -957,5 +961,14 @@ private saveCandidateCredentials({
     ])
 .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => this.cdr.markForCheck());
+  }
+  private displayTooltip(item: CandidateCredential) : string {
+    if ((item.status === this.statusEnum.Reviewed) && !this.isOrganizationSide) {
+      return this.disableEditMessage;
+    } else if ((item.status === this.statusEnum.Verified) && !this.isOrganizationSide) {
+      return this.verifiedDisableEditMessage ;
+    } else{
+      return ''
+    }
   }
 }
