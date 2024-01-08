@@ -877,7 +877,6 @@ private saveCandidateCredentials({
         credentialTypeId: item.credentialType?.id,
       };
     });
-    console.log(this.gridItems)
   }
  private disableViewDocument(item:CandidateCredential):boolean{
   let length= item.credentialFiles==null?0:item.credentialFiles?.length;
