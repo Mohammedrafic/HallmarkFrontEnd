@@ -263,9 +263,9 @@ export class UserVisibilityComponent extends AbstractGridConfigurationComponent 
   onFilterClearAll() {
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 7);
-    this.userVisibilityForm.controls['businessunitType'].setValue(3);
-    this.userVisibilityForm.controls['businessunitName'].setValue([]);
-    // this.userVisibilityForm.controls['userName'].setValue(this.userData[0]?.id);
+    // this.userVisibilityForm.controls['businessunitType'].setValue(3);
+    this.userVisibilityForm.controls['businessunitName'].setValue(this.businessValue);
+    this.userVisibilityForm.controls['userName'].setValue(null);
   }
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
@@ -380,7 +380,6 @@ export class UserVisibilityComponent extends AbstractGridConfigurationComponent 
     let { businessunitName, departmentIds, locationIds,userName,
       regionIds} = this.userVisibilityForm.getRawValue();
 
-
     regionIds = "null";
     locationIds = "null";
     departmentIds = "null";
@@ -396,7 +395,7 @@ export class UserVisibilityComponent extends AbstractGridConfigurationComponent 
       "LocationIdUV": "",
       "DepartmentIdUV":"",
       "RoleNameUV":"",
-      "UserNameUV":userName,
+      "UserNameUV":userName==""?"":this.userData.filter(x=>x.id==userName).map(x=>x.fullName).toString(),
       // "organizationNameVSR": orgName,
       "reportPulledMekssageVSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
         // "DateRangeParamVSR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
