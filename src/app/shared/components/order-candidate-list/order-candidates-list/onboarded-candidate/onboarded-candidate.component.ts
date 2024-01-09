@@ -41,7 +41,7 @@ import {
   sendOnboardCandidateEmailMessage,
   SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
-  UpdateOrganisationCandidateJobSucceed
+  UpdateOrganisationCandidateJobSucceed,
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
@@ -54,7 +54,6 @@ import {
   DELETE_CONFIRM_TITLE,
   DEPLOYED_CANDIDATE,
   deployedCandidateMessage,
-  GRID_CONFIG,
   ONBOARD_CANDIDATE,
   onBoardCandidateMessage,
   OrganizationalHierarchy,
@@ -558,11 +557,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   offeredStartDate: this.candidateJob.offeredStartDate,
                   candidatePayRate: this.candidateJob.candidatePayRate,
                 })
-              );
-
-              if (!this.reloadOnUpdate) {
-                this.closeDialog();
-              }
+              ).pipe(
+                filter(() => !this.reloadOnUpdate),
+                take(1),
+              ).subscribe(() => this.closeDialog());
             } else {
               this.jobStatusControl.reset();
               this.selectedApplicantStatus = null;
