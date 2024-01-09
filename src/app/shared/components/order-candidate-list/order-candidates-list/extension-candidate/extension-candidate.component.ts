@@ -787,6 +787,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       ).pipe(
         takeUntil(this.destroy$)
       ).subscribe(() => {
+        this.form.markAsPristine();
         this.store.dispatch(
           this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists()
         );
