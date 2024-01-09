@@ -121,7 +121,7 @@ import {
 } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
-import { OrderStatus } from '@shared/enums/order-management';
+import { DeletedStatus, OrderStatus } from '@shared/enums/order-management';
 import {
   OrderManagementIRPSystemId,
   OrderManagementIRPTabs,
@@ -412,6 +412,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
   public OrderManagementIRPTabsIndex = OrderManagementIRPTabsIndex;
   public orderStatus = OrderStatus;
+  public deletedStatus = DeletedStatus;
   public reOrderCount$ = new Subject<number>();
   public orderTypes = OrderType;
   public orderTypeTooltipMessage = VmsOrderTypeTooltipMessage;
@@ -1253,7 +1254,8 @@ public RedirecttoIRPOrder(order:Order)
       reOrderDate: this.filters.reOrderDate || null,
       shift:this.filters.shift || null,
       orderLocked:this.filters.orderLocked || null,
-      orderDistributionType:this.filters.orderDistributionType || null
+      orderDistributionType:this.filters.orderDistributionType || null,
+      showDeletedOrders: this.filters.showDeletedOrders || null
     });
 
     if (!prepopulate) {
@@ -3363,6 +3365,10 @@ public RedirecttoIRPOrder(order:Order)
   private getMoreMenuDataSource(order: OrderManagement): ItemModel[] {
     if (order.status === this.orderStatus.Closed) {
       return this.threeDotsMenuOptions['closedOrderMenu'];
+    }
+    if(order.statusText === this.deletedStatus.Deleted)
+    {
+      return this.threeDotsMenuOptions['deletedOrderMenu'];
     }
     if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
       return this.getMenuForReorders(order);
