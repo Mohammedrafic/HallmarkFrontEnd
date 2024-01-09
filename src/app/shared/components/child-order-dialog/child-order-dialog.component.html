@@ -39,10 +39,10 @@
           <div class="e-card-content dialog-controls">
             <ng-container *ngIf="(extensions$ | async) as extensions">
               <app-button
-                *ngIf="showAddExtension && !isAgency && extensions.length === 0"
+                *ngIf="showAddExtension && !isAgency"
                 (clickEmitter)="showExtensionDialog()"
                 [type]="buttonTypeEnum.OUTLINED"
-                [disabled]="disableAddExtension || isAgencySuspended || isdisabledExtension"
+                [disabled]="disableAddExtension || isAgencySuspended || isdisabledExtension || extensions.length > 0"
                 text="Add Extension"
               ></app-button>
             </ng-container>
