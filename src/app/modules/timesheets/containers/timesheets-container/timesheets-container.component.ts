@@ -229,7 +229,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public updateTableByFilters(filters: TimesheetsFilterState): void {
-    const mappedFilters = {...filters, orderIds: filters.orderIds ? [filters.orderIds as string] : filters.orderIds};
+    const mappedFilters = {...filters, orderIds: filters.orderIds ? [filters.orderIds as string] : filters.orderIds,pageNumber:1};
     this.store.dispatch([
       new PreservedFilters.SaveFiltersByPageName(this.getPageName(), mappedFilters),
       new Timesheets.UpdateFiltersState(
