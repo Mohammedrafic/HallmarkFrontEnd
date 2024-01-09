@@ -124,7 +124,7 @@
           </div>
         </div>
         <div class="input-container calendar">
-          <label>Order/Actual Start Date To</label>
+          <label>Order/Actual Start Date To<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="StartDateTo" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                             formControlName="StartDateTo" [min]="candidateJourneyForm.controls['StartDateFrom'].value"
@@ -138,7 +138,7 @@
     <div class="form-element">
       <div class="group">
         <div class="input-container calendar">
-          <label>Order/Actual End Date From<span class="required">*</span></label>
+          <label>Order/Actual End Date From</label>
           <div class="input-group datepicker">
             <ejs-datepicker id="EndDateFrom" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
                             appValidateWithMessage formControlName="EndDateFrom" [disabled]="periodIsDefault"
