@@ -2,6 +2,7 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
 import { MessageTypes } from '../shared/enums/message-types';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsMspAreaStateModel } from '../shared/models/is-msp-area-state.model';
+import { IsAdminAreaStateModel } from '../shared/models/is-admin-area.model';
 
 export class ToggleMobileView {
   static readonly type = '[app] Toggle mobile view layout';
@@ -76,8 +77,13 @@ export class SetIsOrganizationAgencyArea {
 }
 
 export class SetIsMspArea {
-  static readonly type = '[app] Set Is  MSP Area';
+  static readonly type = '[app] Set Is MSP Area';
   constructor(public payload: IsMspAreaStateModel) { }
+}
+
+export class SetIsAdminArea {
+  static readonly type = '[app] Set Is Admin Area';
+  constructor(public payload: IsAdminAreaStateModel) { }
 }
 
 export class ShowEmailSideDialog {
