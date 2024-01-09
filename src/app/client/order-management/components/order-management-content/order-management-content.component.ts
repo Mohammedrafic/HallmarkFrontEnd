@@ -2056,7 +2056,7 @@ public RedirecttoIRPOrder(order:Order)
 
   private onReloadOrderCandidatesLists(): void {
     this.actions$
-      .pipe(ofActionSuccessful(ReloadOrganisationOrderCandidatesLists), takeUntil(this.unsubscribe$))
+      .pipe(ofActionDispatched(ReloadOrganisationOrderCandidatesLists), takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, this.selectedOrder.organizationId as number,
           !!this.selectedOrder.irpOrderMetadata);
