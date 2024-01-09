@@ -216,8 +216,8 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       {
         businessIds: new FormControl([Validators.required]),
         StartDateFrom: new FormControl(StartDateFrom, [Validators.required]),
-        StartDateTo: new FormControl(new Date(Date.now())),
-        EndDateFrom: new FormControl(StartDateFrom, [Validators.required]),
+        StartDateTo: new FormControl(new Date(Date.now()), [Validators.required]),
+        EndDateFrom: new FormControl(StartDateFrom),
         EndDateTo: new FormControl(new Date(Date.now())),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
