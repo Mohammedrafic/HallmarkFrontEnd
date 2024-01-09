@@ -324,7 +324,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   get isdisabledExtension(): boolean {
     if(this.order?.extensionFromId != null && this.candidate?.extensionFromId != null){
       return true;
-    }else if(this.candidate?.extensionFromId && this.order?.extensionFromId == null){
+    }else if(this.candidate?.extensionFromId || this.order?.extensionFromId == null){
       return this.extensions?.length > 0 ? true : false;
     }else{
       return false;
