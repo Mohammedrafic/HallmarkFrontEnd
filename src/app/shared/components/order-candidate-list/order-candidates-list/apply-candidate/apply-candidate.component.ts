@@ -10,7 +10,7 @@ import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from '@agency/store/
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
-import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
 import { Comment } from '@shared/models/comment.model';
@@ -39,7 +39,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
-  @Input() order: any;
+  @Input() order: Order;
   @Input() isTab = false;
   @Input() isAgency = false;
   @Input() isLocked: boolean | undefined = false;
@@ -81,7 +81,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public canCreateOrder : boolean;
 
   get candidateStatus(): ApplicantStatus {
-    return this.candidate.status || (this.candidate.candidateStatus as any);
+    return this.candidate.status || (this.candidate.candidateStatus as ApplicantStatus);
   }
 
   get isDeployedCandidate(): boolean {
@@ -94,6 +94,10 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   get isAcceptedCandidate(): boolean {
     return this.candidateStatus === ApplicantStatus.Accepted;
+  }
+
+  get isOrderFilled(): boolean {
+    return this.order.status === OrderStatus.Filled;
   }
 
   constructor(
