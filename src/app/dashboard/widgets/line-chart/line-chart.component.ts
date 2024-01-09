@@ -176,7 +176,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   public redirectToSourceContent(status : WidgetLegengDataModel ): void {
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
-      this.dashboardService.redirectToUrl('agency/order-management',undefined,status.label);
+      // EIN-28211 this.dashboardService.redirectToUrl('agency/order-management',undefined,status.label);
     } else {
       this.dashboardService.redirectToUrl('client/order-management',undefined,status.label);
     }

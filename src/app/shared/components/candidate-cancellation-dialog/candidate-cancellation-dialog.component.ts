@@ -30,7 +30,6 @@ import { Penalty } from '@shared/models/penalty.model';
 import {
   ClearCandidateCancellationReason,
   GetCandidateCancellationReason,
-  GetRejectReasonsForOrganisation,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { DateTimeHelper } from '@core/helpers';
