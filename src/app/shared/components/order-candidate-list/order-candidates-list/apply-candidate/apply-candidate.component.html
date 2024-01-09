@@ -19,7 +19,7 @@
           <button
             ejs-button
             [isPrimary]="true"
-            [disabled]="isLocked || !actionsAllowed || !canApplyCandidate || candidate?.partnershipStatus === partnershipStatus.Suspended"
+            [disabled]="isLocked || isOrderFilled || !actionsAllowed || !canApplyCandidate || candidate?.partnershipStatus === partnershipStatus.Suspended"
             class="apply-button"
             (click)="applyOrderApplicants()">
             Apply
