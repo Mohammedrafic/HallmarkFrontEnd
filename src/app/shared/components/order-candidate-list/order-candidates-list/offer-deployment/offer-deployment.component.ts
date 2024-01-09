@@ -302,7 +302,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   deletedBillRateIds: this.billRatesSyncService.getDeletedBillRateIds(),
                 })
               ).pipe(
-                takeUntil(this.unsubscribe$)
+                take(1),
               ).subscribe(() => {
                 this.billRatesSyncService.resetDeletedBillRateIds();
                 this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
@@ -314,10 +314,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                     )
                   );
                 }
+                if (!reloadJob) {
+                  this.closeDialog();
+                }
               });
-            if (!reloadJob) {
-              this.closeDialog();
-            }
           } else {
             this.resetStatusControl();
           }
