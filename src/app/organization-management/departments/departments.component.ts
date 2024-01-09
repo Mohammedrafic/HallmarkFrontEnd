@@ -310,8 +310,10 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.bulkaction=0;
         this.bulkactionnotvalidlocationnmaes=locationNames;
         this.bulkactionmessage = payload.payload.message;
+        const departmentName= this.bulkactionnotvalidlocationnmaes.toString();
+        this.bulkactionmessage='Following Department cannot be Updated:'+departmentName +' '+ this.bulkactionmessage;
+       this.store.dispatch(new ShowToast(MessageTypes.Error, this.bulkactionmessage));
 
-        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
       }
       else{
         this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Update_Department));
@@ -331,7 +333,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.bulkactionnotvalidlocationnmaes=[];
         this.bulkaction=0;
         this.clearSelection(this.grid);
-        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+        this.bulkactionmessage='Selected Records are not updated. They have '+ this.bulkactionmessage;
+        this.store.dispatch(new ShowToast(MessageTypes.Error, this.bulkactionmessage));
         this.getDepartments();
         this.isbulkedit=false;
 
@@ -352,7 +355,9 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.bulkaction=1;
         this.bulkactionnotvalidlocationnmaes=locationNames;
         this.bulkactionmessage = payload.payload.message;
-        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+        const departmentName= this.bulkactionnotvalidlocationnmaes.toString();
+        this.bulkactionmessage='This Department cannot be deleted. '+departmentName +' This Department was used in  '+ this.bulkactionmessage;
+       this.store.dispatch(new ShowToast(MessageTypes.Error, this.bulkactionmessage));
       }
       else{
         this.store.dispatch(new ShowToast(MessageTypes.Success, Bulk_Delete_Department));
@@ -371,7 +376,9 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
         this.bulkactionnotvalidlocationnmaes=locationNames;
         this.bulkaction=1;
         this.clearSelection(this.grid);
-        this.store.dispatch(new ShowBulkLocationActionDialog(true,this.bulkactionmessage));
+        const departmentName= this.bulkactionnotvalidlocationnmaes.toString();
+        this.bulkactionmessage='This Department cannot be deleted. '+departmentName +' This Department was used in  '+ this.bulkactionmessage;
+       this.store.dispatch(new ShowToast(MessageTypes.Error, this.bulkactionmessage));
         this.getDepartments();
         this.isbulkedit=false;
         this.isbulkdelete=false;
