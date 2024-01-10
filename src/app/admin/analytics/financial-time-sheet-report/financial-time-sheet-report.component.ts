@@ -212,7 +212,9 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       this.onFilterSkillCategoryChangedHandler();
       this.onFilterTimesheetStatusesChangedHandler();
       if (this.user)
-        this.user.businessUnitType == (BusinessUnitType.Hallmark || BusinessUnitType.MSP) ? this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+        if (this.user.businessUnitType == BusinessUnitType.Hallmark || this.user.businessUnitType == BusinessUnitType.MSP) {
+          this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
+        } else { this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable(); }
     });
   }
 

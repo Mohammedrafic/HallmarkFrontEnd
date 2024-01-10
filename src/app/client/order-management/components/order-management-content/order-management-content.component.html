@@ -1613,6 +1613,19 @@
         </div>
       </div>
     </div>
+    <div *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">
+      <div class="input-group datepicker">
+        <div class="form-elemet">
+          <div class="group">
+            <div class="input-container calendar">
+              <ejs-switch onLabel="Yes"  formControlName="showDeletedOrders"  offLabel="No" [checked]=false></ejs-switch>
+
+              <label class="switch-label">Show Deleted Orders </label>
+            </div>
+          </div>
+        </div>   
+      </div>
+    </div>
   </form>
 </app-filter-dialog>
 
