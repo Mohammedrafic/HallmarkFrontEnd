@@ -140,7 +140,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit,
 
     } else if (this.calculatedLeftAmount > 0 && !balanceCovered) {
       this.confirmService.confirm(
-        PaymentMessages.partialyCovered(this.paymentService.findPartialyCoveredIds(this.paymentsForm)),
+        PaymentMessages.partialyCovered(this.paymentService.getFormatedInvoiceIds(this.paymentService.findPartialyCoveredIds(this.paymentsForm))),
         {
           title: 'Check Payment Amount',
           okButtonLabel: 'Yes',
@@ -158,7 +158,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit,
       this.store.dispatch(new ShowToast(MessageTypes.Error, PaymentMessages.negativeAmount));
     } else if (this.calculatedLeftAmount === 0 && !balanceCovered) {
       this.confirmService.confirm(
-        PaymentMessages.partialyNullAmount(this.paymentService.findPartialyCoveredIds(this.paymentsForm)),
+        PaymentMessages.partialyNullAmount(this.paymentService.getFormatedInvoiceIds(this.paymentService.findPartialyCoveredIds(this.paymentsForm))),
         {
           title: 'Check Payment Amount',
           okButtonLabel: 'Yes',
@@ -184,7 +184,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit,
       filter(Boolean),
       switchMap(() => {
         delete this.paymentsForm[invoiceId];
-
+        delete this.paymentsForm[invoiceDbid+"~"+invoiceId];
         this.tableData = this.tableData.filter((payment) => payment.invoiceNumber !== invoiceId);
         this.totalAmount = this.tableData.reduce((acc, item) => acc + item.amount, 0);
 
@@ -239,7 +239,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit,
   private setTableData(): void {
     this.paymentsForm = this.paymentService.createPaymentsForm(this.invoicesToPay);
     this.tableData = this.paymentService.createTableData(this.invoicesToPay, this.paymentsForm);
-    this.calcLeftAmount();
+     this.calcLeftAmount();
     this.cd.markForCheck();
   }
 
@@ -266,17 +266,19 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit,
         date: DateTimeHelper.setCurrentTimeZone(this.invoiceindividualData?.paymentDate)
       });
 
-      this.initialAmount = response.check.initialAmount;
+      this.initialAmount = response.check.initialAmount;      
+      delete this.paymentsForm[this.invoicesToPay[0].invoiceNumber];
       const tableRecords = this.paymentService.mergeTableData(this.tableData, response.payments, this.paymentsForm);
 
       this.invoicesToPay = this.paymentService.createInitialInvoicesData(response, this.invoicesToPay);
       this.tableData = tableRecords;
-      this.calcLeftAmount();
+      this.totalAmount = this.tableData.reduce((acc, item) => acc + item.amount, 0);     
+     this.calcLeftAmount();
       this.cd.markForCheck();
     });
   }
 
-  private calcLeftAmount(): void {
+  private calcLeftAmount(): void {  
     this.calculatedLeftAmount = this.paymentService.calculateCheckAmount(this.paymentsForm, this.initialAmount);
   }
 

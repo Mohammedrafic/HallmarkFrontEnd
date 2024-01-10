@@ -128,7 +128,7 @@ export const PaymentMessages = {
     amount and ${ids.join(', ')} is/are partially paid. Are you sure you want to proceed?`;
   },
   partialyNullAmount: (ids: string[]): string => {
-    return `Please note that invoices ${ids.join(', ')} is/are partially paid. Are you sure you want to proceed?`;
+      return `Please note that invoices ${ids.join(', ')} is/are partially paid. Are you sure you want to proceed?`;
   },
   lowerAmount: 'Please note that amount assigned to invoices is lower than check amount. Are you sure you want to proceed?',
   negativeAmount: 'Please note that amount assigned to invoices is higher than check amount',
