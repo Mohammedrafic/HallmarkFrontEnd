@@ -40,7 +40,7 @@ import { toNumber, uniqBy } from 'lodash';
   templateUrl: './opd-credentials-expiry.component.html',
   styleUrls: ['./opd-credentials-expiry.component.scss']
 })
-export class OPDCredentialsExpiryComponent implements OnInit {
+export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
   public paramsData: any = {
     "OrganizationParamCREXP": "",
     "StartDateParamCREXP": "",
@@ -172,8 +172,7 @@ export class OPDCredentialsExpiryComponent implements OnInit {
   ngOnInit(): void {
 
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
-      this.agencyOrganizationId = data;
-      this.loadperiod();
+    
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
 
@@ -207,7 +206,8 @@ export class OPDCredentialsExpiryComponent implements OnInit {
         }
       });
       
-      
+      this.agencyOrganizationId = data;
+      this.loadperiod();
       this.organizationData$.pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$)).subscribe((data) => {
         if (data != null && data.length > 0) {
           this.organizations = uniqBy(data, 'organizationId');
@@ -402,7 +402,7 @@ export class OPDCredentialsExpiryComponent implements OnInit {
 
 
               this.changeDetectorRef.detectChanges();
-              this.SearchReport();
+              setTimeout(() => { this.SearchReport(); }, 3000)
             }
           });
           this.regions = this.regionsList;
@@ -624,7 +624,7 @@ export class OPDCredentialsExpiryComponent implements OnInit {
       return;
     }
     this.filteredItems = [];
-    this.SearchReport();
+    setTimeout(() => { this.SearchReport(); }, 3000)
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
