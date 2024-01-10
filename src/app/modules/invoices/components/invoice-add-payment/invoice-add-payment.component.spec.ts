@@ -25,7 +25,7 @@ describe('InvoiceAddPaymentComponent', () => {
   const storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'snapshot', 'select']);
   const addInvoiceAddPaymentService = jasmine.createSpyObj('InvoiceAddPaymentService',
     ['createCheckForm', 'calcBalanceCovered', 'findPartialyCoveredIds',
-      'createTableData', 'mergeTableData', 'createInitialInvoicesData', 'calculateCheckAmount']);
+      'createTableData', 'mergeTableData', 'createInitialInvoicesData', 'calculateCheckAmount','getFormatedInvoiceIds']);
   const confirmServiceSpy = jasmine.createSpyObj('ConfirmService', ['confirm']);
   const invoicesApiServiceSpy = jasmine.createSpyObj('InvoicesApiService', ['deletePayment', 'getCheckData']);
   const formSpy = jasmine.createSpyObj('FormGroup', ['get', 'patchValue']);
@@ -119,12 +119,14 @@ describe('InvoiceAddPaymentComponent', () => {
     });
   });
 
-  xit('savePayment method should show confirm dialog with a partialyCovered message', () => {
+  it('savePayment method should show confirm dialog with a partialyCovered message', () => {
     const ids = ['1', '2'];
     addInvoiceAddPaymentService.calcBalanceCovered.calls.reset();
     addInvoiceAddPaymentService.calcBalanceCovered.and.returnValue(false);
     addInvoiceAddPaymentService.findPartialyCoveredIds.calls.reset();
     addInvoiceAddPaymentService.findPartialyCoveredIds.and.returnValue(ids);
+    addInvoiceAddPaymentService.getFormatedInvoiceIds.calls.reset();
+    addInvoiceAddPaymentService.getFormatedInvoiceIds.and.returnValue(ids);
     confirmServiceSpy.confirm.calls.reset();
     confirmServiceSpy.confirm.and.returnValue(EMPTY);
     formSpy.valid = true;
@@ -155,12 +157,14 @@ describe('InvoiceAddPaymentComponent', () => {
     expect(storeSpy.dispatch).toHaveBeenCalledOnceWith(new ShowToast(MessageTypes.Error, PaymentMessages.negativeAmount));
   });
 
-  xit('savePayment method should show confirm dialog with a partialyNullAmount message', () => {
+  it('savePayment method should show confirm dialog with a partialyNullAmount message', () => {
     const ids = ['1', '2'];
     addInvoiceAddPaymentService.calcBalanceCovered.calls.reset();
     addInvoiceAddPaymentService.calcBalanceCovered.and.returnValue(false);
     addInvoiceAddPaymentService.findPartialyCoveredIds.calls.reset();
     addInvoiceAddPaymentService.findPartialyCoveredIds.and.returnValue(ids);
+    addInvoiceAddPaymentService.getFormatedInvoiceIds.calls.reset();
+    addInvoiceAddPaymentService.getFormatedInvoiceIds.and.returnValue(ids);
     confirmServiceSpy.confirm.calls.reset();
     confirmServiceSpy.confirm.and.returnValue(EMPTY);
     formSpy.valid = true;
