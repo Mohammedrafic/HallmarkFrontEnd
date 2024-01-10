@@ -61,12 +61,12 @@ export class InvoiceAddPaymentService {
     if (!payments || !payments.length) {
       return tableData;
     }
-
+  
     payments.forEach((payment) => {
       const initialAmount = (payment.amountToPay as number) + payment.payment;
       const form = this.createPaymentGroup(initialAmount, payment.amountToPay);
-      paymentsForm[payment.formattedInvoiceId as string] = form;
-
+      paymentsForm[payment.id as number +'~'+ payment.formattedInvoiceId as string] = form;  
+  
       form.get('amount')?.patchValue(payment.payment);
       form.get('balance')?.patchValue(payment.amountToPay);
 
@@ -79,7 +79,7 @@ export class InvoiceAddPaymentService {
         group: form,
       });
 
-      paymentsForm[payment.formattedInvoiceId as string].get('id')?.patchValue(payment.id,
+      paymentsForm[payment.id as number +'~'+ payment.formattedInvoiceId as string].get('id')?.patchValue(payment.id,
         { emitEvent: false, onlySelf: true });
     });
 
@@ -136,7 +136,7 @@ export class InvoiceAddPaymentService {
     return invoicesData;
   }
 
-  private createPaymentGroup(
+  private createPaymentGroup(    
     initAmount: number | null = null,
     initBalance: number | null = null): CustomFormGroup<PaymentForm> {
     return this.fb.group({
