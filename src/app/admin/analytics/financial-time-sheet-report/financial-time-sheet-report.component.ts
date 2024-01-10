@@ -68,7 +68,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     "PeriodParamFTS":""
 
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
   public title: string = "Financial Timesheet";
   public message: string = "";
