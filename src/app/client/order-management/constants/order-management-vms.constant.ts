@@ -198,6 +198,11 @@ export const initOrderManagementFilterColumns = () => ({
     valueType: ValueType.Text,
     checkBoxTitle: 'IRP Only',
   },
+  showDeletedOrders: {
+    type: ControlTypes.Checkbox,
+    valueType: ValueType.Text,
+    checkBoxTitle: 'showDeletedOrders',
+  },
   orderLocked: {
     type: ControlTypes.Dropdown,
     valueType: ValueType.Id,
