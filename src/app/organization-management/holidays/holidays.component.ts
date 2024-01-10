@@ -44,7 +44,6 @@ import { DateTimeHelper } from '@core/helpers';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { MessageTypes } from '@shared/enums/message-types';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { SelectedSystems } from '@shared/components/credentials-list/constants';
@@ -710,12 +709,11 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       takeUntil(this.unsubscribe$)
     )
     .subscribe((organization : Organization) => {
-      const isOrgUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
       this.selectedSystem = {
         isIRP: !!organization.preferences.isIRPEnabled,
         isVMS: !!organization.preferences.isVMCEnabled,
       };
-      this.grid.refresh()
+      this.grid?.refresh();
     });
   }
 }

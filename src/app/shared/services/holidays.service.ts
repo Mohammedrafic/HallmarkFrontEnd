@@ -115,9 +115,9 @@ export class HolidaysService {
    * Remove holiday by its id
    * @param holiday
    */
-  public removeOrganizationHoliday(holiday: OrganizationHoliday): Observable<any> {
-    return this.http.delete<any>(`/api/OrganizationHolidays`, {
-      body: { masterHolidayId: holiday.masterHolidayId || 0, orgHolidayId: holiday.id || 0 }
+  public removeOrganizationHoliday(holiday: OrganizationHoliday): Observable<OrganizationHoliday> {
+    return this.http.delete<OrganizationHoliday>(`/api/OrganizationHolidays`, {
+      body: { masterHolidayId: holiday.masterHolidayId || 0, orgHolidayId: holiday.id || 0 },
     });
   }
 
