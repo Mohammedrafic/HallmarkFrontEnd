@@ -797,6 +797,7 @@ export class OrderFilter {
   orderLocked? : any | null;
   ltaOrder? : boolean | null;
   orderDistributionType? : number | null;
+  showDeletedOrders?: boolean | null;
 }
 
 export class SortModel {

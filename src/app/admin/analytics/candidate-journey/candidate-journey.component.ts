@@ -204,8 +204,10 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
       this.onFilterSkillCategoryChangedHandler();
-
-      this.user?.businessUnitType == (BusinessUnitType.Hallmark || BusinessUnitType.MSP) ? this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      if (this.user)
+        if (this.user.businessUnitType == BusinessUnitType.Hallmark || this.user.businessUnitType == BusinessUnitType.MSP) {
+          this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
+        } else { this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable(); }
     });
   }
 
@@ -216,8 +218,8 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       {
         businessIds: new FormControl([Validators.required]),
         StartDateFrom: new FormControl(StartDateFrom, [Validators.required]),
-        StartDateTo: new FormControl(new Date(Date.now())),
-        EndDateFrom: new FormControl(StartDateFrom, [Validators.required]),
+        StartDateTo: new FormControl(new Date(Date.now()), [Validators.required]),
+        EndDateFrom: new FormControl(StartDateFrom),
         EndDateTo: new FormControl(new Date(Date.now())),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
@@ -516,7 +518,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       }
     }
     let { businessIds, candidateStatuses, departmentIds, jobId,
-      jobStatuses, locationIds, orderTypes, regionIds, skillCategoryIds, skillIds, StartDateFrom, StartDateTo,EndDateFrom,EndDateTo, period }
+      jobStatuses, locationIds, orderTypes, regionIds, skillCategoryIds, skillIds, StartDateFrom, StartDateTo, EndDateFrom, EndDateTo, period }
       = this.candidateJourneyForm.getRawValue();
     if (!this.candidateJourneyForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 30 days";
@@ -683,10 +685,18 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    let StartDateFrom = new Date(Date.now());
-    StartDateFrom.setDate(StartDateFrom.getDate() - 30);
-    let EndDateFrom = new Date(Date.now());
-    StartDateFrom.setDate(EndDateFrom.getDate() - 30);
+
+    let StartDateFromControl = new Date(Date.now());
+    let StartDateToControl = new Date(Date.now());
+    let EndDateFromControl = new Date(Date.now());
+    let EndDateToControl = new Date(Date.now());
+
+
+    StartDateFromControl.setDate(StartDateFromControl.getDate() - 30);
+    EndDateFromControl.setDate(EndDateFromControl.getDate() - 30);
+
+
+
 
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
@@ -697,10 +707,13 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.OrderTypes)?.setValue([]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.JobStatuses)?.setValue([]);
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue(StartDateFrom);
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateTo)?.setValue(new Date(Date.now()));
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue(EndDateFrom);
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue(new Date(Date.now()));
+
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue(((StartDateFromControl)));
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateTo)?.setValue(((StartDateToControl)));
+
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue(((EndDateFromControl)));
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue(((EndDateToControl)));
+
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
     this.filteredItems = [];

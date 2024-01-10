@@ -193,6 +193,9 @@ export const ThreeDotsMenuOptions = (
   moreMenuAddReOrderButton: [
     { text: MoreMenuType[5], id: '5', disabled: !canCreateOrder },
   ],
+  deletedOrderMenu: [
+    { text: MoreMenuType[6], id: '6', disabled: !canCreateOrder },
+  ],
 });
 
 export const PositionGridCell = {

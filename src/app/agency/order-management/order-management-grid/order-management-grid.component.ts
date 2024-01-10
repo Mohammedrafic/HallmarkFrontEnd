@@ -17,7 +17,7 @@ import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
 
 import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
   DetailRowService,
@@ -234,6 +234,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     });
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if(this.filterColumns.regionIds.dataSource.length > 0 && this.isRedirectedFromDashboard){       
+        this.isRedirectedFromDashboard=false;
+        this.patchFilterForm();
+        this.prepopulateAgencyFilterFormStructure();
+      }
       this.ordersPage = data;
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
       if(this.ordersPage?.items){
@@ -251,7 +256,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onCommentRead();
     this.listenRedirectFromPerDiem();
     this.listenRedirectFromReOrder();
-    this.getPreservedFiltersByPageName();
+    if(!this.isRedirectedFromDashboard){
+      this.getPreservedFiltersByPageName();
+    }
+
   }
 
   ngOnDestroy(): void {
@@ -570,7 +578,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private setDefaultStatuses(orderStatusesList: OrderStatusesList, setDefaultFilters: boolean): void {
-    if(this.ltaOrder){
+    if(this.ltaOrder || this.isRedirectedFromDashboard){
       this.clearFilters();
     }
     if(this.Organizations.length > 0){
@@ -657,18 +665,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.filters.ltaOrder = this.ltaOrder;
       }
       if(this.Organizations.length > 0){
-        this.OrderFilterFormGroup.get('organizationIds')?.setValue((this.Organizations.length > 0) ? this.Organizations : undefined);
         this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
       }else{
         this.Organizations = this.filters.organizationIds && this.filters.organizationIds?.length > 0 ? this.filters.organizationIds : this.Organizations;
-        this.OrderFilterFormGroup.get('organizationIds')?.setValue(this.filters.organizationIds);
       }
-      this.OrderFilterFormGroup.get('regionIds')?.setValue(this.filters.regionIds);
-      this.OrderFilterFormGroup.get('locationIds')?.setValue(this.filters.locationIds);
-      this.OrderFilterFormGroup.get('departmentsIds')?.setValue(this.filters.departmentsIds);
-      this.OrderFilterFormGroup.get('skillIds')?.setValue(this.filters.skillIds);
-      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
-      this.filteredItems$.next(this.filteredItems.length);
+      this.patchFilterForm();
+      this.prepopulateAgencyFilterFormStructure();
     }
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     this.filters.orderBy = this.orderBy;
@@ -723,7 +725,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     this.checkSelectedChildrenItem();
     this.cd.detectChanges();
-    this.isRedirectedFromDashboard=false;
   }
 
   public onGridCreated(): void {
@@ -1156,7 +1157,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private onReloadOrderCandidatesLists(): void {
     this.actions$
       .pipe(
-        ofActionSuccessful(ReloadOrderCandidatesLists),
+        ofActionDispatched(ReloadOrderCandidatesLists),
         takeWhile(() => this.isAlive)
       )
       .subscribe(() => {

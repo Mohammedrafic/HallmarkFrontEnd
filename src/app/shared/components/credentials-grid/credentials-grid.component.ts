@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { OutsideZone } from '@core/decorators';
@@ -41,6 +41,7 @@ import { CredentialGridService } from '@agency/services/credential-grid.service'
 import { AbstractGridConfigurationComponent } from
   '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { 
+  CLEAR_START_ON,
   DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADD, RECORD_MODIFIED, RECORD_UNSAVED
 } from '@shared/constants/messages';
 import { optionFields } from '@shared/constants';
@@ -65,6 +66,7 @@ import {
   AllowedCredentialFileExtensions,
   CredentialSelectionSettingsModel,
   DisableEditMessage,
+  verifiedDisableEditMessage,
   StatusFieldSettingsModel,
 } from './credentials-grid.constants';
 import { AddCredentialForm, CredentialFiles, SearchCredentialForm } from './credentials-grid.interface';
@@ -107,6 +109,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() clearedToStart: boolean = false;
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
+  @Output() clearToStartValueChange = new EventEmitter<boolean>();
 
   public readonly statusEnum = CredentialStatus;
   public readonly userPermissions = UserPermissions;
@@ -115,6 +118,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public readonly maxFileSize = FileSize.MB_20;
   public readonly orderCredentialId = 0;
   public readonly disableEditMessage = DisableEditMessage;
+  public readonly verifiedDisableEditMessage =verifiedDisableEditMessage
   public readonly statusFieldSettingsModel = StatusFieldSettingsModel;
   public readonly typeFieldSettingsModel = optionFields;
   public dropElement: HTMLElement;
@@ -582,71 +586,109 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return null;
   }
 
-  private saveCredential({
-    status,
-    number,
-    insitute,
-    experience,
-    createdOn,
-    createdUntil,
-    completedDate,
-    rejectReason,
-  }: CandidateCredential): void {
-    if (this.masterCredentialId) {
-      if (createdOn) {
-        createdOn = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdOn));
+  private saveCredential(candidateCredential :CandidateCredential)
+  : void {
+    let VerifyCandidatesCredentialsValidationMessage:string='';
+    if(candidateCredential.status == CredentialStatus.Verified)
+    {
+      if(!this.isIRP && (this.credentialStatus==CredentialStatus.Pending || this.credentialStatus == CredentialStatus.Completed)){
+        VerifyCandidatesCredentialsValidationMessage='This credential has not been reviewed yet. Are you sure you want to Verify?';
       }
-
-      if (createdUntil) {
-        createdUntil = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdUntil));
-      }
-      
-      if (completedDate) {
-        completedDate = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(completedDate));
-      }
-
-      const file = this.getFileToUpload();
-
-      if (this.isOrganizationAgencyArea.isAgencyArea) {
-        this.store.dispatch(
-          new SaveCandidatesCredential(
-            {
-              status,
-              number,
-              insitute,
-              experience,
-              createdOn,
-              createdUntil,
-              completedDate,
-              rejectReason,
-              masterCredentialId: this.masterCredentialId,
-              id: this.credentialId as number,
-              orderId: this.orderId,
-              organizationId: this.organizationId,
-            },
-            file,
-          )
-        );
-      } else {
-        this.store.dispatch(
-          new SaveCandidatesCredential(
-            {
-              candidateProfileId: this.candidateProfileId,
-              masterCredentialId: this.masterCredentialId,
-              id: this.credentialId as number,
-              status,
-              rejectReason,
-              credentialNumber: number,
-              certifiedOn: createdOn,
-              certifiedUntil: createdUntil,
-              completedDate,
-            },
-            file,
-          )
-        );
+      else if(this.credentialStatus==CredentialStatus.Rejected){
+        VerifyCandidatesCredentialsValidationMessage='Are you sure you want to Verify a Rejected credential?';
       }
     }
+    if(VerifyCandidatesCredentialsValidationMessage)
+    {
+      this.confirmService
+      .confirm(VerifyCandidatesCredentialsValidationMessage, {
+        title: 'Confirm',
+        okButtonLabel: 'Yes',
+        okButtonClass: '',
+      })
+      .pipe(
+        filter((confirm) => confirm),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe(() => {
+        this.saveCandidateCredentials({
+          ...candidateCredential,
+        });
+      });
+    }
+    else{
+      this.saveCandidateCredentials({
+        ...candidateCredential,
+      });
+    }
+    
   }
+private saveCandidateCredentials({
+  status,
+  number,
+  insitute,
+  experience,
+  createdOn,
+  createdUntil,
+  completedDate,
+  rejectReason,
+}: CandidateCredential){
+ 
+  if (this.masterCredentialId) {
+    if (createdOn) {
+      createdOn = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdOn));
+    }
+
+    if (createdUntil) {
+      createdUntil = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(createdUntil));
+    }
+    
+    if (completedDate) {
+      completedDate = DateTimeHelper.setInitHours(DateTimeHelper.setUtcTimeZone(completedDate));
+    }
+
+    const file = this.getFileToUpload();
+
+    if (this.isOrganizationAgencyArea.isAgencyArea) {
+      this.store.dispatch(
+        new SaveCandidatesCredential(
+          {
+            status,
+            number,
+            insitute,
+            experience,
+            createdOn,
+            createdUntil,
+            completedDate,
+            rejectReason,
+            masterCredentialId: this.masterCredentialId,
+            id: this.credentialId as number,
+            orderId: this.orderId,
+            organizationId: this.organizationId,
+          },
+          file,
+        )
+      );
+    } else {
+      this.store.dispatch(
+        new SaveCandidatesCredential(
+          {
+            candidateProfileId: this.candidateProfileId,
+            masterCredentialId: this.masterCredentialId,
+            id: this.credentialId as number,
+            status,
+            rejectReason,
+            credentialNumber: number,
+            certifiedOn: createdOn,
+            certifiedUntil: createdUntil,
+            completedDate,
+          },
+          file,
+        )
+      );
+    }
+  }
+}
 
   private watchForSearchUpdate(): void {
     merge(
@@ -811,7 +853,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     })
   }
   private setDisableAddCredentialButton(): void {
-    console.log(this.areAgencyActionsAllowed,this.isOrgVMSEnabled,this.isOrganizationSide,this.isNavigatedFromCandidateProfile,this.isIRP)
     this.disableAddCredentialButton =
       !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || (this.isOrgVMSEnabled && !this.hasPermissions())
@@ -821,21 +862,23 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   private setGridItems(response: CandidateCredentialResponse): void {
     this.gridItems = response?.credentials.items.map((item: CandidateCredential) => {
+      const tooltipMessage = this.displayTooltip(item);
       return {
         ...item,
         credentialFile: item.credentialFiles?.length ? item.credentialFiles[0] : null,
         disableCopy: this.disableCopy(item),
         disableEdit: this.disableEdit(item),
         disableViewDocument:this.disableViewDocument(item),
+        showtoolTipmessage:tooltipMessage,
         showDisableEditTooltip:
-          (item.status === this.statusEnum.Reviewed) &&
-          !this.isOrganizationSide,
+          ((item.status === this.statusEnum.Reviewed) &&
+          !this.isOrganizationSide) || ((item.status ===  this.statusEnum.Verified) &&
+          !this.isOrganizationSide)  ,
         disableDelete: this.disableDelete(item),
         credentialTypeName: item.credentialType?.name,
         credentialTypeId: item.credentialType?.id,
       };
     });
-
   }
  private disableViewDocument(item:CandidateCredential):boolean{
   let length= item.credentialFiles==null?0:item.credentialFiles?.length;
@@ -857,6 +900,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || item.id === this.orderCredentialId
       || ((item.status === this.statusEnum.Reviewed) && !this.isOrganizationSide)
+      || ((item.status === this.statusEnum.Verified) && !this.isOrganizationSide)
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
       || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
       );
@@ -910,6 +954,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public onSwitcher(event: { checked: boolean }): void {
     this.clearedToStart = event.checked;
+    let flagEvent = true;
+    this.clearToStartValueChange.emit(event.checked);
+    if(this.clearedToStart && flagEvent){
+      this.store.dispatch(new ShowToast(MessageTypes.Success, CLEAR_START_ON));
+      return;
+    }
   }
 
   private watchForCertifiedOnUntilControls(): void {
@@ -919,5 +969,14 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     ])
 .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => this.cdr.markForCheck());
+  }
+  private displayTooltip(item: CandidateCredential) : string {
+    if ((item.status === this.statusEnum.Reviewed) && !this.isOrganizationSide) {
+      return this.disableEditMessage;
+    } else if ((item.status === this.statusEnum.Verified) && !this.isOrganizationSide) {
+      return this.verifiedDisableEditMessage ;
+    } else{
+      return ''
+    }
   }
 }

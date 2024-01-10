@@ -100,6 +100,7 @@ import { OrderManagementService } from '@client/order-management/components/orde
 import { canceldto } from '../../interfaces/order-candidate.interface';
 import { EditIrpCandidateService } from '../../edit-irp-candidate/services/edit-irp-candidate.service';
 import { positionIdStatuses } from '@agency/candidates/add-edit-candidate/add-edit-candidate.constants';
+import { OrderType } from '@shared/enums/order-type';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> { }
 
@@ -786,6 +787,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       ).pipe(
         takeUntil(this.destroy$)
       ).subscribe(() => {
+        this.form.markAsPristine();
         this.store.dispatch(
           this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists()
         );
@@ -1053,7 +1055,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private clearedToStartCheck():void {
-    if(this.candidate && this.candidate.organizationId && this.candidate.candidateJobId){
+    if(this.candidate && this.candidate.organizationId && this.candidate.candidateJobId && (this.currentOrder.orderType == OrderType.LongTermAssignment || this.currentOrder.orderType ==  OrderType.ContractToPerm)){
       this.isEnableClearedToStartForAcceptedCandidates = false;
       this.isClearedToStartEnable =  this.candidate.status == ApplicantStatusEnum.Accepted ? false : true;
 

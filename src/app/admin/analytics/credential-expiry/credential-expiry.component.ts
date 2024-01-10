@@ -214,7 +214,10 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       this.onFilterLocationChangedHandler();
      // this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
 
-      this.user?.businessUnitType == (BusinessUnitType.Hallmark || BusinessUnitType.MSP) ? this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      if (this.user)
+        if (this.user.businessUnitType == BusinessUnitType.Hallmark || this.user.businessUnitType == BusinessUnitType.MSP) {
+          this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
+        } else { this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable(); }
     });
   }
 

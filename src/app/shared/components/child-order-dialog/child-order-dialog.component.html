@@ -37,13 +37,15 @@
             </div>
           </div>
           <div class="e-card-content dialog-controls">
-            <app-button
-              *ngIf="!isAgency"
-              (clickEmitter)="showExtensionDialog()"
-              [type]="buttonTypeEnum.OUTLINED"
-              [disabled]="disableAddExtension || isAgencySuspended || (isdisabledExtension && activeSystem === OrderManagementIRPSystemId.VMS)"
-              text="Add Extension"
-            ></app-button>
+            <ng-container *ngIf="(extensions$ | async) as extensions">
+              <app-button
+                *ngIf="showAddExtension && !isAgency"
+                (clickEmitter)="showExtensionDialog()"
+                [type]="buttonTypeEnum.OUTLINED"
+                [disabled]="disableAddExtension || isAgencySuspended || isdisabledExtension || extensions.length > 0"
+                text="Add Extension"
+              ></app-button>
+            </ng-container>
             <button
               ejs-button
               cssClass="e-outline"

@@ -99,6 +99,7 @@ import {
   GetOrderComments,
   ClearPredefinedBillRates,
   GetIrpOrderExtensionCandidates,
+  SaveClearToStart,  
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SettingsHelper } from '@core/helpers/settings.helper';
@@ -120,7 +121,7 @@ import {
 } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
-import { OrderStatus } from '@shared/enums/order-management';
+import { DeletedStatus, OrderStatus } from '@shared/enums/order-management';
 import {
   OrderManagementIRPSystemId,
   OrderManagementIRPTabs,
@@ -158,6 +159,7 @@ import {
   OrderManagementChild,
   OrderManagementPage,
   OrdersJourneyPage,
+  clearToStartDataset,
 } from '@shared/models/order-management.model';
 import { Configuration } from '@shared/models/organization-settings.model';
 import {
@@ -411,6 +413,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
   public OrderManagementIRPTabsIndex = OrderManagementIRPTabsIndex;
   public orderStatus = OrderStatus;
+  public deletedStatus = DeletedStatus;
   public reOrderCount$ = new Subject<number>();
   public orderTypes = OrderType;
   public orderTypeTooltipMessage = VmsOrderTypeTooltipMessage;
@@ -529,6 +532,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public filterType: string = 'Contains';
   public orderDetail =new Subject<OrderManagement>();
   public isEnableClearedToStart:boolean = false;
+  public clearToStartDataset:clearToStartDataset = new clearToStartDataset();
 
   constructor(
     protected override store: Store,
@@ -1268,7 +1272,8 @@ public RedirecttoIRPOrder(order:Order)
       reOrderDate: this.filters.reOrderDate || null,
       shift:this.filters.shift || null,
       orderLocked:this.filters.orderLocked || null,
-      orderDistributionType:this.filters.orderDistributionType || null
+      orderDistributionType:this.filters.orderDistributionType || null,
+      showDeletedOrders: this.filters.showDeletedOrders || null
     });
 
     if (!prepopulate) {
@@ -2076,7 +2081,7 @@ public RedirecttoIRPOrder(order:Order)
 
   private onReloadOrderCandidatesLists(): void {
     this.actions$
-      .pipe(ofActionSuccessful(ReloadOrganisationOrderCandidatesLists), takeUntil(this.unsubscribe$))
+      .pipe(ofActionDispatched(ReloadOrganisationOrderCandidatesLists), takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, this.selectedOrder.organizationId as number,
           !!this.selectedOrder.irpOrderMetadata);
@@ -3094,10 +3099,18 @@ public RedirecttoIRPOrder(order:Order)
 
   private getLocationState(): void {
     const locationState = this.location.getState() as
-      { orderId: number, orderManagementPagerState: OrderManagementPagerState };
+      { orderId: number, orderManagementPagerState: OrderManagementPagerState,candidateJobId:number, organizationId:number,clearToStartValue:boolean  };
     this.previousSelectedOrderId = locationState.orderId;
     this.orderManagementPagerState = locationState?.orderManagementPagerState;
     this.pageSize = this.orderManagementPagerState?.pageSize ?? this.pageSize;
+    if(locationState?.clearToStartValue != null){
+      this.clearToStartDataset.clearToStart = locationState?.clearToStartValue;
+      this.clearToStartDataset.jobId = locationState?.candidateJobId;
+      this.clearToStartDataset.organizationId = locationState?.organizationId;
+      this.store.dispatch(new SaveClearToStart(this.clearToStartDataset));
+      this.orderManagementService.setCurrentClearToStartVal(locationState?.clearToStartValue);
+    }
+
     this.cd.markForCheck();
   }
 
@@ -3375,6 +3388,10 @@ public RedirecttoIRPOrder(order:Order)
   private getMoreMenuDataSource(order: OrderManagement): ItemModel[] {
     if (order.status === this.orderStatus.Closed) {
       return this.threeDotsMenuOptions['closedOrderMenu'];
+    }
+    if(order.statusText === this.deletedStatus.Deleted)
+    {
+      return this.threeDotsMenuOptions['deletedOrderMenu'];
     }
     if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
       return this.getMenuForReorders(order);

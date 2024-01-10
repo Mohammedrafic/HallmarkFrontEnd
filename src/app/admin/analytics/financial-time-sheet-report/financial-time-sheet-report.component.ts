@@ -68,7 +68,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     "PeriodParamFTS":""
 
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
   public title: string = "Financial Timesheet";
   public message: string = "";
@@ -211,7 +211,10 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       this.onFilterLocationChangedHandler();
       this.onFilterSkillCategoryChangedHandler();
       this.onFilterTimesheetStatusesChangedHandler();
-      this.user?.businessUnitType == (BusinessUnitType.Hallmark || BusinessUnitType.MSP) ? this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      if (this.user)
+        if (this.user.businessUnitType == BusinessUnitType.Hallmark || this.user.businessUnitType == BusinessUnitType.MSP) {
+          this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
+        } else { this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable(); }
     });
   }
 
@@ -249,8 +252,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     let { startDate, period } = this.financialTimesheetReportForm.getRawValue();
     const value = event.itemData.id;
     this.periodIsDefault = this.financialTimesheetReportForm.controls['period'].value == "Custom" ? true : false;
-    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue("");
-    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue("");
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.startDate)?.setValue("");
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.endDate)?.setValue("");
     const PeriodCheck = value;
     let startDateControl = new Date(Date.now());
     let endDateControl = new Date(Date.now());
@@ -301,8 +304,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         break;
     }
 
-    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDateControl);
-    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date((endDateControl)));
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.startDate)?.setValue(startDateControl);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.endDate)?.setValue(new Date((endDateControl)));
 
   }
   private addMonths(date: any, months: any) {
