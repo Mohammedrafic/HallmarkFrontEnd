@@ -206,8 +206,8 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       this.onFilterSkillCategoryChangedHandler();
       if (this.user)
         if (this.user.businessUnitType == BusinessUnitType.Hallmark || this.user.businessUnitType == BusinessUnitType.MSP) {
-          this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
-        } else { this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable(); }
+          this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
+        } else { this.candidateJourneyForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable(); }
     });
   }
 
