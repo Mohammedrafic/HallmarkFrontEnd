@@ -346,7 +346,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.store.dispatch(new RejectCandidateJob(payload)).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
         this.form.disable();
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+        if (!this.reloadOnUpdate) {
+          this.closeDialog();
+        }
+        this.updateDetails.emit();
       });
+    } else {
       if (!this.reloadOnUpdate) {
         this.closeDialog();
       }
@@ -518,6 +523,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
         } else {
           this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
           this.updateDetails.emit();
+          if (!this.reloadOnUpdate) {
+            this.closeDialog();
+          }
         }
       });
   }
@@ -557,10 +565,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
                   offeredStartDate: this.candidateJob.offeredStartDate,
                   candidatePayRate: this.candidateJob.candidatePayRate,
                 })
-              ).pipe(
-                filter(() => !this.reloadOnUpdate),
-                take(1),
-              ).subscribe(() => this.closeDialog());
+              );
             } else {
               this.jobStatusControl.reset();
               this.selectedApplicantStatus = null;
@@ -781,6 +786,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.isSend =  false;
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
     this.updateDetails.emit();
+    if (!this.reloadOnUpdate) {
+      this.closeDialog();
+    }
   }
 
   onGroupEmailSend(){
@@ -806,6 +814,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
           this.store.dispatch(new ShowGroupEmailSideDialog(false));
           this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
           this.updateDetails.emit();
+          if (!this.reloadOnUpdate) {
+            this.closeDialog();
+          }
         });
     }
   }
