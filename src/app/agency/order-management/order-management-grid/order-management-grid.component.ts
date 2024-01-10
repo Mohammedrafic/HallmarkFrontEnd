@@ -234,6 +234,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     });
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if(this.filterColumns.regionIds.dataSource.length > 0){       
+        this.isRedirectedFromDashboard=false;
+        this.patchFilterForm();
+        this.prepopulateAgencyFilterFormStructure();
+      }
       this.ordersPage = data;
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
       if(this.ordersPage?.items){
@@ -251,7 +256,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onCommentRead();
     this.listenRedirectFromPerDiem();
     this.listenRedirectFromReOrder();
-    this.getPreservedFiltersByPageName();
+    if(!this.isRedirectedFromDashboard){
+      this.getPreservedFiltersByPageName();
+    }
+
   }
 
   ngOnDestroy(): void {
@@ -570,7 +578,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private setDefaultStatuses(orderStatusesList: OrderStatusesList, setDefaultFilters: boolean): void {
-    if(this.ltaOrder){
+    if(this.ltaOrder || this.isRedirectedFromDashboard){
       this.clearFilters();
     }
     if(this.Organizations.length > 0){
@@ -661,7 +669,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       }else{
         this.Organizations = this.filters.organizationIds && this.filters.organizationIds?.length > 0 ? this.filters.organizationIds : this.Organizations;
       }
-      this.patchFilterForm(false);
+      this.patchFilterForm();
+      this.prepopulateAgencyFilterFormStructure();
     }
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     this.filters.orderBy = this.orderBy;
@@ -716,7 +725,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     this.checkSelectedChildrenItem();
     this.cd.detectChanges();
-    this.isRedirectedFromDashboard=false;
   }
 
   public onGridCreated(): void {
