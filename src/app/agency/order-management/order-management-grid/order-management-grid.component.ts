@@ -234,7 +234,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     });
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if(this.filterColumns.regionIds.dataSource.length > 0){       
+      if(this.filterColumns.regionIds.dataSource.length > 0 && this.isRedirectedFromDashboard){       
         this.isRedirectedFromDashboard=false;
         this.patchFilterForm();
         this.prepopulateAgencyFilterFormStructure();
