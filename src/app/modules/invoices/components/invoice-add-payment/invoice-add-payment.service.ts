@@ -113,6 +113,11 @@ export class InvoiceAddPaymentService {
     .filter((key) => paymentForms[key].get('balance')?.value > 0);
   }
 
+  getFormatedInvoiceIds(ids: string[]): string[] {
+   const modifiedIds = ids.map(id => id.includes('~') ? id.split('~')[1] : id);
+   return Array.from(modifiedIds);
+  }
+
   checkPaymentsFormTouch(paymentForms: Record<string, CustomFormGroup<PaymentForm>>): boolean {
     return Object.keys(paymentForms).some((key) => paymentForms[key].touched);
   }

@@ -124,15 +124,11 @@ export const CheckPaymentsDefs: ColDef[] = [
 
 export const PaymentMessages = {
   partialyCovered: (ids: string[]): string => {
-    const modifiedIdsSet = new Set(ids.map(id => id.split('~').length>0?id.split('~')[1]:id));
-    const uniqueModifiedIds = Array.from(modifiedIdsSet);
     return `Please note that amount assigned to invoices is lower than check\u00A0
-    amount and ${uniqueModifiedIds.join(', ')} is/are partially paid. Are you sure you want to proceed?`;
+    amount and ${ids.join(', ')} is/are partially paid. Are you sure you want to proceed?`;
   },
   partialyNullAmount: (ids: string[]): string => {
-    const modifiedIds = ids.map(id => id.includes('~') ? id.split('~')[1] : id);
-    const uniqueModifiedIds = Array.from(modifiedIds);
-    return `Please note that invoices ${uniqueModifiedIds.join(', ')} is/are partially paid. Are you sure you want to proceed?`;
+      return `Please note that invoices ${ids.join(', ')} is/are partially paid. Are you sure you want to proceed?`;
   },
   lowerAmount: 'Please note that amount assigned to invoices is lower than check amount. Are you sure you want to proceed?',
   negativeAmount: 'Please note that amount assigned to invoices is higher than check amount',
