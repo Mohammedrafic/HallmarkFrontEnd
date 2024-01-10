@@ -84,7 +84,9 @@ import { OrderStatusSummaryCustomReportState } from '../../modules/custom-report
 import { AccumulationChartModule } from '@syncfusion/ej2-angular-charts';
 import {  PieSeriesService, AccumulationLegendService, AccumulationTooltipService, AccumulationAnnotationService,
   AccumulationDataLabelService} from '@syncfusion/ej2-angular-charts';
-  import { UserVisibilityComponent } from '../../admin/analytics/user-visibility/user-visibility.component';
+import { UserVisibilityComponent } from '../../admin/analytics/user-visibility/user-visibility.component';
+import { OPDCredentialsExpiryComponent } from './opd-credentials-expiry/opd-credentials-expiry.component';
+
 
 @NgModule({
   declarations: [
@@ -146,7 +148,8 @@ import {  PieSeriesService, AccumulationLegendService, AccumulationTooltipServic
     FinancialTimeSheetBetaComponent,
     OrderStatusSummaryComponent,
     DepartmentSpendAndHoursComponent,
-    UserVisibilityComponent],
+    UserVisibilityComponent,
+    OPDCredentialsExpiryComponent],
   exports: [
     CandidateListComponent
   ],
