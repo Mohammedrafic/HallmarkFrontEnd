@@ -37,7 +37,7 @@ import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList, RegularRatesData, clearToStartDataset } from '@shared/models/order-management.model';
+import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList, OrderCandidatesListPage, RegularRatesData, clearToStartDataset } from '@shared/models/order-management.model';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
   GetAgencyAvailableSteps,
@@ -66,6 +66,7 @@ import { SettingsViewService } from '@shared/services';
 import { positionIdStatuses } from '@agency/candidates/add-edit-candidate/add-edit-candidate.constants';
 import { ReloadOrganisationOrderCandidatesLists, SaveClearToStart, SaveClearToStartSucceeded } from '@client/store/order-managment-content.actions';
 import { OrderType } from '@shared/enums/order-type';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -103,6 +104,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   @Select(OrderManagementState.availableSteps)
   applicantStatuses$: Observable<ApplicantStatus[]>;
+
+  @Select(OrderManagementContentState.orderCandidatePage)
+  public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
   form: FormGroup;
 
@@ -208,7 +212,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   get revertStatusSelected(): boolean {
     return !!this.revertedStatus;
   }
-
+  currentJob:OrderCandidatesList | undefined;
   private unsubscribe$: Subject<void> = new Subject();
   private isWithdraw: boolean;
   private revertedStatus: ApplicantStatus;
@@ -237,17 +241,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.patchForm();
     this.subscribeOnReasonsList();
     this.subscribeOnSuccessRejection();
+    this.subscribeOrderCandidatePage();
     this.clearToStartCheck();
   }
 
   clearToStartCheck(){
-    this.orderManagementService.getCurrentClearToStartVal().pipe(takeUntil(this.unsubscribe$)).subscribe(val=>{
-      if(val != null){
-        this.clearedToStart = val;
-      }else{
-        this.clearedToStart = this.candidate && this.candidate.clearToStart ? this.candidate.clearToStart : false;
-      }
-    });
     if(this.candidate && positionIdStatuses.includes(this.candidate.status)){
       this.clearedToStartCheck();
     }else if(this.candidate && !this.candidate.status && this.candidate.candidateStatus && positionIdStatuses.includes(this.candidate.candidateStatus)){
@@ -256,6 +254,32 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       this.isEnableClearedToStartForAcceptedCandidates = false;
     }
   }
+
+  subscribeOrderCandidatePage(){
+    this.orderCandidatePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((currentOrder:OrderCandidatesListPage) => {
+      if(currentOrder){
+        this.orderManagementService.getCurrentClearToStartVal().pipe(takeUntil(this.unsubscribe$)).subscribe(val=>{
+          if(val != null){
+            this.clearedToStart = val;
+          }else{
+            this.clearedToStart = false;
+            if(this.candidate && this.candidate.candidateJobId){
+              this.currentJob =  currentOrder.items.find(jobData=>jobData.candidateJobId == this.candidate.candidateJobId);
+              if(this.currentJob && this.currentJob.clearToStart){
+                this.clearedToStart = this.currentJob.clearToStart;
+              }          
+            }
+            if(this.candidate && this.candidate.jobId){
+              this.currentJob =  currentOrder.items.find(jobData=>jobData.candidateJobId == this.candidate.jobId);
+              if(this.currentJob && this.currentJob.clearToStart){
+                this.clearedToStart = this.currentJob.clearToStart;
+              }          
+            }
+          }
+        });
+      }
+    });
+  }  
 
   private clearedToStartCheck():void {
     if(this.candidate && this.candidate.organizationId && (this.candidate.candidateJobId || this.candidate.jobId) && (this.order.orderType == OrderType.LongTermAssignment || this.order.orderType ==  OrderType.ContractToPerm)){
