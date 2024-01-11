@@ -309,9 +309,9 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       if(locationNames && locationNames.length > 0){
         this.bulkaction=0;
         this.bulkactionnotvalidlocationnmaes=locationNames;
-        this.bulkactionmessage = payload.payload.message;
-        const departmentName= this.bulkactionnotvalidlocationnmaes.toString();
-        this.bulkactionmessage='Following Department cannot be Updated:'+departmentName +' '+ this.bulkactionmessage;
+        this.bulkactionmessage = payload.payload.message.replace(/;/g,'; ');
+        const departmentName= this.bulkactionnotvalidlocationnmaes.join(', ');
+        this.bulkactionmessage='Following Department cannot be Updated: '+departmentName +' '+ this.bulkactionmessage;
        this.store.dispatch(new ShowToast(MessageTypes.Error, this.bulkactionmessage));
 
       }
@@ -329,7 +329,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       ofActionSuccessful(BulkUpdateDepartmentFailed),
       takeUntil(this.componentDestroy())
     ).subscribe((payload) => {
-        this.bulkactionmessage = payload.payload.message;
+        this.bulkactionmessage = payload.payload.message.replace(/;/g,'; ');
         this.bulkactionnotvalidlocationnmaes=[];
         this.bulkaction=0;
         this.clearSelection(this.grid);
@@ -354,8 +354,8 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       if(locationNames && locationNames.length > 0){
         this.bulkaction=1;
         this.bulkactionnotvalidlocationnmaes=locationNames;
-        this.bulkactionmessage = payload.payload.message;
-        const departmentName= this.bulkactionnotvalidlocationnmaes.toString();
+        this.bulkactionmessage = payload.payload.message.replace(/;/g,'; ');
+        const departmentName= this.bulkactionnotvalidlocationnmaes.join(', ');
         this.bulkactionmessage='This Department cannot be deleted. '+departmentName +' This Department was used in  '+ this.bulkactionmessage;
        this.store.dispatch(new ShowToast(MessageTypes.Error, this.bulkactionmessage));
       }
@@ -372,11 +372,11 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       takeUntil(this.componentDestroy())
     ).subscribe((payload) => {
       let locationNames=payload.payload.names;
-        this.bulkactionmessage = payload.payload.message;
+        this.bulkactionmessage = payload.payload.message.replace(/;/g,'; ');
         this.bulkactionnotvalidlocationnmaes=locationNames;
         this.bulkaction=1;
         this.clearSelection(this.grid);
-        const departmentName= this.bulkactionnotvalidlocationnmaes.toString();
+        const departmentName= this.bulkactionnotvalidlocationnmaes.join(', ');
         this.bulkactionmessage='This Department cannot be deleted. '+departmentName +' This Department was used in  '+ this.bulkactionmessage;
        this.store.dispatch(new ShowToast(MessageTypes.Error, this.bulkactionmessage));
         this.getDepartments();

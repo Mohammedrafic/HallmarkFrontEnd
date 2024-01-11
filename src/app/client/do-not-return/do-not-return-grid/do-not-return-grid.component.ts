@@ -36,6 +36,7 @@ import { DocumentLibraryState } from 'src/app/modules/document-library/store/sta
 import { Region } from '@shared/models/region.model';
 import { GetLocationsByRegions, GetRegionsByOrganizations } from 'src/app/modules/document-library/store/actions/document-library.actions';
 import { Candidatests, FormControlNames } from '../enums/dnotreturn.enum';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-do-not-return-grid',
@@ -183,6 +184,7 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
           }
 
         }
+        const user = this.store.selectSnapshot(UserState.user);   
         if(this.fliterFlag){
             this.doNotReturnFilterForm.get(FormControlNames.BusinessUnitId)?.setValue(this.selectedOrganization.id);
             if(this.doNotReturnFilterForm.value.currentStatus == Candidatests.Block){
@@ -191,6 +193,8 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
             else{
               this.isFilterBlock = false;
             }
+            if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP)
+            {           this.isFilterBlock = true;}
             if(this.doNotReturnFilterForm.value.regionBlocked != null && this.doNotReturnFilterForm.value.regionBlocked.length > 0){
               let locationFilter: LocationsByRegionsFilter = {
                 ids: this.doNotReturnFilterForm.value.regionBlocked,

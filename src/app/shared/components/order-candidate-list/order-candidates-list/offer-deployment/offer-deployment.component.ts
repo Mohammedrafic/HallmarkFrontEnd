@@ -242,7 +242,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.formGroup.patchValue({ rejectReason: value });
       this.store.dispatch(new RejectCandidateJob(payload));
-      this.closeDialog();
     }
   }
 
@@ -468,6 +467,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       .subscribe(() => {
         this.formGroup.disable();
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+        this.closeDialog();
       });
   }
 

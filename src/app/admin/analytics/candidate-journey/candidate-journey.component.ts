@@ -219,8 +219,8 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
         businessIds: new FormControl([Validators.required]),
         StartDateFrom: new FormControl(StartDateFrom, [Validators.required]),
         StartDateTo: new FormControl(new Date(Date.now()), [Validators.required]),
-        EndDateFrom: new FormControl(StartDateFrom),
-        EndDateTo: new FormControl(new Date(Date.now())),
+        EndDateFrom: new FormControl([]),
+        EndDateTo: new FormControl([]),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
@@ -323,16 +323,6 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     }
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue(((StartDateFromControl)));
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateTo)?.setValue(((StartDateToControl)));
-
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue(((EndDateFromControl)));
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue(((EndDateToControl)));
-
-    //this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue(new Date((StartDateFromControl)));
-    //this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateTo)?.setValue(new Date((StartDateToControl)));
-
-    //this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue(new Date((EndDateFromControl)));
-    //this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue(new Date((EndDateToControl)));
-
   }
   private addMonths(date: any, months: any) {
     date.setMonth(date.getMonth() + months);
@@ -551,9 +541,9 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       "OrganizationParamCJR": this.selectedOrganizations?.length == 0 ? "null" :
         this.selectedOrganizations?.join(","),
       "StartDateFromParamCJR": formatDate(StartDateFrom, this.dateFormat, this.culture),
-      "StartDateToParamCJR": StartDateTo == null ? "01/01/0001" : formatDate(StartDateTo, this.dateFormat, this.culture),
-      "EndDateFromParamCJR": formatDate(EndDateFrom, this.dateFormat, this.culture),
-      "EndDateToParamCJR": EndDateTo == null ? "01/01/0001" : formatDate(EndDateTo, this.dateFormat, this.culture),
+      "StartDateToParamCJR": StartDateTo.length == null ? "01/01/0001" : formatDate(StartDateTo, this.dateFormat, this.culture),
+      "EndDateFromParamCJR": EndDateFrom.length == 0 ? null : formatDate(EndDateFrom, this.dateFormat, this.culture),
+      "EndDateToParamCJR": EndDateTo.length == 0 ? null : formatDate(EndDateTo, this.dateFormat, this.culture),
       "RegionParamCJR": regionIds.length == 0 ? "null" : regionIds,
       "LocationParamCJR": locationIds.length == 0 ? "null" : locationIds,
       "DepartmentParamCJR": departmentIds.length == 0 ? "null" : departmentIds,
@@ -710,9 +700,6 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
 
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateFrom)?.setValue(((StartDateFromControl)));
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateTo)?.setValue(((StartDateToControl)));
-
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue(((EndDateFromControl)));
-    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue(((EndDateToControl)));
 
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");

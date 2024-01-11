@@ -682,9 +682,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       if(locationNames && locationNames.length > 0){
         this.bulkaction=0;
         this.bulkactionnotvalidlocationnmaes=locationNames;
-        this.bulkactionmessage = payload.payload.message;
-        const locationName= this.bulkactionnotvalidlocationnmaes.toString();
-        this.bulkactionmessage='Following Locations cannot be Updated:'+locationName +' '+ this.bulkactionmessage;
+        this.bulkactionmessage = payload.payload.message.replace(/;/g, '; ');
+        const locationName= this.bulkactionnotvalidlocationnmaes.join(', ');
+        this.bulkactionmessage='Following Locations cannot be Updated: '+locationName +' '+ this.bulkactionmessage;
        this.store.dispatch(new ShowToast(MessageTypes.Error, this.bulkactionmessage));
       }
       else{
@@ -698,7 +698,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       ofActionSuccessful(BulkUpdateAssignedLocationFailed),
       takeUntil(this.componentDestroy())
     ).subscribe((payload) => {
-        this.bulkactionmessage = payload.payload.message;
+        this.bulkactionmessage = payload.payload.message.replace(/;/g, '; ');
         this.bulkactionnotvalidlocationnmaes=[];
         this.bulkaction=0;
         this.clearSelection(this.grid);
@@ -718,8 +718,8 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       if(locationNames && locationNames.length > 0){
         this.bulkaction=1;
         this.bulkactionnotvalidlocationnmaes=locationNames;
-        this.bulkactionmessage = payload.payload.message;
-        const locationName= this.bulkactionnotvalidlocationnmaes.toString();
+        this.bulkactionmessage = payload.payload.message.replace(/;/g, '; ');
+        const locationName= this.bulkactionnotvalidlocationnmaes.join(', ');
         this.bulkactionmessage='This Locations cannot be deleted. '+locationName +' This Locations was used in  '+ this.bulkactionmessage;
        this.store.dispatch(new ShowToast(MessageTypes.Error, this.bulkactionmessage));
       }
@@ -734,11 +734,11 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       takeUntil(this.componentDestroy())
     ).subscribe((payload) => {
       let locationNames=payload.payload.locationNames;
-        this.bulkactionmessage = payload.payload.message;
+        this.bulkactionmessage = payload.payload.message.replace(/;/g, '; ');
         this.bulkactionnotvalidlocationnmaes=locationNames;
         this.bulkaction=1;       
         this.clearSelection(this.grid);
-        const locationName= this.bulkactionnotvalidlocationnmaes.toString();
+        const locationName= this.bulkactionnotvalidlocationnmaes.join(', ');
         this.bulkactionmessage='This Locations cannot be deleted. '+locationName +' This Locations was used in  '+ this.bulkactionmessage;
        this.store.dispatch(new ShowToast(MessageTypes.Error, this.bulkactionmessage));
         this.getLocations();

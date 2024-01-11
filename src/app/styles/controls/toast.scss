@@ -31,6 +31,12 @@ body.light, body.dark {
         }
       }
     }
+
+    .e-toast.e-toast-header-close-icon {
+      .e-toast-content {
+        white-space: pre-line;
+      }
+    }
   }
 
   .success-toast {

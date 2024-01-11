@@ -18,7 +18,7 @@ import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
 import { extensionDurationPrimary, extensionDurationSecondary } from '@shared/components/extension/extension-sidebar/config';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
-import { ExtensionStartDateValidation } from '@shared/constants';
+import { ExtensionStartDateValidation, OrganizationSettingKeys } from '@shared/constants';
 import { Duration } from '@shared/enums/durations';
 import { MessageTypes } from '@shared/enums/message-types';
 import { BillRate } from '@shared/models';
@@ -33,6 +33,9 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { ExtenstionResponseModel } from './models/extension.model';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
+import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
+import { Configuration } from '@shared/models/organization-settings.model';
+import { SettingsKeys } from '@shared/enums/settings';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -72,6 +75,8 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   public commentContainerId: number;
   public activeSystems: OrderManagementIRPSystemId | null;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
+  public configurations: Configuration[] = [];
+  public configdata: boolean;
 
   private get billRateControl(): FormControl {
     return this.extensionForm?.get('billRate') as FormControl;
@@ -85,12 +90,14 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
     private permissionService: PermissionService,
     private billRatesApiService: BillRatesService,
     private cd: ChangeDetectorRef,
-    private orderManagementService : OrderManagementService
+    private orderManagementService : OrderManagementService,
+    private organizationSettingService : OrganizationSettingsService,
   ) {
     super();
   }
 
   public ngOnInit(): void {
+    this.subscribeForSettings()
     this.getJobData();
     this.activeSystems = this.orderManagementService.getOrderManagementSystem();
     this.subscribeOnPermissions();
@@ -450,7 +457,6 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
       const rate = this.getBillRate(rates, startDateValue);
 
       this.extensionForm.get('billRate')?.patchValue(rate?.rateHour, { emitEvent: false, onlySelf: true });
-      this.extensionForm.get('clockId')?.patchValue(this.candidateJob?.clockId || null);
       this.extensionForm.get('guaranteedWorkWeek')?.patchValue(this.candidateJob?.guaranteedWorkWeek || null);
       this.candidateRates = rates;
       this.cd.markForCheck();
@@ -459,5 +465,16 @@ export class ExtensionSidebarComponent extends Destroyable implements OnInit {
   addComments(saveComments: Comment[])
   {
     this.comments=saveComments;
+  }
+  private subscribeForSettings(): void {
+    this.organizationSettingService.getOrganizationSettings().subscribe(data => {
+      const showOrgCanCarryClockID = data.filter(settingdata => settingdata.settingKey === SettingsKeys.OrganizationCanCarryClockIDFromParent);
+      const response = Object.assign({},...showOrgCanCarryClockID);
+      this.configdata = response.value && JSON.parse(response.value);
+      if(this.configdata)
+      {
+        this.extensionForm.get('clockId')?.patchValue(this.candidateJob?.clockId || null); 
+      }
+    });
   }
 }

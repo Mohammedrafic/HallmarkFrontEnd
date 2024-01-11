@@ -59,7 +59,7 @@ import { FinancialTimeSheetBetaComponent } from './financial-time-sheet-beta/fin
 import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/department-spend-and-hours.component';
 import { OrderStatusSummaryComponent } from './order-status-summary/order-status-summary.component';
 import { UserVisibilityComponent } from './user-visibility/user-visibility.component';
-
+import { OPDCredentialsExpiryComponent } from './opd-credentials-expiry/opd-credentials-expiry.component';
 const routes: Routes = [
   {
     path: '',
@@ -461,6 +461,13 @@ const routes: Routes = [
       {
         path: 'user-visibility',
         component: UserVisibilityComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'opd-credentials-expiry',
+        component: OPDCredentialsExpiryComponent,
         data: {
           isOrganizationArea: true,
         }

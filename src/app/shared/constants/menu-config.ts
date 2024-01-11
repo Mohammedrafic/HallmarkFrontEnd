@@ -544,6 +544,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/user-visibility',
     },
+    132: {
+      // opd-credentials-expiry
+      icon: '',
+      route: '/analytics/opd-credentials-expiry',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -1496,7 +1501,12 @@ export const MENU_CONFIG: any = {
     // User Visibility
     icon: '',
     route: '/analytics/user-visibility',
-  },
+    },
+    132: {
+      // opd-credentials-expiry
+      icon: '',
+      route: '/analytics/opd-credentials-expiry',
+    },
   },
 
   [BusinessUnitType.Agency]: {
