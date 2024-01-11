@@ -201,7 +201,7 @@ export const initOrderManagementFilterColumns = () => ({
   showDeletedOrders: {
     type: ControlTypes.Checkbox,
     valueType: ValueType.Text,
-    checkBoxTitle: 'showDeletedOrders',
+    checkBoxTitle: 'Show Deleted Orders',
   },
   orderLocked: {
     type: ControlTypes.Dropdown,
