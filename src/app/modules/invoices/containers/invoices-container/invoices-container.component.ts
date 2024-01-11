@@ -136,8 +136,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           invoiceRecords?.map((record: Interfaces.PendingInvoiceRecord) => record.id)
       ).flat();
       if (this.groupingInvoiceRecordsIds[0] == undefined || this.groupingInvoiceRecordsIds[0] == null) {
-        const data = event.api.getSelectedRows().map(val => val.invoiceId);
-        this.groupingInvoiceRecordsIds = data[0];
+        this.groupingInvoiceRecordsIds = event.api.getSelectedRows()
+        .map(({ invoiceIdData }: Interfaces.PendingInvoice) =>
+        invoiceIdData?.map((record: Interfaces.PendingInvoiceRecord) => record.id)
+      ).flat();
       }
     },
   };
@@ -270,7 +272,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     }
 
     this.document.defaultView?.localStorage.setItem("BussinessUnitID", JSON.stringify(""));
-
+    
 
     if (this.isAgency) {
       this.checkActionsAllowed();
