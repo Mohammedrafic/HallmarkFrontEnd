@@ -7,4 +7,5 @@ export enum SettingsKeys {
   ATPRateCalculation = 'ATPRateCalculation',
   DisableNumberOfOpenPositions='DisableNumberOfOpenPositions',
   ShowDeployedEmployees = 'ShowDeployedEmployees',
+  OrganizationCanCarryClockIDFromParent='OrganizationCanCarryClockIDFromParent'
 }
