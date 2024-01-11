@@ -24,7 +24,7 @@ import {
 } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ApplicantStatus, IRPOrderPosition, Order, OrderCandidateJob, OrderCandidatesList, clearToStartDataset } from '@shared/models/order-management.model';
+import { ApplicantStatus, IRPOrderPosition, Order, OrderCandidateJob, OrderCandidatesList, OrderCandidatesListPage, clearToStartDataset } from '@shared/models/order-management.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { formatDate, formatNumber } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -111,6 +111,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Select(UserState.orderPermissions)
   orderPermissions$: Observable<CurrentUserPermission[]>;
 
+  @Select(OrderManagementContentState.orderCandidatePage)
+  public orderCandidatePage$: Observable<OrderCandidatesListPage>;
+
   @Output() closeModalEvent = new EventEmitter<never>();
   @Output() updateDetails = new EventEmitter<void>();
 
@@ -172,6 +175,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public commentContainerId: number;
   irpdata: any;
+  currentJob:OrderCandidatesList | undefined;
 
   public clearedToStart:boolean = false;
 
@@ -267,13 +271,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.observeCandidateJob();
     this.observeStartDate();
     this.subscribeOnJobUpdate();
-    this.orderManagementService.getCurrentClearToStartVal().pipe(takeUntil(this.unsubscribe$)).subscribe(val=>{
-      if(val != null){
-        this.clearedToStart = val;
-      }else{
-        this.clearedToStart = this.candidate && this.candidate.clearToStart ? this.candidate.clearToStart : false;
-      }
-    });
+    this.subscribeOrderCandidatePage();
+
     if(this.candidate && positionIdStatuses.includes(this.candidate.status)){
       this.clearedToStartCheck();
     }else if(this.candidate && !this.candidate.status && this.candidate.candidateStatus && positionIdStatuses.includes(this.candidate.candidateStatus)){
@@ -282,6 +281,36 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.isEnableClearedToStartForAcceptedCandidates = false;
     }
   }
+
+  subscribeOrderCandidatePage(){
+    this.orderCandidatePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((currentOrder:OrderCandidatesListPage) => {
+      if(currentOrder){
+        this.orderManagementService.getCurrentClearToStartVal().pipe(takeUntil(this.unsubscribe$)).subscribe(val=>{
+          if(val != null){
+            this.clearedToStart = val;
+          }else{
+            this.clearedToStart = false;
+            if(this.candidate && this.candidate.candidateJobId){
+              this.currentJob =  currentOrder.items.find(jobData=>jobData.candidateJobId == this.candidate.candidateJobId);
+              if(this.currentJob && this.currentJob.clearToStart){
+                this.clearedToStart = this.currentJob.clearToStart;
+              }          
+            }
+            if(this.candidate && this.candidate.jobId){
+              this.currentJob =  currentOrder.items.find(jobData=>jobData.candidateJobId == this.candidate.jobId);
+              if(this.currentJob && this.currentJob.clearToStart){
+                this.clearedToStart = this.currentJob.clearToStart;
+              }          
+            }
+          }
+        });
+
+       // console.log('currentOrder',currentOrder.items);
+      }
+
+    });
+  }
+
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
