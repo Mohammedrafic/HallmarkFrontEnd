@@ -8,8 +8,8 @@ export const ScheduleSortingCategory = [
     { id: 4, text: 'Orientation', sortOrder: SortOrder.ASCENDING, tooltip:"Oriented on the top" ,columnName: 'IsOriented',},
     { id: 5, text: 'Onboarded To LTA' , sortOrder: SortOrder.ASCENDING, tooltip:"Onboarded to LTA on the top",columnName: 'IsLTA'},
     { id: 6, text: 'Scheduled Hours', sortOrder: SortOrder.ASCENDING, tooltip:"Ascending" ,columnName: 'ScheduleHrs',},
-    { id: 7, text: 'Added Availability', sortOrder: SortOrder.ASCENDING, tooltip:"Ascending",columnName: 'AvailabilityHrs', },
-    { id: 8, text: 'Added UnAvailability',sortOrder: SortOrder.ASCENDING, tooltip:"Ascending",columnName: 'UnAvailabilityHrs' },
+    { id: 7, text: 'Added Availability', sortOrder: SortOrder.DESCENDING, tooltip:SortOrder.DESCENDING,columnName: 'AvailabilityHrs', },
+    { id: 8, text: 'Added UnAvailability',sortOrder: SortOrder.DESCENDING, tooltip:SortOrder.DESCENDING,columnName: 'UnAvailabilityHrs' },
    
   ];
 
