@@ -1,10 +1,9 @@
-import { ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, ChangeDetectorRef, Inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
-
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, distinctUntilChanged, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
@@ -15,26 +14,24 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import {
-  GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData,
-  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState
-} from '@organization-management/store/logi-report.action';
+import { ClearLogiReportState, GetCommonReportFilterOptions, GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
-import { analyticsConstants, Period } from '../constants/analytics.constant';
 import { FilterService } from '@shared/services/filter.service';
-import { AppSettings, APP_SETTINGS } from 'src/app.settings';
+import { analyticsConstants, Period } from '../constants/analytics.constant';
 import { ConfigurationDto } from '@shared/models/analytics.model';
-import { AgencyDto, CandidateStatusAndReasonFilterOptionsDto, CandidateStatusDto, CommonReportFilter, CommonReportFilterOptions } from '../models/common-report.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto, OrderTypeOptionsForReport, AgencyDto } from '../models/common-report.model';
+import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
-import { MessageTypes } from '../../../shared/enums/message-types';
-import { User } from '../../../shared/models/user.model';
-import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-//import { analyticsConstants, Period } from '../constants/analytics.constant';
 import { toNumber, uniqBy } from 'lodash';
+import { MessageTypes } from '@shared/enums/message-types';
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
+import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
+import { DateTime } from '@syncfusion/ej2-angular-charts';
+
 @Component({
   selector: 'app-opd-credentials-expiry',
   templateUrl: './opd-credentials-expiry.component.html',
@@ -86,8 +83,7 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
 
-  @Select(LogiReportState.commonReportFilterData)
-  public CommonReportFilterData$: Observable<CommonReportFilterOptions>;
+
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
@@ -97,6 +93,8 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
   public organizationData$: Observable<Organisation[]>;
   selectedOrganizations: Organisation[] = [];
 
+  @Select(LogiReportState.commonReportFilterData)
+  public CommonReportFilterData$: Observable<CommonReportFilterOptions>;
 
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
@@ -137,7 +135,7 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-  private fixedCandidateStatusesIncluded: string[]= ['Applied', 'Shortlisted', 'Custom', 'Offered', 'Accepted', 'Onboard'];
+  private fixedCandidateStatusesIncluded: string[] = ['Applied', 'Shortlisted', 'Custom', 'Offered', 'Accepted', 'Onboard'];
   private culture = 'en-US';
   public periodList: Period[] = [];
   public periodIsDefault: boolean = false;
@@ -172,40 +170,15 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
-    
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
-
-      this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
-      this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue([]);
-
-      this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
-
-      this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
-        if (data != null) {
-          this.isAlive = false;
-          this.filterOptionsData = data;
-          this.defaultCandidateStatuses = ['Onboard']
-          //let notLoadingStatuses :string[]= ['Applied','Shortlisted','Rejected','Bill Rate Pending','Offered Bill Rate','Offboard','Withdraw','Cancelled','Not Applied'];
-          this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses.filter(i => this.fixedCandidateStatusesIncluded.includes(i.statusText));
-          this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
-          this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
-          this.filterColumns.agencyIds.dataSource = data.agencies;
-          this.defaultAgencys = data.agencies.map((list) => list.agencyId);
-          if (this.isInitialLoad) {
-            setTimeout(() => { this.SearchReport(); }, 3000)
-            this.isInitialLoad = false;
-          }
-
-        }
-      });
       //this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
         }
       });
-      
+
       this.agencyOrganizationId = data;
       this.loadperiod();
       this.organizationData$.pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -321,7 +294,7 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
     this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.startDate)?.setValue(startDateControl);
     this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.endDate)?.setValue(new Date((endDateControl)));
 
-   
+
   }
   private addMonths(date: any, months: any) {
     date.setMonth(date.getMonth() + months);
@@ -395,19 +368,20 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
             if (data != null) {
               this.isAlive = true;
               this.filterOptionsData = data;
+              this.defaultCandidateStatuses = ['Onboard'];
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses.filter(i => this.fixedCandidateStatusesIncluded.includes(i.statusText));
               this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
               this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
               this.filterColumns.agencyIds.dataSource = data.agencies;
-
+              this.defaultAgencys = data.agencies.map((list) => list.agencyId);
 
               this.changeDetectorRef.detectChanges();
-              setTimeout(() => { this.SearchReport(); }, 3000)
+              this.SearchReport();
             }
           });
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          setTimeout(() => { this.SearchReport() }, 3000);
+          this.SearchReport();
         }
         else {
           this.isClearAll = false;
@@ -472,7 +446,7 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
 
 
   public SearchReport(): void {
-    let { departmentIds, locationIds, regionIds, startDate, endDate, jobId, candidateStatuses, opcredFlag, agencyIds, period } = this.opdcredentialExpiryForm.getRawValue();
+    let { businessIds, departmentIds, locationIds, regionIds, startDate, endDate, jobId, candidateStatuses, opcredFlag, agencyIds, period } = this.opdcredentialExpiryForm.getRawValue();
 
     if (!this.opdcredentialExpiryForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
@@ -491,7 +465,7 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
 
     this.paramsData =
     {
-      "OrganizationIdOCE": this.selectedOrganizations?.length == 0 ? "null" :
+      "OrganizationIdOCE": this.selectedOrganizations?.length == 0 ? businessIds.tostring() :
         this.selectedOrganizations?.map((list) => list).join(","),
       "StartDateOCE": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateOCE": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
@@ -624,7 +598,7 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
       return;
     }
     this.filteredItems = [];
-    setTimeout(() => { this.SearchReport(); }, 3000)
+    this.SearchReport();
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
