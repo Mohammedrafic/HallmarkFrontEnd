@@ -39,6 +39,15 @@ export class GetUsersPage {
     public filterModel: any
   ) {}
 }
+
+export class GetNotificationSubscription {
+  static readonly type = '[security] Get Notification Subscription';
+  constructor(
+    public businessUnitType: BusinessUnitType,
+    public userId: string
+  ) {}
+}
+
 export class GetAllUsersPage {
   static readonly type = '[security] Get All Users Page';
   constructor(
