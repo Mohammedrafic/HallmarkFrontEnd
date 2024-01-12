@@ -69,6 +69,20 @@ class="button-group system-buttons"
         </div>
       </div>
     </div>
+    <div>
+    </div>
+  </ng-container>
+  <ng-container right>
+    <div class="input-group" *ngIf="showTurnOffNotifications">
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        [isPrimary]="true"
+        (click)="DisableNotification()"
+      >
+        Turn Off Notification Subscriptions
+      </button>
+    </div>
   </ng-container>
 
 </app-page-toolbar>

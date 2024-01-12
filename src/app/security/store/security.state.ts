@@ -48,6 +48,7 @@ import {
   SetAgencyVisibilityFlag,
   GetEmpGeneralNoteImportDetails,
   ExportEmpGeneralNoteImportDetails,
+  GetNotificationSubscription,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -58,7 +59,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { DOCUMENT_DOWNLOAD_SUCCESS, EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../services/users.service';
-import { GetBusinessUnitIdDetails, RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
+import { GetBusinessUnitIdDetails, RolesPerUser, turnOffNotification, User, UsersPage } from '@shared/models/user-managment-page.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -100,6 +101,7 @@ interface SecurityStateModel {
   interfaceLogSummaryIRP:InterfaceLogSummaryIRPPage |null;
   isAgencyVisibilityEnabled:boolean;
   isOrganizaionsLoaded:boolean;
+  Notification: turnOffNotification | null;
 }
 
 @State<SecurityStateModel>({
@@ -133,7 +135,8 @@ interface SecurityStateModel {
     logSummaryDetailsPage:null,
     isAgencyVisibilityEnabled:false,
     isOrganizaionsLoaded:false,
-    logSummaryEmpGeneralnoteDetailsPage:null
+    logSummaryEmpGeneralnoteDetailsPage:null,
+    Notification:null
   },
 })
 @Injectable()
@@ -162,6 +165,11 @@ export class SecurityState {
   static userGridData(state: SecurityStateModel): User[] {
     return state.usersPage?.items || [];
   }
+
+  @Selector()
+  static getNotificationValue(state: SecurityStateModel): turnOffNotification | null{
+    return state.Notification;
+  } 
 
   @Selector()
   static usersPage(state: SecurityStateModel): UsersPage | null {
@@ -411,6 +419,24 @@ export class SecurityState {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
+  }
+
+  @Action(GetNotificationSubscription)
+  GetNotificationSubscription(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { businessUnitType, userId }: GetNotificationSubscription
+  ): Observable<turnOffNotification | void> {
+    return this.userService
+      .turnOffSubscription(businessUnitType, userId)
+      .pipe(
+        tap((payload) => {
+          patchState({ Notification: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
   }
 
   @Action(GetUsersPage)
