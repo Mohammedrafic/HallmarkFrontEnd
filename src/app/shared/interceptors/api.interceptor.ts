@@ -42,8 +42,8 @@ export class ApiInterceptor implements HttpInterceptor {
       };
 
       const { isOrganizationArea, isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-      const isMspArea = this.store.selectSnapshot(AppState.isMspArea);
-      const isAdminArea = this.store.selectSnapshot(AppState.isAdminArea);
+      const { isMSPArea } = this.store.selectSnapshot(AppState.isMspArea);
+      const { isAdminArea } = this.store.selectSnapshot(AppState.isAdminArea);
 
       if (isOrganizationArea) {
         headers['selected-businessunit-type'] = BusinessUnitType.Organization.toString();
@@ -51,7 +51,7 @@ export class ApiInterceptor implements HttpInterceptor {
       else if (isAgencyArea) {
         headers['selected-businessunit-type'] = BusinessUnitType.Agency.toString();
       }
-      else if (isAdminArea.isAdminArea) {
+      else if (isAdminArea) {
         headers['selected-businessunit-type'] = BusinessUnitType.Hallmark.toString();
       }
       else {
@@ -62,7 +62,7 @@ export class ApiInterceptor implements HttpInterceptor {
         headers['selected-businessunit-id'] = request.headers.get('selected-businessunit-id') as string;
       }
       
-      if (isMspArea && lastSelectedMspId && isMsp) {
+      if (isMSPArea && lastSelectedMspId && isMsp) {
         headers['selected-businessunit-id'] = lastSelectedMspId.toString();
       }
 
