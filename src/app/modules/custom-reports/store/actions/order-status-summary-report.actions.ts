@@ -10,12 +10,15 @@ export class GetOrderStatusSummaryFiltersByOrganization {
   constructor() { }
 }
 
-export class GetOrganizationRegions {
-  static readonly type = '[candidate details] Get Candidate Regions';
-  constructor() { }
+export class GetRegionsByOrganizations {
+  static readonly type = '[Order Status Summary Report] Get The List Of Regions By Organizations';
+  constructor(public organizationId: number[]) { }
 }
-
-export class GetOrganizationSkills {
-  static readonly type = '[candidate details] Get Candidate Skills';
-  constructor() { }
+export class GetLocationsByRegions {
+  static readonly type = '[Order Status Summary Report] Get The List Of Locations By Regions';
+  constructor(public regionIds: string, public organizationId: number[]) { }
+}
+export class GetDepartmentsByLocations {
+  static readonly type = '[Order Status Summary Report] Get The List Of Departments By Locations';
+  constructor(public locationIds: string, public organizationId: number[]) { }
 }

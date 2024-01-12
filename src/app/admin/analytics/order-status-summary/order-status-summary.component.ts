@@ -1,12 +1,12 @@
 import { Select, Store } from '@ngxs/store';
 import { SetHeaderState, ShowFilterDialog } from '../../../store/app.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, Inject, OnDestroy, HostListener } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { GRID_CONFIG } from '@shared/constants';
 import { ColDef, FilterChangedEvent, GridOptions, IAggFuncParams, ICellRendererParams } from '@ag-grid-community/core';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { BehaviorSubject, Observable, Subject, map, takeUntil, takeWhile, filter, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, map, takeUntil, takeWhile, filter, switchMap, delay } from 'rxjs';
 import { ColumnDefinitionModel } from '../../../shared/components/grid/models/column-definition.model';
 import { DatePipe } from '@angular/common';
 import { ControlTypes, ValueType } from '../../../shared/enums/control-types.enum';
@@ -17,6 +17,7 @@ import * as OrderStatusSummaryReportActions from '../../../modules/custom-report
 import { OrderStatusSummaryReportService } from '../../../modules/custom-reports/services/order-status-summary-report.services';
 import { SideBarConfig, DefaultOrdersStatusSummaryGridColDef } from './order-status-summary.constants';
 import { UserState } from '../../../store/user.state';
+import { sortByField } from '../../../shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-order-status-summary',
@@ -49,7 +50,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   public filters$: Observable<OrderStatusSummaryReportFilters>;
 
   @Select(UserState.lastSelectedOrganizationId)
-  public organizationId$: Observable<string | null>;
+  public organizationId$: Observable<number>;
 
   regions$: Region[] = [];
   regionFields: FieldSettingsModel = { text: 'region', value: 'regionId' };
@@ -68,6 +69,8 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   orderType$: OrderTypeDto[] = [];
   orderTypeFields: FieldSettingsModel = { text: 'orderTypeName', value: 'orderTypeId' };
 
+  private organizationId: (number)[] = [];
+
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
       region: {
@@ -80,14 +83,14 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       location: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Text,
-        dataSource: this.filteredLocations$,
+        dataSource: [],
         valueField: 'location',
         valueId: 'locationId',
       },
       department: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Text,
-        dataSource: this.filteredDepartments$,
+        dataSource: [],
         valueField: 'department',
         valueId: 'departmentId',
       },
@@ -304,15 +307,19 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     this.initForm();
     if (this.organizationId$ != null) {
       this.organizationId$.pipe(takeUntil(this.unsubscribe$))
-        .subscribe(() => {
-          this.setFilterDefaultValues();
-          this.store.dispatch(new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage(this.orderStatusSummaryReportForm.value));
-          this.onFilterClearAll();
-          this.setFilters();
+        .subscribe((data) => {
+          if (data) {    
+            this.onFilterClearAll();
+            this.organizationId.push(data);
+            this.store.dispatch(new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage(this.orderStatusSummaryReportForm.value));
+            this.setFilters();
+            delay(500);
+            this.orderFilterColumnsSetup();
+            this.setFilterDefaultValues();
+          }
         });
     }
     this.getGridData();
-    this.orderFilterColumnsSetup();
     this.watchForReason();
     this.watchForLocation();
   }
@@ -334,15 +341,26 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   }
 
   public setFilters(): void {
+    this.dataService.getRegionsByOrganizationId({ organizationId: this.organizationId }).pipe(takeUntil(this.unsubscribe$))
+      .subscribe(data => {
+        this.regions$ = data.map(item => ({ region: item.region, regionId: item.regionId }));
+        this.regions$ = sortByField(this.regions$, "region");
+      });
+    this.dataService.getLocationsByRegionIds({ regionIds: '', organizationId: this.organizationId }).pipe(takeUntil(this.unsubscribe$))
+      .subscribe(data => {
+        this.locations$ = data.map(item => ({ locationId: item.locationId, location: item.location, regionId: item.regionId }));
+        this.locations$ = sortByField(this.locations$, "location");
+      });
+    this.dataService.getDepartmentsByLocationIds({ locationIds: '', organizationId: this.organizationId }).pipe(takeUntil(this.unsubscribe$))
+      .subscribe(data => {
+        this.departments$ = data.map(item => ({ departmentId: item.departmentId, department: item.department, locationId: item.locationId }));
+        this.departments$ = sortByField(this.departments$, "department");
+      });
     this.dataService.getFiltersByOrganizationId().pipe(takeUntil(this.unsubscribe$))
       .subscribe(data => {
-        if (data.region != null) {
-          this.regions$ = data.region.map(item => ({ region: item.region, regionId: item.regionId }));
-          this.locations$ = data.location.map(item => ({ locationId: item.locationId, location: item.location, regionId: item.regionId }));
-          this.departments$ = data.department.map(item => ({ departmentId: item.departmentId, department: item.department, locationId: item.locationId }));
-          this.skills$ = data.skills.map(item => ({ skillId: item.skillId, skill: item.skill }));
-          this.orderType$ = data.orderType.map(item => ({ orderTypeId: item.orderTypeId, orderTypeName: item.orderTypeName }));
-        }
+        this.skills$ = data.skills.map(item => ({ skillId: item.skillId, skill: item.skill }));
+        this.skills$ = sortByField(this.skills$, "skill");
+        this.orderType$ = data.orderType.map(item => ({ orderTypeId: item.orderTypeId, orderTypeName: item.orderTypeName }));
       });
   }
 
@@ -354,6 +372,10 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
   }
 
   public setFilterDefaultValues(): void {
+    this.orderStatusSummaryReportForm.get('region')?.setValue([]);
+    this.orderStatusSummaryReportForm.get('location')?.setValue([]);
+    this.orderStatusSummaryReportForm.get('department')?.setValue([]);
+    this.orderStatusSummaryReportForm.get('skills')?.setValue([]);
     this.orderStatusSummaryReportForm.get('orderType')?.setValue([0, 3]);
   }
 
@@ -389,13 +411,18 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     if (this.orderStatusSummaryReportForm.invalid) {
       return;
     }
-    if (this.regions$.length == this.orderStatusSummaryReportForm.controls['region'].value.length) {
+    var regionsData = this.orderStatusSummaryReportForm.controls['region'].value;
+    var locationsData = this.orderStatusSummaryReportForm.controls['location'].value;
+    var departmentsData = this.orderStatusSummaryReportForm.controls['department'].value;
+    var skillsData = this.orderStatusSummaryReportForm.controls['skills'].value;
+    if (this.regions$.length == this.orderStatusSummaryReportForm.controls['region'].value.length) {     
       this.orderStatusSummaryReportForm.controls['region'].setValue([]);
     }
     if (this.locations$.length == this.orderStatusSummaryReportForm.controls['location'].value.length) {
       this.orderStatusSummaryReportForm.controls['location'].setValue([]);
     }
-    if (this.departments$.length == this.orderStatusSummaryReportForm.controls['department'].value.length) {
+    if (this.departments$.length == this.orderStatusSummaryReportForm.controls['department'].value.length ||
+      this.departments$.length > 300) {      
       this.orderStatusSummaryReportForm.controls['department'].setValue([]);
     }
     if (this.skills$.length == this.orderStatusSummaryReportForm.controls['skills'].value.length) {
@@ -405,6 +432,10 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
       ...this.orderStatusSummaryReportForm.value
     };
     this.store.dispatch(new OrderStatusSummaryReportActions.GetOrderStatusSummaryReportPage(payload));
+    this.orderStatusSummaryReportForm.controls['region'].setValue(regionsData);
+    this.orderStatusSummaryReportForm.controls['location'].setValue(locationsData);
+    this.orderStatusSummaryReportForm.controls['department'].setValue(departmentsData);
+    this.orderStatusSummaryReportForm.controls['skills'].setValue(skillsData);
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
@@ -414,7 +445,7 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
 
   public onFilterClose() {
   }
-
+  
   onBtExport() {
     const params = {
       fileName: 'Order-Position Status Summary Report',
