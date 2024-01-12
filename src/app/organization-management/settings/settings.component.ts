@@ -694,12 +694,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       isIRPConfigurationValue: this.configurationSystemType === SystemType.IRP,
     };
 
-    this.store.dispatch(new SaveOrganizationSettings(setting, this.filters));
-    this.store.dispatch(new ShowSideDialog(false));
-    this.setSelectedRecords();
-    this.removeActiveCssClass();
-    this.clearFormDetails();
-    this.isFormShown = false;
+    this.store.dispatch(new SaveOrganizationSettings(setting, this.filters)).pipe(tap(() => {
+      this.closeSettingDialog();
+    }), take(1)).subscribe();
   }
 
   private setFormValidation(data: Configuration): void {
