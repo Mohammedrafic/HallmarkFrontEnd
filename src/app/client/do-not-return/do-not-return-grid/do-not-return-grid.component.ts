@@ -194,7 +194,10 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
               this.isFilterBlock = false;
             }
             if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP)
-            {           this.isFilterBlock = true;}
+            {    
+              this.doNotReturnFilterForm.get('currentStatus')?.setValue(Candidatests.Block); 
+              this.isFilterBlock = true;
+            }
             if(this.doNotReturnFilterForm.value.regionBlocked != null && this.doNotReturnFilterForm.value.regionBlocked.length > 0){
               let locationFilter: LocationsByRegionsFilter = {
                 ids: this.doNotReturnFilterForm.value.regionBlocked,
