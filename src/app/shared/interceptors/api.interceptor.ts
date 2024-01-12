@@ -15,6 +15,7 @@ import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { LogoutUser } from 'src/app/store/user.actions';
 import { AppSettings, APP_SETTINGS, APP_SETTINGS_URL } from 'src/app.settings';
+import { BusinessUnitType } from '../enums/business-unit-type';
 
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
@@ -41,13 +42,27 @@ export class ApiInterceptor implements HttpInterceptor {
       };
 
       const { isOrganizationArea, isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-      const isMspArea = this.store.selectSnapshot(AppState.isMspArea);
+      const { isMSPArea } = this.store.selectSnapshot(AppState.isMspArea);
+      const { isAdminArea } = this.store.selectSnapshot(AppState.isAdminArea);
+
+      if (isOrganizationArea) {
+        headers['selected-businessunit-type'] = BusinessUnitType.Organization.toString();
+      }
+      else if (isAgencyArea) {
+        headers['selected-businessunit-type'] = BusinessUnitType.Agency.toString();
+      }
+      else if (isAdminArea) {
+        headers['selected-businessunit-type'] = BusinessUnitType.Hallmark.toString();
+      }
+      else {
+        headers['selected-businessunit-type'] = '0';
+      }
 
       if(request.headers.has('selected-businessunit-id')) {
         headers['selected-businessunit-id'] = request.headers.get('selected-businessunit-id') as string;
       }
       
-      if (isMspArea && lastSelectedMspId && isMsp) {
+      if (isMSPArea && lastSelectedMspId && isMsp) {
         headers['selected-businessunit-id'] = lastSelectedMspId.toString();
       }
 

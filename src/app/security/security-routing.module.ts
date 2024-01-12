@@ -15,11 +15,17 @@ const routes: Routes = [
       {
         path: 'roles-and-permissions',
         component: RolesAndPermissionsComponent,
+        data: {
+          isAdminArea: true,
+        },
       },
       {
         path: 'user-list',
         component: UserListComponent,
-        resolve:[AgencyVisibilityFlagResolverService],
+        resolve: [AgencyVisibilityFlagResolverService],
+        data: {
+          isAdminArea: true,
+        },
       }
     ],
   },
