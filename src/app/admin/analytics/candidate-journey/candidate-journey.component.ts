@@ -541,7 +541,7 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
       "OrganizationParamCJR": this.selectedOrganizations?.length == 0 ? "null" :
         this.selectedOrganizations?.join(","),
       "StartDateFromParamCJR": formatDate(StartDateFrom, this.dateFormat, this.culture),
-      "StartDateToParamCJR": StartDateTo.length == null ? "01/01/0001" : formatDate(StartDateTo, this.dateFormat, this.culture),
+      "StartDateToParamCJR":   formatDate(StartDateTo, this.dateFormat, this.culture),
       "EndDateFromParamCJR": EndDateFrom.length == 0 ? null : formatDate(EndDateFrom, this.dateFormat, this.culture),
       "EndDateToParamCJR": EndDateTo.length == 0 ? null : formatDate(EndDateTo, this.dateFormat, this.culture),
       "RegionParamCJR": regionIds.length == 0 ? "null" : regionIds,
