@@ -5,8 +5,9 @@
 </button> -->
 <!-- <button type="button">{{label}}</button> -->
 <!-- class="btn btn-transparent-dark border-0 btn-icon rounded"  -->
-<button *ngIf="label === 'Edit'"
+<button *ngIf="label === 'Edit'" 
   style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
+  [disabled]="alertEditDisable"
   [attr.title]="label"
   (click)="onClick($event)">
   <fa-icon [icon]='faEdit' class="pr-3">
