@@ -17,7 +17,7 @@ import {
 import { FormControl } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
+import { ChangedEventArgs, ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
 import { catchError, EMPTY, filter, map, Observable, Subscription, switchMap, take, takeUntil, tap, zip } from 'rxjs';
 
 import { OutsideZone } from '@core/decorators';
@@ -373,6 +373,15 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       this.createBookSchedule()
         .pipe(takeUntil(this.componentDestroy()))
         .subscribe(() => this.handleSuccessAdding());
+    }
+  }
+
+  handleDateChange(event: ChangedEventArgs): void {
+    this.checkOpenPositions(event as { isInteracted: boolean });
+
+    if (event.value) {
+      this.editScheduleService.updateTimeControlsDate(event.value, this.scheduleForm);
+      this.setHours();
     }
   }
 

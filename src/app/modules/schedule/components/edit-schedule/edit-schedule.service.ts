@@ -214,11 +214,7 @@ export class EditScheduleService {
       ];
     }
 
-    if (
-      currentStartTimeMs === initialStartTimeMs
-      && currentEndTimeMs < initialEndTimeMs
-      && currentEndTimeMs > initialStartTimeMs
-    ) {
+    if (currentEndTimeMs < initialEndTimeMs && currentEndTimeMs > initialStartTimeMs) {
       return [
         {
           ...remainingBookingBase,
@@ -229,5 +225,23 @@ export class EditScheduleService {
     }
 
     return [];
+  }
+
+  updateTimeControlsDate(date: Date, scheduleForm: CustomFormGroup<ScheduledShiftForm>): void {
+    const month = date.getMonth();
+    const day = date.getDate();
+    const startTimeControl = scheduleForm.get('startTime');
+    const endTimeControl = scheduleForm.get('endTime');
+
+    const startTimeValue: Date = startTimeControl?.value;
+    const endTimeValue: Date = endTimeControl?.value;
+
+    startTimeValue.setMonth(month);
+    startTimeValue.setDate(day);
+    endTimeValue.setMonth(month);
+    endTimeValue.setDate(day);
+
+    startTimeControl?.setValue(startTimeValue);
+    endTimeControl?.setValue(endTimeValue);
   }
 }

@@ -94,7 +94,7 @@
                 [max]="datePickerLimitations.maxDate"
                 [formGroupInstance]="scheduleForm"
                 [disabled]="!!control.readonly"
-                (change)="checkOpenPositions($any($event))"
+                (change)="handleDateChange($event)"
               ></app-datepicker>
             </ng-template>
             <ng-template [ngSwitchCase]="FieldTypes.Input">
