@@ -56,11 +56,11 @@
               </ng-template>
 
               <ng-template [ngSwitchCase]="FieldTypes.MultiSelectDropdown">
-                <div class="input-container bootstrap">
+                <div class="input-container">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="dropdown-wrapper">
-                    <div class="input-group">
+                    <div class="input-group bootstrap" [ngClass]="{ 'with-toggle': field.showAllToggle }">
                       <ejs-multiselect
                         appValidateWithMessage
                         selectAllText="Select All"
