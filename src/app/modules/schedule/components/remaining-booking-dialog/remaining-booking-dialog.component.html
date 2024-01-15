@@ -1,0 +1,38 @@
+<ejs-dialog
+  #destroyableDialog
+  cssClass="remaining-booking-dialog"
+  isModal="true"
+  visible="false"
+  showCloseIcon="true"
+  width="500px"
+  height="362px"
+  closeOnEscape
+  (close)="closeOnEscape()"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">Cancel the Remaining Booking</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <div>Would you like to cancel the remaining booking(s)?</div>
+    <div *ngFor="let item of remainingBookings; let i = index; trackBy: trackByStartTime">
+      {{i+1}}. {{item.startTime | date: 'HH:mm': 'UTC'}} - {{item.endTime | date: 'HH:mm': 'UTC'}}
+      <div class="booking-info">
+        {{item.region}} - {{item.location}} - {{item.department}} - {{item.skill}}
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <button ejs-button cssClass="e-outline" (click)="divideBooking()">No</button>
+      <button ejs-button [isPrimary]="true" (click)="cancelRemainingBooking()">Yes</button>
+    </div>
+  </ng-template>
+</ejs-dialog>

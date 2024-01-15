@@ -199,3 +199,10 @@
   (destroyDialog)="closeReplacementOrderDialog()"
   (createOrder)="saveNewEvent($event)"
 ></app-replacement-order-dialog>
+
+<app-remaining-booking-dialog
+  *ngIf="remainingBookingDialogOpen"
+  [remainingBookings]="remainingBookingDialogData"
+  (destroyDialog)="closeRemainingBookingDialog()"
+  (partialFloat)="handleRemainingBooking($event)"
+></app-remaining-booking-dialog>
