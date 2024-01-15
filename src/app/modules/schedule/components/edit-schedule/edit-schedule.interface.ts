@@ -21,6 +21,7 @@ export interface ScheduledShift {
   charge?: boolean;
   preceptor?: boolean;
   meal?: boolean;
+  shouldPartialFloat?: boolean;
 }
 
 export interface ScheduledShiftForm {
