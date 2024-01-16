@@ -55,7 +55,7 @@
         <label>Region</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="region" appValidateWithMessage placeholder="All"
-                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.region.dataSource"
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="regionsData$ | async"
                            [fields]="regionFields" [selectAllText]='allOption' showSelectAll=true>
           </ejs-multiselect>
         </div>
@@ -67,7 +67,7 @@
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="location" appValidateWithMessage
                            placeholder="All" [allowFiltering]="true" [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.location.dataSource" [fields]="locationFields" [selectAllText]='allOption' showSelectAll=true>
+                           [dataSource]="locationsData$ | async" [fields]="locationFields" [selectAllText]='allOption' showSelectAll=true>
           </ejs-multiselect>
         </div>
       </div>
@@ -77,7 +77,7 @@
         <label>Department</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="department" appValidateWithMessage placeholder="All"
-                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.department.dataSource"
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="departmentsData$ | async"
                            [fields]="departmentFields" [selectAllText]='allOption' showSelectAll=true>
           </ejs-multiselect>
         </div>
@@ -88,7 +88,7 @@
         <label>Skills</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="skills" placeholder="All"
-                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skills.dataSource"
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="skillsData$ | async"
                            [fields]="skillFields" [selectAllText]='allOption' showSelectAll=true>
           </ejs-multiselect>
         </div>
@@ -99,7 +99,7 @@
         <label>Order Type</label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox" formControlName="orderType" appValidateWithMessage placeholder="All"
-                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.orderType.dataSource"
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="orderTypeData$ | async"
                            [fields]="orderTypeFields" [selectAllText]='allOption' showSelectAll=true>
           </ejs-multiselect>
         </div>

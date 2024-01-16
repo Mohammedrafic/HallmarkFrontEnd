@@ -22,3 +22,7 @@ export class GetDepartmentsByLocations {
   static readonly type = '[Order Status Summary Report] Get The List Of Departments By Locations';
   constructor(public locationIds: string, public organizationId: number[]) { }
 }
+export class GetSkillsByOrganizations {
+  static readonly type = '[Order Status Summary Report] Get The List Of Regions By Organizations';
+  constructor() { }
+}
