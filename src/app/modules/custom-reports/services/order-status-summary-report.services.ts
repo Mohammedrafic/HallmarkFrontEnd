@@ -36,6 +36,6 @@ export class OrderStatusSummaryReportService {
   }
 
   public getSkillsByOrganizationId(): Observable<Skills[]> {
-    return this.http.get<Region[]>(`/api/AnalyticsFilterOptions/skills/filter`).pipe(map((data) => sortByField(data, 'skill')));
+    return this.http.get<Skills[]>(`/api/AnalyticsFilterOptions/skills/filter`).pipe(map((data) => sortByField(data, 'skill')));
   }
 }

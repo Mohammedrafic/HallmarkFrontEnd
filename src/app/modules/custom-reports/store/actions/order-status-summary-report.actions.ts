@@ -23,6 +23,6 @@ export class GetDepartmentsByLocations {
   constructor(public locationIds: string, public organizationId: number[]) { }
 }
 export class GetSkillsByOrganizations {
-  static readonly type = '[Order Status Summary Report] Get The List Of Regions By Organizations';
+  static readonly type = '[Order Status Summary Report] Get The List Of Skills By Organizations';
   constructor() { }
 }
