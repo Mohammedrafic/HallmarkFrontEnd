@@ -243,9 +243,14 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     const shiftIdControl = this.scheduleForm.get('shiftId');
     const startTimeDate = field === 'startTime' ? event.value : this.scheduleForm.get('startTime')?.value;
     const endTimeDate = field === 'endTime' ? event.value : this.scheduleForm.get('endTime')?.value;
+    const shiftDate = this.scheduleForm.get('date')?.value;
 
     if (shiftIdControl?.value !== this.customShiftId) {
       shiftIdControl?.setValue(this.customShiftId);
+    }
+
+    if (shiftDate && this.editScheduleService.needToUpdateEndTimeDate(startTimeDate, endTimeDate)) {
+      endTimeDate.setDate(shiftDate.getDate());
     }
 
     this.setHours(startTimeDate, endTimeDate);
