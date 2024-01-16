@@ -516,7 +516,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
         takeUntil(this.componentDestroy()),
       )
       .subscribe((shift: ScheduleShift) => {
-        this.scheduleForm.patchValue(GetShiftTimeControlsValue(shift.startTime, shift.endTime));
+        this.scheduleForm.patchValue(
+          GetShiftTimeControlsValue(shift.startTime, shift.endTime, this.selectedDaySchedule.date)
+        );
         this.setHours();
       }) || null;
   }

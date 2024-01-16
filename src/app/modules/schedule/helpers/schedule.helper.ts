@@ -167,7 +167,7 @@ export const CardTitleforExport = (scheduleItem: DaySchedules): string => {
 };
 
 export const GetScheduleFilterByEmployees = (filters: ScheduleInt.ScheduleFilters): ScheduleInt.EmployeesFilters => {
-  const { 
+  const {
     startDate, endDate, departmentIds, locationIds, regionIds, isAvailablity,
     isUnavailablity, isOnlySchedulatedCandidate, startTime, endTime,employeeSortCategory
   } = filters;
@@ -268,11 +268,11 @@ export const GetScheduleTabItems = (daySchedules: ScheduleItem[]): ShiftTab[] =>
 };
 
 export const GetShiftTimeControlsValue =
-  (shiftStartTime: string, shiftEndTime: string): { startTime: Date, endTime: Date } => {
+  (shiftStartTime: string, shiftEndTime: string, date?: string): { startTime: Date, endTime: Date } => {
     const [startH, startM, startS] = getHoursMinutesSeconds(shiftStartTime);
     const [endH, endM, endS] = getHoursMinutesSeconds(shiftEndTime);
-    const startTime = new Date();
-    const endTime = new Date();
+    const startTime = date ? new Date(date) : new Date();
+    const endTime = date ? new Date(date) : new Date();
     startTime.setHours(startH, startM, startS);
     endTime.setHours(endH, endM, endS);
 
