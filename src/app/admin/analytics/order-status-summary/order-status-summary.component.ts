@@ -409,17 +409,8 @@ export class OrderStatusSummaryComponent extends AbstractGridConfigurationCompon
     var locationsData = this.orderStatusSummaryReportForm.controls['location'].value;
     var departmentsData = this.orderStatusSummaryReportForm.controls['department'].value;
     var skillsData = this.orderStatusSummaryReportForm.controls['skills'].value;
-    if (this.orderStatusSummaryReportForm.controls['region'].value.length > 300) {     
-      this.orderStatusSummaryReportForm.controls['region'].setValue([]);
-    }
-    if (this.orderStatusSummaryReportForm.controls['location'].value.length > 300) {
-      this.orderStatusSummaryReportForm.controls['location'].setValue([]);
-    }
     if (this.orderStatusSummaryReportForm.controls['department'].value.length > 300) {      
       this.orderStatusSummaryReportForm.controls['department'].setValue([]);
-    }
-    if (this.orderStatusSummaryReportForm.controls['skills'].value.length > 300) {
-      this.orderStatusSummaryReportForm.controls['skills'].setValue([]);
     }
     const payload = {
       ...this.orderStatusSummaryReportForm.value
