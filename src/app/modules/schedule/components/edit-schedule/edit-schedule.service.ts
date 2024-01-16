@@ -244,4 +244,12 @@ export class EditScheduleService {
     startTimeControl?.setValue(startTimeValue);
     endTimeControl?.setValue(endTimeValue);
   }
+
+  needToUpdateEndTimeDate(start: Date, end: Date): boolean {
+    return this.getDateTimeMs(start) < this.getDateTimeMs(end) && start.getDate() !== end.getDate();
+  }
+
+  private getDateTimeMs(date: Date): number {
+    return date.getHours() * 3600000 + date.getMinutes() * 60000 + date.getSeconds() * 1000 + date.getMilliseconds();
+  }
 }
