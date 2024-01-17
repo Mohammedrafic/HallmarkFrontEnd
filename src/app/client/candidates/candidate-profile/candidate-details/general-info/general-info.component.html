@@ -172,4 +172,14 @@
     id="source-id"
     controlName="sourceId"
   ></app-dropdown>
+
+  <app-input
+  [formGroupInstance]="candidateForm"
+  [required]="false"
+  maxlength="50"
+  [disable]="true"
+  controlName="userEmail"
+  id="user-name"
+  label="User Name"
+></app-input>
 </form>
