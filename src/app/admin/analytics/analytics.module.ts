@@ -86,6 +86,7 @@ import {  PieSeriesService, AccumulationLegendService, AccumulationTooltipServic
   AccumulationDataLabelService} from '@syncfusion/ej2-angular-charts';
 import { UserVisibilityComponent } from '../../admin/analytics/user-visibility/user-visibility.component';
 import { OPDCredentialsExpiryComponent } from './opd-credentials-expiry/opd-credentials-expiry.component';
+import { OpdMissingCredentialComponent } from './opd-missing-credential/opd-missing-credential.component';
 
 
 @NgModule({
@@ -149,7 +150,8 @@ import { OPDCredentialsExpiryComponent } from './opd-credentials-expiry/opd-cred
     OrderStatusSummaryComponent,
     DepartmentSpendAndHoursComponent,
     UserVisibilityComponent,
-    OPDCredentialsExpiryComponent],
+    OPDCredentialsExpiryComponent,
+    OpdMissingCredentialComponent],
   exports: [
     CandidateListComponent
   ],
