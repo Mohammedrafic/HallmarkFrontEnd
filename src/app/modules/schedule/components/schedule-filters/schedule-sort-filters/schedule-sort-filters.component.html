@@ -14,7 +14,7 @@
   </ng-template>
   <ng-template #content>
     <section class="filter-wrapper">
-      <section >
+      
         <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="sortCategories" class="example-list"
           (cdkDropListDropped)="drop($event)">
           <div class="orgname" *ngFor="let item of sortCategories" cdkDrag>
@@ -64,7 +64,7 @@
                   </defs>
                 </svg>
               </div>
-              <div *ngIf="isShowSortingChange"  [ngClass]="item.class">
+              <div *ngIf="isShowSortingChange" class="list-opction"  [ngClass]="item.class">
                 <ejs-listbox [dataSource]='schduleSortCategories' (change)="ChangeSortCategories($event)"></ejs-listbox>
               </div>
               <div class="delete-icon e-control e-btn e-lib e-flat secondary-icon-button enabled-button">
@@ -161,7 +161,7 @@
           </div>
         </div>
         
-      </section>
+      
     </section>
    
   </ng-template>
