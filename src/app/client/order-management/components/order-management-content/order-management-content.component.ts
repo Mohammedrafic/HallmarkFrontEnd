@@ -17,6 +17,7 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import {
   ColDef,
+  ColumnApi,
   GridApi,
   GridOptions,
   GridReadyEvent,
@@ -213,7 +214,7 @@ import {
   GetOrderFilterDatesInUts,
   OrderManagementIrpGridHelper,
   OrderManagementIrpSubrowHelper,
-  PrepareOrderFilterDates
+  PrepareOrderFilterDates,
 } from '@client/order-management/helpers';
 import {
   AllOrdersDefaultStatuses,
@@ -263,6 +264,7 @@ import { IrpEmployeeToggleState } from '@shared/components/order-candidate-list/
 import { OrderManagementIRPRowPositionService } from '@shared/components/grid/cell-renderers/order-management-irp-row-position/order-management-irp-row-position.service';
 import { OrderJobType } from '@shared/enums';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
+import { resetAgGridHorizontalScroll } from '@core/helpers/grid-scroll.helper';
 
 @Component({
   selector: 'app-order-management-content',
@@ -482,6 +484,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private redirectFromPerdiem = false;
   private cd$ = new Subject();
   private gridApi: GridApi;
+  private columnApi: ColumnApi;
   private SelectedStatus: string[] = [];
   private candidateStatusId: string;
   private candidateStatusIds: string[] = [];
@@ -1552,6 +1555,7 @@ public RedirecttoIRPOrder(order:Order)
   }
   setGridApi(params: GridReadyEvent): void {
     this.gridApi = params.api;
+    this.columnApi = params.columnApi;
   }
 
   public onRowClick(event: RowSelectEventArgs): void {
@@ -1693,13 +1697,6 @@ public RedirecttoIRPOrder(order:Order)
     this.gridWithChildRow.pageSettings.pageSize = this.pageSize;
   }
 
-  public setRowHighlight(args: any): void {
-    // get and highlight rows with status 'open'
-    if (Object.values(STATUS_COLOR_GROUP)[0].includes(args.data['status'])) {
-      args.row.classList.add('e-success-row');
-    }
-  }
-
   public irpTabSelected(tabIndex: OrderManagementIRPTabsIndex) {
     if (tabIndex === this.activeIRPTabIndex) {
       return;
@@ -1719,6 +1716,7 @@ public RedirecttoIRPOrder(order:Order)
       this.dispatchPreservedFilters();
       this.pageSubject.next(1);
     }
+    resetAgGridHorizontalScroll(this.gridApi, this.columnApi);
     this.cd$.next(true);
   }
 
@@ -1781,6 +1779,7 @@ public RedirecttoIRPOrder(order:Order)
 
       this.dispatchPreservedFilters();
     }
+    this.resetGridHorizontalScroll(this.gridWithChildRow);
     this.cd$.next(true);
   }
 
