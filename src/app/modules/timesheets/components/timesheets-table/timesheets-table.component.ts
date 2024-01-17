@@ -16,6 +16,7 @@ import { TimesheetsTableColumns } from '../../enums';
 import { GRID_CONFIG } from '@shared/constants';
 import { BulkActionConfig, BulkActionDataModel } from '@shared/models/bulk-action-data.model';
 import { RowNode } from '@ag-grid-community/core';
+import { resetAgGridHorizontalScroll } from '@core/helpers/grid-scroll.helper';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -28,9 +29,15 @@ export class TimesheetsTableComponent extends AbstractPermission implements OnIn
 
   @Input() newSelectedIndex: null | number;
 
-  @Input() activeTabIdx: number;
+  @Input()
+  get activeTabIdx(): number { return this._activeTabIdx; }
+  set activeTabIdx(activeTabIdx: number) {
+    resetAgGridHorizontalScroll(this.gridInstance$.getValue()?.api, this.gridInstance$.getValue()?.columnApi);
+    this._activeTabIdx = activeTabIdx;
+  }
+  private _activeTabIdx: number;
 
-  @Input() allowSelecton: boolean = true;
+  @Input() allowSelecton = true;
 
   @Output() readonly changePage: EventEmitter<number> = new EventEmitter<number>();
 

@@ -39,7 +39,7 @@ export class GridValuesHelper {
     }
 
     if (value < 0) {
-      return `(${formatNumber(Math.abs(value), 'en', format) || ''})`
+      return `(${formatNumber(Math.abs(value), 'en', format) || ''})`;
     }
 
     return formatNumber(value, 'en', format) || '';

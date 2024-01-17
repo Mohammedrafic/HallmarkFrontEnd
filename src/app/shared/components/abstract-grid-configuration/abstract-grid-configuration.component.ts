@@ -247,6 +247,12 @@ export abstract class AbstractGridConfigurationComponent {
     event.stopPropagation();
   }
 
+  public resetGridHorizontalScroll(grid: GridComponent): void {
+    setTimeout(() => {
+      grid.getContent().children[0].scrollLeft = 0;
+    });
+  }
+
   public onSubrowToggle(event: MouseEvent, data: { index: string }): void {
     event.stopPropagation();
     const index = Number(data.index);

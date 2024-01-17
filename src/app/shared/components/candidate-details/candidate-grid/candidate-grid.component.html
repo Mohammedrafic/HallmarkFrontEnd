@@ -8,6 +8,7 @@
   [pageSize]="pageSize"
   [currentPage]="pageNumber"
   [totalRecordsCount]="candidatesPage?.totalCount || 0"
+  (gridReadyEmitter)="setGridApi($event)"
 ></app-grid>
 
 <app-export-dialog  [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()"
