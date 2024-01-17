@@ -1697,13 +1697,6 @@ public RedirecttoIRPOrder(order:Order)
     this.gridWithChildRow.pageSettings.pageSize = this.pageSize;
   }
 
-  public setRowHighlight(args: any): void {
-    // get and highlight rows with status 'open'
-    if (Object.values(STATUS_COLOR_GROUP)[0].includes(args.data['status'])) {
-      args.row.classList.add('e-success-row');
-    }
-  }
-
   public irpTabSelected(tabIndex: OrderManagementIRPTabsIndex) {
     if (tabIndex === this.activeIRPTabIndex) {
       return;

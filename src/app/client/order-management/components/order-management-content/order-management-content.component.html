@@ -224,7 +224,6 @@
     <ejs-grid
       #grid
       class="e-gridwithchildrow"
-      (rowDataBound)="setRowHighlight($event)"
       [dataSource]="(ordersPage$ | async)?.items"
       [pageSettings]="pageSettings"
       [height]="fullScreenGridHeight"
@@ -674,7 +673,7 @@
 </ng-template>
 <ng-template #orderJourneyGridTemplate>
   <section class="grid-component">
-    <ejs-grid #grid [dataSource]="(ordersJourneyPage$ | async)?.items" class="e-gridwithchildrow" (rowDataBound)="setRowHighlight($event)"
+    <ejs-grid #grid [dataSource]="(ordersJourneyPage$ | async)?.items" class="e-gridwithchildrow"
       [pageSettings]="pageSettings" [height]="isMobile ? mobileGridHeight : fullScreenGridHeight"
       [rowHeight]="rowHeight" [resizeSettings]="resizeSettings" [allowSorting]="allowSorting"
       [allowResizing]="allowResizing" [allowTextWrap]="allowWrap" (actionBegin)="actionBegin($event)"
