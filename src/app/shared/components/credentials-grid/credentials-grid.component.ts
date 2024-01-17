@@ -872,8 +872,7 @@ private saveCandidateCredentials({
         showtoolTipmessage:tooltipMessage,
         showDisableEditTooltip:
           ((item.status === this.statusEnum.Reviewed) &&
-          !this.isOrganizationSide) || ((item.status ===  this.statusEnum.Verified) &&
-          !this.isOrganizationSide)  ,
+          !this.isOrganizationSide) || ((item.status ===  this.statusEnum.Verified && !this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false)),
         disableDelete: this.disableDelete(item),
         credentialTypeName: item.credentialType?.name,
         credentialTypeId: item.credentialType?.id,
@@ -900,9 +899,9 @@ private saveCandidateCredentials({
       !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || item.id === this.orderCredentialId
       || ((item.status === this.statusEnum.Reviewed) && !this.isOrganizationSide)
-      || ((item.status === this.statusEnum.Verified) && !this.isOrganizationSide)
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
-      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
+      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile]) ||
+      ((item.status === this.statusEnum.Verified) && !this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false && !this.isOrganizationSide) 
       );
   }
 
@@ -912,7 +911,8 @@ private saveCandidateCredentials({
       || item.id === this.orderCredentialId
       || !this.hasPermissions()
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
-      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
+      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile]) ||
+      (item.status ===  this.statusEnum.Verified && !this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false && !this.isOrganizationSide)
     );
   }
 
@@ -973,9 +973,10 @@ private saveCandidateCredentials({
   private displayTooltip(item: CandidateCredential) : string {
     if ((item.status === this.statusEnum.Reviewed) && !this.isOrganizationSide) {
       return this.disableEditMessage;
-    } else if ((item.status === this.statusEnum.Verified) && !this.isOrganizationSide) {
+    } else if ((item.status === this.statusEnum.Verified)) {
       return this.verifiedDisableEditMessage ;
-    } else{
+    } 
+    else{
       return ''
     }
   }

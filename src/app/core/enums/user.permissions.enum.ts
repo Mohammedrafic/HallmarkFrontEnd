@@ -231,7 +231,7 @@ export enum UserPermissions {
   CanRejectCandidateIRP = 6410,
   CanEditOrderBillRateIRP = 6412,
   CanCloseOrdersIRP = 6413,
-
+  EditOrDeleteVerifiedCredentials=9030,
   //Agency setup
   EditAgencyNetsuitePaymentId = 8110,
   
