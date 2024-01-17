@@ -79,7 +79,7 @@ export interface ScheduleItem {
     department: string;
     orderPublicId: string;
     region: string;
-    primarySkill: number;
+    primarySkill: string;
     primarySkillId: number;
     regionId: number;
     locationId: number;
@@ -394,7 +394,7 @@ export interface SortCriteria
 {
    columnName :string
    sortOrder :string
-   
+
 }
 
 export interface EmployeeSortCategory

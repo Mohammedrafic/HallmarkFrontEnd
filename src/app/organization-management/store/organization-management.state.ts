@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { ImportResult } from '@shared/models/import.model';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, Observable, of, tap, throwError } from 'rxjs';
 import { Days } from 'src/app/shared/enums/days';
 import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
@@ -9,7 +9,6 @@ import { Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
-
 
 import {
   ClearAssignedSkillsByOrganization,
@@ -145,8 +144,7 @@ import {
   BulkUpdateDepartmentFailed,
   BulkUpdateDepartment,
   DeleteOrganizationSettingsValues,
-  DeleteOrganizationSettingsValuesSucceeded
-  
+  DeleteOrganizationSettingsValuesSucceeded,
 } from './organization-management.actions';
 import { BulkDepartmentAction, Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
 import { ImportedRegion, Region, regionFilter, regionsPage } from '@shared/models/region.model';
@@ -169,26 +167,21 @@ import {
   Skill,
   SkillDataSource,
   SkillsPage,
-  BulkSkillsAction
+  BulkSkillsAction,
 } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
-import { ShowToast,ShowBulkSkillActionDialog } from 'src/app/store/app.actions';
+import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialPage } from '@shared/models/credential.model';
 import {
+  RECALCULATING_TRIGGERED_BY_CONFIG,
   RECORD_ADDED,
   RECORD_ALREADY_EXISTS,
   RECORD_CANNOT_BE_DELETED,
   RECORD_DELETE,
   RECORD_MODIFIED,
-  Bulk_Update_Skills,
-  Bulk_Delete_Skills,
   usedByOrderErrorMessage,
-  Bulk_Update_Locations,
-  Bulk_Update_Department,
-  Bulk_Delete_Locations,
-  Bulk_Delete_Department,
 } from 'src/app/shared/constants/messages';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { Configuration } from '@shared/models/organization-settings.model';
@@ -206,13 +199,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import { ImportedBillRate } from '@shared/models';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { SplitReportedTimeOnBillRateEffectiveDate } from '@organization-management/settings/settings.constant';
 
 interface DropdownOption {
   id: number;
   text: string;
 }
 
-const StringIsNumber = (value: any) => isNaN(Number(value)) === true; // TODO: move to utils
+const StringIsNumber = (value: string) => isNaN(Number(value)) === true; // TODO: move to utils
 
 // TODO: separate states (skills, creds etc)
 export interface OrganizationManagementStateModel {
@@ -321,7 +315,7 @@ export interface OrganizationManagementStateModel {
     assignedSkillsByOrganization: [],
     filteringAssignedSkillsByOrganization: [],
     credentialSettingPage: null,
-    bulkupdateskills:null   
+    bulkupdateskills: null,
   },
 })
 @Injectable()
@@ -536,7 +530,6 @@ export class OrganizationManagementState {
     private organizationSettingsService: OrganizationSettingsService,
     private nodatimeService: NodatimeService,
     private billRatesService: BillRatesService
-   
   ) {}
 
   @Action(SetGeneralStatesByCountry)
@@ -619,8 +612,7 @@ export class OrganizationManagementState {
 
   @Action(GetBusinessUnitList)
   GetBusinessUnitList(
-    { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetBusinessUnitList
+    { patchState }: StateContext<OrganizationManagementStateModel>
   ): Observable<BusinessUnit[]> {
     return this.organizationService.getBusinessUnit().pipe(
       tap((payload) => {
@@ -720,7 +712,7 @@ export class OrganizationManagementState {
         ]);
         return payload;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         const message = error.error.errors?.EntityInUse
           ? usedByOrderErrorMessage('Department', error.error.errors['EntityInUse'])
           : RECORD_CANNOT_BE_DELETED;
@@ -868,6 +860,7 @@ export class OrganizationManagementState {
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
     );
   }
+
   @Action(BulkUpdateLocation)
   BulkUpdateLocation(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
@@ -893,11 +886,11 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError((error) => {
-        const errorObj = error.error;
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
       })
     );
   }
+
   @Action(BulkDeleteLocation)
   BulkDeleteLocation(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
@@ -923,11 +916,11 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError((error) => {
-        const errorObj = error.error;
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
       })
     );
   }
+
   @Action(BulkUpdateDepartment)
   BulkUpdateDepartment(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
@@ -953,11 +946,11 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError((error) => {
-        const errorObj = error.error;
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
       })
     );
   }
+
   @Action(BulkDeleteDepartment)
   BulkDeleteDepartment(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
@@ -983,7 +976,6 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError((error) => {
-        const errorObj = error.error;
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
       })
     );
@@ -1035,7 +1027,7 @@ export class OrganizationManagementState {
         dispatch(new GetLocationsByRegionId(regionId, filters));
         return payload;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         const message = error.error.errors?.EntityInUse
           ? usedByOrderErrorMessage('Location', error.error.errors['EntityInUse'])
           : RECORD_CANNOT_BE_DELETED;
@@ -1157,7 +1149,7 @@ export class OrganizationManagementState {
         dispatch(new RemoveSkillsCategorySucceeded());
         return payload;
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail))))
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
     );
   }
 
@@ -1190,7 +1182,7 @@ export class OrganizationManagementState {
         dispatch(new RemoveMasterSkillSucceeded());
         return payload;
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail))))
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
     );
   }
 
@@ -1218,7 +1210,6 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError((error) => {
-        const errorObj = error.error;
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
       })
     );
@@ -1247,7 +1238,6 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError((error) => {
-        const errorObj = error.error;
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
       })
     );
@@ -1312,7 +1302,7 @@ export class OrganizationManagementState {
         dispatch(new RemoveAssignedSkillSucceeded());
         return payload;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         const message = error.error.errors?.EntityInUse
           ? usedByOrderErrorMessage('Skill', error.error.errors['EntityInUse'])
           : 'Skill cannot be deleted';
@@ -1373,7 +1363,7 @@ export class OrganizationManagementState {
         dispatch(new GetCredentialTypes());
         return payload;
       }),
-      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
     );
   }
 
@@ -1428,7 +1418,7 @@ export class OrganizationManagementState {
         dispatch(new SaveCredentialSucceeded(payloadResponse));
         return payloadResponse;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
@@ -1445,7 +1435,7 @@ export class OrganizationManagementState {
         dispatch(new RemoveCredentialSuccess());
         return payload;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         const message = error.error.errors?.EntityInUse
           ? usedByOrderErrorMessage('Credential', error.error.errors['EntityInUse'])
           : RECORD_CANNOT_BE_DELETED;
@@ -1456,8 +1446,7 @@ export class OrganizationManagementState {
 
   @Action(GetAllSkills)
   GetAllSkills(
-    { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetAllSkills
+    { patchState }: StateContext<OrganizationManagementStateModel>
   ): Observable<SkillsPage> {
     return this.skillsService.getAllMasterSkills().pipe(
       tap((payload) => {
@@ -1510,7 +1499,7 @@ export class OrganizationManagementState {
         dispatch(new GetCredentialSkillGroup(pageNumber, pageSize));
         return payload;
       }),
-      catchError((error: any) => {
+      catchError((error: HttpErrorResponse) => {
         const message = error.error.errors?.EntityInUse
           ? usedByOrderErrorMessage('Group', error.error.errors['EntityInUse'])
           : RECORD_CANNOT_BE_DELETED;
@@ -1546,22 +1535,27 @@ export class OrganizationManagementState {
   SaveOverrideOrganizationSettings(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
     { organizationSettings, filters }: SaveOrganizationSettings
-  ): Observable<void | Observable<void>> {
+  ): Observable<void | HttpErrorResponse> {
     return this.organizationSettingsService.saveOrganizationSetting(organizationSettings).pipe(
       tap((payload) => {
         patchState({ isCredentialSetupLoading: false });
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-        dispatch(new GetOrganizationSettings(filters));
+        let message = RECORD_MODIFIED;
+        if (organizationSettings.settingKey === SplitReportedTimeOnBillRateEffectiveDate) {
+          message += '\n' + RECALCULATING_TRIGGERED_BY_CONFIG;
+        }
+        dispatch([new ShowToast(MessageTypes.Success, message), new GetOrganizationSettings(filters)]);
         return payload;
       }),
-      catchError((error: HttpErrorResponse) => of(dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+        return throwError(() => error);
+      }),
     );
   }
 
   @Action(ClearDepartmentList)
   ClearDepartmentList(
-    { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: ClearDepartmentList
+    { patchState }: StateContext<OrganizationManagementStateModel>
   ): Observable<any> {
     patchState({ departments: [] });
     return of([]);
@@ -1569,15 +1563,14 @@ export class OrganizationManagementState {
 
   @Action(ClearLocationList)
   ClearLocationList(
-    { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: ClearLocationList
+    { patchState }: StateContext<OrganizationManagementStateModel>
   ): Observable<any> {
     patchState({ locations: [] });
     return of([]);
   }
 
   @Action(ExportLocations)
-  ExportLocations({}: StateContext<OrganizationManagementStateModel>, { payload }: ExportLocations): Observable<any> {
+  ExportLocations({ payload }: ExportLocations): Observable<any> {
     return this.locationService.export(payload).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
@@ -1586,7 +1579,7 @@ export class OrganizationManagementState {
     );
   }
   @Action(ExportRegions)
-  ExportRegions({}: StateContext<OrganizationManagementStateModel>, { payload }: ExportRegions): Observable<any> {
+  ExportRegions({ payload }: ExportRegions): Observable<any> {
     return this.regionService.exportRegion(payload).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
@@ -1597,7 +1590,6 @@ export class OrganizationManagementState {
 
   @Action(ExportDepartments)
   ExportDepartments(
-    {}: StateContext<OrganizationManagementStateModel>,
     { payload }: ExportDepartments
   ): Observable<any> {
     return this.departmentService.export(payload).pipe(
@@ -1609,7 +1601,7 @@ export class OrganizationManagementState {
   }
 
   @Action(ExportSkills)
-  ExportSkills({}: StateContext<OrganizationManagementStateModel>, { payload }: ExportSkills): Observable<any> {
+  ExportSkills({ payload }: ExportSkills): Observable<any> {
     return this.skillsService.exportAssignedSkills(payload).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
@@ -1620,8 +1612,7 @@ export class OrganizationManagementState {
 
   @Action(GetSkillDataSources)
   GetSkillDataSources(
-    { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetSkillDataSources
+    { patchState }: StateContext<OrganizationManagementStateModel>
   ): Observable<SkillDataSource> {
     return this.skillsService.getSkillsDataSources().pipe(
       tap((dataSource) => {
@@ -1633,8 +1624,7 @@ export class OrganizationManagementState {
 
   @Action(GetAllOrganizationSkills)
   GetAllOrganizationSkills(
-    { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetAllOrganizationSkills
+    { patchState }: StateContext<OrganizationManagementStateModel>
   ): Observable<Skill[]> {
     return this.skillsService.getAllOrganizationSkills().pipe(
       tap((skills) => {
@@ -1709,8 +1699,7 @@ export class OrganizationManagementState {
 
   @Action(GetLocationTypes)
   GetLocationTypes(
-    { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetLocationTypes
+    { patchState }: StateContext<OrganizationManagementStateModel>
   ): Observable<LocationType[]> {
     patchState({ isLocationTypesLoading: true });
     return this.locationService.getLocationTypes().pipe(
@@ -1723,8 +1712,7 @@ export class OrganizationManagementState {
 
   @Action(GetUSCanadaTimeZoneIds)
   GetUSCanadaTimeZoneIds(
-    { patchState }: StateContext<OrganizationManagementStateModel>,
-    {}: GetUSCanadaTimeZoneIds
+    { patchState }: StateContext<OrganizationManagementStateModel>
   ): Observable<TimeZoneModel[]> {
     return this.nodatimeService.getUSCanadaTimeZoneIds().pipe(
       tap((payload) => {
@@ -1744,7 +1732,7 @@ export class OrganizationManagementState {
         dispatch(new GetLocationsImportTemplateSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))),
     );
   }
 
@@ -1758,7 +1746,7 @@ export class OrganizationManagementState {
         dispatch(new GetLocationsImportErrorsSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))),
     );
   }
 
@@ -1766,19 +1754,17 @@ export class OrganizationManagementState {
   UploadLocationsFile(
     { dispatch }: StateContext<CandidateStateModel>,
     { payload }: UploadLocationsFile
-  ): Observable<ImportResult<ImportedLocation> | Observable<void>> {
+  ): Observable<ImportResult<ImportedLocation> | void> {
     return this.locationService.uploadLocationsFile(payload).pipe(
       tap((payload) => {
         dispatch(new UploadLocationsFileSucceeded(payload));
         return payload;
       }),
-      catchError((error: any) =>
-        of(
-          dispatch(
-            new ShowToast(
-              MessageTypes.Error,
-              error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
-            )
+      catchError((error: HttpErrorResponse) =>
+        dispatch(
+          new ShowToast(
+            MessageTypes.Error,
+            error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
           )
         )
       )
@@ -1789,13 +1775,13 @@ export class OrganizationManagementState {
   SaveLocationsImportResult(
     { dispatch }: StateContext<OrganizationManagementStateModel>,
     { payload }: SaveLocationsImportResult
-  ): Observable<ImportResult<ImportedLocation> | Observable<void>> {
+  ): Observable<ImportResult<ImportedLocation> | void> {
     return this.locationService.saveLocationImportResult(payload).pipe(
       tap((payload) => {
         dispatch(new SaveLocationsImportResultSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Locations were not imported'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Locations were not imported')))
     );
   }
 
@@ -1809,7 +1795,7 @@ export class OrganizationManagementState {
         dispatch(new GetDepartmentsImportTemplateSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file')))
     );
   }
 
@@ -1823,7 +1809,7 @@ export class OrganizationManagementState {
         dispatch(new GetDepartmentsImportErrorsSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file')))
     );
   }
 
@@ -1831,19 +1817,17 @@ export class OrganizationManagementState {
   UploadDepartmentsFile(
     { dispatch }: StateContext<CandidateStateModel>,
     { payload }: UploadDepartmentsFile
-  ): Observable<ImportResult<ImportedDepartment> | Observable<void>> {
+  ): Observable<ImportResult<ImportedDepartment> | void> {
     return this.departmentService.uploadDepartmentsFile(payload).pipe(
       tap((payload) => {
         dispatch(new UploadDepartmentsFileSucceeded(payload));
         return payload;
       }),
-      catchError((error: any) =>
-        of(
-          dispatch(
-            new ShowToast(
-              MessageTypes.Error,
-              error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
-            )
+      catchError((error: HttpErrorResponse) =>
+        dispatch(
+          new ShowToast(
+            MessageTypes.Error,
+            error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
           )
         )
       )
@@ -1854,13 +1838,13 @@ export class OrganizationManagementState {
   SaveDepartmentsImportResult(
     { dispatch }: StateContext<OrganizationManagementStateModel>,
     { payload }: SaveDepartmentsImportResult
-  ): Observable<ImportResult<ImportedDepartment> | Observable<void>> {
+  ): Observable<ImportResult<ImportedDepartment> | void> {
     return this.departmentService.saveDepartmentsImportResult(payload).pipe(
       tap((payload) => {
         dispatch(new SaveDepartmentsImportResultSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rates were not imported'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Bill rates were not imported')))
     );
   }
 
@@ -1874,7 +1858,7 @@ export class OrganizationManagementState {
         dispatch(new GetBillRatesImportTemplateSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file')))
     );
   }
 
@@ -1888,7 +1872,7 @@ export class OrganizationManagementState {
         dispatch(new GetBillRatesImportErrorsSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file')))
     );
   }
 
@@ -1896,19 +1880,17 @@ export class OrganizationManagementState {
   UploadBillRatesFile(
     { dispatch }: StateContext<CandidateStateModel>,
     { payload }: UploadBillRatesFile
-  ): Observable<ImportResult<ImportedBillRate> | Observable<void>> {
+  ): Observable<ImportResult<ImportedBillRate> | void> {
     return this.billRatesService.uploadBillRatesFile(payload).pipe(
       tap((payload) => {
         dispatch(new UploadBillRatesFileSucceeded(payload));
         return payload;
       }),
-      catchError((error: any) =>
-        of(
-          dispatch(
-            new ShowToast(
-              MessageTypes.Error,
-              error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
-            )
+      catchError((error: HttpErrorResponse) =>
+        dispatch(
+          new ShowToast(
+            MessageTypes.Error,
+            error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
           )
         )
       )
@@ -1919,13 +1901,13 @@ export class OrganizationManagementState {
   SaveBillRatesImportResult(
     { dispatch }: StateContext<OrganizationManagementStateModel>,
     { payload }: SaveBillRatesImportResult
-  ): Observable<ImportResult<ImportedBillRate> | Observable<void>> {
+  ): Observable<ImportResult<ImportedBillRate> | void> {
     return this.billRatesService.saveBillRatesImportResult(payload).pipe(
       tap((payload) => {
         dispatch(new SaveBillRatesImportResultSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rates were not imported'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Bill rates were not imported')))
     );
   }
 
@@ -1937,7 +1919,7 @@ export class OrganizationManagementState {
         dispatch(new GetRegionsImportTemplateSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file')))
     );
   }
 
@@ -1948,34 +1930,34 @@ export class OrganizationManagementState {
         dispatch(new GetRegionsImportErrorsSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file')))
     );
   }
 
   @Action(UploadRegionsFile)
-  UploadRegionsFile({ dispatch }: StateContext<CandidateStateModel>, { payload }: UploadRegionsFile): Observable<ImportResult<ImportedRegion> | Observable<void>> {
+  UploadRegionsFile({ dispatch }: StateContext<CandidateStateModel>, { payload }: UploadRegionsFile): Observable<ImportResult<ImportedRegion> | void> {
     return this.regionService.uploadRegionsFile(payload).pipe(
       tap((payload) => {
         dispatch(new UploadRegionsFileSucceeded(payload));
         return payload;
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : 'File was not uploaded'))))
+      catchError((error: HttpErrorResponse) =>dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : 'File was not uploaded')))
     );
   }
 
   @Action(SaveRegionsImportResult)
-  SaveRegionsImportResult({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveRegionsImportResult): Observable<ImportResult<ImportedRegion> | Observable<void>> {
+  SaveRegionsImportResult({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveRegionsImportResult): Observable<ImportResult<ImportedRegion> | void> {
     return this.regionService.saveRegionImportResult(payload).pipe(
       tap((payload) => {
         dispatch(new SaveRegionsImportResultSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Regions were not imported'))))
+      catchError(() => dispatch(new ShowToast(MessageTypes.Error, 'Regions were not imported')))
     );
   }
   @Action(DeleteOrganizationSettingsValues)
   DeleteOrganizationSettingValue(
-    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
     { settingValueId}: DeleteOrganizationSettingsValues
   ): Observable<any> {
     return this.organizationSettingsService.deleteOrganizationSettingValues(settingValueId).pipe(
@@ -1984,7 +1966,7 @@ export class OrganizationManagementState {
         dispatch(new DeleteOrganizationSettingsValuesSucceeded());
         return payload;
       }),
-      catchError((error: HttpErrorResponse) => of(dispatch(new ShowToast(MessageTypes.Error, error.error)))),
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error))),
     );
   }
 }

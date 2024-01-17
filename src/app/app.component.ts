@@ -5,7 +5,7 @@ import { Store } from '@ngxs/store';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { B2CAuthService } from './b2c-auth/b2c-auth.service';
 
-import { CheckScreen, SetIsMspArea, SetIsOrganizationAgencyArea } from './store/app.actions';
+import { CheckScreen, SetIsAdminArea, SetIsMspArea, SetIsOrganizationAgencyArea } from './store/app.actions';
 import { SetUserPermissions } from "./store/user.actions";
 @Component({
   selector: 'app-root',
@@ -39,10 +39,12 @@ export class AppComponent implements OnInit {
     ).subscribe(data => {
       if (!data?.['skipAuthentication']) {
         const isOrganizationArea = data?.['isOrganizationArea'] || false;
-        const isAgencyArea = data?.['isAgencyArea'] || false;
+        const isAgencyArea = data?.['isAgencyArea'] || false;        
         const isMSPArea = data?.['isMSPArea'] || false;
+        const isAdminArea = data?.['isAdminArea'] || false;
         this.store.dispatch(new SetIsOrganizationAgencyArea({ isOrganizationArea, isAgencyArea }));
         this.store.dispatch(new SetIsMspArea({ isMSPArea }));
+        this.store.dispatch(new SetIsAdminArea({ isAdminArea }));
         this.store.dispatch(new SetUserPermissions());
       }
     });

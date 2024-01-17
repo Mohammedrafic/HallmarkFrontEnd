@@ -34,6 +34,11 @@ export type UserDTO = {
 
 export type UsersPage = PageOfCollections<User>;
 
+export type turnOffNotification = {
+  userId: string;
+  businessUnitType: number;
+}
+
 export type RolesPerUser = {
   id: number;
   name: string;

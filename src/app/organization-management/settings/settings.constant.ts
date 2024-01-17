@@ -85,7 +85,7 @@ export const SettingsAppliedToPermissions: string[] = [
   'AllowDuplicateClockIdforOrganization',
   'EnableClearedToStartForAcceptedCandidates',
   'SplitReportedTimeOnBillRateEffectiveDate',
-  'TimeLimitforManagerReviewEmail'
+  'TimeLimitforManagerReviewEmail',
 ];
 
 export const DisabledSettingsByDefault = [

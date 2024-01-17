@@ -20,6 +20,7 @@ import {
   SaveMainContentElement,
   SetHelpSystem,
   SetIsMspArea,
+  SetIsAdminArea,
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -28,6 +29,7 @@ import { IS_DARK_THEME } from '@shared/constants';
 import { BreakpointObserverService } from '@core/services';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 import { IsMspAreaStateModel } from '../shared/models/is-msp-area-state.model';
+import { IsAdminAreaStateModel } from '../shared/models/is-admin-area.model';
 
 export interface AppStateModel {
   isMobile: boolean;
@@ -38,6 +40,7 @@ export interface AppStateModel {
   isSidebarOpened: boolean;
   isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
   isMspsArea: IsMspAreaStateModel;
+  isAdminArea: IsAdminAreaStateModel;
   getAlertsForCurrentUser: GetAlertsForUserStateModel[];
   getAlertsCountForCurrentUser: number;
   isMobileScreen: boolean;
@@ -69,6 +72,7 @@ export interface AppStateModel {
       isAgencyArea: false,
     },
     isMspsArea: { isMSPArea: false },
+    isAdminArea: { isAdminArea: false },
     getAlertsForCurrentUser: [],
     getAlertsCountForCurrentUser:0,
     isMobileScreen: false,
@@ -128,6 +132,11 @@ export class AppState {
   @Selector()
   static isMspArea(state: AppStateModel): IsMspAreaStateModel {
     return state.isMspsArea;
+  }
+
+  @Selector()
+  static isAdminArea(state: AppStateModel): IsAdminAreaStateModel {
+    return state.isAdminArea;
   }
 
   @Selector()
@@ -220,6 +229,14 @@ export class AppState {
     { payload }: SetIsMspArea
   ): void {
     patchState({ isMspsArea: payload });
+  }
+
+  @Action(SetIsAdminArea)
+  SetIsAdminArea(
+    { patchState }: StateContext<AppStateModel>,
+    { payload }: SetIsAdminArea
+  ): void {
+    patchState({ isAdminArea: payload });
   }
 
   @Action(GetAlertsForCurrentUser)

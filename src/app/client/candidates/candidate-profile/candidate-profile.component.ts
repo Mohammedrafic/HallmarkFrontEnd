@@ -78,6 +78,9 @@ export class CandidateProfileComponent extends DestroyableDirective implements O
       this.candidateProfileFormService.markCandidateFormAsTouched();
       return EMPTY;
     } else {
+      if(this.candidateService.employeeId == null){
+        this.candidateProfileFormService.candidateForm.controls['userEmail'].setValue(this.candidateProfileFormService.candidateForm.get('personalEmail')?.value);
+      }
       return this.skillsChangeHandler();
     }
   }

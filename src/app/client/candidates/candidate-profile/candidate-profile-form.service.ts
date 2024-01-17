@@ -77,6 +77,7 @@ export class CandidateProfileFormService {
           [Validators.required, Validators.email, Validators.maxLength(200)],
         ],
         workEmail: [null, [Validators.email, Validators.maxLength(200)]],
+        userEmail: [null, [Validators.email, Validators.maxLength(200)]],
         phone1: [null, [Validators.required]],
         phone2: [null],
         professionalSummary: [null, Validators.maxLength(500)],

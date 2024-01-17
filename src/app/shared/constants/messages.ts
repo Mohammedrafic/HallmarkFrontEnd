@@ -17,6 +17,7 @@ export const DELETE_CONFIRM_TEXT = 'Are you sure you want to leave this page wit
 export const DELETE_FOLDER_TEXT = 'Are you sure you want to delete folder?';
 export const DELETE_FOLDER_TITLE = 'Delete Folder';
 export const RECALCULATING_TRIGGERED = 'Timesheets will be recalculated according to the new Holiday Rate';
+export const RECALCULATING_TRIGGERED_BY_CONFIG = 'Timesheets will be recalculated according to the new config setting';
 export const WARNING_TITLE = 'Warning';
 export const ADD_CONFIRM_TEXT =
   'Are you sure you want to add Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';

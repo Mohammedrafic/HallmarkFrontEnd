@@ -17,7 +17,7 @@ import {
 import { FormControl } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
-import { ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
+import { ChangedEventArgs, ChangeEventArgs } from '@syncfusion/ej2-angular-calendars';
 import { catchError, EMPTY, filter, map, Observable, Subscription, switchMap, take, takeUntil, tap, zip } from 'rxjs';
 
 import { OutsideZone } from '@core/decorators';
@@ -26,8 +26,8 @@ import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { CustomFormGroup, DropdownOption, Permission } from '@core/interface';
 import { GlobalWindow } from '@core/tokens';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
-import { 
-  DELETE_CONFIRM_TITLE, RECORD_MODIFIED, RECORDS_ADDED, 
+import {
+  DELETE_CONFIRM_TITLE, RECORD_MODIFIED, RECORDS_ADDED,
   UNSAVED_TABS_TEXT, OrganizationSettingKeys, OrganizationalHierarchy,
 } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -69,6 +69,7 @@ import {
 } from '../../interface';
 import { CreateScheduleService, OpenPositionService, ScheduleApiService, ScheduleFiltersService } from '../../services';
 import { BookingsOverlapsRequest, BookingsOverlapsResponse } from '../replacement-order-dialog/replacement-order.interface';
+import { RemainingBooking } from '../remaining-booking-dialog/remaining-booking.interface';
 import {
   EditScheduleFormSourceKeys,
   EditScheduleSourcesMap,
@@ -86,7 +87,6 @@ import { EditScheduleFormFieldConfig, ShiftTab } from './edit-schedule.interface
 import { EditScheduleService } from './edit-schedule.service';
 import { SettingsViewService } from '@shared/services';
 import { UserState } from 'src/app/store/user.state';
-
 
 @Component({
   selector: 'app-edit-schedule',
@@ -133,6 +133,8 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   trackByTabs: TrackByFunction<ShiftTab> = (_: number, tab: ShiftTab) => tab.id;
   replacementOrderDialogOpen = false;
   replacementOrderDialogData: BookingsOverlapsResponse[] = [];
+  remainingBookingDialogOpen = false;
+  remainingBookingDialogData: RemainingBooking[] = [];
 
   private readonly customShiftId = -1;
   private readonly newScheduleId = -1;
@@ -241,9 +243,14 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     const shiftIdControl = this.scheduleForm.get('shiftId');
     const startTimeDate = field === 'startTime' ? event.value : this.scheduleForm.get('startTime')?.value;
     const endTimeDate = field === 'endTime' ? event.value : this.scheduleForm.get('endTime')?.value;
+    const shiftDate = this.scheduleForm.get('date')?.value;
 
     if (shiftIdControl?.value !== this.customShiftId) {
       shiftIdControl?.setValue(this.customShiftId);
+    }
+
+    if (shiftDate && this.editScheduleService.needToUpdateEndTimeDate(startTimeDate, endTimeDate)) {
+      endTimeDate.setDate(shiftDate.getDate());
     }
 
     this.setHours(startTimeDate, endTimeDate);
@@ -293,6 +300,15 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   closeReplacementOrderDialog(): void {
     this.replacementOrderDialogOpen = false;
     this.cdr.markForCheck();
+  }
+
+  closeRemainingBookingDialog(): void {
+    this.remainingBookingDialogOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  handleRemainingBooking(shouldPartialFloat: boolean): void {
+    this.updateScheduledShift(shouldPartialFloat);
   }
 
   saveSchedule(): void {
@@ -365,6 +381,15 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
   }
 
+  handleDateChange(event: ChangedEventArgs): void {
+    this.checkOpenPositions(event as { isInteracted: boolean });
+
+    if (event.value) {
+      this.editScheduleService.updateTimeControlsDate(event.value, this.scheduleForm);
+      this.setHours();
+    }
+  }
+
   checkOpenPositions(event: { isInteracted: boolean }): void {
     this.openPositionsConfig.canFetchOpenPositions = this.selectedDaySchedule.scheduleType !== ScheduleType.Unavailability
       && !this.isEmployee
@@ -402,7 +427,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
 
   private ifShiftEdited(): boolean {
     return !!(this.isShiftOriented &&
-      (this.scheduleForm.get('departmentId')?.dirty || 
+      (this.scheduleForm.get('departmentId')?.dirty ||
        this.scheduleForm.get('date')?.dirty || this.scheduleForm.get('skillId')?.dirty));
   }
 
@@ -412,8 +437,24 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
         filter(Boolean),
         takeUntil(this.componentDestroy())
       ).subscribe(() => {
-        this.updateScheduledShift();
+        this.handleScheduledShiftPartialFloating();
       });
+    } else {
+      this.handleScheduledShiftPartialFloating();
+    }
+  }
+
+  private handleScheduledShiftPartialFloating(): void {
+    if (!this.needPartialFloating()) {
+      this.updateScheduledShift();
+      return;
+    }
+
+    const remainingBookingDialogData: RemainingBooking[] = this.editScheduleService
+      .getRemainingBookingDialogData(this.selectedDaySchedule, this.scheduleForm);
+
+    if (remainingBookingDialogData.length) {
+      this.openRemainingBookingDialog(remainingBookingDialogData);
     } else {
       this.updateScheduledShift();
     }
@@ -480,7 +521,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
         takeUntil(this.componentDestroy()),
       )
       .subscribe((shift: ScheduleShift) => {
-        this.scheduleForm.patchValue(GetShiftTimeControlsValue(shift.startTime, shift.endTime));
+        this.scheduleForm.patchValue(
+          GetShiftTimeControlsValue(shift.startTime, shift.endTime, this.selectedDaySchedule.date)
+        );
         this.setHours();
       }) || null;
   }
@@ -589,7 +632,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }) || null;
   }
 
-  private updateScheduledShift(): void {
+  private updateScheduledShift(shouldPartialFloat = false): void {
     const { departmentId, skillId, shiftId, startTime, endTime, date,
       unavailabilityReasonId, orientated, critical, oncall, charge, preceptor, meal } = this.scheduleForm.getRawValue();
     const schedule: EditSchedule.ScheduledShift = {
@@ -608,6 +651,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       charge: charge || false,
       preceptor: preceptor || false,
       meal: meal || false,
+      shouldPartialFloat,
     };
 
     if (this.selectedDaySchedule.scheduleType !== ScheduleType.Book) {
@@ -821,6 +865,12 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     this.cdr.markForCheck();
   }
 
+  private openRemainingBookingDialog(remainingBookingDialogData: RemainingBooking[]): void {
+    this.remainingBookingDialogData = remainingBookingDialogData;
+    this.remainingBookingDialogOpen = true;
+    this.cdr.markForCheck();
+  }
+
   private changeScheduledShift(scheduledItem: ScheduledItem | null) {
     if (scheduledItem && scheduledItem.schedule) {
       this.isCreateMode = false;
@@ -1021,5 +1071,28 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
     }
 
     return !this.editScheduleService.hasScheduleAvailability(this.scheduledItem);
+  }
+
+  private needPartialFloating(): boolean {
+    return this.isTimeChanged() && this.isPartialFloatingFieldsChanged();
+  }
+
+  private isTimeChanged(): boolean {
+    const { startTime, endTime } = this.scheduleForm.getRawValue();
+    const currentStartTime = getTime(startTime);
+    const currentEndTime = getTime(endTime);
+    const initialStartTime = getTime(DateTimeHelper.setCurrentTimeZone(this.selectedDaySchedule.startDate));
+    const initialEndTime = getTime(DateTimeHelper.setCurrentTimeZone(this.selectedDaySchedule.endDate));
+
+    return currentStartTime !== initialStartTime || currentEndTime !== initialEndTime;
+  }
+
+  private isPartialFloatingFieldsChanged(): boolean {
+    const { regionId, locationId, departmentId, skillId } = this.scheduleForm.getRawValue();
+
+    return regionId !== this.selectedDaySchedule.orderMetadata.regionId
+      || locationId !== this.selectedDaySchedule.orderMetadata.locationId
+      || departmentId !== this.selectedDaySchedule.orderMetadata.departmentId
+      || skillId !== this.selectedDaySchedule.orderMetadata.primarySkillId;
   }
 }

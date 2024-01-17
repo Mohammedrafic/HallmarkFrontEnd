@@ -6,11 +6,13 @@ import { Store } from '@ngxs/store';
 import { EMPTY, Observable } from 'rxjs';
 
 import { CustomFormGroup, DropdownOption } from '@core/interface';
+import { DateTimeHelper } from '@core/helpers';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { ScheduledItem, ScheduleItem } from 'src/app/modules/schedule/interface';
 import { ShowToast } from 'src/app/store/app.actions';
 
+import { RemainingBooking } from './../remaining-booking-dialog/remaining-booking.interface';
 import { ScheduleItemType } from '../../constants';
 import { ScheduleType } from '../../enums';
 import { ScheduledShiftForm } from './edit-schedule.interface';
@@ -163,5 +165,91 @@ export class EditScheduleService {
   hasScheduleAvailability(scheduledItem: ScheduledItem): boolean {
     return scheduledItem.schedule.daySchedules
       .some((day: ScheduleItem) => day.scheduleType === ScheduleType.Availability);
+  }
+
+  getRemainingBookingDialogData(
+    selectedDaySchedule: ScheduleItem,
+    scheduleForm: CustomFormGroup<ScheduledShiftForm>
+  ): RemainingBooking[] {
+    const remainingBookingBase: RemainingBooking = {
+      region: selectedDaySchedule.orderMetadata.region,
+      location: selectedDaySchedule.orderMetadata.location,
+      department: selectedDaySchedule.orderMetadata.department,
+      skill: selectedDaySchedule.orderMetadata.primarySkill,
+    } as RemainingBooking;
+
+    const { startTime: currentStartTime, endTime: currentEndTime } = scheduleForm.getRawValue();
+    const currentStartTimeMs = currentStartTime.getTime();
+    const currentEndTimeMs = currentEndTime.getTime();
+    const initialStartTimeMs = DateTimeHelper.setCurrentTimeZone(selectedDaySchedule.startDate).getTime();
+    const initialEndTimeMs = DateTimeHelper.setCurrentTimeZone(selectedDaySchedule.endDate).getTime();
+
+    if (
+      currentStartTimeMs > initialStartTimeMs
+      && currentEndTimeMs < initialEndTimeMs
+      && currentEndTimeMs > currentStartTimeMs
+    ) {
+      return [
+        {
+          ...remainingBookingBase,
+          startTime: selectedDaySchedule.startDate,
+          endTime: DateTimeHelper.setUtcTimeZone(currentStartTime),
+        }, {
+          ...remainingBookingBase,
+          startTime: DateTimeHelper.setUtcTimeZone(currentEndTime),
+          endTime: selectedDaySchedule.endDate,
+        },
+      ];
+    }
+
+    if (currentStartTimeMs > initialStartTimeMs) {
+      return [
+        {
+          ...remainingBookingBase,
+          startTime: selectedDaySchedule.startDate,
+          endTime: currentStartTimeMs < initialEndTimeMs
+            ? DateTimeHelper.setUtcTimeZone(currentStartTime)
+            : selectedDaySchedule.endDate,
+        },
+      ];
+    }
+
+    if (currentEndTimeMs < initialEndTimeMs && currentEndTimeMs > initialStartTimeMs) {
+      return [
+        {
+          ...remainingBookingBase,
+          startTime: DateTimeHelper.setUtcTimeZone(currentEndTime),
+          endTime: selectedDaySchedule.endDate,
+        },
+      ];
+    }
+
+    return [];
+  }
+
+  updateTimeControlsDate(date: Date, scheduleForm: CustomFormGroup<ScheduledShiftForm>): void {
+    const month = date.getMonth();
+    const day = date.getDate();
+    const startTimeControl = scheduleForm.get('startTime');
+    const endTimeControl = scheduleForm.get('endTime');
+
+    const startTimeValue: Date = startTimeControl?.value;
+    const endTimeValue: Date = endTimeControl?.value;
+
+    startTimeValue.setMonth(month);
+    startTimeValue.setDate(day);
+    endTimeValue.setMonth(month);
+    endTimeValue.setDate(day);
+
+    startTimeControl?.setValue(startTimeValue);
+    endTimeControl?.setValue(endTimeValue);
+  }
+
+  needToUpdateEndTimeDate(start: Date, end: Date): boolean {
+    return this.getDateTimeMs(start) < this.getDateTimeMs(end) && start.getDate() !== end.getDate();
+  }
+
+  private getDateTimeMs(date: Date): number {
+    return date.getHours() * 3600000 + date.getMinutes() * 60000 + date.getSeconds() * 1000 + date.getMilliseconds();
   }
 }

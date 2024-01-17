@@ -8,7 +8,7 @@ import {
   UserVisibilitySettingsPage,
 } from '@shared/models/visibility-settings.model';
 import { Observable, map } from 'rxjs';
-import { RolesPerUser, User, UserDTO, UsersPage } from '@shared/models/user-managment-page.model';
+import { RolesPerUser, turnOffNotification, User, UserDTO, UsersPage } from '@shared/models/user-managment-page.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
@@ -36,6 +36,13 @@ export class UsersService {
     FilterModel: any
   ): Observable<UsersPage> {
     return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel });
+  }
+
+  public turnOffSubscription(
+    BusinessUnitType: BusinessUnitType,
+    userId: string
+  ): Observable<turnOffNotification> {
+    return this.http.post<turnOffNotification>(`/api/UserSubscription/IRPturnoffallsubscriptions`, { userId, BusinessUnitType });
   }
 
   /**
