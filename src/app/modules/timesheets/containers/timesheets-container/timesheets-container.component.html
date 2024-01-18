@@ -24,11 +24,11 @@
             >
             </ejs-dropdownlist>
             <ng-container *ngIf="!isAgencyVisibilityFlagEnabled">
-              <ejs-dropdownlist  *ngIf="organizations$ | async as organizations" 
+              <ejs-dropdownlist  *ngIf="showDropDown" 
                 appHideBeforeSyncfusionLoad
                 placeholder="Select organization"
                 [allowFiltering]="true"
-                [dataSource]="organizations"
+                [dataSource]="(organizations$ | async)"
                 [fields]="unitOrganizationsFields"
                 [formControl]="organizationControl"
               >
