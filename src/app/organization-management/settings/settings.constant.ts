@@ -116,7 +116,8 @@ export const DisabledSettingsByDefault = [
   'MandatorySpecialProjectDetails',
   'SplitReportedTimeOnBillRateEffectiveDate',
   'TimeLimitforManagerReviewEmail',
-  'Createreplacementorderswhenschedulesgetcancelled'
+  'Createreplacementorderswhenschedulesgetcancelled',
+  'Leaverequestcomments'
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {
