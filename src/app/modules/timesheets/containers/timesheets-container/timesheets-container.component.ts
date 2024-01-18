@@ -115,6 +115,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public isAgencyVisibilityFlagEnabled = false;
   public orderTypeId: any;
   isRedirectedFromDashboard: boolean;
+  showDropDown:boolean = false;
 
   constructor(
     private store: Store,
@@ -161,6 +162,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.calcTabsBadgeAmount();
     this.initOnRedirect();
     this.timesheets$.subscribe(tableData=>{
+      this.showDropDown = true;
       if(tableData && this.timesheetId > 0){
         let filterTimesheet = tableData.items.find(ele=>ele.id == this.timesheetId);
         let filterTimesheetIndex = tableData.items.findIndex(ele=>ele.id == this.timesheetId);
@@ -387,6 +389,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         take(1)
       )
       .subscribe((res) => {
+        this.showDropDown = false;
         const orgId = this.routerState?.["condition"] === "setOrg"
                       ? this.routerState?.["orderStatus"]
                       : this.getOrganizationIdFromState() || res[0].id;

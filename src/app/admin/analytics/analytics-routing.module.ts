@@ -60,6 +60,7 @@ import { DepartmentSpendAndHoursComponent } from './department-spend-and-hours/d
 import { OrderStatusSummaryComponent } from './order-status-summary/order-status-summary.component';
 import { UserVisibilityComponent } from './user-visibility/user-visibility.component';
 import { OPDCredentialsExpiryComponent } from './opd-credentials-expiry/opd-credentials-expiry.component';
+import { OpdMissingCredentialComponent } from './opd-missing-credential/opd-missing-credential.component';
 const routes: Routes = [
   {
     path: '',
@@ -468,6 +469,13 @@ const routes: Routes = [
       {
         path: 'opd-credentials-expiry',
         component: OPDCredentialsExpiryComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'opd-missing-credentials',
+        component: OpdMissingCredentialComponent,
         data: {
           isOrganizationArea: true,
         }
