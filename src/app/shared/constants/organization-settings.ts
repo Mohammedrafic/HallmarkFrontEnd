@@ -70,6 +70,9 @@ export enum OrganizationSettingKeys {
   MarkZeroDollarInvoicetoPaidOnApproval,
   EnableClearedToStartForAcceptedCandidates,
   TimeLimitforManagerReviewEmail,
+  SplitReportedTimeOnBillRateEffectiveDate,
+  AutoEnableClearedToStart,
+  Leaverequestcomments,
   Createreplacementorderswhenschedulesgetcancelled
 }
 

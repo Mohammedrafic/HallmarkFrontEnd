@@ -96,6 +96,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public isFeatureIrpEnabled = false;
   public readonly systemType = OrderManagementIRPSystemId;
   public isCandidatePayRateVisible: boolean;
+  public isCandidateLeaveRequest:boolean;
   public readonly orderStatus = OrderStatus;
   public editCandidateDialogState: EditCandidateDialogState = {
     isOpen: false,
@@ -201,6 +202,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     this.candidate = { ...data };
     this.getDeployedCandidateOrders();
     this.getCandidatePayRateSetting();
+    this.getRequestLeaveComments();
     this.dialogNextPreviousOption =
       getDialogNextPreviousOption(this.candidate, this.grid.dataSource as OrderCandidatesList[]);
     this.orderCandidateListViewService.setIsCandidateOpened(true);
@@ -456,7 +458,22 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       });
     }
   }
-
+  private getRequestLeaveComments(): void {
+    const organizationId = this.candidate.organizationId;
+    if(organizationId) {
+    this.settingService
+      .getViewSettingKey(
+        OrganizationSettingKeys.Leaverequestcomments,
+        OrganizationalHierarchy.Organization,
+        organizationId,
+        organizationId
+      ).pipe(takeUntil(this.unsubscribe$))
+      .subscribe(({ Leaverequestcomments }) => {
+        this.isCandidateLeaveRequest = JSON.parse(Leaverequestcomments);
+      });
+    }
+  }
+  
   private setPreviousSelectedSystem(): void {
     this.previousSelectedSystemId = this.orderManagementService.getOrderManagementSystem();
   }

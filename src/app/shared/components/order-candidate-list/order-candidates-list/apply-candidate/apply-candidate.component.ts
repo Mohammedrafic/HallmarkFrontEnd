@@ -47,7 +47,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
   @Input() isOrderOverlapped: boolean;
-
+  @Input() isCandidateLeaveRequest: boolean;
   public formGroup: FormGroup;
   public readOnlyMode: boolean;
   public candidatStatus = CandidatStatus;
@@ -119,6 +119,19 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.today.setMinutes(0);
     this.createForm();
     this.subscribeOnInitialData();
+    this.leaveValidation();
+  }
+  leaveValidation():void
+  {
+    if(this.isCandidateLeaveRequest)
+    {
+      this.formGroup.get('requestComment')?.setValidators(Validators.required);
+      this.formGroup.get('requestComment')?.updateValueAndValidity();
+    }else{
+      this.formGroup.get('requestComment')?.setValidators(Validators.maxLength(2000));
+      this.formGroup.get('requestComment')?.updateValueAndValidity();
+    }
+    this.changeDetectorRef.markForCheck();
   }
 
   ngOnDestroy(): void {
@@ -131,6 +144,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public applyOrderApplicants(): void {
+    this.leaveValidation();
     this.formGroup.markAllAsTouched();
     if (this.formGroup.valid) {
 
