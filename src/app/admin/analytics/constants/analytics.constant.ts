@@ -264,6 +264,18 @@ export const departmentSpendHourReportConstants = {
     EndDate: 'endDate',
   }
 }
+export const OPDMissingCredentialReportConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',    
+    skillCategoryIds: 'skillCategoryIds',
+    skillIds: 'skillIds',
+    StartDate: 'startDate',
+    EndDate: 'endDate',
+  }
+}
 
 export const accrualReportTypesList : { name: string; id: number }[] = [
   { name: 'Invoice date range', id: 0 },
