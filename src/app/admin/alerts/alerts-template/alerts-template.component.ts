@@ -217,7 +217,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           suppressMovable: true,
           filter: false,
           sortable: false,
-          menuTabs: []
+          menuTabs: [],
+          alertChannel:AlertChannel.SMS,
         },
       },
       {
@@ -229,7 +230,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           suppressMovable: true,
           filter: false,
           sortable: false,
-          menuTabs: []
+          menuTabs: [],
+          alertChannel:AlertChannel.OnScreen
         },
       },
 

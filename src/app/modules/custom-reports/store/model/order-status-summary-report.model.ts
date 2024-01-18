@@ -1,10 +1,3 @@
-//export enum OrderType {
-//  'Contract to Perm' = 0,
-//  'Open Per Diem' = 1,
-//  'Perm Placement' = 2,
-//  'LTA' = 3,
-//  'Reorder' = 10
-//}
 export class OrderStatusSummaryReportRequest {
   Region?: string;
   Location?: string;
@@ -14,29 +7,37 @@ export class OrderStatusSummaryReportRequest {
   OrderStatus?: string;
 }
 
+export class LocationFilter {
+  RegionIds?: number[];
+  OrganizationId: number[];
+}
+
+export class DepartmentFilter {
+  LocationIds?: number[];
+  OrganizationId: number[];
+}
+
 export class OrderStatusSummaryReportFilters {
-  region: Region[];
-  location: Location[];
-  department: Department[];
   skills: Skills[];
   orderType: OrderTypeDto[];
 }
 
 export class Region {
-  regionId: number;
+  regionId: number | undefined;
   region: string
 }
 
 export class Location {
   locationId: number;
   location: string;
-  regionId: number
+  regionId: number;
 }
 
 export class Department {
   departmentId: number;
   department: string;
-  locationId: number
+  locationId: number;
+  extDepartmentId?: string;
 }
 
 export class Skills {

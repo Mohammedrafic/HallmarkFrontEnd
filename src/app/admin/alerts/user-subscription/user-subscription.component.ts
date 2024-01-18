@@ -1,5 +1,5 @@
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
-import { GetEmployeeUsers, GetNonEmployeeUsers, GetRolePerUser } from '../../../security/store/security.actions';
+import { GetEmployeeUsers, GetNonEmployeeUsers, GetNotificationSubscription, GetRolePerUser } from '../../../security/store/security.actions';
 import { ButtonModel } from '@shared/models/buttons-group.model';
 import { Component, Input, NgZone, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
@@ -7,7 +7,7 @@ import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, Subject, take, takeUntil, takeWhile } from 'rxjs';
 import { SecurityState } from 'src/app/security/store/security.state';
 import {
   alertsFilterColumns,
@@ -45,7 +45,8 @@ import { DetectActiveSystem, SystemGroupConfig } from '@client/order-management/
 import { GetOrganizationById } from '@admin/store/alerts.actions';
 import { isNumber } from 'lodash';
 import { GroupEmailRole } from '@shared/models/group-email.model';
-import { RolesPerUser } from '@shared/models/user-managment-page.model';
+import { RolesPerUser, turnOffNotification } from '@shared/models/user-managment-page.model';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-user-subscription',
@@ -58,6 +59,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   @Select(SecurityState.allUsersPage)
   public userData$: Observable<UsersPage>;
+
+  @Select(SecurityState.getNotificationValue)
+  public NotificationData$: Observable<turnOffNotification>;
 
   @Select(AlertsState.UserSubscriptionPage)
   public userSubscriptionPage$: Observable<UserSubscriptionPage>;
@@ -152,10 +156,17 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   get rolesControl(): AbstractControl {
     return this.businessForm.get('roles') as AbstractControl;
   }
+
+  public get showTurnOffNotifications(): boolean {
+    const user = this.store.selectSnapshot(UserState.user);
+    return (user?.businessUnitType == BusinessUnitType.Hallmark) && (this.activeSystem === OrderManagementIRPSystemId.IRP);
+  }
+
   @Select(AlertsState.GetGroupRolesByOrgId)
   public roleData$: Observable<GroupEmailRole[]>;
   constructor(private actions$: Actions,
     private readonly ngZone: NgZone,
+    private confirmService: ConfirmService,
     private store: Store,
     private orderManagementService: OrderManagementService,
     private changeDetector: ChangeDetectorRef) {
@@ -367,6 +378,32 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     });
     this.allowActiveUsers = true;
 
+  }
+
+  public DisableNotification() {
+    let userId = this.store.selectSnapshot(UserState.user)?.id as string;
+    const userBusinessType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    this.confirmService.confirm("Are you sure you want to Turn Off All the Subscriptions for the user", {
+      title: 'Confirm',
+      okButtonLabel: 'OK',
+      cancelButtonLabel: 'Cancel',
+      okButtonClass: '',
+    }).pipe(
+      filter((confirm: boolean) => !!confirm),
+      take(1),
+      takeWhile(() => this.isAlive)
+    ).subscribe((value: boolean) => {
+      if(value){
+        this.store.dispatch(new GetNotificationSubscription(userBusinessType, userId));
+        this.NotificationData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+          setTimeout(() => {
+            this.dispatchNewPage(this.usersControl.value);
+            this.store.dispatch(new ShowToast(MessageTypes.Success, "Notification Subscription has been turned off"));
+            this.changeDetector.detectChanges();
+          },500);
+        });  
+      }
+    });
   }
 
   public onGridReady(params: GridReadyEvent): void {

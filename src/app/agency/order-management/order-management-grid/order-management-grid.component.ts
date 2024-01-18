@@ -154,7 +154,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
   };
-  public isAgency:boolean = false;
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public orderPositionSelected$ = new Subject<boolean>();
@@ -649,6 +648,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
             this.filteredItems$.next(this.filteredItems.length);
           }
           this.store.dispatch(new GetAgencyFilterOptions());
+          this.resetGridHorizontalScroll(this.gridWithChildRow);
         })
       )
       .subscribe();

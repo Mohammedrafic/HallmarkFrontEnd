@@ -58,10 +58,9 @@ import {
   GetOrganizationSettings,
   GetOrganizationSettingsFilterOptions,
   GetRegions,
-  SaveOrganizationSettings
+  SaveOrganizationSettings,
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
-import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.model';
 import { SettingsDataAdapter } from '../../shared/helpers/settings-data.adapter';
 import {
   AssociatedLink,
@@ -79,14 +78,14 @@ import {
   SettingsFilterCols,
   SettingsSystemFilterCols,
   TextOptionFields,
-  TierSettingsKey
+  TierSettingsKey,
 } from './settings.constant';
 import {
   ATPRateCalculationPayload,
   AutoGenerationPayload,
   PayPeriodPayload,
   StartsOnPayload,
-  SwitchValuePayload
+  SwitchValuePayload,
 } from '@shared/models/settings.interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { mapKeys, camelCase } from 'lodash';
@@ -695,12 +694,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       isIRPConfigurationValue: this.configurationSystemType === SystemType.IRP,
     };
 
-    this.store.dispatch(new SaveOrganizationSettings(setting, this.filters));
-    this.store.dispatch(new ShowSideDialog(false));
-    this.setSelectedRecords();
-    this.removeActiveCssClass();
-    this.clearFormDetails();
-    this.isFormShown = false;
+    this.store.dispatch(new SaveOrganizationSettings(setting, this.filters)).pipe(tap(() => {
+      this.closeSettingDialog();
+    }), take(1)).subscribe();
   }
 
   private setFormValidation(data: Configuration): void {
@@ -842,15 +838,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       const valueOptions = this.isParentEdit ? parentDataValue : childDataValue;
 
       dynamicValue = SettingsDataAdapter.getParsedValue(valueOptions);
-      const startsOn = dynamicValue.StartsOn || dynamicValue.startsOn;
-      const isEnabled = dynamicValue.IsEnabled || dynamicValue.isEnabled;
-      const startsOnDate = startsOn ? DateTimeHelper.setCurrentTimeZone(startsOn) : null;
-
-      this.startsOnMinDate = new Date();
-      this.startsOnFormGroup.setValue({
-        startsOn: startsOnDate,
-        isEnabled: isEnabled ? isEnabled : false,
-      });
+      this.startsOnDateHandler(dynamicValue);
     }
 
     if (this.formControlType === OrganizationSettingControlType.ATPRateCalculation) {
@@ -880,6 +868,19 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       });
     }
     this.updateFormOutsideZone(parentData, childData, dynamicValue);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private startsOnDateHandler(dynamicValue: any): void {
+    const startsOn = dynamicValue.StartsOn || dynamicValue.startsOn;
+    const isEnabled = dynamicValue.IsEnabled || dynamicValue.isEnabled;
+    const startsOnDate = startsOn ? DateTimeHelper.setCurrentTimeZone(startsOn) : null;
+
+    this.startsOnMinDate = DateTimeHelper.setInitDateHours(new Date());
+    this.startsOnFormGroup.setValue({
+      startsOn: startsOnDate,
+      isEnabled: isEnabled ? isEnabled : false,
+    });
   }
 
   private regionChanged(regionId: number): void {

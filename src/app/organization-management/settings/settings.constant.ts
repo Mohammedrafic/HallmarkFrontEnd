@@ -85,7 +85,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'AllowDuplicateClockIdforOrganization',
   'EnableClearedToStartForAcceptedCandidates',
   'SplitReportedTimeOnBillRateEffectiveDate',
-  'TimeLimitforManagerReviewEmail'
+  'TimeLimitforManagerReviewEmail',
+  'Createreplacementorderswhenschedulesgetcancelled'
 ];
 
 export const DisabledSettingsByDefault = [
@@ -115,6 +116,7 @@ export const DisabledSettingsByDefault = [
   'MandatorySpecialProjectDetails',
   'SplitReportedTimeOnBillRateEffectiveDate',
   'TimeLimitforManagerReviewEmail',
+  'Createreplacementorderswhenschedulesgetcancelled'
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

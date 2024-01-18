@@ -1,5 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { Component, Input, OnInit } from '@angular/core';
 import { CandidateStatus } from '@shared/enums/status';
 import { Actions, Store, ofActionDispatched } from '@ngxs/store';
 import {
@@ -14,14 +13,15 @@ import {
   SetPageSize,
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { CandidateDetailsPage, FiltersModal } from '@shared/components/candidate-details/models/candidate.model';
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, ColumnApi, GridApi, GridReadyEvent } from '@ag-grid-community/core';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
 import { ShowExportDialog } from 'src/app/store/app.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { Subject, filter, takeUntil } from 'rxjs';
-import { DatePipe } from '@angular/common';
+import { formatDate } from '@angular/common';
 import { CandidateDetailsFilterTab } from '@shared/enums/candidate-assignment.enum';
+import { resetAgGridHorizontalScroll } from '@core/helpers/grid-scroll.helper';
 
 @Component({
   selector: 'app-candidate-grid',
@@ -33,8 +33,13 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
   @Input() public pageNumber: number;
   @Input() public override pageSize: number;
   @Input() public filters: FiltersModal |  null;
-  @Input() public activeTab: CandidateDetailsFilterTab;
-  @ViewChild('grid') grid: GridComponent;
+  @Input()
+  get activeTab(): CandidateDetailsFilterTab { return this._activeTab; }
+  set activeTab(activeTab: CandidateDetailsFilterTab) {
+    resetAgGridHorizontalScroll(this.gridApi, this.columnApi);
+    this._activeTab = activeTab;
+  }
+  private _activeTab: CandidateDetailsFilterTab;
 
   public readonly statusEnum = CandidateStatus;
   public isAgency = false;
@@ -46,7 +51,10 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
   private unsubscribe$: Subject<void> = new Subject();
   public defaultFileName: string;
   public fileName: string;
-  constructor(private router: Router, store: Store, public datePipe: DatePipe, private actions$: Actions) {
+  private gridApi: GridApi;
+  private columnApi: ColumnApi;
+  
+  constructor(private router: Router, store: Store, private actions$: Actions) {
     super(store);
   }
 
@@ -78,7 +86,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
     this.filters!.orderBy = this.orderBy;
     this.columnsToExport = this.isAgency ? CandidateAgencyExportColumns : CandidateOrgExportColumns;
     let tab= this.activeTab;
-    this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab] + ' '+ this.generateDateTime(this.datePipe);
+    this.defaultFileName = this.generateExportFileName();
     let filterQuery:any = {...this.filters};
     if(filterQuery?.organizationIds){
       filterQuery.organizationIds = [filterQuery.organizationIds]
@@ -94,7 +102,6 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
         )
       )
     );
-    this.clearSelection(this.grid);
   }
 
   public closeExport(): void {
@@ -104,7 +111,7 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
 
   private watchForDefaultExport(): void {
     this.export$.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
-      this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab] + ' '+ this.generateDateTime(this.datePipe);
+      this.defaultFileName = this.generateExportFileName();
       this.defaultExport(event);
     });
   }
@@ -117,13 +124,22 @@ export class CandidateGridComponent extends AbstractPermissionGrid implements On
         takeUntil(this.unsubscribe$)
       )
       .subscribe(() => {
-        this.defaultFileName = 'Candidate Assignment '+ CandidateDetailsFilterTab[this.activeTab]+ ' ' + this.generateDateTime(this.datePipe);
+        this.defaultFileName = this.generateExportFileName();
         this.fileName = this.defaultFileName;
       });
+  }
+
+  private generateExportFileName(): string {
+    return 'Candidate Assignment ' + CandidateDetailsFilterTab[this.activeTab] +
+      ' ' + formatDate(Date.now(), 'MM/dd/yyyy HH:mm', 'en-US');
   }
 
   public sortByColumn(order: string): void {
   this.orderBy =order
     }
   
+  public setGridApi(params: GridReadyEvent): void {
+    this.gridApi = params.api;
+    this.columnApi = params.columnApi;
+  }
 }

@@ -6,6 +6,7 @@ import { AgencyStatus } from '@shared/enums/status';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { Store } from '@ngxs/store';
 import { ButtonRenderedEvent } from '../../../models/button.model';
+import { AlertChannel, AlertIdEnum } from '@admin/alerts/alerts.enum';
 
 @Component({
   selector: 'app-button-renderer',
@@ -24,12 +25,14 @@ export class ButtonRendererComponent extends AbstractPermission implements ICell
   params: any;
   label: string;
   selectedType:number=0;
+  alertEditDisable:boolean =false;
 
   agInit(params: any): void {
     this.params = params;
     this.label = this.params.label || null;
     this.selectedType = this.params.selectedType
 
+    this.alertEditDisable = (this.params.alertChannel== AlertChannel.OnScreen || this.params.alertChannel==AlertChannel.SMS) && this.params.data.alertId == AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets'];
   }
 
   refresh(params?: any): boolean {

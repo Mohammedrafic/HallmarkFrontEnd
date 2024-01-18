@@ -32,6 +32,7 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
   public isShowSorting = false;
   public isShowSortingChange = false;
   public isSortingClick = true;
+  private readonly ScheduleSortingCategories=ScheduleSortingCategory
   public constructor(private store: Store, private action$: Actions, private scheduleFiltersService: ScheduleFiltersService,) {
     super();
   }
@@ -107,17 +108,22 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
     this.isShowSorting = !this.isShowSorting
     this.isShowSortingChange = false;
   }
-  sortClick(sort: any) {
-
-    this.sortCategories.forEach(element => {
-      if (element.id == sort.id) {
-        element.sortOrder = sort.sortOrder == SortOrder.ASCENDING ? SortOrder.DESCENDING : SortOrder.ASCENDING
-        element.tooltip = this.toolTipValues(element)
+  sortOrderChange(sort: any) {
+    this.sortCategories.forEach((element, index) => {
+      if (element.id === sort.id) {
+        // Deep copy the object to avoid reference sharing
+        const updatedElement = JSON.parse(JSON.stringify(element));
+        // Update the properties of the copied object
+        updatedElement.sortOrder = sort.sortOrder === SortOrder.ASCENDING ? SortOrder.DESCENDING : SortOrder.ASCENDING;
+        updatedElement.tooltip = this.toolTipChangeValues(updatedElement);
+        // Replace the old object with the updated copy
+        this.sortCategories[index] = updatedElement;
       }
     });
+  
 
   }
-  toolTipValues(sort: any): string {
+  toolTipChangeValues(sort: any): string {
     if (sort.sortOrder == SortOrder.ASCENDING && (sort.columnName == 'FirstName' || sort.columnName == 'LastName')) {
       return 'A - Z'
     }
@@ -134,7 +140,7 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
     }
   }
   HideSortCategories(event: any) {
-    this.sortCategories.push(event.items[0]);
+    this.sortCategories.push(this.ScheduleSortingCategories.find(f=>f.id==event.items[0].id));
     this.isShowSorting = false
     this.isShowSortingChange = false;
     this.sortListCategories();
@@ -142,15 +148,15 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
   ChangeSortCategories(event: any) {
     this.isShowSortingChange = false;
     this.schduleSortCategories.push(this.sortChangeCategories[0]);
-    this.sortCategories.push(event.items[0]);
+    this.sortCategories.push(this.ScheduleSortingCategories.find(f=>f.id==event.items[0].id));
     this.sortCategories = this.sortCategories.filter(f => !this.sortChangeCategories.map(m => m.id).includes(f.id));
     this.sortListCategories();
     this.sortChangeCategories = [];
   }
   onRemove(event: any) {
     this.sortCategories = this.sortCategories.filter(f => f.id !== event.id);
-    this.schduleSortCategories.push(event);
-    this.schduleSortCategories = [...this.schduleSortCategories]
+    this.schduleSortCategories.push(this.ScheduleSortingCategories.find(f=>f.id==event.id));
+    this.schduleSortCategories = [...this.schduleSortCategories];
   }
 
   sortListCategories() {
@@ -167,7 +173,7 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
   activeTimePeriodBasedSortCategories() {
     this.activeSchedulePeriod = this.scheduleFiltersService.getActiveScheduleTimePeriod();
     if (this.activeSchedulePeriod == DatesRangeType.Day) {
-      return ScheduleSortingCategory
+      return this.ScheduleSortingCategories
     } else {
       let notAvailableIDs = [7, 8];
       if (this.sortCategories.some(f => notAvailableIDs.includes(f.id))) {
@@ -183,7 +189,7 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
         );
         this.scheduleFiltersService.setScheduleFiltersData(filters);
       }
-      return ScheduleSortingCategory.filter(f => !notAvailableIDs.includes(f.id))
+      return this.ScheduleSortingCategories.filter(f => !notAvailableIDs.includes(f.id))
     }
   }
 
@@ -210,7 +216,7 @@ export class ScheduleSortFiltersComponent extends DestroyableDirective implement
         element.class = "active"
       }
     });
-    this.sortChangeCategories.push(event)
+    this.sortChangeCategories.push(this.ScheduleSortingCategories.find(f=>f.id==event.id))
 
   }
 }

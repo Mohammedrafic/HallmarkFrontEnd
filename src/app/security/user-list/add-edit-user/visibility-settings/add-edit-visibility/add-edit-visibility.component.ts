@@ -112,7 +112,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
           regionIds: this.allRegions ? null : value.regionIds,
           locationIds: this.allLocations ? null : value.locationIds,
           departmentIds: this.allDepartments ? null : value.departmentIds,
-          organisationIds: value.organisationIds === this.allOrganisationId ? result : [value.organisationIds],
+          organisationIds: value.organisationIds === this.allOrganisationId ? [] : [value.organisationIds],
           userId: this.createdUser?.id as string,
           id: (this.editVisibility?.id as number) || null,
         })

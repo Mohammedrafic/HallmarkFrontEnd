@@ -39,24 +39,23 @@ import { DateTime } from '@syncfusion/ej2-angular-charts';
 })
 export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
   public paramsData: any = {
-    "OrganizationParamCREXP": "",
-    "StartDateParamCREXP": "",
-    "EndDateParamCREXP": "",
-    "RegionParamCREXP": "",
-    "LocationParamCREXP": "",
-    "DepartmentParamCREXP": "",
-    "BearerParamCREXP": "",
-    "BusinessUnitIdParamCREXP": "",
-    "HostName": "",
-    "AgencyParamCREXP": "",
-    "CandidateStatusCREXP": "",
-    "JobIdCREXP": "",
-    "OpCredFlagEXP": "",
-    "UserId": "",
-    "organizationNameCREXP": "",
-    "reportPulledMessageCREXP": "",
-    "DateRangeCREXP": "",
-    "PeriodParamCREXP": ""
+
+    "OrganizationIdOCE": "",
+    "StartDateOCE": "",
+    "EndDateOCE": "",
+    "RegionIdsOCE": "",
+    "LocationIdsOCE": "",
+    "DepartmentIdsOCE": "",
+    "AgencyIdOCE": "",
+    "CandidateStatusOCE": "",
+    "OrderIdOCE": "",
+    "BOrganizationIdOCE": "",
+    "OptionalOCE": "",
+    "UserIdOCE": "",
+    "OrganizationNameOCE": "",
+    "ReportPulledMessageOCE": "",
+    "DateRangeOCE": "",
+    "PeriodOCE": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/OPDCredentialExpiry/OPDCredentialExpiry.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/OPDCredentialExpiry/OPDCredentialExpiry.cat" };

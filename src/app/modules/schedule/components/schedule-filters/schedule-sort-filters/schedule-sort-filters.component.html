@@ -14,7 +14,7 @@
   </ng-template>
   <ng-template #content>
     <section class="filter-wrapper">
-      <section >
+      
         <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="sortCategories" class="example-list"
           (cdkDropListDropped)="drop($event)">
           <div class="orgname" *ngFor="let item of sortCategories" cdkDrag>
@@ -45,7 +45,7 @@
             <div class="right-section">
               <span class="active-text">{{item.tooltip}}</span>
               <div [ngClass]="item.sortOrder">
-                <svg xmlns="http://www.w3.org/2000/svg" class="sortIcon" (click)="sortClick(item)" width="16" height="16"
+                <svg xmlns="http://www.w3.org/2000/svg" class="sortIcon" (click)="sortOrderChange(item)" width="16" height="16"
                   viewBox="0 0 16 16" fill="none">
                   <g clip-path="url(#clip0_10530_410166)">
                     <path d="M8.83789 3.8623L11.6663 1.03388L14.4947 3.8623" stroke="white" stroke-width="1.25"
@@ -64,7 +64,7 @@
                   </defs>
                 </svg>
               </div>
-              <div *ngIf="isShowSortingChange"  [ngClass]="item.class">
+              <div *ngIf="isShowSortingChange" class="list-opction"  [ngClass]="item.class">
                 <ejs-listbox [dataSource]='schduleSortCategories' (change)="ChangeSortCategories($event)"></ejs-listbox>
               </div>
               <div class="delete-icon e-control e-btn e-lib e-flat secondary-icon-button enabled-button">
@@ -161,7 +161,7 @@
           </div>
         </div>
         
-      </section>
+      
     </section>
    
   </ng-template>

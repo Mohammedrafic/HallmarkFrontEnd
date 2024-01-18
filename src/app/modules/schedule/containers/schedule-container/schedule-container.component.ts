@@ -419,11 +419,11 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   }
 
   public exportTable() {
+    this.scheduleFilters.pageNumber = 1;
     this.scheduleFilters.pageSize = this.totalCount;
     this.scheduleApiService
       .getScheduleEmployees(this.scheduleFilters)
       .subscribe((scheduleData: ScheduleInt.ScheduleCandidatesPage) => {
-        this.scheduleFilters.pageSize = this.totalCount;
         this.scheduleApiService
           .exportSchedule(
             scheduleData.items.map((c) => c.id),

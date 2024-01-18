@@ -16,6 +16,7 @@ export interface PendingInvoice extends BaseInvoice {
   weekNumber: number;
   rejectionReason: string | null;
   invoiceRecords: PendingInvoiceRecord[];
+  invoiceIdData:PendingInvoiceRecord[];
   attachments: Attachment[];
   rate: number | null;
   bonus: number | null;

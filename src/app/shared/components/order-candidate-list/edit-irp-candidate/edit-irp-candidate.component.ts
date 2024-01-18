@@ -547,10 +547,12 @@ export class EditIrpCandidateComponent extends Destroyable implements OnInit {
               statusConfigField.dataSource.splice(objWithIdIndex, 1);
             }
           }
-          this.availableStartDate = candidateDetails.actualStartDate;
+          this.availableStartDate = candidateDetails.actualStartDate || this.orderDetailsData.jobStartDate;
           this.candidateForm.patchValue({
-            actualStartDate: DateTimeHelper.setCurrentTimeZone(candidateDetails.actualStartDate as string),
-            actualEndDate: DateTimeHelper.setCurrentTimeZone(candidateDetails.actualEndDate as string),
+            actualStartDate: candidateDetails.actualStartDate ? 
+              DateTimeHelper.setCurrentTimeZone(candidateDetails.actualStartDate as string) : null,
+            actualEndDate: candidateDetails.actualEndDate ? 
+              DateTimeHelper.setCurrentTimeZone(candidateDetails.actualEndDate as string) : null,
           }, { emitEvent: false, onlySelf: true });
         }),
         switchMap(() => {
