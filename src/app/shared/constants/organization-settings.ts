@@ -70,6 +70,7 @@ export enum OrganizationSettingKeys {
   MarkZeroDollarInvoicetoPaidOnApproval,
   EnableClearedToStartForAcceptedCandidates,
   TimeLimitforManagerReviewEmail,
+  Createreplacementorderswhenschedulesgetcancelled
 }
 
 export enum OrganizationalHierarchy {
