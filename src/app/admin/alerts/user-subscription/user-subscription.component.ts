@@ -349,6 +349,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if (data != undefined) {
         this.defaultBusinessValue = data[0]?.id;
+        this.businessControl.patchValue(data[0]?.id);
         if (!this.isBusinessFormDisabled) {
           this.defaultValue = data[0]?.id;
         }
