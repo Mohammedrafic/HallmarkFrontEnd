@@ -166,7 +166,8 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
   public regionsList: OrganizationRegion[] = [];
   public locationsList: OrganizationLocation[] = [];
   public departmentsList: OrganizationDepartment[] = [];
-  public defaultOrganizations: number[] = [];
+ // public defaultOrganizations: number[] = [];
+  public defaultOrganizations: number;
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultDepartments: (number | undefined)[] = [];
@@ -256,9 +257,9 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
               if (data != undefined && data != null && data.length > 0) {
                 this.organizations = uniqBy(data, 'organizationId');
                 this.filterColumns.businessIds.dataSource = this.organizations;
-                // this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
+                this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
 
-                this.defaultOrganizations = this.organizations.map(element => element.organizationId)
+                //this.defaultOrganizations = this.organizations.map(element => element.organizationId)
 
                 this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
                 this.changeDetectorRef.detectChanges();
@@ -279,6 +280,8 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      
+
       // this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
@@ -335,8 +338,8 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
         let modifedOrgStructure = data.map(({ organizationId, name, regions }) => ({ organizationId: organizationId, organizationName: name, regions: regions }));
         this.organizations = uniqBy(modifedOrgStructure, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
-        //this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
-        this.defaultOrganizations = this.organizations.map(element => element.organizationId)
+        this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
+        //this.defaultOrganizations = this.organizations.map(element => element.organizationId)
 
         this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
         this.changeDetectorRef.detectChanges();
