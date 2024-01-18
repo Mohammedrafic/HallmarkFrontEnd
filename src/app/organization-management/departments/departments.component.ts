@@ -5,7 +5,7 @@ import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '
 import { filter, Observable, Subject, switchMap, takeUntil, throttleTime, of, tap, debounceTime, take } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
-import { DatePicker, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { DatePicker, MaskedDateTimeService, RenderDayCellEventArgs } from '@syncfusion/ej2-angular-calendars';
 
 import { ShowBulkLocationActionDialog, ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { Department, DepartmentFilter, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
@@ -268,6 +268,25 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
       )
     );
     this.clearSelection(this.grid);
+  }
+
+  public handleInactivationDatepickerRenderCell(event: RenderDayCellEventArgs): void {
+    const { inactiveDate, reactivateDate } = this.selectedLocation;
+    const start = inactiveDate ? DateTimeHelper.setCurrentTimeZone(inactiveDate) : null;
+    const end = reactivateDate ? DateTimeHelper.setCurrentTimeZone(reactivateDate) : null;
+
+    if (!event.date || !start) {
+      return;
+    }
+
+    if (!reactivateDate && start < event.date) {
+      event.isDisabled = true;
+      return;
+    }
+
+    if (start < event.date && end && end > event.date) {
+      event.isDisabled = true;
+    }
   }
 
   private watchForDepartmentUpdate(): void {
@@ -547,7 +566,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     }
   }
 
-  onAddDepartmentClick(): void {    
+  onAddDepartmentClick(): void {
     if (this.selectedLocation && this.selectedRegion) {
       this.departmentsDetailsFormGroup.controls['inactiveDate'].enable();
       this.departmentsDetailsFormGroup.controls['includeInIRP']?.setValue(
@@ -561,7 +580,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
     }
   }
 
-  onDepartmentFormCancelClick(): void { 
+  onDepartmentFormCancelClick(): void {
     if (this.departmentsDetailsFormGroup.dirty) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
