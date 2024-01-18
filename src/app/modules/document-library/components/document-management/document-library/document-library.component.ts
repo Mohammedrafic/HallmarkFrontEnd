@@ -1251,7 +1251,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.documentLibraryform.markAllAsTouched();
         return;
       }
-      this.store.dispatch(new SaveDocuments(document)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
+      this.store.dispatch(new SaveDocuments(document)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {  
+        this.selectedDocumentNode!.id = Number(val?.documentLibrary?.savedDocumentLibraryDto?.folderId);
         if (this.isShare) {
           this.shareDocumentIds = [val?.documentLibrary?.savedDocumentLibraryDto?.id];
           this.saveShareDocument(true);
