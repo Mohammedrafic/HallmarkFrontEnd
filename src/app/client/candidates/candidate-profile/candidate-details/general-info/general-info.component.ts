@@ -181,7 +181,7 @@ export class GeneralInfoComponent extends AbstractContactDetails implements OnIn
       this.candidateForm.get('employeeId')?.setValue(value);
     });
     this.isSourceConfig = true;
-
+    this.removeValidatorsAndReset(['inactivationDate', 'inactivationReasonId','holdStartDate', 'holdEndDate']);
   }
 
   private handleOnHoldProfileStatus(): void {
