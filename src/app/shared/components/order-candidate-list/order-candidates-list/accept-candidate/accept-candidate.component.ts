@@ -105,7 +105,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Select(OrderManagementState.availableSteps)
   applicantStatuses$: Observable<ApplicantStatus[]>;
 
-  @Select(OrderManagementContentState.orderCandidatePage)
+  @Select(OrderManagementState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
   form: FormGroup;

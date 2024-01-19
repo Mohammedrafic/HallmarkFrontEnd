@@ -194,9 +194,11 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
               this.isFilterBlock = false;
             }
             if (user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP)
-            {    
-              this.doNotReturnFilterForm.get('currentStatus')?.setValue(Candidatests.Block); 
-              this.isFilterBlock = true;
+            {   
+                this.filters.currentStatus = this.filters.currentStatus === null ? Candidatests.Block : this.filters.currentStatus;
+              this.doNotReturnFilterForm.get('currentStatus')?.setValue(this.filters.currentStatus ); 
+              this.isFilterBlock = this.filters.currentStatus == Candidatests.Block?true:false;
+              
             }
             if(this.doNotReturnFilterForm.value.regionBlocked != null && this.doNotReturnFilterForm.value.regionBlocked.length > 0){
               let locationFilter: LocationsByRegionsFilter = {
@@ -426,9 +428,34 @@ export class DoNotReturnGridComponent extends AbstractGridConfigurationComponent
 
   private getDoNotReturn(): void {
     this.selectedOrganization = {} as AllOrganization;
-    this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.orgid,this.currentPage, this.pageSize, this.filters, this.sortByField)]);
-  }
+    if(this.filters.currentStatus == null)
+    { this.doNotReturnFilterForm.get('currentStatus')?.setValue(Candidatests.Block); 
+      this.filters.currentStatus = this.filters.currentStatus === null ? Candidatests.Block : this.filters.currentStatus;
+      this.sortByField = 1;
+      this.isFilterBlock = this.filters.currentStatus == Candidatests.Block?true:false; 
 
+      this.filters = this.doNotReturnFilterForm.getRawValue();
+      if(this.filters.businessUnitId === null || this.filters.businessUnitId === undefined){
+        this.filters.businessUnitId = this.selectedOrganization?.id == undefined ? this.orgid : this.selectedOrganization?.id;
+      }
+      this.filters.ssn = this.maskedFilterSSN == '' ? null : parseInt(this.maskedFilterSSN);
+      this.filters.locationBlocked = this.doNotReturnFilterForm.value.locationBlocked?.join(',');
+      this.filters.regionBlocked = this.doNotReturnFilterForm.value.regionBlocked?.join(',');
+      this.filters.pageNumber = 1;
+      this.filters.pageSize = this.pageSize;
+ 
+      this.filteredItems = this.filterService.generateChips(this.doNotReturnFilterForm, this.filterColumns);
+      this.filteredItemsData$.next(this.filteredItems);
+      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.orgid,this.currentPage, this.pageSize, this.filters, this.sortByField)]);
+ 
+      this.appliedFilteredItems.emit(this.filteredItems.length);
+    }
+    else
+    {  
+      this.store.dispatch([new DoNotReturn.DonotreturnByPage(this.orgid,this.currentPage, this.pageSize, this.filters, this.sortByField)]);
+    }
+ 
+  }
   private GetAllOrganization(): void {
     this.store.dispatch(
       new DoNotReturn.GetAllOrganization());

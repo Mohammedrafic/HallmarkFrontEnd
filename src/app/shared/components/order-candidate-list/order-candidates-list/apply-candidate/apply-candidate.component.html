@@ -126,9 +126,9 @@
                 </div>
                 <div class="d-flex bootstrap">
                   <div class="input-container">
-                    <label>Leave request comments</label>
+                    <label>Leave request comments<span *ngIf="isCandidateLeaveRequest" class="required">*</span></label>
                     <div class="input-group" [ngClass]="{'input-readonly': readOnlyMode}">
-                      <input formControlName="requestComment" class="e-input" type="text" maxlength="2000" [readonly]="readOnlyMode"/>
+                      <input appValidateWithMessage formControlName="requestComment" class="e-input" type="text" maxlength="2000" [readonly]="readOnlyMode"/>
                     </div>
                   </div>
                 </div>
