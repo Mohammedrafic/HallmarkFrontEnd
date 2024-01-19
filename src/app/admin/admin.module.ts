@@ -89,6 +89,7 @@ import { NewInterfacesComponent } from './organization-integrations/widgets/new-
 import { WidgetWrapperModule } from '../dashboard/widgets/widget-wrapper/widget-wrapper.module';
 import { GetRecentRunListComponent } from './organization-integrations/widgets/get-recent-run-list/get-recent-run-list.component';
 import { ScheduledIntegrationsComponent } from './organization-integrations/widgets/scheduled-integrations/scheduled-integrations.component';
+import { MigrateCandidatesComponent } from './migrate-candidates/migrate-candidates.component';
 
 const sidebarIcons = {
   Download,
@@ -136,7 +137,8 @@ const sidebarIcons = {
     MonthlyIntegrationsFailureComponent,
     NewInterfacesComponent,
     GetRecentRunListComponent,
-    ScheduledIntegrationsComponent
+    ScheduledIntegrationsComponent,
+    MigrateCandidatesComponent
   ],
     imports: [
         CommonModule,

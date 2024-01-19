@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, tap } from 'rxjs';
 import { Action, createSelector, Selector, State, StateContext } from '@ngxs/store';
 
-import { Organisation, UserVisibilitySettingsPage } from '@shared/models/visibility-settings.model';
+import { Agency, Organisation, UserVisibilitySettingsPage } from '@shared/models/visibility-settings.model';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { BusinessUnitService } from '@shared/services/business-unit.service';
 
@@ -49,6 +49,8 @@ import {
   GetEmpGeneralNoteImportDetails,
   ExportEmpGeneralNoteImportDetails,
   GetNotificationSubscription,
+  GetAgencyList,
+  MigrateCandidates,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -87,6 +89,7 @@ interface SecurityStateModel {
   userVisibilitySettingsPage: UserVisibilitySettingsPage | null;
   copyRoleData: Role[];
   organizations: Organisation[];
+  agencies: Agency[];
   timeZones: TimeZoneModel[] | null;
   orgInterfacePage: OrgInterfacePage | null;
   logInterfacePage: LogInterfacePage | null;
@@ -119,6 +122,7 @@ interface SecurityStateModel {
     userVisibilitySettingsPage: null,
     copyRoleData: [],
     organizations: [],
+    agencies: [],
     timeZones: [],
     orgInterfacePage: null,
     logInterfacePage: null,
@@ -188,6 +192,11 @@ export class SecurityState {
   @Selector()
   static organisations(state: SecurityStateModel): Organisation[] {
     return state.organizations;
+  }
+
+  @Selector()
+  static agencies(state: SecurityStateModel): Agency[] {
+    return state.agencies;
   }
   
   @Selector()
@@ -659,6 +668,35 @@ export class SecurityState {
         });
         patchState({ organizations: payload.filter(org=>org.regions.length > 0) , isOrganizaionsLoaded:true});
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetAgencyList)
+  GetAgencyList(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    {  }: GetAgencyList
+  ): Observable<Agency[] | void> {
+    return this.userService.getAgencyList().pipe(
+      tap((payload) => {
+        patchState({ agencies: payload });
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(MigrateCandidates)
+  MigrateCandidates(
+    { dispatch }: StateContext<SecurityStateModel>,
+    { agencyId }: MigrateCandidates
+  ): Observable<any> {
+    return this.userService.migrateCandidates(agencyId).pipe(
+      tap(() => {        
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));

@@ -139,6 +139,16 @@ export class GetOrganizationsStructureAll {
   constructor(public userId: string, public visibiltySettings: boolean = false) { }
 }
 
+export class GetAgencyList {
+  static readonly type = '[security] Get Agency List';
+  constructor() { }
+}
+
+export class MigrateCandidates {
+  static readonly type = '[security] Migrate Candidates';
+  constructor(public agencyId : number = 0) { }
+}
+
 export class ExportUserList {
   static readonly type = '[security] Export User List';
   constructor(public payload: ExportPayload) {}
