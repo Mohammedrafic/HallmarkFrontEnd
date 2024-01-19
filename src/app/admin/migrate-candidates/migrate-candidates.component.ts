@@ -4,7 +4,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { CONFIRM_CANDIDATES_MIGRATION, CANDIDATES_MIGRATION_SUCCESS } from '@shared/constants/messages';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import {  Observable } from 'rxjs';
+import { Observable, filter, take } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
@@ -16,7 +16,7 @@ import { UserAgencyOrganization } from '../../shared/models/user-agency-organiza
 import { GetUserAgencies } from '../../store/user.actions';
 import { SecurityState } from '../../security/store/security.state';
 import { Agency } from '../../shared/models/visibility-settings.model';
-import { GetAgencyList, MigrateCandidates } from '../../security/store/security.actions';
+import { GetAgencyList, MigrateCandidates, RemaningCandidatesForMigration } from '../../security/store/security.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
@@ -26,9 +26,12 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MigrateCandidatesComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
- 
+
   @Select(SecurityState.agencies)
   agencies$: Observable<Agency[]>;
+
+  @Select(SecurityState.remainingCandidates)
+  remaningCandidates$: Observable<number | null>;
 
   //@Select(SecurityState.businessIdDetails)
   //public businessUnitIdDetails$: Observable<GetBusinessUnitIdDetails>;
@@ -37,18 +40,19 @@ export class MigrateCandidatesComponent extends AbstractPermissionGrid implement
   private isAlive = true;
   public agencyData = BUSINESS_UNITS_VALUES_USERS_ROLES;
   agencyFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public control = new FormControl('');
 
-  constructor(protected override store: Store,) {
+  constructor(protected override store: Store,
+    private confirmService: ConfirmService,) {
     super(store);
     this.store.dispatch(new SetHeaderState({ title: 'Migrate Candidates', iconName: 'file-text' }));
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.store.dispatch(new GetUserAgencies());
     this.store.dispatch(new GetAgencyList());
     this.migrateCandidatesForm = this.generateMigrateCandidatesForm();
-    
+    setInterval(() => { this.remaningCandidates() }, 10000);
   }
 
   ngOnDestroy(): void {
@@ -56,7 +60,31 @@ export class MigrateCandidatesComponent extends AbstractPermissionGrid implement
   }
 
   public migrateCandidates(): void {
-    this.store.dispatch(new MigrateCandidates(this.migrateCandidatesForm?.controls['agency'].value));
+    var agencyIdValue = this.migrateCandidatesForm?.controls['agency'].value;
+    if (agencyIdValue == null) {
+      agencyIdValue = 0;
+    }
+
+    this.confirmService
+      .confirm(CONFIRM_CANDIDATES_MIGRATION, {
+        title: "Migrate Candidates",
+        okButtonLabel: 'Migrate',
+        okButtonClass: 'save-button',
+      })
+      .pipe(
+        filter((confirm: any) => !!confirm),
+        take(1)
+      ).subscribe(() => {
+        this.store.dispatch(new MigrateCandidates(agencyIdValue));
+      });
+  }
+
+  public remaningCandidates(): void {
+    var agencyIdValue = this.migrateCandidatesForm?.controls['agency'].value;
+    if (agencyIdValue == null) {
+      agencyIdValue = 0;
+    }
+    this.store.dispatch(new RemaningCandidatesForMigration(agencyIdValue));
   }
 
   private generateMigrateCandidatesForm(): FormGroup {

@@ -1,7 +1,14 @@
+.migrate-container{
+    align-content:center;
+}
 .agency-dropdowns {
   display: flex;
 
   .dropdown-container {
-    margin-right: 12px;
+      padding: 50px;
   }
+}
+.migrate-button {
+  padding: 50px;
+  padding-top: 0px;
 }
