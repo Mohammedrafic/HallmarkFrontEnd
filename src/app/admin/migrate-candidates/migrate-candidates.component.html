@@ -1,0 +1,28 @@
+<section>
+  <ng-container left>
+    <div class="bootstrap agency-dropdowns" [formGroup]="migrateCandidatesForm">
+      <div class="dropdown-container">
+        <div class="input-group dropdown">
+          <ejs-dropdownlist appValidateWithMessage
+                            formControlName="agency"
+                            [allowFiltering]="true"
+                            [fields]="agencyFields"
+                            [dataSource]="agencies$ | async"
+                            placeholder="Agency"></ejs-dropdownlist>
+        </div>
+      </div>      
+    </div>
+  </ng-container>
+  <ng-container right>
+    <ng-container>
+      <app-tooltip-container [message]="toolTipMessage"
+                             [showToolTip]="!userPermission[userPermissions.CanMigrateCandidate]">
+        <button ejs-button appHideBeforeSyncfusionLoad
+                [disabled]="!userPermission[userPermissions.CanMigrateCandidate]"
+                [isPrimary]="true" (click)="migrateCandidates()">
+          Migrate Candidates
+        </button>
+      </app-tooltip-container>
+    </ng-container>
+  </ng-container>
+</section>

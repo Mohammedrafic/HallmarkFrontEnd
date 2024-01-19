@@ -147,6 +147,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/roles-and-permissions',
     },
+    135: {
+      // Security
+      icon: '',
+      route: 'admin/migrate-candidates',
+    },
     31: {
       // User List
       icon: '',
