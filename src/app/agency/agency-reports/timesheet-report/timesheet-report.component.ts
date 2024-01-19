@@ -227,7 +227,6 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
     }
     this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.orderFilterColumnsSetup();
-      debugger;
       if (data != null && data != undefined) {
         this.defaultAgency = data.toString();
 
@@ -402,10 +401,11 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
               // this.filterColumns.agencyIds.dataSource = data.agencies;
               //  this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
               this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-              if (this.isInitialLoad) {
-                this.SearchReport()
-                this.isInitialLoad = false;
-              }
+              // if (this.isInitialLoad) {
+              //   this.SearchReport()
+              //   this.isInitialLoad = false;
+              // }
+              setTimeout(() => { this.SearchReport() }, 3000);
               this.changeDetectorRef.detectChanges();
             }
           });
@@ -473,7 +473,6 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
 
 
   public SearchReport(): void {
-    debugger;
     this.filteredItems = [];
     let auth = "Bearer ";
     
@@ -504,12 +503,12 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
       "AgencyIdAT": this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
         this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
       "OrganizationIdsAT": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "TimesheetServiceEndDateAT": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "TimesheetServiceStartDateAT": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "TimesheetServiceStartDateAT": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "TimesheetServiceEndDateAT": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionIdsAT": regionIds==null? "" : regionIds,
       "LocationIdsAT": locationIds==null ? "" : locationIds,
       "DepartmentIdsAT": departmentIds==null ? "" : departmentIds,
-      "CandidateNameAT": candidateName == null || candidateName == "" ? '' : candidateName.toString(),
+      "CandidateNameAT": candidateName == null || candidateName == "" ? '' : candidateName,
       "TimesheetStatusAT": statusArray?.length > 0 ? statusArray.join(",") : '',
       "organizationNameAT":orgName,
       "reportPulledMessageAT": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
@@ -517,6 +516,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
       "PositionIdAT": jobId == null ? "" : jobId,
       "UserIdAT": this.user?.id,
     };
+    console.log(this.paramsData);
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
