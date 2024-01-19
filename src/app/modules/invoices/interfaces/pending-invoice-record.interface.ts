@@ -24,6 +24,7 @@ export interface PendingInvoice extends BaseInvoice {
   hours: number | null;
   miles: number | null;
   amount: number;
+  isBasedOnPdTimesheet: boolean;
 }
 
 export interface PendingInvoiceRecord {
@@ -47,6 +48,7 @@ export interface PendingInvoiceRecord {
   attachments: InvoiceAttachment[];
   timesheetRecordId: number;
   timesheetType?: number;
+  reorderCandidatePosition: string;
 }
 
 export interface TimeSpan {

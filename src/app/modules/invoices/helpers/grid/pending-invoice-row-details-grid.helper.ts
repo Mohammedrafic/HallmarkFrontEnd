@@ -17,7 +17,7 @@ import { GridValuesHelper } from '../../../timesheets/helpers';
 import {
   InvoiceRecordsTableRowDetailsComponent,
 } from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
-import { CurrencyFormatter, invoicesRowDetailsOffsetColDef, titleValueCellRendererSelector } from '../../constants';
+import { CurrencyFormatter, invoicesRowDetailsOffsetColDef, reorderPositionIdColDef, titleValueCellRendererSelector } from '../../constants';
 import { InvoiceType } from '../../enums/invoice-type.enum';
 import { GetPendingInvoiceDetailsColDefsFn,
   InvoiceAttachment, PendingInvoiceRowDetailsConfig, TypedColDef } from '../../interfaces';
@@ -50,7 +50,7 @@ const totalColDef: TypedColDef<PendingInvoiceRecord> = {
 };
 
 const timesheetTypeColDefs: TypedColDef<PendingInvoiceRecord>[] = [
-  invoicesRowDetailsOffsetColDef,
+  reorderPositionIdColDef, //invoicesRowDetailsOffsetColDef,
   dayColDef,
   {
     field: 'billRateConfigTitle',
@@ -179,12 +179,11 @@ export class PendingInvoiceRowDetailsGridHelper {
       masterDetail: true,
       detailCellRenderer: InvoiceRecordsTableRowDetailsComponent,
       animateRows: true,
-      embedFullWidthRows: true,
       isRowMaster: (dataItem: PendingInvoice) => !!dataItem?.invoiceRecords?.length,
       getRowHeight: (params: RowHeightParams) => {
         if (params?.node?.detail) {
           const data = params.data as PendingInvoice;
-          return data.invoiceRecords.length * params.api.getSizesForCurrentTheme().rowHeight + 1;
+          return data.invoiceRecords.length * params.api.getSizesForCurrentTheme().rowHeight + 3; // including borders
         }
 
         return null;
@@ -198,7 +197,7 @@ export class PendingInvoiceRowDetailsGridHelper {
             columnDefs: PendingInvoiceRowDetailsGridHelper.getRowDetailsColumnDefinitions(timesheetType, config),
           },
           getDetailRowData: (params: GetDetailRowDataParams) => params.successCallback(
-           (params.data as PendingInvoice).invoiceRecords.map((rec) => ({ ...rec, timesheetType: timesheetType,})),
+           (params.data as PendingInvoice).invoiceRecords.map((rec) => ({ ...rec, timesheetType: timesheetType })),
           ),
         };
       },

@@ -21,6 +21,7 @@ interface GetPendingInvoiceRecordsColDefsConfig {
 }
 
 export class PendingInvoicesGridHelper {
+  // eslint-disable-next-line max-lines-per-function
   public static getOrganizationColDefs(
     { previewAttachment, downloadAttachment }: GetPendingInvoiceRecordsColDefsConfig
   ): TypedColDef<PendingInvoice>[] {

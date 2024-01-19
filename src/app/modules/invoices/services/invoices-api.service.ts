@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
@@ -16,7 +16,6 @@ import {
   ManualInvoiceReason,
   ManualInvoicesData,
   ManualInvoiceTimesheetResponse,
-  InvoiceDetail,
   PrintingPostDto,
   PrintInvoiceData,
   ManualInvoicePutDto,
@@ -29,6 +28,7 @@ import {
   InvoicesPendingInvoiceRecordsFilteringOptions,
   InvoiceManualPendingRecordsFilteringOptions,
   InvoiceDetailDto,
+  PendingInvoiceRecord,
 } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
@@ -45,7 +45,7 @@ export class InvoicesApiService {
   constructor(
     private http: HttpClient,
   ) {}
-
+  
   private invoicedataSubject = new BehaviorSubject<any>(null);
   public data$ = this.invoicedataSubject.asObservable();
 
@@ -152,6 +152,107 @@ export class InvoicesApiService {
 
   public getPendingInvoices(data: InvoicesFilterState): Observable<PendingInvoicesData> {
     return this.http.post<PendingInvoicesData>('/api/PendingInvoices', data);
+  }
+
+  public getInvoiceReorderDetails(timesheetId: number, organizationId: number): Observable<PendingInvoiceRecord[]> {
+    return of([
+      {
+        "id": 98125,
+        "invoiceRecordType": 0,
+        "invoiceRecordTypeText": "",
+        "dateTime": "2023-08-07T00:00:00+00:00",
+        "billRateConfigId": 1,
+        "billRateConfigTitle": "Regular",
+        "dateTimeIn": "2023-08-07T02:45:00+00:00",
+        "timeIn": "02:45:00",
+        "timeOut": "05:00:00",
+        "vendorFeeApplicable": false,
+        "comment": null,
+        "reasonId": null,
+        "reasonCode": null,
+        "rate": 20,
+        "value": 2.25,
+        "total": 45,
+        "timesheetId": 71059,
+        "parentTimesheetId": null,
+        "timesheetRecordId": 459487,
+        "linkedInvoiceId": null,
+        "attachments": [],
+        reorderCandidatePosition: 'aaa',
+      },
+      {
+        "id": 98126,
+        "invoiceRecordType": 0,
+        "invoiceRecordTypeText": "",
+        "dateTime": "2023-08-08T00:00:00+00:00",
+        "billRateConfigId": 1,
+        "billRateConfigTitle": "Regular",
+        "dateTimeIn": "2023-08-08T07:00:00+00:00",
+        "timeIn": "07:00:00",
+        "timeOut": "11:30:00",
+        "vendorFeeApplicable": false,
+        "comment": null,
+        "reasonId": null,
+        "reasonCode": null,
+        "rate": 20,
+        "value": 4.5,
+        "total": 90,
+        "timesheetId": 71059,
+        "parentTimesheetId": null,
+        "timesheetRecordId": 459488,
+        "linkedInvoiceId": null,
+        "attachments": [],
+        reorderCandidatePosition: 'aaa',
+      },
+      {
+        "id": 98127,
+        "invoiceRecordType": 0,
+        "invoiceRecordTypeText": "",
+        "dateTime": "2023-08-09T00:00:00+00:00",
+        "billRateConfigId": 1,
+        "billRateConfigTitle": "Regular",
+        "dateTimeIn": "2023-08-09T01:45:00+00:00",
+        "timeIn": "01:45:00",
+        "timeOut": "08:15:00",
+        "vendorFeeApplicable": false,
+        "comment": null,
+        "reasonId": null,
+        "reasonCode": null,
+        "rate": 20,
+        "value": 6,
+        "total": 120,
+        "timesheetId": 71059,
+        "parentTimesheetId": null,
+        "timesheetRecordId": 459489,
+        "linkedInvoiceId": null,
+        "attachments": [],
+        reorderCandidatePosition: 'aaa',
+      },
+      {
+        "id": 98128,
+        "invoiceRecordType": 0,
+        "invoiceRecordTypeText": "",
+        "dateTime": "2023-08-10T00:00:00+00:00",
+        "billRateConfigId": 1,
+        "billRateConfigTitle": "Regular",
+        "dateTimeIn": "2023-08-10T04:30:00+00:00",
+        "timeIn": "04:30:00",
+        "timeOut": "08:45:00",
+        "vendorFeeApplicable": false,
+        "comment": null,
+        "reasonId": null,
+        "reasonCode": null,
+        "rate": 20,
+        "value": 4.25,
+        "total": 85,
+        "timesheetId": 71059,
+        "parentTimesheetId": null,
+        "timesheetRecordId": 459490,
+        "linkedInvoiceId": null,
+        "attachments": [],
+        reorderCandidatePosition: 'AAA-123-4',
+      }
+    ] as any[])//this.http.get<PendingInvoiceRecord[]>(`/api/PendingInvoices/reorderDetails/${timesheetId}/${organizationId}`);
   }
 
   public getPendingApproval(data: InvoicesFilterState, isAgency = false): Observable<PendingApprovalInvoicesData> {
