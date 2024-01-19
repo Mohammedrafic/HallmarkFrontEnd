@@ -403,15 +403,17 @@
             </ng-template>
           </ng-template>
         </e-column>
-        <e-column field="statusText" headerText="STATUS" width="215" minWidth="120" maxWidth="260">
+        <e-column field="statusText" headerText="STATUS" width="300" minWidth="170">
           <ng-template #template let-data>
             <div class="status-cell" [class.ex-chip]="data?.extensionFromId">
-              <ejs-chiplist>
-                <e-chips>
-                  <e-chip [text]="data.statusText" [cssClass]="data.statusText | chipsCssClass"></e-chip>
-                  <e-chip *ngIf="data?.extensionFromId" text="E" cssClass="e-warning ex"></e-chip>
-                </e-chips>
-              </ejs-chiplist>
+              <ejs-tooltip [content]="data.statusText.toUpperCase()" position="TopCenter">
+                <ejs-chiplist>
+                  <e-chips>
+                    <e-chip [text]="data.statusText" [cssClass]="data.statusText | chipsCssClass"></e-chip>
+                    <e-chip *ngIf="data?.extensionFromId" text="E" cssClass="e-warning ex"></e-chip>
+                  </e-chips>
+                </ejs-chiplist>
+              </ejs-tooltip>
             </div>
           </ng-template>
         </e-column>
