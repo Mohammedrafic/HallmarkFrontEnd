@@ -517,7 +517,6 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
       "PositionIdAT": jobId == null ? "" : jobId,
       "UserIdAT": this.user?.id,
     };
-    console.log(this.paramsData);
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
