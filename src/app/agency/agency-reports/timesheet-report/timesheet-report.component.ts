@@ -288,8 +288,9 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
         candidateName: new FormControl(null),
         timesheetStatuses: new FormControl([]),
         jobStatuses: new FormControl([]),
-        jobId: new FormControl(''),
+        jobId: new FormControl('')
         //agencyIds: new FormControl([])
+       
       }
     );
   }
