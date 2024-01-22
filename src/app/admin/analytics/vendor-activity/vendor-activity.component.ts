@@ -58,7 +58,10 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
     "skillCategoryVA": "",
     "skillVA": "",
     "startDateVA": "",
-    "endDateVA": ""
+    "endDateVA": "",
+    "organizationNameVA": "",
+    "reportPulledMessageVA": "",
+    "DateRangeVA": ""
   };
 
 
@@ -507,7 +510,10 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OrganizationsVA": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+     // "OrganizationsVA": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "OrganizationParamVA": this.selectedOrganizations?.length == 0 ? "null" :
+        this.selectedOrganizations?.join(","),
+
       "regionVA": regionIds.length == 0 ? "null" : regionIds,
       "locationVA": locationIds.length == 0 ? "null" : locationIds,
       "departmentVA": departmentIds.length == 0 ? "null" : departmentIds,
@@ -515,7 +521,12 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
       "skillCategoryVA": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
       "skillVA": skillIds.length == 0 ? "null" : skillIds,
       "startDateVA": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "endDateVA": formatDate(endDate, 'MM/dd/yyyy', 'en-US')
+      "endDateVA": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "organizationNameVA": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
+
+      "reportPulledMessageVA": ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeVA": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+      
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
