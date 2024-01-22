@@ -895,13 +895,15 @@ private saveCandidateCredentials({
   }
 
   private disableEdit(item: CandidateCredential): boolean {
+    console.log(this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false)
     return (
       !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || item.id === this.orderCredentialId
       || ((item.status === this.statusEnum.Reviewed) && !this.isOrganizationSide)
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
-      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile]) ||
-      ((item.status === this.statusEnum.Verified) && !this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false && !this.isOrganizationSide) 
+      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile])
+      || ((item.status === this.statusEnum.Verified) && this.isIRP && !this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false) 
+      || ((item.status === this.statusEnum.Verified) && !this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false && !this.isOrganizationSide) 
       );
   }
 
@@ -911,9 +913,11 @@ private saveCandidateCredentials({
       || item.id === this.orderCredentialId
       || !this.hasPermissions()
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile && !this.isIRP)
-      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile]) ||
-      (item.status ===  this.statusEnum.Verified && !this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false && !this.isOrganizationSide)
-    );
+      || (this.isIRP && !this.userPermission[this.userPermissions.ManageIrpCandidateProfile]) 
+      || (item.status ===  this.statusEnum.Verified && !this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false && !this.isOrganizationSide)
+      || ((item.status === this.statusEnum.Verified) && this.isIRP && !this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false) 
+
+      );
   }
 
   private setExistingFiles(credentialFiles: CredentialFile[] = []): void {
