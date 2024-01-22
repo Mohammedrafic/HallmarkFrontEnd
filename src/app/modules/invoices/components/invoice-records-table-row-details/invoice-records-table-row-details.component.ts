@@ -20,7 +20,7 @@ export class InvoiceRecordsTableRowDetailsComponent<T> extends GridRowDetailsCel
   }
 
   public override agInit(params: IDetailCellRendererParams): void {
-    if (!params.data.isBasedOnPdTimesheet) {
+    if (params.data.isBasedOnPdTimesheet) {
       this.invoicesApiService.getInvoiceReorderDetails(params.data.id, params.data.organizationId)
         .subscribe((invoiceReordersData) => {
           params.data.invoiceRecords.map((record: PendingInvoiceRecord) => {
@@ -32,7 +32,6 @@ export class InvoiceRecordsTableRowDetailsComponent<T> extends GridRowDetailsCel
       return;
     }
     super.agInit(params);
-    debugger;
   }
   
   public gridReady(): void {

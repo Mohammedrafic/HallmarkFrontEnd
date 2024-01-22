@@ -60,6 +60,7 @@ export class DropdownEditorComponent extends Destroyable  implements ICellRender
   }
 
   private setData(params: ICellRendererParams): void {
+    debugger;
     const colDef = (params.colDef as ColDef);
     const storeField = colDef.cellRendererParams.storeField as string;
     const regionId = params.context.componentParent.timesheetDetails?.orderRegionId;
