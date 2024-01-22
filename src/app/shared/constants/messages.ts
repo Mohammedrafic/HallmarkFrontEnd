@@ -178,3 +178,6 @@ export const Bulk_Delete_Department = 'Selected Records are deleted';
 
 
 export const CLEAR_START_ON = 'Candidate is Cleared to Start';
+
+export const CONFIRM_CANDIDATES_MIGRATION = 'Are you sure you want to migrate cadidates?';
+export const CANDIDATES_MIGRATION_SUCCESS = 'Cadidates are migrated successfully';

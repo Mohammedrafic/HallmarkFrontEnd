@@ -62,22 +62,24 @@ import {
 export class TimesheetReportComponent implements OnInit, OnDestroy {
 
   public paramsData: any = {
-    "OrganizationParamTS": "",
-    "RegionsParamTS": "",
-    "LocationsParamTS": "",
-    "DepartmentsParamTS": "",
-    "AgenciesParamTS": "",
+    "OrganizationIdsAT": "",
+    "RegionIdsAT": "",
+    "LocationIdsAT": "",
+    "DepartmentIdsAT": "",
+    "AgencyIdAT": "",
     "JobIDParamTS": "",
-    "StatusesParamTS": "",
-    "CandidateNameParamTS": "",
-    "StartDateParamTS": "",
-    "EndDateParamTS": "",
+    "TimesheetStatusAT": "",
+    "CandidateNameAT": "",
+    "TimesheetServiceEndDateAT": "",
+    "TimesheetServiceStartDateAT": "",
     "organizationNameTS": "",
-    "reportPulledMessageTS": "",
-    "DateRangeTS": ""
+    "reportPulledMessageAT": "",
+    "DateRangeAT": "",
+    "PositionIdAT": "",
+    "UserIdAT": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cat" };
+  public reportName: LogiReportFileDetails = { name: "/AgencyReports/AgencyTimesheet/AgencyTimesheet.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/AgencyReports/AgencyTimesheet/AgencyTimesheet.cat" };
   public title: string = "Timesheet Report";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
@@ -141,7 +143,8 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedDepartments: Department[];
   selectedAgencies: AgencyDto[];
-  @Select(UserState.lastSelectedOrganizationId)
+
+  @Select(UserState.lastSelectedAgencyId)
   private agencyId$: Observable<number>;
 
   //private organizationId$: Observable<number>;
@@ -166,7 +169,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
   public regionsList: OrganizationRegion[] = [];
   public locationsList: OrganizationLocation[] = [];
   public departmentsList: OrganizationDepartment[] = [];
- // public defaultOrganizations: number[] = [];
+  // public defaultOrganizations: number[] = [];
   public defaultOrganizations: number;
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
@@ -222,24 +225,6 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
         }
       });
     }
-    //this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
-    //  this.orderFilterColumnsSetup();
-    //  if (data != null && data != undefined) {
-    //    this.defaultAgency = data.toString();
-    //    this.store.dispatch(new ClearLogiReportState());
-    //    //if(this.user?.businessUnitType == BusinessUnitType.Agency){
-    //    this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: Organisation[]) => {
-    //      if (data != null && data != undefined) {
-    //        this.associatedOrganizations = data;
-    //        let modifedOrgStructure = data.map(({ organizationId, name, regions }) => ({ organizationId: organizationId, organizationName: name, regions: regions }));
-    //        this.organizations = uniqBy(modifedOrgStructure, 'organizationId');
-    //        this.filterColumns.businessIds.dataSource = this.organizations;
-    //        this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
-    //        this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
-    //        this.changeDetectorRef.detectChanges();
-    //      }
-    //    });
-    //  }
     this.agencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.orderFilterColumnsSetup();
       if (data != null && data != undefined) {
@@ -258,9 +243,6 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
                 this.organizations = uniqBy(data, 'organizationId');
                 this.filterColumns.businessIds.dataSource = this.organizations;
                 this.defaultOrganizations = this.organizations.length == 0 ? 0 : this.organizations[0].organizationId;
-
-                //this.defaultOrganizations = this.organizations.map(element => element.organizationId)
-
                 this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.defaultOrganizations);
                 this.changeDetectorRef.detectChanges();
               }
@@ -268,22 +250,23 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
           }
         });
       }
-      //this.SetReportData();
+
+
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
         }
       });
-      this.agencyOrganizationId = data;
-      this.isInitialLoad = true;
+
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
-      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
-      
+      // this.onFilterSkillCategoryChangedHandler();
 
-      // this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark || this.user?.businessUnitType == BusinessUnitType.Agency ? this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.timesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      // this.loadperiod();
     });
+
   }
 
   private initForm(): void {
@@ -418,10 +401,11 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
               // this.filterColumns.agencyIds.dataSource = data.agencies;
               //  this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
               this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-              if (this.isInitialLoad) {
-                this.SearchReport()
-                this.isInitialLoad = false;
-              }
+              // if (this.isInitialLoad) {
+              //   this.SearchReport()
+              //   this.isInitialLoad = false;
+              // }
+              setTimeout(() => { this.SearchReport() }, 3000);
               this.changeDetectorRef.detectChanges();
             }
           });
@@ -489,14 +473,9 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
 
 
   public SearchReport(): void {
-
     this.filteredItems = [];
     let auth = "Bearer ";
-    for (let x = 0; x < window.localStorage.length; x++) {
-      if (window.localStorage.key(x)!.indexOf('accesstoken') > 0) {
-        auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
-      }
-    }
+    
 
     let { businessIds, candidateName, timesheetStatuses, departmentIds, jobId, locationIds,
       regionIds, agencyIds, startDate, endDate } = this.timesheetReportForm.getRawValue();
@@ -508,38 +487,36 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
       this.message = ""
     }
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : "";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "";
 
     var statusArray = Array.isArray(timesheetStatuses)
       ? (timesheetStatuses?.length > 0 ? timesheetStatuses : [])
       : (isNaN(timesheetStatuses) == false ? [timesheetStatuses] : []);
 
     let currentDate = new Date(Date.now());
+    var orgName = this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "";
+    
     this.paramsData =
     {
-      "AgenciesParamTS": this.defaultAgency,
-      "OrganizationParamTS": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "StartDateParamTS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamTS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionsParamTS": regionIds.length == 0 ? "null" : regionIds,
-      "LocationsParamTS": locationIds.length == 0 ? "null" : locationIds,
-      "DepartmentsParamTS": departmentIds.length == 0 ? "null" : departmentIds,
-      "CandidateNameParamTS": candidateName == null || candidateName == "" ? 'null' : candidateName.toString(),
-      "StatusesParamTS": statusArray?.length > 0 ? statusArray.join(",") : 'null',
-      "JobIDParamTS": jobId == null || jobId == "" ? 'null' : jobId,
-      // "AgenciesParamTS": agencyIds?.length > 0 ? agencyIds.join(",") : 'null',
-      "BearerParamTS": auth,
-      // "BusinessUnitIdParamTS": businessIds,
-      "BusinessUnitIdParamTS": this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
+      "AgencyIdAT": this.defaultAgency == null ? this.selectedOrganizations != null && this.selectedOrganizations.length > 0 && this.selectedOrganizations[0]?.organizationId != null ?
         this.selectedOrganizations[0].organizationId.toString() : "1" : this.defaultAgency,
-      "HostName": this.baseUrl,
-      "organizationNameTS": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
-      "reportPulledMessageTS": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
-      "DateRangeTS": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
-
+      "OrganizationIdsAT": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "TimesheetServiceStartDateAT": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "TimesheetServiceEndDateAT": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionIdsAT": regionIds==null? "" : regionIds,
+      "LocationIdsAT": locationIds==null ? "" : locationIds,
+      "DepartmentIdsAT": departmentIds==null ? "" : departmentIds,
+      "CandidateNameAT": candidateName == null || candidateName == "" ? '' : candidateName,
+      "TimesheetStatusAT": statusArray?.length > 0 ? statusArray.join(",") : '',
+      "organizationNameAT":orgName,
+      "reportPulledMessageAT": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeAT": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
+      "PositionIdAT": jobId == null ? "" : jobId,
+      "UserIdAT": this.user?.id,
     };
+    console.log(this.paramsData);
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }

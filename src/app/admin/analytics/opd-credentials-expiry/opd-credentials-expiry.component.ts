@@ -384,6 +384,9 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
         }
         else {
           this.isClearAll = false;
+          if (this.selectedOrganizations.length == 0) {
+            this.selectedOrganizations = data;
+          }
           this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }

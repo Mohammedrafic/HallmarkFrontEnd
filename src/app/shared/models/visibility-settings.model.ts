@@ -34,6 +34,11 @@ export type Organisation = {
   id?: number;
 };
 
+export type Agency = {
+  name: string;
+  id: number;
+};
+
 export type Department = {
   id: number;
   name: string;
