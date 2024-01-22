@@ -149,6 +149,11 @@ export class MigrateCandidates {
   constructor(public agencyId : number = 0) { }
 }
 
+export class RemaningCandidatesForMigration {
+  static readonly type = '[security] Remaning Candidates For Migration';
+  constructor(public agencyId: number = 0) { }
+}
+
 export class ExportUserList {
   static readonly type = '[security] Export User List';
   constructor(public payload: ExportPayload) {}

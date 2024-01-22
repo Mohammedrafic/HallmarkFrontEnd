@@ -159,7 +159,7 @@ export class UsersService {
    */
   public getAgencyList(): Observable<Agency[]> {
     return this.http
-      .get<Agency[]>(`/api/Agency/agencylist`);
+      .get<Agency[]>(`/api/Agency/agencylist`).pipe(map((data) => sortByField(data, 'name')));
   }
 
   /**
@@ -167,7 +167,17 @@ export class UsersService {
    * params agencyId is optional
    */
   public migrateCandidates(agencyId: number = 0): Observable<any> {
-    return this.http.post<any>('/api/LegacyCandidateMigration/LegacycandidatesProfilelist', agencyId);
+    const body = { NG_Agency_BusinessUnitID: agencyId };
+    return this.http.post<any>('/api/LegacyCandidateMigration/LegacycandidatesProfilelist', body);
+  }
+
+  /**
+   * remaning candidates for migration
+   * params agencyId is optional
+   */
+  public remaningCandidatesForMigration(agencyId: number = 0): Observable<any> {
+    const body = { NG_Agency_BusinessUnitID: agencyId };
+    return this.http.post<any>('/api/LegacyCandidateMigration/NonSyncedLegacyCandidatesCount', body);
   }
   /**
    * Export users list

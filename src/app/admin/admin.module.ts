@@ -90,6 +90,7 @@ import { WidgetWrapperModule } from '../dashboard/widgets/widget-wrapper/widget-
 import { GetRecentRunListComponent } from './organization-integrations/widgets/get-recent-run-list/get-recent-run-list.component';
 import { ScheduledIntegrationsComponent } from './organization-integrations/widgets/scheduled-integrations/scheduled-integrations.component';
 import { MigrateCandidatesComponent } from './migrate-candidates/migrate-candidates.component';
+import { MatCardModule } from '@angular/material/card';
 
 const sidebarIcons = {
   Download,
@@ -175,7 +176,8 @@ const sidebarIcons = {
         AppGridModule,
         AgGridModule,
         InputModule,
-        FontAwesomeModule,
+      FontAwesomeModule,
+      MatCardModule,
         FeatherModule.pick(sidebarIcons),
         NgxMaskModule.forChild(),
         //STORE

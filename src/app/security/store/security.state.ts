@@ -51,6 +51,7 @@ import {
   GetNotificationSubscription,
   GetAgencyList,
   MigrateCandidates,
+  RemaningCandidatesForMigration,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -105,6 +106,7 @@ interface SecurityStateModel {
   isAgencyVisibilityEnabled:boolean;
   isOrganizaionsLoaded:boolean;
   Notification: turnOffNotification | null;
+  remainingCandidates: number | null;
 }
 
 @State<SecurityStateModel>({
@@ -140,7 +142,8 @@ interface SecurityStateModel {
     isAgencyVisibilityEnabled:false,
     isOrganizaionsLoaded:false,
     logSummaryEmpGeneralnoteDetailsPage:null,
-    Notification:null
+    Notification: null,
+    remainingCandidates: 0,
   },
 })
 @Injectable()
@@ -341,6 +344,11 @@ export class SecurityState {
   @Selector()
   static logGeneralNoteSummaryDetails(state: SecurityStateModel): EmpGeneralNoteImportDetails[] | null {
     return state.logSummaryEmpGeneralnoteDetailsPage;
+  }
+
+  @Selector()
+  static remainingCandidates(state: SecurityStateModel): number | null {
+    return state.remainingCandidates;
   }
 
 
@@ -697,6 +705,23 @@ export class SecurityState {
   ): Observable<any> {
     return this.userService.migrateCandidates(agencyId).pipe(
       tap(() => {        
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(RemaningCandidatesForMigration)
+  RemaningCandidatesForMigration(
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
+    { agencyId }: RemaningCandidatesForMigration
+  ): Observable<any> {
+    return this.userService.remaningCandidatesForMigration(agencyId).pipe(
+      tap((payload: any) => {
+        const remainingCandidatesCount = payload && payload.length > 0 ? payload[0]?.remainingCount : 0;
+        patchState({ remainingCandidates: remainingCandidatesCount });
+        return remainingCandidatesCount;
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
