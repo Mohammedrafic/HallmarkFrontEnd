@@ -895,7 +895,6 @@ private saveCandidateCredentials({
   }
 
   private disableEdit(item: CandidateCredential): boolean {
-    console.log(this.userPermission[this.userPermissions.EditOrDeleteVerifiedCredentials] ? true : false)
     return (
       !this.areAgencyActionsAllowed || (this.isNavigatedFromCandidateProfile && this.disableNonlinkedagency)
       || item.id === this.orderCredentialId
