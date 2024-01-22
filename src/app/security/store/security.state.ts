@@ -718,8 +718,10 @@ export class SecurityState {
     { agencyId }: RemaningCandidatesForMigration
   ): Observable<any> {
     return this.userService.remaningCandidatesForMigration(agencyId).pipe(
-      tap((payload) => {
-        patchState({ remainingCandidates: payload });
+      tap((payload: any) => {
+        const remainingCandidatesCount = payload && payload.length > 0 ? payload[0]?.remainingCount : 0;
+        patchState({ remainingCandidates: remainingCandidatesCount });
+        return remainingCandidatesCount;
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
