@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, ViewChild } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { filter, Observable, scheduled, switchMap, takeUntil } from 'rxjs';
@@ -12,7 +12,7 @@ import { OrganizationStructure } from '@shared/models/organization.model';
 import { DatePickerLimitations } from '@shared/components/icon-multi-date-picker/icon-multi-date-picker.interface';
 import { ChipDeleteEventType, ChipItem } from '@shared/components/inline-chips';
 import { SettingsViewService } from '@shared/services';
-import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
+import { Apply_Previous_Filters, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { SetHeaderState, SetHelpSystem, ShowFilterDialog, ShowToast } from '../../../../store/app.actions';
@@ -28,6 +28,7 @@ import { DatesRangeType } from '@shared/enums';
 import { GlobalWindow } from '@core/tokens';
 import { any } from 'lodash/fp';
 import { Data, dataBound } from '@syncfusion/ej2-angular-grids';
+import { ScheduleGridComponent } from '../../components/schedule-grid/schedule-grid.component';
 
 @Component({
   selector: 'app-schedule-container',
@@ -53,7 +54,7 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   chipsData: ChipItem[];
 
   hasViewPermission = false;
-
+  hasUndoPermission = false;
   hasSchedulePermission = false;
 
   isEmployee = false;
@@ -72,7 +73,8 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
   candidateDetails: ScheduleInt.ScheduleCandidatesPage;
   dateRange: ScheduleInt.DateRangeOption[];
   activeTimePeriod = DatesRangeType.TwoWeeks;
-
+  public tooltipMessageback = Apply_Previous_Filters;
+  @ViewChild(ScheduleGridComponent) ScheduleGrid!: ScheduleGridComponent;
   constructor(
     protected override store: Store,
     private cdr: ChangeDetectorRef,
@@ -195,8 +197,10 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.selectedCandidate = selectedCandidate;
 
     if (selectedCandidate) {
+      this.hasUndoPermission=true;
       this.getEmployeeOrganizationStructure(selectedCandidate.id);
     } else {
+      this.hasUndoPermission=false;
       this.store.dispatch(new GetOrganizationStructure());
       this.scheduleFilters.firstLastNameOrId = '';
       this.scheduleFilters.regionIds = [];
@@ -417,7 +421,10 @@ export class ScheduleContainerComponent extends AbstractPermission implements On
     this.activeTimePeriod = activePeriod;
     this.scheduleFiltersService.setActiveScheduleTimePeriod(activePeriod||DatesRangeType.TwoWeeks);
   }
-
+public undoFilter() :void
+{
+  this.ScheduleGrid.clearCandidateSuggesstion();
+}
   public exportTable() {
     this.scheduleFilters.pageNumber = 1;
     this.scheduleFilters.pageSize = this.totalCount;

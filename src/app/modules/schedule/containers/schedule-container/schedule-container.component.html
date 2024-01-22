@@ -5,13 +5,17 @@
         <div class="title">
           Scheduling
         </div>
-        <div>
+          <div class="button-container">
 
-          <button ejs-button appHideBeforeSyncfusionLoad id="importButton" cssClass="e-outline button-export"
-            (click)="exportTable()" target="_blank">
-            <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
-          </button>
-
+              <button ejs-button appHideBeforeSyncfusionLoad id="undoButton" cssClass="e-outline button-export"
+                [disabled]="!hasUndoPermission" target="_blank" (click)="undoFilter()">
+                <app-tooltip-container [message]="tooltipMessageback" [showToolTip]="hasUndoPermission">
+                <div  class="button-back">Back<span>
+                  <img *ngIf="hasUndoPermission" src="assets/icons/undo.svg"  class="icon" />
+                  <img *ngIf="!hasUndoPermission" src="assets/icons/undo-disable.svg"  class="icon"   />
+                </span></div>
+              </app-tooltip-container>
+              </button>       
 
           <app-tooltip-container [showToolTip]="!hasViewPermission">
             <button *ngIf="!isEmployee" ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter"
@@ -24,6 +28,15 @@
               </div>
             </button>
           </app-tooltip-container>
+
+      
+          <button ejs-button appHideBeforeSyncfusionLoad id="importButton" cssClass="e-outline button-export"
+            (click)="exportTable()" target="_blank"> 
+            <div class="button-export-container">Export<i-feather name="upload" class="icon"></i-feather></div>
+          </button>  
+
+
+      
         </div>
       </div>
       <div class="control-group block">
