@@ -66,6 +66,7 @@ import { difference } from 'lodash';
 import { SystemType } from '@shared/enums/system-type.enum';
 import { SettingsViewService } from '@shared/services';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
+import { GetOrganizationStructure } from 'src/app/store/user.actions';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 enum BulkDepartmentActionConfig {
@@ -272,7 +273,7 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
 
   private watchForDepartmentUpdate(): void {
     this.action$.pipe(ofActionDispatched(SaveDepartmentSucceeded), takeUntil(this.componentDestroy())).subscribe(() => {
-      this.store.dispatch(new ShowSideDialog(false));
+      this.store.dispatch([new ShowSideDialog(false), new GetOrganizationStructure()]);
       this.removeActiveCssClass();
       this.departmentsDetailsFormGroup.reset();
       if (this.isEdit) {
