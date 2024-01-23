@@ -385,8 +385,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   }
 
   public DisableNotification() {
-    let userId = this.store.selectSnapshot(UserState.user)?.id as string;
-    const userBusinessType = this.store.selectSnapshot(UserState.user)?.businessUnitType as BusinessUnitType;
+    const { businessUnit } = this.businessForm?.getRawValue();
     this.confirmService.confirm("Are you sure you want to Turn Off All the Subscriptions for the user", {
       title: 'Confirm',
       okButtonLabel: 'OK',
@@ -398,11 +397,10 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       takeWhile(() => this.isAlive)
     ).subscribe((value: boolean) => {
       if(value){
-        this.store.dispatch(new GetNotificationSubscription(userBusinessType, userId));
+        this.store.dispatch(new GetNotificationSubscription(businessUnit, this.usersControl.value));
         this.NotificationData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
           setTimeout(() => {
             this.dispatchNewPage(this.usersControl.value);
-            this.store.dispatch(new ShowToast(MessageTypes.Success, "Notification Subscription has been turned off"));
             this.changeDetector.detectChanges();
           },500);
         });  
