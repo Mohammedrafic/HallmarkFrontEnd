@@ -20,6 +20,7 @@ export class CommonReportFilterOptions {
   allJobStatusesAndReasons: JobStatusAndReasonFilterOptionsDto[];
   invoiceStatuses:FilterOption[];
   activeAgency: AgencyDto[];
+  credentialType:credentialTypeDto[];
 }
 
 export class CandidateStatusAndReasonFilterOptionsDto {
@@ -64,6 +65,10 @@ export class timesheetStatusesDto {
 export class AgencyDto {
   agencyId: number;
   agencyName: string;
+}
+export class credentialTypeDto{
+  id: number;
+  name: string;
 }
 export class CommonReportFilter {
   businessUnitIds: number[];
