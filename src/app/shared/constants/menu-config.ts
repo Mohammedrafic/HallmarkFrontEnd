@@ -554,6 +554,10 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/opd-missing-credentials',
     },
+    134:{
+      icon:"",
+      route:'/analytics/opd-credential-summary'
+    }
   },
 
   [BusinessUnitType.MSP]: {
@@ -1517,6 +1521,10 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/opd-missing-credentials',
     },
+    134:{
+      icon:"",
+      route:'/analytics/opd-credential-summary'
+    }
   },
 
   [BusinessUnitType.Agency]: {
