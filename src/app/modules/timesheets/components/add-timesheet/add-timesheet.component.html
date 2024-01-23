@@ -118,8 +118,8 @@ cssClass="dialog short"
                       class="datepicker"
                       appValidateWithMessage
                       format="MM/dd/yyyy"
-                      [min]="dateSettings.timeIn.min"
-                      [max]="dateSettings.timeIn.max"
+                      [min]="isReorder ? reorderMinDate : dateSettings.timeIn.min"
+                      [max]="isReorder ? reorderMaxDate : dateSettings.timeIn.max"
                       [strictMode]="true"
                       [formControlName]="field.field"
                     >

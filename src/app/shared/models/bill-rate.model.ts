@@ -96,6 +96,7 @@ export interface BillRate {
   dailyOtEnabled?: boolean;
   holidayCalculationEnabled?: boolean;
   isUpdated?: boolean;
+  candidateJobId?: number;
 }
 
 export type ImportedBillRate = {

@@ -28,6 +28,7 @@ export class InvoiceRecordsTableRowDetailsComponent<T> extends GridRowDetailsCel
               .find(reorderData => reorderData.id === record.id)?.reorderCandidatePosition || '';
           });
           super.agInit(params);
+          this.addDetailsGridInfo();
         });
       return;
     }

@@ -181,6 +181,10 @@ export class BillRatesService {
     return this.http.get<BillRate[]>(endpoint);
   }
 
+  public getPDCandidateBillRates(orgId: number, timesheetId: number): Observable<BillRate[]> {
+    return this.http.get<BillRate[]>(`/api/timesheets/pdTimesheetBillRates/${timesheetId}/${orgId}`);
+  }
+
   public getCalculatedRates(jobId: number): Observable<BillRate[]> {
     return this.http.get<BillRate[]>(`/api/candidatejobs/${jobId}/billrates`);
   }

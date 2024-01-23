@@ -6,12 +6,24 @@ import { DetailsTableConfig, DialogConfig } from '../interface';
 export const MealBreakeName = 'hadLunchBreak';
 export const TimeInName = 'timeIn';
 export const TimeOutName = 'timeOut';
+export const Reorder = 'reorderCandidateJobId';
+export const BillRateConfig = 'billRateConfigId';
 
 export const GetRecordAddDialogConfig = (isMobile: boolean): DialogConfig => {
   return {
     timesheets: {
       title: 'Add Timesheet Record',
       fields: [
+        {
+          title: 'Re-order',
+          field: 'reorderCandidateJobId',
+          type: FieldType.Dropdown,
+          disabled: false,
+          required: true,
+          widthStyle: FieldWidthStyle.Long,
+          visible: true,
+          optionsStateKey: 'timesheetReorders',
+        },
         {
           title: 'Day',
           field: 'day',

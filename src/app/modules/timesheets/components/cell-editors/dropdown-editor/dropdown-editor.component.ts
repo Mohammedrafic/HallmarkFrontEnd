@@ -15,6 +15,7 @@ import { createUniqHashObj } from '@core/helpers/functions.helper';
 
 import { GetCostCenterOptions, GetDropdownOptions } from '../../../helpers';
 import { TimesheetsState } from '../../../store/state/timesheets.state';
+import { AddRecorTimesheetReorder } from '../../../interface';
 
 @Component({
   selector: 'app-dropdown-editor',
@@ -60,7 +61,6 @@ export class DropdownEditorComponent extends Destroyable  implements ICellRender
   }
 
   private setData(params: ICellRendererParams): void {
-    debugger;
     const colDef = (params.colDef as ColDef);
     const storeField = colDef.cellRendererParams.storeField as string;
     const regionId = params.context.componentParent.timesheetDetails?.orderRegionId;
@@ -83,9 +83,15 @@ export class DropdownEditorComponent extends Destroyable  implements ICellRender
 
     if (storeField === 'billRateTypes') {
       const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'Mileage', 'OT'];
-      const filteredOptions = this.options.filter((option) => {
+      const isReorder = params.context.componentParent.timesheetDetails?.reorderDates !== null;
+      let filteredOptions = this.options.filter((option) => {
         return !ratesNotForSelect.includes(option.text);
       });
+      if (isReorder) {
+        filteredOptions = filteredOptions.filter((option) => {
+          return (option as AddRecorTimesheetReorder).candidateJobId === params.data.reorderCandidateJobId;
+        });
+      }
       const uniqBillRatesHashObj = createUniqHashObj(
         filteredOptions,
         (el: DropdownOption) => el.value,
