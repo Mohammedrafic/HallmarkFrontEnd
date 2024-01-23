@@ -162,7 +162,7 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
   public periodIsDefault: boolean = false;
   periodFields: FieldSettingsModel = { text: 'name', value: 'name' };
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
-
+  public isDefaultLoad: boolean = false;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
     private filterService: FilterService,
@@ -343,49 +343,128 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
         this.changeDetectorRef.detectChanges();
       }
     });
-    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.VendorActivityReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
-      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+    //this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+    //  this.VendorActivityReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
+    //  if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+    //    this.isAlive = true;
+    //    this.previousOrgId = data;
+    //    if (!this.isClearAll) {
+    //      let orgList = this.organizations?.filter((x) => data == x.organizationId);
+    //      this.selectedOrganizations = orgList;
+    //      this.regionsList = [];
+    //      let regionsList: Region[] = [];
+    //      let locationsList: Location[] = [];
+    //      let departmentsList: Department[] = [];
+    //      orgList.forEach((value) => {
+    //        regionsList.push(...value.regions);
+    //        locationsList = regionsList.map(obj => {
+    //          return obj.locations.filter(location => location.regionId === obj.id);
+    //        }).reduce((a, b) => a.concat(b), []);
+    //        departmentsList = locationsList.map(obj => {
+    //          return obj.departments.filter(department => department.locationId === obj.id);
+    //        }).reduce((a, b) => a.concat(b), []);
+    //      });
+    //      this.regionsList = sortByField(regionsList, "name");
+    //      this.locationsList = sortByField(locationsList, 'name');
+    //      this.departmentsList = sortByField(departmentsList, 'name');
+    //      this.masterRegionsList = this.regionsList;
+    //      this.masterLocationsList = this.locationsList;
+    //      this.masterDepartmentsList = this.departmentsList;
+
+    //      if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+    //        this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+    //      }
+    //      else {
+    //        this.isResetFilter = true;
+    //      }
+    //      let businessIdData = [];
+    //      businessIdData.push(data);
+    //      let filter: CommonReportFilter = {
+    //        businessUnitIds: businessIdData
+    //      };
+    //      this.store.dispatch(new GetCommonReportFilterOptions(filter));
+    //      this.regions = this.regionsList;
+    //      this.filterColumns.regionIds.dataSource = this.regions;
+    //      this.SearchReport() ;
+    //    }
+    //    else {
+    //      this.isClearAll = false;
+    //      this.VendorActivityReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+    //    }
+    //  }
+    //});
+    this.bussinessControl = this.VendorActivityReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
+
+    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((data) => {
+      this.VendorActivityReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+      this.selectedOrganizations = [];
+      // if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+      if (data && data.length > 0) {
         this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
-          let orgList = this.organizations?.filter((x) => data == x.organizationId);
-          this.selectedOrganizations = orgList;
+
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
           let departmentsList: Department[] = [];
-          orgList.forEach((value) => {
-            regionsList.push(...value.regions);
-            locationsList = regionsList.map(obj => {
-              return obj.locations.filter(location => location.regionId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-            departmentsList = locationsList.map(obj => {
-              return obj.departments.filter(department => department.locationId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-          });
-          this.regionsList = sortByField(regionsList, "name");
-          this.locationsList = sortByField(locationsList, 'name');
-          this.departmentsList = sortByField(departmentsList, 'name');
+          this.selectedOrganizations = data;
+          if (data.length == 1) {
+
+
+            let orgList = this.organizations?.filter((x) => data[0] == x.organizationId);
+            orgList.forEach((value) => {
+              regionsList.push(...value.regions);
+              locationsList = regionsList.map(obj => {
+                return obj.locations.filter(location => location.regionId === obj.id);
+              }).reduce((a, b) => a.concat(b), []);
+              departmentsList = locationsList.map(obj => {
+                return obj.departments.filter(department => department.locationId === obj.id);
+              }).reduce((a, b) => a.concat(b), []);
+            });
+
+          }
+          this.regionsList = regionsList.length > 0 ? sortByField(regionsList, "name") : [];
+          this.locationsList = locationsList.length > 0 ? sortByField(locationsList, 'name') : [];
+          this.departmentsList = departmentsList.length > 0 ? sortByField(departmentsList, 'name') : [];
+
           this.masterRegionsList = this.regionsList;
           this.masterLocationsList = this.locationsList;
           this.masterDepartmentsList = this.departmentsList;
 
-          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
-          }
-          else {
-            this.isResetFilter = true;
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          if (this.bussinessControl?.value.length == "1") {
+            if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+              this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+            }
+            else {
+              this.isResetFilter = true;
+            }
           }
           let businessIdData = [];
-          businessIdData.push(data);
+          //businessIdData.push(data[0]);
+          businessIdData = data;
           let filter: CommonReportFilter = {
             businessUnitIds: businessIdData
           };
+
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
-          this.regions = this.regionsList;
-          this.filterColumns.regionIds.dataSource = this.regions;
-          this.SearchReport() ;
+          this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+            if (data != null) {
+              this.isAlive = true;
+              this.filterOptionsData = data;
+              this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+              this.filterColumns.skillIds.dataSource = [];
+              //this.filterColumns.jobStatuses.dataSource = data.jobStatusesAndReasons;
+             // this.filterColumns.candidateStatuses.dataSource = data.candidateStatusesAndReasons;
+              //this.filterColumns.timesheetStatuses.dataSource = data.timesheetStatuses.filter(i => this.fixedTimesheetStatusesIncluded.includes(i.id));
+             // this.VendorActivityReportForm.get(analyticsConstants.formControlNames.TimesheetStatuses)?.setValue(this.defaultTimesheetStatuses);
+              this.isDefaultLoad = true;
+              this.SearchReport()
+            }
+          });
+
         }
         else {
           this.isClearAll = false;
@@ -511,7 +590,7 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
      // "OrganizationsVA": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "OrganizationParamVA": this.selectedOrganizations?.length == 0 ? "null" :
+      "OrganizationsVA": this.selectedOrganizations?.length == 0 ? "null" :
         this.selectedOrganizations?.join(","),
 
       "regionVA": regionIds.length == 0 ? "null" : regionIds,
