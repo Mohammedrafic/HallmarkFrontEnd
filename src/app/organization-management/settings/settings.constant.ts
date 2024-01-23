@@ -86,7 +86,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'EnableClearedToStartForAcceptedCandidates',
   'SplitReportedTimeOnBillRateEffectiveDate',
   'TimeLimitforManagerReviewEmail',
-  'Createreplacementorderswhenschedulesgetcancelled'
+  'Createreplacementorderswhenschedulesgetcancelled',
+  'Leaverequestcomments'
 ];
 
 export const DisabledSettingsByDefault = [
