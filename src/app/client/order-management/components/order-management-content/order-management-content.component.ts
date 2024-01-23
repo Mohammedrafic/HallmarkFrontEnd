@@ -290,6 +290,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   selectedCandidateforIRPorderDetails: IRPOrderPosition;
   DeployedEmployeeConfigValue: boolean;
   deployedState: boolean;
+  public allOrdersChildColumnsToExport:ExportColumn[] = allOrdersChildColumnsToExport;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -689,17 +690,22 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public checkEnableClearToStart(): void {
-      this.settingService
-          .getViewSettingKey(
-            OrganizationSettingKeys.EnableClearedToStartForAcceptedCandidates,
-            OrganizationalHierarchy.Organization,
-            this.organizationId,
-            this.organizationId,
-            false,
-          ).pipe(takeUntil(this.unsubscribe$))
-            .subscribe(({ EnableClearedToStartForAcceptedCandidates }) => {
-              this.isEnableClearedToStart = JSON.parse(EnableClearedToStartForAcceptedCandidates);
-            });
+    this.isEnableClearedToStart = false;
+    if(this.activeTab == OrganizationOrderManagementTabs.AllOrders){
+        this.settingService
+            .getViewSettingKey(
+              OrganizationSettingKeys.EnableClearedToStartForAcceptedCandidates,
+              OrganizationalHierarchy.Organization,
+              this.organizationId,
+              this.organizationId,
+              false,
+            ).pipe(takeUntil(this.unsubscribe$))
+              .subscribe(({ EnableClearedToStartForAcceptedCandidates }) => {
+                this.isEnableClearedToStart = JSON.parse(EnableClearedToStartForAcceptedCandidates);
+                this.checkSelectedChildrenItem();
+              });
+    }
+      
   }
 
   ngOnDestroy(): void {
@@ -1309,20 +1315,21 @@ public RedirecttoIRPOrder(order:Order)
     this.reorderFilledStatus = false;
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
+        this.allOrdersChildColumnsToExport = [...allOrdersChildColumnsToExport]
         if(this.isEnableClearedToStart){
             let newCol = { text: 'Cleared to Start', column: 'ClearedToStart' };
-            allOrdersChildColumnsToExport.splice(2, 0, newCol);
-            allOrdersChildColumnsToExport.join();
+            this.allOrdersChildColumnsToExport.splice(2, 0, newCol);
+            this.allOrdersChildColumnsToExport.join();
         }
         if(this.selectedItems.filter(ele=> ele.orderType == 1).length == this.selectedItems.length){
           this.openregrateupdate = false;
         }
         if (this.selectedItems.length === 0) {
-          this.columnsToExport = [...allOrdersColumnsToExport, ...allOrdersChildColumnsToExport];
+          this.columnsToExport = [...allOrdersColumnsToExport, ...this.allOrdersChildColumnsToExport];
           return;
         }
         this.columnsToExport = hasSelectedItemChildren
-          ? [...allOrdersColumnsToExport, ...allOrdersChildColumnsToExport]
+          ? [...allOrdersColumnsToExport, ...this.allOrdersChildColumnsToExport]
           : allOrdersColumnsToExport;
         break;
       case OrganizationOrderManagementTabs.PerDiem:
@@ -2987,7 +2994,7 @@ public RedirecttoIRPOrder(order:Order)
       this.initGridColumns();
       this.getOrders();
       this.getProjectSpecialData();
-
+      this.checkEnableClearToStart();
       this.previousSelectedSystemId = null;
       this.orderManagementService.saveSelectedOrderManagementSystem(this.activeSystem);
     });

@@ -1055,7 +1055,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private clearedToStartCheck():void {
-    if(this.candidate && this.candidate.organizationId && this.candidate.candidateJobId && (this.currentOrder.orderType == OrderType.LongTermAssignment || this.currentOrder.orderType ==  OrderType.ContractToPerm)){
+    if(this.candidate && this.candidate.organizationId && this.candidate.candidateJobId && (this.currentOrder?.orderType == OrderType.LongTermAssignment || this.currentOrder?.orderType ==  OrderType.ContractToPerm)){
       this.isEnableClearedToStartForAcceptedCandidates = false;
       this.isClearedToStartEnable =  this.candidate.status == ApplicantStatusEnum.Accepted ? false : true;
 

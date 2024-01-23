@@ -8,6 +8,18 @@ import { GetQueryParams } from '@core/helpers';
 export class SettingsViewService {
   constructor(private http: HttpClient) {}
 
+  public getViewSettingsOfMultiOrg(settingKeys: OrganizationSettingKeys, hierarchyLevel: OrganizationalHierarchy, id: number,organizationId: number[]): Observable<Record<string, string>>{
+    const params = {
+      SettingKeys: settingKeys,
+      HierarchyId: organizationId[0],
+      HierarchyLevel: hierarchyLevel,
+      OrganizationId: organizationId,
+    };
+    const url = '/api/OrganizationSettings/byKeysForMultipleOrgs';
+
+    return this.http.post<Record<string, string>>(url,  params );
+  }
+
   public getViewSettingKey(
     settingKeys: OrganizationSettingKeys,
     hierarchyLevel: OrganizationalHierarchy,

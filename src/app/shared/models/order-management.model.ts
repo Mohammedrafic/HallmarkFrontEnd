@@ -303,6 +303,7 @@ export interface OrderManagementChild  {
   status: OrderStatus;
   extensionFromId?: number;
   clearToStart?:boolean | null;
+  clearToStartForGrid?:boolean | null;
 };
 
 export type OrderCandidatesList = {
@@ -795,6 +796,7 @@ export class OrderFilter {
   shift?: string[] | string;
   isQuickLinkWidgetLTA?: boolean | null;
   orderLocked? : any | null;
+  clearedToStart? : any | null;
   ltaOrder? : boolean | null;
   orderDistributionType? : number | null;
   showDeletedOrders?: boolean | null;
