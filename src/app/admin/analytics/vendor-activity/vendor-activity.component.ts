@@ -6,7 +6,7 @@ import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { EmitType } from '@syncfusion/ej2-base';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { debounceTime, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { debounceTime, Observable, Subject, takeUntil, takeWhile, distinctUntilChanged } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -23,7 +23,7 @@ import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { accrualConstants, analyticsConstants } from '../constants/analytics.constant';
+import { accrualConstants, analyticsConstants, Period } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
@@ -58,7 +58,10 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
     "skillCategoryVA": "",
     "skillVA": "",
     "startDateVA": "",
-    "endDateVA": ""
+    "endDateVA": "",
+    "organizationNameVA": "",
+    "reportPulledMessageVA": "",
+    "DateRangeVA": ""
   };
 
 
@@ -111,7 +114,7 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   private agencyOrganizationId: number;
-
+  public organizations: Organisation[] = [];
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   public organizationFields = ORGANIZATION_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
@@ -129,7 +132,7 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
-  public organizations: Organisation[] = [];
+ // public organizations: Organisation[] = [];
   public regionsList: Region[] = [];
   public locationsList: Location[] = [];
   public departmentsList: Department[] = [];
@@ -151,14 +154,15 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
   private isAlive = true;
   private previousOrgId: number = 0;
   private dateFormat = 'MM/dd/yyyy';
-  private culture = 'en-US';
-
+  private culture = 'en-US'; 
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
-
+  public periodList: Period[] = [];
+  public periodIsDefault: boolean = false;
+  periodFields: FieldSettingsModel = { text: 'name', value: 'name' };
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
-
+  public isDefaultLoad: boolean = false;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
     private filterService: FilterService,
@@ -178,7 +182,8 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
-      this.orderFilterColumnsSetup();
+      this.orderFilterColumnsSetup();      
+      this.loadperiod();
       this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
           this.isAlive = false;
@@ -237,7 +242,8 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
         skillCategoryIds: new FormControl([]),
         skillIds: new FormControl([]),
         startDate: new FormControl(startDate, [Validators.required]),
-        endDate: new FormControl(endDate, [Validators.required])
+        endDate: new FormControl(endDate, [Validators.required]),
+        period: new FormControl(null)
       }
     );
   }
@@ -245,6 +251,84 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.isAlive = false;
+  }
+
+  selectPeriod(event: any) {
+    let { startDate, period } = this.VendorActivityReportForm.getRawValue();
+    const value = event.itemData.id;
+    this.periodIsDefault = this.VendorActivityReportForm.controls['period'].value == "Custom" ? true : false;
+    this.VendorActivityReportForm.get(analyticsConstants.formControlNames.startDate)?.setValue("");
+    this.VendorActivityReportForm.get(analyticsConstants.formControlNames.endDate)?.setValue("");
+    const PeriodCheck = value;
+    let startDateControl = new Date(Date.now());
+    let endDateControl = new Date(Date.now());
+    let lastDayOfLastMonth = new Date();
+    lastDayOfLastMonth.setMonth(lastDayOfLastMonth.getMonth(), 0);
+
+    switch (PeriodCheck) {
+      case 0:
+        startDateControl.setDate(startDateControl.getDate() - 30);
+        break;
+      case 1:
+        startDateControl.setDate(startDateControl.getDate() - 31);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 2:
+        startDateControl.setDate(startDateControl.getDate() - 61);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 3:
+        startDateControl.setDate(startDateControl.getDate() - 91);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 4:
+        startDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        break;
+      case 5:
+        const today = new Date(Date.now());
+        const quarter = Math.floor((today.getMonth() / 3));
+        startDateControl = new Date(today.getFullYear(), quarter * 3 - 3, 1);
+        endDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth() + 3, 0);
+        break;
+      case 6:
+        const startDate = new Date(startDateControl.getFullYear(), 0, 1)
+        startDate.setDate(startDate.getDate());
+        startDateControl = startDate;
+        break;
+      case 7:
+        const firstDay = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(firstDay, -6);
+        startDateControl.setDate(startDateControl.getDate());
+        endDateControl = new Date((lastDayOfLastMonth));
+        break;
+      case 8:
+        const dayFirst = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(dayFirst, -12);
+        startDateControl.setDate(startDateControl.getDate());
+        endDateControl = new Date((lastDayOfLastMonth));
+        break;
+    }
+
+    this.VendorActivityReportForm.get(analyticsConstants.formControlNames.startDate)?.setValue(startDateControl);
+    this.VendorActivityReportForm.get(analyticsConstants.formControlNames.endDate)?.setValue(new Date((endDateControl)));
+
+  }
+  private addMonths(date: any, months: any) {
+    date.setMonth(date.getMonth() + months);
+    return date;
+  }
+  private loadperiod(): void {
+    this.periodList = [];
+    this.periodList.push({ id: 0, name: 'Custom' });
+    this.periodList.push({ id: 1, name: 'Last 30 days' });
+    this.periodList.push({ id: 2, name: 'Last 60 days' });
+    this.periodList.push({ id: 3, name: 'Last 90 days' });
+    this.periodList.push({ id: 4, name: 'MTD' });
+    this.periodList.push({ id: 5, name: 'Last Quarter' });
+    this.periodList.push({ id: 6, name: 'YTD' });
+    this.periodList.push({ id: 7, name: 'Last 6 Months' });
+    this.periodList.push({ id: 8, name: 'Last 12 Months' });
+    this.VendorActivityReportForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
   }
 
   public onFilterControlValueChangedHandler(): void {
@@ -255,53 +339,132 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
         this.organizations = uniqBy(data, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
         this.defaultOrganizations = this.agencyOrganizationId;
-        this.VendorActivityReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.VendorActivityReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
         this.changeDetectorRef.detectChanges();
       }
     });
-    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.VendorActivityReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
-      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+    //this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+    //  this.VendorActivityReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
+    //  if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+    //    this.isAlive = true;
+    //    this.previousOrgId = data;
+    //    if (!this.isClearAll) {
+    //      let orgList = this.organizations?.filter((x) => data == x.organizationId);
+    //      this.selectedOrganizations = orgList;
+    //      this.regionsList = [];
+    //      let regionsList: Region[] = [];
+    //      let locationsList: Location[] = [];
+    //      let departmentsList: Department[] = [];
+    //      orgList.forEach((value) => {
+    //        regionsList.push(...value.regions);
+    //        locationsList = regionsList.map(obj => {
+    //          return obj.locations.filter(location => location.regionId === obj.id);
+    //        }).reduce((a, b) => a.concat(b), []);
+    //        departmentsList = locationsList.map(obj => {
+    //          return obj.departments.filter(department => department.locationId === obj.id);
+    //        }).reduce((a, b) => a.concat(b), []);
+    //      });
+    //      this.regionsList = sortByField(regionsList, "name");
+    //      this.locationsList = sortByField(locationsList, 'name');
+    //      this.departmentsList = sortByField(departmentsList, 'name');
+    //      this.masterRegionsList = this.regionsList;
+    //      this.masterLocationsList = this.locationsList;
+    //      this.masterDepartmentsList = this.departmentsList;
+
+    //      if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+    //        this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+    //      }
+    //      else {
+    //        this.isResetFilter = true;
+    //      }
+    //      let businessIdData = [];
+    //      businessIdData.push(data);
+    //      let filter: CommonReportFilter = {
+    //        businessUnitIds: businessIdData
+    //      };
+    //      this.store.dispatch(new GetCommonReportFilterOptions(filter));
+    //      this.regions = this.regionsList;
+    //      this.filterColumns.regionIds.dataSource = this.regions;
+    //      this.SearchReport() ;
+    //    }
+    //    else {
+    //      this.isClearAll = false;
+    //      this.VendorActivityReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+    //    }
+    //  }
+    //});
+    this.bussinessControl = this.VendorActivityReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
+
+    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((data) => {
+      this.VendorActivityReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+      this.selectedOrganizations = [];
+      // if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+      if (data && data.length > 0) {
         this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
-          let orgList = this.organizations?.filter((x) => data == x.organizationId);
-          this.selectedOrganizations = orgList;
+
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
           let departmentsList: Department[] = [];
-          orgList.forEach((value) => {
-            regionsList.push(...value.regions);
-            locationsList = regionsList.map(obj => {
-              return obj.locations.filter(location => location.regionId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-            departmentsList = locationsList.map(obj => {
-              return obj.departments.filter(department => department.locationId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-          });
-          this.regionsList = sortByField(regionsList, "name");
-          this.locationsList = sortByField(locationsList, 'name');
-          this.departmentsList = sortByField(departmentsList, 'name');
+          this.selectedOrganizations = data;
+          if (data.length == 1) {
+
+
+            let orgList = this.organizations?.filter((x) => data[0] == x.organizationId);
+            orgList.forEach((value) => {
+              regionsList.push(...value.regions);
+              locationsList = regionsList.map(obj => {
+                return obj.locations.filter(location => location.regionId === obj.id);
+              }).reduce((a, b) => a.concat(b), []);
+              departmentsList = locationsList.map(obj => {
+                return obj.departments.filter(department => department.locationId === obj.id);
+              }).reduce((a, b) => a.concat(b), []);
+            });
+
+          }
+          this.regionsList = regionsList.length > 0 ? sortByField(regionsList, "name") : [];
+          this.locationsList = locationsList.length > 0 ? sortByField(locationsList, 'name') : [];
+          this.departmentsList = departmentsList.length > 0 ? sortByField(departmentsList, 'name') : [];
+
           this.masterRegionsList = this.regionsList;
           this.masterLocationsList = this.locationsList;
           this.masterDepartmentsList = this.departmentsList;
 
-          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
-          }
-          else {
-            this.isResetFilter = true;
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          if (this.bussinessControl?.value.length == "1") {
+            if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+              this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+            }
+            else {
+              this.isResetFilter = true;
+            }
           }
           let businessIdData = [];
-          businessIdData.push(data);
+          //businessIdData.push(data[0]);
+          businessIdData = data;
           let filter: CommonReportFilter = {
             businessUnitIds: businessIdData
           };
+
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
-          this.regions = this.regionsList;
-          this.filterColumns.regionIds.dataSource = this.regions;
-          this.SearchReport() ;
+          this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+            if (data != null) {
+              this.isAlive = true;
+              this.filterOptionsData = data;
+              this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+              this.filterColumns.skillIds.dataSource = [];
+              //this.filterColumns.jobStatuses.dataSource = data.jobStatusesAndReasons;
+             // this.filterColumns.candidateStatuses.dataSource = data.candidateStatusesAndReasons;
+              //this.filterColumns.timesheetStatuses.dataSource = data.timesheetStatuses.filter(i => this.fixedTimesheetStatusesIncluded.includes(i.id));
+             // this.VendorActivityReportForm.get(analyticsConstants.formControlNames.TimesheetStatuses)?.setValue(this.defaultTimesheetStatuses);
+              this.isDefaultLoad = true;
+              this.SearchReport()
+            }
+          });
+
         }
         else {
           this.isClearAll = false;
@@ -398,7 +561,7 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
       }
     }
     let { departmentIds, locationIds,
-      regionIds, skillCategoryIds, skillIds, startDate, endDate, agencyIds } = this.VendorActivityReportForm.getRawValue();
+      regionIds, skillCategoryIds, skillIds, startDate, endDate, agencyIds, period } = this.VendorActivityReportForm.getRawValue();
 
     if (!this.VendorActivityReportForm.dirty) {
       //this.message = "Default filter selected with all regions, locations and departments for 90 days";
@@ -415,7 +578,7 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
     skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
     skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : "null";
-
+    let currentDate = new Date(Date.now());
 
     this.paramsData =
     {
@@ -426,7 +589,10 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OrganizationsVA": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+     // "OrganizationsVA": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "OrganizationsVA": this.selectedOrganizations?.length == 0 ? "null" :
+        this.selectedOrganizations?.join(","),
+
       "regionVA": regionIds.length == 0 ? "null" : regionIds,
       "locationVA": locationIds.length == 0 ? "null" : locationIds,
       "departmentVA": departmentIds.length == 0 ? "null" : departmentIds,
@@ -434,7 +600,12 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
       "skillCategoryVA": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
       "skillVA": skillIds.length == 0 ? "null" : skillIds,
       "startDateVA": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "endDateVA": formatDate(endDate, 'MM/dd/yyyy', 'en-US')
+      "endDateVA": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "organizationNameVA": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
+
+      "reportPulledMessageVA": ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeVA": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+      
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -525,6 +696,9 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
     let startDate = new Date(year, month, 1);
     let endDate = new Date(year, month + 1, 0);
 
+    this.VendorActivityReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
+    this.VendorActivityReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
+
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
@@ -533,6 +707,7 @@ export class VendorActivityComponent implements OnInit, OnDestroy {
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.VendorActivityReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(endDate);
+    this.VendorActivityReportForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

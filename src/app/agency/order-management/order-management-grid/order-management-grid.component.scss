@@ -86,3 +86,11 @@
 .order-type-text-cell {
   @include order-type-text-cell;
 }
+
+.status-cell {
+  width: 100%;
+
+  .e-chip {
+    width: 85%;
+  }
+}

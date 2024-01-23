@@ -111,11 +111,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public OrganizationId:number;
   public allowSelecton:boolean = true;
   public user: any;
-  organizations: AgencyDataSourceItem[];
+  public organizations: AgencyDataSourceItem[];
   public isAgencyVisibilityFlagEnabled = false;
   public orderTypeId: any;
-  isRedirectedFromDashboard: boolean;
-  showDropDown:boolean = false;
+  public isRedirectedFromDashboard: boolean;
+  public showDropDown:boolean = false;
 
   constructor(
     private store: Store,
@@ -368,6 +368,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   private initOrganizationsList(): void {
     if(this.isAgency && this.isAgencyVisibilityFlagEnabled){
       this.user=this.store.selectSnapshot(UserState.user);
+      this.showDropDown = false;
+      this.organizations= [];
       this.store
       .dispatch(new Timesheets.GetOrganizationsForAgency(this.user.id))
       .pipe(

@@ -643,3 +643,11 @@
     margin-left: 8px !important;
   }
 }
+
+.status-cell {
+  width: 100%;
+
+  .e-chip {
+    width: 85%;
+  }
+}

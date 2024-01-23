@@ -1,0 +1,25 @@
+.migrate-container{
+    display: flex;
+    align-content:center;
+    justify-content:center;
+}
+.agency-dropdowns {
+  display: flex;
+
+  .dropdown-container {
+    padding: 50px;
+    min-width: 250px;
+  }
+}
+.migrate-button {
+  padding: 50px;
+  padding-top: 0px;
+  min-width: 250px;
+}
+
+.wave-container{
+    display: inline-block;
+    font-size: 2rem;
+    text-align:center;
+    min-width: 250px;
+}
