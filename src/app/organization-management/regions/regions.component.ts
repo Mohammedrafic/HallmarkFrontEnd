@@ -32,6 +32,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { FilterService } from '@shared/services/filter.service';
 import { UserState } from '../../store/user.state';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions/abstract-permission-grid';
+import { GetOrganizationStructure } from 'src/app/store/user.actions';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 
@@ -382,7 +383,7 @@ export class RegionsComponent extends AbstractPermissionGrid implements OnInit, 
       takeUntil(this.unsubscribe$)
     ).subscribe((res) => {
       if (selectedIndex == (selectedRegionsLength - 1)) {
-        this.store.dispatch(new GetRegionsPage(this.filters));
+        this.store.dispatch([new GetRegionsPage(this.filters), new GetOrganizationStructure()]);
         this.getMasterRegionData();
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
       }

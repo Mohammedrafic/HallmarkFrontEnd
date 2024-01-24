@@ -1,4 +1,4 @@
-import { formatDate, formatNumber } from '@angular/common';
+import { DatePipe, formatDate, formatNumber } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -279,7 +279,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private confirmService: ConfirmService,
     private billRatesSyncService: BillRatesSyncService,
     private orderManagementService: OrderManagementService,
-    private editIrpCandidateService: EditIrpCandidateService
+    private editIrpCandidateService: EditIrpCandidateService,
+    private datePipe: DatePipe,
   ) {
     super();
     this.isAgency = this.router.url.includes('agency');
@@ -732,7 +733,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const value = this.form.getRawValue();
     const jobStartDate = new Date(this.candidateJob.order.jobStartDate);
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
-    const finalDate = this.candidateJob.offeredStartDate && this.candidateJob.offeredStartDate !== '' ? new Date(this.candidateJob.offeredStartDate) : jobStartDate;
+    const offeredStartDate = this.candidateJob.offeredStartDate && this.candidateJob.offeredStartDate !== '' ? this.datePipe.transform(this.candidateJob.offeredStartDate,'MM/dd/yyyy HH:mm', 'UTC') : null;
+    const finalDate = offeredStartDate ? new Date(offeredStartDate) : jobStartDate;
     const daysDifference =  DateTimeHelper.getDateDiffInDays(jobStartDate, jobEndDate);
     const actualEndDate = this.calculateActualEndDate(finalDate, daysDifference).toISOString();
     const accepted = applicantStatus.applicantStatus ===ApplicantStatusEnum.Accepted;
@@ -1055,7 +1057,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private clearedToStartCheck():void {
-    if(this.candidate && this.candidate.organizationId && this.candidate.candidateJobId && (this.currentOrder.orderType == OrderType.LongTermAssignment || this.currentOrder.orderType ==  OrderType.ContractToPerm)){
+    if(this.candidate && this.candidate.organizationId && this.candidate.candidateJobId && (this.currentOrder?.orderType == OrderType.LongTermAssignment || this.currentOrder?.orderType ==  OrderType.ContractToPerm)){
       this.isEnableClearedToStartForAcceptedCandidates = false;
       this.isClearedToStartEnable =  this.candidate.status == ApplicantStatusEnum.Accepted ? false : true;
 

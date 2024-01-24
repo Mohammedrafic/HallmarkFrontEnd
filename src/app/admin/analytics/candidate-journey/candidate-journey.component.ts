@@ -702,6 +702,8 @@ export class CandidateJourneyComponent implements OnInit, OnDestroy {
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.StartDateTo)?.setValue(((StartDateToControl)));
 
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateFrom)?.setValue("");
+    this.candidateJourneyForm.get(analyticsConstants.formControlNames.EndDateTo)?.setValue("");
     this.candidateJourneyForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
     this.filteredItems = [];
     this.locations = [];

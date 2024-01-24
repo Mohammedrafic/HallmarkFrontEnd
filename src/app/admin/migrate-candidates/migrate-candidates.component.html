@@ -1,0 +1,43 @@
+<div class="migrate-container">
+  <section>
+    <ng-container>
+      <div class="bootstrap agency-dropdowns" [formGroup]="migrateCandidatesForm">
+        <div class="dropdown-container">
+          <div class="input-group dropdown">
+            <ejs-dropdownlist appValidateWithMessage
+                              formControlName="agency"
+                              [allowFiltering]="true"
+                              [fields]="agencyFields"
+                              [dataSource]="agencies$ | async"
+                              placeholder="Agency"></ejs-dropdownlist>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container>
+      <div class="migrate-button">
+        <app-tooltip-container [message]="toolTipMessage"
+                               [showToolTip]="!userPermission[userPermissions.CanMigrateCandidate]">
+          <button ejs-button appHideBeforeSyncfusionLoad class="migrate-button"
+                  [disabled]="!userPermission[userPermissions.CanMigrateCandidate]"
+                  [isPrimary]="true" (click)="migrateCandidates()">
+            Migrate Candidates
+          </button>
+        </app-tooltip-container>
+      </div>
+    </ng-container>
+    <ng-container>
+      <div class="migrate-button">
+        <div class="wave-container">
+          <mat-card>
+            <mat-card-content>
+              <div [@waveAnimation]="remaningCandidates$ | async">
+                Remaning Candidates: {{remaningCandidates$ | async}}
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </ng-container>
+  </section>
+</div>

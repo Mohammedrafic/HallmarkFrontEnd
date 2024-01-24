@@ -291,7 +291,7 @@ export class CredientialExpiryAgencyComponent implements OnInit {
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.RegionIds)?.setValue([]);
-      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+      if (data != null && typeof data === 'number') {
         this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
@@ -337,14 +337,12 @@ export class CredientialExpiryAgencyComponent implements OnInit {
 
           this.store.dispatch(new GetAgencyCommonFilterReportOptions(filter));
           this.agencycommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: AgencyCommonFilterReportOptions | null) => {
-            debugger;
             if (data != null) {
               this.isAlive = true;
               this.filterOptionsData = data;
               // this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               // this.filterColumns.skillIds.dataSource = [];
               // this.filterColumns.jobStatuses.dataSource = data.jobStatusesAndReasons;
-              debugger;
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
 
               this.candidateStatusesData = data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
@@ -360,6 +358,8 @@ export class CredientialExpiryAgencyComponent implements OnInit {
         }
         else {
           this.isClearAll = false;
+          let orgList = this.organizations?.filter((x) => data == x.organizationId);
+          this.selectedOrganizations = orgList;
           this.agencyCredientialExpiryReportForm.get(AgencyCredientialExpiryConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
@@ -516,7 +516,6 @@ export class CredientialExpiryAgencyComponent implements OnInit {
   }
 
   public onFilterCandidateStatusChangedHandler(): void {
-    debugger;
     this.canidateStatusControl = this.agencyCredientialExpiryReportForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
     this.canidateStatusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.canidateStatusControl.value.length > 0) {

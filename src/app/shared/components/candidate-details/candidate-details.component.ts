@@ -127,9 +127,6 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
   @Select(CandidateDetailsState.associateOrganizations)
   public associateOrg$: Observable<AgencyOrderFilteringOptions>;
 
-  @Select(SecurityState.isOrganizaionsLoaded)
-  isOrganizaionsLoaded$: Observable<boolean>;
-
   @ViewChild(FiltersComponent, { static: false }) filterco: FiltersComponent;
   @Input() export$: Subject<ExportedFileType>;
   @ViewChild('grid')
@@ -208,6 +205,10 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
         distinctUntilChanged(),
       ).subscribe((id) => {
         const agencyIdvalue = id.toString();
+        const user = this.store.selectSnapshot(UserState.user);
+        if(user && this.isAgencyVisibilityFlagEnabled){
+          this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
+        }
         this.lastAgencyId = Number(agencyIdvalue) || 0;
         this.store.dispatch([new GetCandidateSkills(), new GetAssociateOrganizations(Number(agencyIdvalue))]);
       });
@@ -239,14 +240,10 @@ export class CandidateDetailsComponent extends AbstractPermissionGrid implements
     if(this.isAgencyVisibilityFlagEnabled){
       this.loginAsAgency= true;
       this.agencyOrganizations();
-      this.isOrganizaionsLoaded$.pipe(takeUntil(this.destroy$)).subscribe((flag) => {
-        if(!flag){
-          const user = this.store.selectSnapshot(UserState.user);
-          if(this.loginAsAgency && user){
-            this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
-          }
-        }
-      });
+      const user = this.store.selectSnapshot(UserState.user);
+      if(this.loginAsAgency && user){
+        this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
+      }
     }
 
     combineLatest([

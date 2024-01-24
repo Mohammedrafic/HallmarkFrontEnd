@@ -303,6 +303,7 @@ export interface OrderManagementChild  {
   status: OrderStatus;
   extensionFromId?: number;
   clearToStart?:boolean | null;
+  clearToStartForGrid?:boolean | null;
 };
 
 export type OrderCandidatesList = {

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import {
+    Agency,
   Organisation,
   UserVisibilityFilter,
   UserVisibilitySettingBody,
@@ -153,6 +154,31 @@ export class UsersService {
       );
   }
 
+  /**
+   * Get the list of Agencies
+   */
+  public getAgencyList(): Observable<Agency[]> {
+    return this.http
+      .get<Agency[]>(`/api/Agency/agencylist`).pipe(map((data) => sortByField(data, 'name')));
+  }
+
+  /**
+   * Migrate candidates
+   * params agencyId is optional
+   */
+  public migrateCandidates(agencyId: number = 0): Observable<any> {
+    const body = { NG_Agency_BusinessUnitID: agencyId };
+    return this.http.post<any>('/api/LegacyCandidateMigration/LegacycandidatesProfilelist', body);
+  }
+
+  /**
+   * remaning candidates for migration
+   * params agencyId is optional
+   */
+  public remaningCandidatesForMigration(agencyId: number = 0): Observable<any> {
+    const body = { NG_Agency_BusinessUnitID: agencyId };
+    return this.http.post<any>('/api/LegacyCandidateMigration/NonSyncedLegacyCandidatesCount', body);
+  }
   /**
    * Export users list
    * @param payload

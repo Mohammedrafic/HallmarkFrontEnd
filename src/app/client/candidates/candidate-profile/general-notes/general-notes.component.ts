@@ -63,20 +63,20 @@ export class GeneralNotesComponent extends AbstractPermissionGrid implements OnI
       headerName: 'Category',
       cellRenderer: GeneralNotesGridCategoryRendererComponent,
       cellRendererParams: (params: ICellRendererParams) => this.getCategoryById(params.value),
-      minWidth: 185,
+      minWidth: 160,
     },
     {
       field: 'note',
       headerName: 'Note',
       flex: 1,
-      minWidth: 185,
+      minWidth: 300,
       tooltipField: 'note',
     },
     {
       field: 'createdByName',
       headerName: 'Created By Name',
-      flex: 1,
-      minWidth: 185,
+      //flex: 1,
+      width: 200,
     },
   ];
 

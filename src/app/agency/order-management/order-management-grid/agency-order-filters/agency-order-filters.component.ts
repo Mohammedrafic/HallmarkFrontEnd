@@ -55,6 +55,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   @Input() filterColumns: any;
   @Input() activeTab: AgencyOrderManagementTabs;
   @Output() setDefault = new EventEmitter();
+  @Output() mappedOrganizations = new EventEmitter();
 
   public AgencyOrderManagementTabs = AgencyOrderManagementTabs;
 
@@ -66,9 +67,6 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
 
   @Select(SecurityState.organisations)
   organizations$: Observable<Organisation[]>;
-
-  @Select(SecurityState.isOrganizaionsLoaded)
-  isOrganizaionsLoaded$: Observable<boolean>;
 
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
@@ -127,11 +125,9 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     const user = this.store.selectSnapshot(UserState.user);
     if(this.isAgencyVisibilityFlagEnabled){
       this.agencyOrganizations();
-      this.isOrganizaionsLoaded$.pipe(takeUntil(this.destroy$)).subscribe((flag) => {
-        if(user && !flag){
-            this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
-         }
-      });
+      if(user){
+        this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
+     }
     }
   }
 
@@ -366,6 +362,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         reorderStatuses: [],
       });
     }
+    this.mappedOrganizations.emit(this.filterColumns.organizationIds.dataSource)
   }
 
   static generateFiltersForm(): FormGroup {

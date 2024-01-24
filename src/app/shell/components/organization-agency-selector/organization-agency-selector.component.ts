@@ -104,6 +104,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   private userMsps: UserMsp;
 
   private unsubscribe$: Subject<void> = new Subject();
+  private organizationAgencyControlValue:Number | null;
 
   constructor(
     private store: Store,
@@ -324,6 +325,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     }
 
     this.organizationAgencyControl.patchValue(newOrganizationAgencyControlValue);
+    this.organizationAgencyControlValue=newOrganizationAgencyControlValue;
 
     this.cd.detectChanges();
     setTimeout(() => this.cd.markForCheck());
@@ -365,6 +367,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     }
 
     this.organizationAgencyControl.patchValue(newOrganizationAgencyControlValue);
+    this.organizationAgencyControlValue=newOrganizationAgencyControlValue;
 
     this.cd.detectChanges();
     setTimeout(() => this.cd.markForCheck());
@@ -448,8 +451,10 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         if (selectedType === 'MSP') {
           this.selectMSP(selectedOrganizationAgencyId);
         }
-
+       if(this.organizationAgencyControlValue!=selectedOrganizationAgencyId){
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType,false));
+        this.organizationAgencyControlValue=0;
+       }
       });
   }
 
