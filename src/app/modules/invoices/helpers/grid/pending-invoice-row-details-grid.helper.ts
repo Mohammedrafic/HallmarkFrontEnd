@@ -50,7 +50,7 @@ const totalColDef: TypedColDef<PendingInvoiceRecord> = {
 };
 
 const timesheetTypeColDefs: TypedColDef<PendingInvoiceRecord>[] = [
-  reorderPositionIdColDef, //invoicesRowDetailsOffsetColDef,
+  reorderPositionIdColDef,
   dayColDef,
   {
     field: 'billRateConfigTitle',
