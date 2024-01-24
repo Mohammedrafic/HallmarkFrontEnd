@@ -16,7 +16,7 @@ import {
 import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
 
-import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
+import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take, BehaviorSubject } from 'rxjs';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
@@ -33,7 +33,7 @@ import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
 import { AbstractGridConfigurationComponent } from
   '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { FilterOrderStatusText, STATUS_COLOR_GROUP } from '@shared/enums/status';
-import { GRID_CONFIG } from '@shared/constants';
+import { GRID_CONFIG, OrganizationSettingKeys, OrganizationalHierarchy } from '@shared/constants';
 import {
   myAgencyChildColumnsToExport,
   myAgencyColumnsToExport,
@@ -105,6 +105,7 @@ import { OutsideZone } from '@core/decorators';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { DateTimeHelper } from '@core/helpers';
 import { Router } from '@angular/router';
+import { SettingsViewService } from '@shared/services';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 
 @Component({
@@ -192,7 +193,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderPublicId:string;
   public isAgencyVisibilityFlagEnabled = false;
   public isRedirectedFromDashboard : boolean;
-
+  public isEnableClearedToStart:boolean = false;
+  public myAgencyChildColumnsToExport:ExportColumn[] = myAgencyChildColumnsToExport;
+  public isEnableClearedToStart$ : BehaviorSubject<boolean> =new BehaviorSubject<boolean>(false);
   constructor(
     private store: Store,
     private location: Location,
@@ -204,7 +207,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private orderManagementService: OrderManagementService,
     private cd: ChangeDetectorRef,
     private readonly ngZone: NgZone,
-    private router: Router
+    private router: Router,
+    private settingService: SettingsViewService,
   ) {
     super();
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
@@ -260,6 +264,28 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.getPreservedFiltersByPageName();
     }
 
+  }
+
+  public getMappedOrganizations($event:Array<any>): void {    
+    this.isEnableClearedToStart = false;
+    this.isEnableClearedToStart$.next(false);
+    if($event.length > 0 && this.selectedTab == AgencyOrderManagementTabs.MyAgency){
+      let mappedOrg = $event.map((ele:any)=> ele.id ? ele.id : ele.organizationId);
+      this.settingService
+      .getViewSettingsOfMultiOrg(
+        OrganizationSettingKeys.EnableClearedToStartForAcceptedCandidates,
+        OrganizationalHierarchy.Organization,
+        mappedOrg[0],
+        mappedOrg,
+      ).pipe(takeUntil(this.unsubscribe$))
+        .subscribe(({ EnableClearedToStartForAcceptedCandidates }) => {
+          this.isEnableClearedToStart = JSON.parse(EnableClearedToStartForAcceptedCandidates);
+          console.log('isEnableClearedToStart',this.isEnableClearedToStart);
+          this.isEnableClearedToStart$.next(this.isEnableClearedToStart);
+          this.checkSelectedChildrenItem();
+        });
+    }
+    
   }
 
   ngOnDestroy(): void {
@@ -980,12 +1006,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
+        this.myAgencyChildColumnsToExport = [...myAgencyChildColumnsToExport];
+        if(this.isEnableClearedToStart){
+          let newCol = { text: 'Cleared to Start', column: 'ClearedToStart' };
+          this.myAgencyChildColumnsToExport.splice(2, 0, newCol);
+          this.myAgencyChildColumnsToExport.join();
+        }
         if (this.selectedItems.length === 0) {
-          this.columnsToExport = [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport];
+          this.columnsToExport = [...myAgencyColumnsToExport, ...this.myAgencyChildColumnsToExport];
           return;
         }
         this.columnsToExport = hasSelectedItemChildren
-          ? [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport]
+          ? [...myAgencyColumnsToExport, ...this.myAgencyChildColumnsToExport]
           : myAgencyColumnsToExport;
         break;
       case AgencyOrderManagementTabs.PerDiem:
