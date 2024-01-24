@@ -87,7 +87,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'SplitReportedTimeOnBillRateEffectiveDate',
   'TimeLimitforManagerReviewEmail',
   'Createreplacementorderswhenschedulesgetcancelled',
-  'Leaverequestcomments'
+  'Leaverequestcomments',
+  'AutoEnableClearedToStart'
 ];
 
 export const DisabledSettingsByDefault = [
@@ -118,7 +119,8 @@ export const DisabledSettingsByDefault = [
   'SplitReportedTimeOnBillRateEffectiveDate',
   'TimeLimitforManagerReviewEmail',
   'Createreplacementorderswhenschedulesgetcancelled',
-  'Leaverequestcomments'
+  'Leaverequestcomments',
+  'AutoEnableClearedToStart'
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {

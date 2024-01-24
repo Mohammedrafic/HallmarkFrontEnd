@@ -280,7 +280,7 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.RegionIds)?.setValue([]);
-      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+      if (data != null && typeof data === 'number') {
         this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
@@ -339,6 +339,8 @@ export class InvoiceSummaryReportComponent implements OnInit, OnDestroy {
         }
         else {
           this.isClearAll = false;
+          let orgList = this.organizations?.filter((x) => data == x.organizationId);
+          this.selectedOrganizations = orgList;
           this.agencyInvoicesummaryReportForm.get(AgencyInvoiceSummaryConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
