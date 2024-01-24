@@ -1603,6 +1603,10 @@ public RedirecttoIRPOrder(order:Order)
     }
 
     const rowData = event.data as OrderManagement;
+    if(rowData.statusText === this.deletedStatus.Deleted)
+    {
+      return;
+    }
     const pagerState = { page: this.currentPage, pageSize: this.pageSize, filters: this.filters };
 
     this.store.dispatch(new SetOrderManagementPagerState(pagerState));

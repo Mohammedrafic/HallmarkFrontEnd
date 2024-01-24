@@ -106,6 +106,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { DateTimeHelper } from '@core/helpers';
 import { Router } from '@angular/router';
 import { SettingsViewService } from '@shared/services';
+import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -1179,6 +1180,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         skip(1)
       )
       .subscribe(() => {
+        const user = this.store.selectSnapshot(UserState.user);
+        if(user && this.isAgencyVisibilityFlagEnabled){
+          this.store.dispatch(new GetOrganizationsStructureAll(user?.id));
+        }
         this.openPreview.next(false);
         this.clearFilters();
         this.getPreservedFiltersByPageName();

@@ -41,6 +41,8 @@ export const analyticsConstants = {
     IsOptionalRequred:'IsOptionalRequred',
     Period: 'period',
     businessunitName: 'businessunitName',
+    credentialType:"credentialType",
+    duration:"duration",
   }
 }
 

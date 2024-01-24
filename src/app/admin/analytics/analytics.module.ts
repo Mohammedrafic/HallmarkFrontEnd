@@ -87,6 +87,7 @@ import {  PieSeriesService, AccumulationLegendService, AccumulationTooltipServic
 import { UserVisibilityComponent } from '../../admin/analytics/user-visibility/user-visibility.component';
 import { OPDCredentialsExpiryComponent } from './opd-credentials-expiry/opd-credentials-expiry.component';
 import { OpdMissingCredentialComponent } from './opd-missing-credential/opd-missing-credential.component';
+import { OpdCredentialSummaryComponent } from './opd-credential-summary/opd-credential-summary.component';
 
 
 @NgModule({
@@ -151,7 +152,8 @@ import { OpdMissingCredentialComponent } from './opd-missing-credential/opd-miss
     DepartmentSpendAndHoursComponent,
     UserVisibilityComponent,
     OPDCredentialsExpiryComponent,
-    OpdMissingCredentialComponent],
+    OpdMissingCredentialComponent,
+    OpdCredentialSummaryComponent],
   exports: [
     CandidateListComponent
   ],

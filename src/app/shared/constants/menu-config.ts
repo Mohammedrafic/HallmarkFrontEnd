@@ -147,6 +147,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/roles-and-permissions',
     },
+    135: {
+      // Security
+      icon: '',
+      route: 'admin/migrate-candidates',
+    },
     31: {
       // User List
       icon: '',
@@ -554,6 +559,10 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/opd-missing-credentials',
     },
+    134:{
+      icon:"",
+      route:'/analytics/opd-credential-summary'
+    }
   },
 
   [BusinessUnitType.MSP]: {
@@ -1517,6 +1526,10 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/opd-missing-credentials',
     },
+    134:{
+      icon:"",
+      route:'/analytics/opd-credential-summary'
+    }
   },
 
   [BusinessUnitType.Agency]: {

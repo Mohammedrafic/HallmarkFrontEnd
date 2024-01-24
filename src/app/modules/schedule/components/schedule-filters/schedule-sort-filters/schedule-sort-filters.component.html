@@ -14,156 +14,70 @@
   </ng-template>
   <ng-template #content>
     <section class="filter-wrapper">
-      
-        <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="sortCategories" class="example-list"
-          (cdkDropListDropped)="drop($event)">
-          <div class="orgname" *ngFor="let item of sortCategories" cdkDrag>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8H4" stroke="#677089" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M3 12H4" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M3 4H4" stroke="#677089" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M6 8H7" stroke="#677089" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M6 12H7" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M6 4H7" stroke="#677089" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M9 8H10" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M9 12H10" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M9 4H10" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M12 8H13" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M12 12H13" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M12 4H13" stroke="#677089" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <i-feather name="chevron-down" (click)="sortDynamic(item)"></i-feather>
-            <p> {{item.text}}</p>
-              
-            <div class="right-section">
-              <span class="active-text">{{item.tooltip}}</span>
-              <div [ngClass]="item.sortOrder">
-                <svg xmlns="http://www.w3.org/2000/svg" class="sortIcon" (click)="sortOrderChange(item)" width="16" height="16"
-                  viewBox="0 0 16 16" fill="none">
-                  <g clip-path="url(#clip0_10530_410166)">
-                    <path d="M8.83789 3.8623L11.6663 1.03388L14.4947 3.8623" stroke="white" stroke-width="1.25"
-                      stroke-linecap="round" stroke-linejoin="round" class="Decendingarrow" />
-                    <path d="M7.16174 12.1377L4.33331 14.9661L1.50488 12.1377" stroke="#2368EE" stroke-width="1.25"
-                      stroke-linecap="round" stroke-linejoin="round" class="Ascendingarrow" />
-                    <path d="M11.666 1.0332V15" stroke="white" stroke-width="1.25" stroke-linecap="round"
-                      stroke-linejoin="round" class="Decendingarrow" />
-                    <path d="M4.33271 14.9665V1.0003" stroke="#2368EE" stroke-width="1.25" stroke-linecap="round"
-                      stroke-linejoin="round" class="Ascendingarrow" />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_10530_410166">
-                      <rect width="16" height="16" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              </div>
-              <div *ngIf="isShowSortingChange" class="list-opction"  [ngClass]="item.class">
-                <ejs-listbox [dataSource]='schduleSortCategories' (change)="ChangeSortCategories($event)"></ejs-listbox>
-              </div>
-              <div class="delete-icon e-control e-btn e-lib e-flat secondary-icon-button enabled-button">
-                <i-feather name="trash-2" class="icon remove-icon" (click)="onRemove(item)"></i-feather>
-              </div>
-            </div>
-           
-       
-          </div>
-          <div class="selectBox">
-            <div class="orgname" (click)="AddSortingCategory()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8H4" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M3 12H4" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M3 4H4" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M6 8H7" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M6 12H7" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M6 4H7" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M9 8H10" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M9 12H10" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M9 4H10" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M12 8H13" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M12 12H13" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M12 4H13" stroke="#677089" stroke-width="1.33" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-              <i-feather name="chevron-down"></i-feather>
-              <p>Add Sorting Category</p>
 
-            </div>
+      <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="sortCategories" class="example-list"
+        (cdkDropListDropped)="drop($event)">
+        <div class="orgname" *ngFor="let item of sortCategories" cdkDrag>
+          <img src="assets/icons/menu-round-icon.svg" />
+          <i-feather name="chevron-down" (click)="sortDynamic(item)"></i-feather>
+          <p> {{item.text}}</p>
 
-            
-            
-            <div *ngIf="isShowSorting" class="list-opction">
-              <ejs-listbox [dataSource]='schduleSortCategories' (change)="HideSortCategories($event)"></ejs-listbox>
+          <div class="right-section">
+            <span class="active-text">{{item.tooltip}}</span>
+            <div [ngClass]="item.sortOrder">
+               <img  *ngIf="item.sortOrder =='Ascending'" class="sortIcon"  src="assets/icons/Asec-icon.svg" 
+                (click)="sortOrderChange(item)" />
+              <img *ngIf="item.sortOrder =='Descending'" class="sortIcon" src="assets/icons/Desc-icon.svg" 
+                (click)="sortOrderChange(item)" />
+            </div>
+            <div *ngIf="isShowSortingChange" class="list-opction" [ngClass]="item.class">
+              <ejs-listbox [dataSource]='schduleSortCategories' (change)="ChangeSortCategories($event)"></ejs-listbox>
+            </div>
+            <div class="delete-icon e-control e-btn e-lib e-flat secondary-icon-button enabled-button">
+              <i-feather name="trash-2" class="icon remove-icon" (click)="onRemove(item)"></i-feather>
             </div>
           </div>
 
-          <div class="header-part">
-            <p class="header-sectio">Work commitment</p>
 
-
-            <ejs-tooltip [content]="description" position='TopCenter'>
-              <span class="mytooltip">
-                <i-feather name="info" id="info"
-                  ></i-feather>
-              </span>
-            </ejs-tooltip>    
-          
+        </div>
+        <div class="selectBox">
+          <div class="orgname" (click)="AddSortingCategory()">
+            <img src="assets/icons/menu-round-icon.svg" />
+            <i-feather name="chevron-down"></i-feather>
+            <p>Add Sorting Category</p>
           </div>
 
-          <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="empWorkCommitments" class="example-list"
-            (cdkDropListDropped)="dragDropWorkCommitments($event)">
-            <div class="example-box orgname" *ngFor="let item of empWorkCommitments" cdkDrag>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8H4" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M3 12H4" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M3 4H4" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M6 8H7" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M6 12H7" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M6 4H7" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M9 8H10" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M9 12H10" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M9 4H10" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M12 8H13" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M12 12H13" stroke="#677089" stroke-width="1.33333" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M12 4H13" stroke="#677089" stroke-width="1.33" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-              <p> {{item}}</p>
-            </div>
+
+
+          <div *ngIf="isShowSorting" class="list-opction">
+            <ejs-listbox [dataSource]='schduleSortCategories' (change)="HideSortCategories($event)"></ejs-listbox>
           </div>
         </div>
-        
-      
+
+        <div class="header-part">
+          <p class="header-sectio">Work commitment</p>
+
+
+          <ejs-tooltip [content]="description" position='TopCenter'>
+            <span class="mytooltip">
+              <i-feather name="info" id="info"></i-feather>
+            </span>
+          </ejs-tooltip>
+
+        </div>
+
+        <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="empWorkCommitments" class="example-list"
+          (cdkDropListDropped)="dragDropWorkCommitments($event)">
+          <div class="example-box orgname" *ngFor="let item of empWorkCommitments" cdkDrag>
+           <img src="assets/icons/menu-round-icon.svg" />
+            <p> {{item}}</p>
+          </div>
+        </div>
+      </div>
+
+
     </section>
-   
+
   </ng-template>
 
   <ng-template #footerTemplate>

@@ -4,8 +4,8 @@ import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { debounceTime, distinctUntilChanged, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { debounceTime, distinctUntilChanged, filter, merge, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -14,16 +14,16 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { ClearLogiReportState, GetCommonReportFilterOptions, GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { ClearLogiReportState, GetCommonReportCandidateSearch, GetCommonReportFilterOptions, GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { analyticsConstants, Period } from '../constants/analytics.constant';
+import { analyticsConstants, OPDMissingCredentialReportConstants, Period } from '../constants/analytics.constant';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto, OrderTypeOptionsForReport, AgencyDto } from '../models/common-report.model';
+import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto, OrderTypeOptionsForReport, AgencyDto, CommonCandidateSearchFilter, SearchCandidate } from '../models/common-report.model';
 import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { toNumber, uniqBy } from 'lodash';
@@ -31,37 +31,66 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { DateTime } from '@syncfusion/ej2-angular-charts';
+import { EmitType } from '@syncfusion/ej2-base';
+import { OutsideZone } from '@core/decorators';
+import { Skill } from '@shared/models/skill.model';
+import { CandidateState } from '@agency/store/candidate.state';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { optionFields } from '@shared/constants';
+import { GetMasterCredentials } from '@agency/store/candidate.actions';
 
 @Component({
-  selector: 'app-opd-credentials-expiry',
-  templateUrl: './opd-credentials-expiry.component.html',
-  styleUrls: ['./opd-credentials-expiry.component.scss']
+  selector: 'app-opd-credential-summary',
+  templateUrl: './opd-credential-summary.component.html',
+  styleUrls: ['./opd-credential-summary.component.scss'],
 })
-export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
+export class OpdCredentialSummaryComponent implements OnInit {
+  title="OPD Credential Summary"
+  
   public paramsData: any = {
 
-    "OrganizationIdOCE": "",
-    "StartDateOCE": "",
-    "EndDateOCE": "",
-    "RegionIdsOCE": "",
-    "LocationIdsOCE": "",
-    "DepartmentIdsOCE": "",
-    "AgencyIdOCE": "",
-    "CandidateStatusOCE": "",
-    "OrderIdOCE": "",
-    "BOrganizationIdOCE": "",
-    "OptionalOCE": "",
-    "UserIdOCE": "",
-    "OrganizationNameOCE": "",
-    "ReportPulledMessageOCE": "",
-    "DateRangeOCE": "",
-    "PeriodOCE": ""
+    "OrganizationIdsOCS": "",
+    "CertifiedUntilFromOCS": "",
+    "CertifiedUntilToOCS": "",
+    "CredentialNameOCS":"",
+    "CredentialTypeOCS":"",
+    "CredentialsOMC":"",
+    "PositionIdOMC":"",
+    "RegionIdsOCS": "",
+    "LocationIdsOCS": "",
+    "OrderIdOCS":"",
+    "DepartmentIdsOCS": "",
+    "DurationOCS":"",
+    "SkillCategoryIdsOCS":"",
+    "SkillIdsOCS":"",
+    "AgencyOCS": "",
+    "CandidateNameOMC":"",
+    "CandidateStatusOCS": "",
+    "BOrganizationIdsOCS": "",
+    "OptionalOMC": "",
+    "UserIdOCS": "",
+    "OrganizationNameOCS": "",
+    "ReportPulledMessageOCS": "",
+    "DateRangeOCS": "",
+    "PeriodOMC": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/OPDCredentialExpiry/OPDCredentialExpiry.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/OPDCredentialExpiry/OPDCredentialExpiry.cat" };
-  public title: string = "OPD Credential Expiry";
+  
+  @Select(LogiReportState.commonReportCandidateSearch)
+  public financialTimeSheetCandidateSearchData$: Observable<SearchCandidate[]>;
+
+  remoteWaterMark: string = 'e.g. Andrew Fuller';
+  candidateSearchData: SearchCandidate[] = [];
+  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/OPDCredentialSummary/OPDCredentialSummary.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/OPDCredentialSummary/OPDCredentialSummary.cat" };
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
+  
+  public readonly typeFieldSettingsModel = optionFields;
+  public defaultSkillCategories: (number | undefined)[] = [];
+  
+  public defaultSkills: (number | undefined)[] = [];
+  commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -98,7 +127,7 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
   public filterColumns: any;
-  public opdcredentialExpiryForm: FormGroup;
+  public opdCredentialsummaryForm: FormGroup;
   public bussinessControl: AbstractControl;
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
@@ -106,6 +135,7 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
   public agencyIdControl: AbstractControl;
   public candidateStatusesIdControl: AbstractControl;
 
+  public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
@@ -141,6 +171,13 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
   periodFields: FieldSettingsModel = { text: 'name', value: 'name' };
   public defaultOrganizations: number;
 
+  private get searchTermControl(): AbstractControl | null {
+    return this.opdCredentialsummaryForm.get('searchTerm');
+  }
+
+  private get credentialTypeIdControl(): AbstractControl | null {
+    return this.opdCredentialsummaryForm.get('credentialTypeId');
+  }
 
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
@@ -166,6 +203,8 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
     //}   
     //this.SetReportData();    
   }
+  
+
   ngOnInit(): void {
 
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
@@ -186,21 +225,23 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
           this.filterColumns.businessIds.dataSource = this.organizations;
           if (this.agencyOrganizationId) {
             this.defaultOrganizations = this.agencyOrganizationId;
-            this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
+            this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
           }
           this.changeDetectorRef.detectChanges();
         }
       });
       this.isInitialLoad = true;
+      this.onFilterSkillCategoryChangedHandler();
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
-      // this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
+      
+      // this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
 
       if (this.user)
         if (this.user.businessUnitType == BusinessUnitType.Hallmark || this.user.businessUnitType == BusinessUnitType.MSP) {
-          this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
-        } else { this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable(); }
+          this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable()
+        } else { this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable(); }
     });
   }
 
@@ -210,7 +251,7 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
     startDate.setDate(startDate.getDate() - 14);
     let endate = new Date(Date.now())
     endate.setDate(endate.getDate() + 28);
-    this.opdcredentialExpiryForm = this.formBuilder.group(
+    this.opdCredentialsummaryForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
         startDate: new FormControl(startDate, [Validators.required]),
@@ -221,8 +262,13 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
         agencyIds: new FormControl([]),
         jobId: new FormControl(''),
         candidateStatuses: new FormControl([]),
+        candidateName: new FormControl(null),
         opcredFlag: new FormControl(false),
-        period: new FormControl(null)
+        period: new FormControl(null),
+        skillCategoryIds: new FormControl([]),
+        skillIds: new FormControl([]),
+        credentialType:new FormControl(null),
+        duration:new FormControl(null),
       }
     );
   }
@@ -234,11 +280,11 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
 
 
   selectPeriod(event: any) {
-    let { startDate, period } = this.opdcredentialExpiryForm.getRawValue();
+    let { startDate, period } = this.opdCredentialsummaryForm.getRawValue();
     const value = event.itemData.id;
-    this.periodIsDefault = this.opdcredentialExpiryForm.controls['period'].value == "Custom" ? true : false;
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.startDate)?.setValue("");
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.endDate)?.setValue("");
+    this.periodIsDefault = this.opdCredentialsummaryForm.controls['period'].value == "Custom" ? true : false;
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.startDate)?.setValue("");
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.endDate)?.setValue("");
     const PeriodCheck = value;
     let startDateControl = new Date(Date.now());
     let endDateControl = new Date(Date.now());
@@ -290,8 +336,8 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
         break;
     }
 
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.startDate)?.setValue(startDateControl);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.endDate)?.setValue(new Date((endDateControl)));
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.startDate)?.setValue(startDateControl);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.endDate)?.setValue(new Date((endDateControl)));
 
 
   }
@@ -310,18 +356,19 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
     this.periodList.push({ id: 6, name: 'YTD' });
     this.periodList.push({ id: 7, name: 'Last 6 Month' });
     this.periodList.push({ id: 8, name: 'Last 12 Months' });
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
   }
   public onFilterControlValueChangedHandler(): void {
-    this.bussinessControl = this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
+    this.bussinessControl = this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((data) => {
-      this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+      this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       this.selectedOrganizations = [];
       // if (data != null && typeof data === 'number' && data != this.previousOrgId) {
       if (data && data.length > 0) {
         this.isAlive = true;
         this.previousOrgId = data;
+       
         if (!this.isClearAll) {
           this.regionsList = [];
           let regionsList: Region[] = [];
@@ -367,13 +414,19 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
             if (data != null) {
               this.isAlive = true;
               this.filterOptionsData = data;
+              debugger;
+
+              this.filterColumns.credentialType.dataSource=data?.credentialType;
               this.defaultCandidateStatuses = ['Onboard'];
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses.filter(i => this.fixedCandidateStatusesIncluded.includes(i.statusText));
-              this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
-              this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
+              this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
+              this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
               this.filterColumns.agencyIds.dataSource = data.agencies;
               this.defaultAgencys = data.agencies.map((list) => list.agencyId);
-
+              this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+              this.filterColumns.skillIds.dataSource = data.masterSkills;
+            let masterSkills = this.filterOptionsData.masterSkills;
+            this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.changeDetectorRef.detectChanges();
               this.SearchReport();
             }
@@ -384,16 +437,13 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
         }
         else {
           this.isClearAll = false;
-          if (this.selectedOrganizations.length == 0) {
-            this.selectedOrganizations = data;
-          }
-          this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+          this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
         }
       }
     });
 
 
-    this.agencyIdControl = this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
+    this.agencyIdControl = this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
     this.agencyIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.agencyIdControl.value.length > 0) {
         let agencyData = this.filterOptionsData.agencies;
@@ -402,12 +452,43 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
     });
 
   }
+  public skillCategoryIdControl: AbstractControl;
+  public skillIdControl: AbstractControl;
+  selectedSkillCategories: SkillCategoryDto[];
+  selectedSkills: MasterSkillDto[];
+  public skillIds: Skill[] = [];
+  public onFilterSkillCategoryChangedHandler(): void {
+    this.skillIds = [];
 
+    this.skillCategoryIdControl = this.opdCredentialsummaryForm.get(OPDMissingCredentialReportConstants.formControlNames.skillCategoryIds) as AbstractControl;
+    this.skillCategoryIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.skillCategoryIdControl.value.length > 0) {
+
+        let masterSkills = this.filterOptionsData.masterSkills;
+        this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
+        let skills = masterSkills.filter((i) => data?.includes(i.skillCategoryId));
+        this.filterColumns.skillIds.dataSource = skills;
+      }
+      else {
+          this.opdCredentialsummaryForm.get(OPDMissingCredentialReportConstants.formControlNames.skillIds)?.setValue([]);
+          let masterSkills = this.filterOptionsData.masterSkills;
+
+          this.filterColumns.skillIds.dataSource = masterSkills;
+      }
+    });
+      this.skillIdControl = this.opdCredentialsummaryForm.get(OPDMissingCredentialReportConstants.formControlNames.skillIds) as AbstractControl;
+    this.skillIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.skillIdControl.value.length > 0) {
+        let masterSkills = this.filterOptionsData.masterSkills;
+        this.selectedSkills = masterSkills?.filter((object) => data?.includes(object.id));
+      }
+    });
+  }
   public onFilterRegionChangedHandler(): void {
-    this.regionIdControl = this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
+    this.regionIdControl = this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-      this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+      this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       this.locations = [];
       this.departments = [];
 
@@ -420,16 +501,16 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
       }
       else {
         this.filterColumns.locationIds.dataSource = [];
-        this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-        this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+        this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+        this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
   }
 
   public onFilterLocationChangedHandler(): void {
-    this.locationIdControl = this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
+    this.locationIdControl = this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+      this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
 
       if (this.locationIdControl.value.length > 0) {
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
@@ -437,10 +518,10 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
       }
       else {
         this.filterColumns.departmentIds.dataSource = [];
-        this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+        this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
-    this.departmentIdControl = this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
+    this.departmentIdControl = this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.departments = this.departments?.filter((object) => data?.includes(object.id));
     });
@@ -448,9 +529,10 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
 
 
   public SearchReport(): void {
-    let { businessIds, departmentIds, locationIds, regionIds, startDate, endDate, jobId, candidateStatuses, opcredFlag, agencyIds, period } = this.opdcredentialExpiryForm.getRawValue();
+    let { businessIds, departmentIds, locationIds, regionIds,skillCategoryIds,skillIds,candidateName, startDate, endDate, jobId, candidateStatuses, 
+      credentialType,period,duration,agencyIds } = this.opdCredentialsummaryForm.getRawValue();
 
-    if (!this.opdcredentialExpiryForm.dirty) {
+    if (!this.opdCredentialsummaryForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
     }
     else {
@@ -458,36 +540,47 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
       this.message = ""
     }
 
-    regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
-    locationIds = locationIds.length > 0 ? locationIds.join(",") : "null";
-    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
+    regionIds = regionIds.length > 0 ? regionIds.join(",") : "";
+    locationIds = locationIds.length > 0 ? locationIds.join(",") : "";
+    departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "";
 
     let currentDate = new Date(Date.now());
 
 
     this.paramsData =
     {
-      "OrganizationIdOCE": this.selectedOrganizations?.length == 0 ? businessIds.tostring() :
+      "OrganizationIdsOCS": this.selectedOrganizations?.length == 0 ? businessIds.tostring() :
         this.selectedOrganizations?.map((list) => list).join(","),
-      "StartDateOCE": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateOCE": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionIdsOCE": regionIds.length == 0 ? "null" : regionIds,
-      "LocationIdsOCE": locationIds.length == 0 ? "null" : locationIds,
-      "DepartmentIdsOCE": departmentIds.length == 0 ? "null" : departmentIds,
-      "AgencyIdOCE": this.selectedAgencies.length == 0 ? "0" : this.selectedAgencies?.map((list) => list.agencyId).join(","),
-      "CandidateStatusOCE": candidateStatuses.length == 0 ? '' : candidateStatuses.join(this.joinString),
-      "OrderIdOCE": jobId.trim() == "" ? "null" : jobId.trim(),
-      "BOrganizationIdOCE": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "CertifiedUntilFromOCS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "CertifiedUntilToOCS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionIdsOCS": regionIds==null ? "" : regionIds,
+      "LocationIdsOCS": locationIds==null ? "" : locationIds,
+      "DepartmentIdsOCS": departmentIds==null? "" : departmentIds,
+      "AgencyOCS":this.selectedAgencies.length == 0 ? "" : this.selectedAgencies?.map((list) => list.agencyId).join(","),
+      "CandidateStatusOCS": candidateStatuses.length == 0 ? '' : candidateStatuses.join(this.joinString),
+      "PositionIdOMC": jobId == "" ? "" : jobId.trim(),
+      "BOrganizationIdsOCS": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OptionalOCE": opcredFlag == "" ? "false" : opcredFlag.toString(),
-      "UserIdOCE": this.user?.id,
-      "OrganizationNameOCE": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
-      "ReportPulledMessageOCE": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
-      "DateRangeOCE": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
-      "PeriodOCE": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id))
+      // "OptionalOMC": opcredFlag == "" ? "false" : opcredFlag.toString(),
+      "UserIdOCS": this.user?.id,
+      "OrganizationNameOCS": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
+      "ReportPulledMessageOCS": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeOCS": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
+      "PeriodOCE": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id)),
+      "CredentialsOMC":"",
+      // "PositionIdOMC":jobId.tostring(),
+      "SkillCategoryIdsOCS": skillCategoryIds.length == 0 ? "" : skillCategoryIds.join(","),
+      "SkillIdsOCS":skillIds.length == 0 ? "" : skillIds.join(","),
+      "CandidateNameOMC":candidateName==null?"":candidateName,
+      "OrderIdOCS":jobId == "" ? "" : jobId.trim(),
+      "CredentialNameOCS":"",
+      "CredentialTypeOCS":credentialType,
+      "DurationOCS": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id)),
+      
     };
+    console.log(this.paramsData);
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
@@ -541,9 +634,37 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
         valueField: 'statusText',
         valueId: 'statusText',
       },
+      candidateName: {
+        type: ControlTypes.Dropdown,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'fullName',
+        valueId: 'id',
+      },
+      skillIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      skillCategoryIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      credentialType: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
     }
   }
-
+  
   private SetReportData() {
     const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
     if (logiReportData != null && logiReportData.length == 0) {
@@ -562,7 +683,7 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
   }
 
   public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.opdcredentialExpiryForm, this.filterColumns);
+    this.filterService.removeValue(event, this.opdCredentialsummaryForm, this.filterColumns);
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
@@ -570,18 +691,23 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
     startDate.setDate(startDate.getDate() - 14);
     let endDate = new Date(Date.now());
     endDate.setDate(endDate.getDate() + 28);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.startDate)?.setValue(startDate);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.endDate)?.setValue(endDate);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencys);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.JobId)?.setValue('');
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.opcredFlag)?.setValue(false);
-    this.opdcredentialExpiryForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.startDate)?.setValue(startDate);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.endDate)?.setValue(endDate);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencys);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.JobId)?.setValue('');
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.opcredFlag)?.setValue(false);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue([]);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.CandidateName)?.setValue(null);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.credentialType)?.setValue(null);
+    this.opdCredentialsummaryForm.get(analyticsConstants.formControlNames.duration)?.setValue(null);
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];
@@ -595,8 +721,8 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
       this.store.dispatch(new ShowToast(MessageTypes.Error, error));
       return;
     }
-    this.opdcredentialExpiryForm.markAllAsTouched();
-    if (this.opdcredentialExpiryForm?.invalid) {
+    this.opdCredentialsummaryForm.markAllAsTouched();
+    if (this.opdCredentialsummaryForm?.invalid) {
       return;
     }
     this.filteredItems = [];
@@ -611,4 +737,30 @@ export class OPDCredentialsExpiryComponent implements OnInit, OnDestroy {
     this.store.dispatch([new ShowToast(MessageTypes.Error, error)]);
     return;
   }
+  public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
+    this.onFilterChild(e);
+  }
+  // @OutsideZone
+  private onFilterChild(e: any) {
+    if (e.text != '') {
+      let ids = [];
+      ids.push(this.bussinessControl.value);
+      let filter: CommonCandidateSearchFilter = {
+        searchText: e.text,
+        businessUnitIds: this.bussinessControl.value
+      };
+      this.filterColumns.dataSource = [];
+      this.store.dispatch(new GetCommonReportCandidateSearch(filter))
+        .subscribe((result) => {
+          this.candidateFilterData = result.LogiReport.searchCandidates;
+          this.candidateSearchData = result.LogiReport.searchCandidates;
+          this.filterColumns.dataSource = this.candidateFilterData;
+          // pass the filter data source to updateData method.
+          e.updateData(this.candidateFilterData);
+        });
+
+    }
+  }
 }
+
+
