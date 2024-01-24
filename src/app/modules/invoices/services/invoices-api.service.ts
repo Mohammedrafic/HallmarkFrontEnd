@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
