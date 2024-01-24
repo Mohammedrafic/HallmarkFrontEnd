@@ -161,7 +161,6 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
         takeUntil(this.destroy$)
       )
       .subscribe(([grid, isLoading]: [GridReadyEventModel | null, boolean]) => {
-        debugger;
         isLoading ? grid?.api.showLoadingOverlay() : this.rowData?.length && grid?.api.hideOverlay();
       });
   }
