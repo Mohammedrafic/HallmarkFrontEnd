@@ -1157,9 +1157,9 @@ public RedirecttoIRPOrder(order:Order)
         if(this.filters.orderLocked){
           filtersAllOrders.orderLocked = filtersAllOrders.orderLocked == 'false' ? false : filtersAllOrders.orderLocked == 'true' ? true : null
         }
-        /*if(this.filters.clearedToStart){
+        if(this.filters.clearedToStart){
           filtersAllOrders.clearedToStart = filtersAllOrders.clearedToStart == 'no' ? false : filtersAllOrders.clearedToStart == 'yes' ? true : null
-        }*/
+        }
         cleared ? this.store.dispatch([new GetOrders(filtersAllOrders)])
           : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
@@ -3253,7 +3253,7 @@ public RedirecttoIRPOrder(order:Order)
       : GetVMSFilterFormConfig(this.activeTab);
 
     this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
-    this.filters.clearedToStart = this.isEnableClearedToStart ? this.filters.clearedToStart : null;
+    this.filters.clearedToStart = this.isEnableClearedToStart ? this.filters.clearedToStart == false ? "no" : this.filters.clearedToStart == true ? 'yes' : null : null;
     if (this.activeTab === OrganizationOrderManagementTabs.Incomplete && this.filters) {
       this.filters  = this.checkFiltersForIncompleteTab(this.filters);
     }

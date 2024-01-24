@@ -388,7 +388,7 @@ export type AgencyOrderFilters = {
   shift?: string | string[];
   orderLocked? : any | null;
   ltaOrder? : boolean | null;
-  clearedToStart? : any | null;
+  clearedToStart? : boolean | string | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -797,7 +797,7 @@ export class OrderFilter {
   shift?: string[] | string;
   isQuickLinkWidgetLTA?: boolean | null;
   orderLocked? : any | null;
-  clearedToStart? : any | null;
+  clearedToStart? : boolean | null| string;
   ltaOrder? : boolean | null;
   orderDistributionType? : number | null;
   showDeletedOrders?: boolean | null;

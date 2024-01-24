@@ -516,7 +516,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const filterState = { ...state, orderStatuses };
       const filterFormConfig = GetAgencyFilterFormConfig(this.selectedTab);
       this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
-      this.filters.clearedToStart = this.isEnableClearedToStart ? this.filters.clearedToStart : null;
+      this.filters.clearedToStart = this.isEnableClearedToStart ? this.filters.clearedToStart == false ? "no" : this.filters.clearedToStart == true ? 'yes' : null :  null;
       if(this.Organizations != null && this.Organizations.length > 0){
         this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.Organizations]);
         this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
@@ -711,6 +711,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         let filtersMyAgency = {...this.filters};
           if(this.filters.orderLocked){
             filtersMyAgency.orderLocked = filtersMyAgency.orderLocked == 'false' ? false : filtersMyAgency.orderLocked == 'true' ? true : null
+          }
+          if(this.filters.clearedToStart){
+            filtersMyAgency.clearedToStart = filtersMyAgency.clearedToStart == 'no' ? false : filtersMyAgency.clearedToStart == 'yes' ? true : null
           }
         this.hasOrderMyAgencyId();
         selectedOrderAfterRedirect?.orderType !== OrderType.ReOrder &&
