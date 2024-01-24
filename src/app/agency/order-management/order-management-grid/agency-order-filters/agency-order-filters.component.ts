@@ -55,6 +55,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   @Input() filterColumns: any;
   @Input() activeTab: AgencyOrderManagementTabs;
   @Output() setDefault = new EventEmitter();
+  @Output() mappedOrganizations = new EventEmitter();
 
   public AgencyOrderManagementTabs = AgencyOrderManagementTabs;
 
@@ -360,6 +361,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         reorderStatuses: [],
       });
     }
+    this.mappedOrganizations.emit(this.filterColumns.organizationIds.dataSource)
   }
 
   static generateFiltersForm(): FormGroup {

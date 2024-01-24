@@ -118,7 +118,7 @@ import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.const
 import { SearchComponent } from '@shared/components/search/search.component';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import {
-  DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG, ViewOrderIRP_PERMISSION, ViewOrderVMS_PERMISSION
+  DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG, OrganizationSettingKeys, OrganizationalHierarchy, ViewOrderIRP_PERMISSION, ViewOrderVMS_PERMISSION
 } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -265,6 +265,7 @@ import { OrderManagementIRPRowPositionService } from '@shared/components/grid/ce
 import { OrderJobType } from '@shared/enums';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
 import { resetAgGridHorizontalScroll } from '@core/helpers/grid-scroll.helper';
+import { SettingsViewService } from '@shared/services';
 
 @Component({
   selector: 'app-order-management-content',
@@ -289,6 +290,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   selectedCandidateforIRPorderDetails: IRPOrderPosition;
   DeployedEmployeeConfigValue: boolean;
   deployedState: boolean;
+  public allOrdersChildColumnsToExport:ExportColumn[] = allOrdersChildColumnsToExport;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -533,6 +535,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
   public filterType: string = 'Contains';
   public orderDetail =new Subject<OrderManagement>();
+  public isEnableClearedToStart:boolean = false;
   public clearToStartDataset:clearToStartDataset = new clearToStartDataset();
 
   constructor(
@@ -557,6 +560,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private ordergridsystemstateservice:OrderGridSystemStateService,
     public orderManagementIRPRowPositionService: OrderManagementIRPRowPositionService,
     private organizationSettingService : OrganizationSettingsService,
+    private settingService: SettingsViewService,
     @Inject(DOCUMENT) private documentEle: Document,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
@@ -682,6 +686,26 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.watchForOrderIRPSubRowClickEvent();
     this.subscribeForDeployedEmployees();
     this.watchForDeployedState();
+    this.checkEnableClearToStart();
+  }
+
+  public checkEnableClearToStart(): void {
+    this.isEnableClearedToStart = false;
+    if(this.activeTab == OrganizationOrderManagementTabs.AllOrders){
+        this.settingService
+            .getViewSettingKey(
+              OrganizationSettingKeys.EnableClearedToStartForAcceptedCandidates,
+              OrganizationalHierarchy.Organization,
+              this.organizationId,
+              this.organizationId,
+              false,
+            ).pipe(takeUntil(this.unsubscribe$))
+              .subscribe(({ EnableClearedToStartForAcceptedCandidates }) => {
+                this.isEnableClearedToStart = JSON.parse(EnableClearedToStartForAcceptedCandidates);
+                this.checkSelectedChildrenItem();
+              });
+    }
+      
   }
 
   ngOnDestroy(): void {
@@ -1291,15 +1315,21 @@ public RedirecttoIRPOrder(order:Order)
     this.reorderFilledStatus = false;
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
+        this.allOrdersChildColumnsToExport = [...allOrdersChildColumnsToExport]
+        if(this.isEnableClearedToStart){
+            let newCol = { text: 'Cleared to Start', column: 'ClearedToStart' };
+            this.allOrdersChildColumnsToExport.splice(2, 0, newCol);
+            this.allOrdersChildColumnsToExport.join();
+        }
         if(this.selectedItems.filter(ele=> ele.orderType == 1).length == this.selectedItems.length){
           this.openregrateupdate = false;
         }
         if (this.selectedItems.length === 0) {
-          this.columnsToExport = [...allOrdersColumnsToExport, ...allOrdersChildColumnsToExport];
+          this.columnsToExport = [...allOrdersColumnsToExport, ...this.allOrdersChildColumnsToExport];
           return;
         }
         this.columnsToExport = hasSelectedItemChildren
-          ? [...allOrdersColumnsToExport, ...allOrdersChildColumnsToExport]
+          ? [...allOrdersColumnsToExport, ...this.allOrdersChildColumnsToExport]
           : allOrdersColumnsToExport;
         break;
       case OrganizationOrderManagementTabs.PerDiem:
@@ -2968,7 +2998,7 @@ public RedirecttoIRPOrder(order:Order)
       this.initGridColumns();
       this.getOrders();
       this.getProjectSpecialData();
-
+      this.checkEnableClearToStart();
       this.previousSelectedSystemId = null;
       this.orderManagementService.saveSelectedOrderManagementSystem(this.activeSystem);
     });

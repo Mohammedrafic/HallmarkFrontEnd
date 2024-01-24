@@ -57,4 +57,16 @@
     height: calc(100vh - 80px);
     margin-right: -25px;
   }
+
 }
+
+.button-container {
+  display: flex;
+  gap: 10px; /* Adjust the value as needed for the desired space between buttons */
+}
+
+.button-back{
+  display: flex;
+  align-items: center;
+}
+

@@ -181,3 +181,6 @@ export const CLEAR_START_ON = 'Candidate is Cleared to Start';
 
 export const CONFIRM_CANDIDATES_MIGRATION = 'Are you sure you want to migrate cadidates?';
 export const CANDIDATES_MIGRATION_SUCCESS = 'Cadidates are migrated successfully';
+
+export const Apply_Previous_Filters = 'Apply Previous Filters';
+export const Subscription_Turned_Off = 'Notification Subscription has been turned off';

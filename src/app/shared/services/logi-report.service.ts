@@ -72,7 +72,8 @@ export class LogiReportService {
         jobStatusesAndReasons :'statusText',
         allCandidateStatusesAndReasons :'statusText',
         allJobStatusesAndReasons :'statusText',
-        invoiceStatuses:'name'
+        invoiceStatuses:'name',
+        credentialType:"name",
       }
 
       return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof CommonReportFilterOptions])]))

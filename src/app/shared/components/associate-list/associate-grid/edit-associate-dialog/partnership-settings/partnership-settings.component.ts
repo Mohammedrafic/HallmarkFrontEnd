@@ -20,6 +20,7 @@ import {
 import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
 import { OPTION_FIELDS } from '@shared/components/associate-list/constant';
 import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-partnership-settings',
@@ -102,6 +103,7 @@ export class PartnershipSettingsComponent extends Destroyable implements OnInit 
       this.partnershipSettings = settings;
       this.partnershipForm.reset();
       this.partnershipForm.patchValue({ ...settings });
+      this.partnershipForm.get("suspentionDate")?.setValue(formatDate(settings.suspentionDate, 'MM/dd/yyyy', 'en-US', 'utc'));
 
       if (this.isAgency) {
         this.partnershipForm.get('status')?.disable();

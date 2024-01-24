@@ -60,6 +60,7 @@ import { LocationsFormConfig, LocationsFormSource, LocationsSubFormConfig } from
 import { LocationsService } from './locations.service';
 import { DateTimeHelper } from '@core/helpers';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
+import { GetOrganizationStructure } from 'src/app/store/user.actions';
 
 enum BulkSkillsActionConfig {
   'Ediit',
@@ -659,7 +660,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
   private watchForLocationUpdate(): void {
     this.action$.pipe(ofActionDispatched(SaveLocationSucceeded), takeUntil(this.componentDestroy())).subscribe(() => {
-      this.store.dispatch(new ShowSideDialog(false));
+      this.store.dispatch([new ShowSideDialog(false), new GetOrganizationStructure()]);
       this.locationDetailsFormGroup.reset({ includeInIRP: false });
       if (this.isEdit) {
         this.isEdit = false;

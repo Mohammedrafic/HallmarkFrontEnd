@@ -24,7 +24,7 @@
       </e-chips>
     </ejs-chiplist>
   </div>
-  <div class="info clearedToStart" *ngIf="candidat?.clearToStart">
+  <div class="info clearedToStart" *ngIf="candidat?.clearToStartForGrid && candidat?.clearToStart">
     <div class="data">Cleared to Start</div>
     <div class="title"><app-custom-progress-bar [value]="100"></app-custom-progress-bar></div>
   </div>

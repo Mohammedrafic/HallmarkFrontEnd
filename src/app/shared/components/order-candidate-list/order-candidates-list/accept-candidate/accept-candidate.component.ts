@@ -58,7 +58,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidatePayRateSettings } from '@shared/constants/candidate-pay-rate-settings';
 import { CommonHelper } from '@shared/helpers/common.helper';
-import { formatNumber } from '@angular/common';
+import { DatePipe, formatNumber } from '@angular/common';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { DropDownListComponent, SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
@@ -226,6 +226,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private permissionService: PermissionService,
     private orderManagementService: OrderManagementService,
     private settingService: SettingsViewService,
+    private datePipe: DatePipe,
   ) {
     this.createForm();
   }
@@ -480,7 +481,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     const value = this.form.getRawValue();
     const jobStartDate = new Date(this.candidateJob?.order.jobStartDate); 
     const jobEndDate = new Date(this.candidateJob.order.jobEndDate);
-    const finalDate = this.candidateJob.offeredStartDate && this.candidateJob.offeredStartDate !== '' ? new Date(this.candidateJob.offeredStartDate) : jobStartDate; 
+    const offeredStartDate = this.candidateJob.offeredStartDate && this.candidateJob.offeredStartDate !== '' ? this.datePipe.transform(this.candidateJob.offeredStartDate,'MM/dd/yyyy HH:mm', 'UTC') : null;
+    const finalDate = offeredStartDate ? new Date(offeredStartDate) : jobStartDate; 
     const daysDifference =  DateTimeHelper.getDateDiffInDays(jobStartDate, jobEndDate);
     const actualEndDate = this.calculateActualEndDate(finalDate, daysDifference).toISOString(); 
     const accepted = applicantStatus.applicantStatus ===ApplicantStatusEnum.Accepted;
