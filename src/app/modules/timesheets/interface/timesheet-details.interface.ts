@@ -100,6 +100,7 @@ export interface TimesheetDetailsModel {
   orderSkillName: string;
   commentContainerId: number;
   externalCommentsConfiguration?: boolean | null;
+  reorderDates: string[] | null;
 }
 
 export interface WorkWeek<T> {

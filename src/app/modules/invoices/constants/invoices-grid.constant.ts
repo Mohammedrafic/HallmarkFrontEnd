@@ -45,6 +45,13 @@ export const invoicesRowDetailsOffsetColDef: ColDef = {
   width: 140,
 };
 
+export const reorderPositionIdColDef: ColDef = {
+  width: 140,
+  field: 'reorderCandidatePosition',
+  headerName: 'Position ID',
+  cellRendererSelector: titleValueCellRendererSelector,
+};
+
 export const vendorFeeAppliedColDef: TypedColDef<ManualInvoice> = {
   width: 130,
   maxWidth: 130,

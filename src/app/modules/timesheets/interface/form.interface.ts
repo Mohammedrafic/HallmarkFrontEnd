@@ -8,6 +8,7 @@ export interface AddTimesheetForm {
   hadLunchBreak?: boolean;
   day?: Date | string;
   value?: number;
+  reorderCandidateJobId?: number;
 }
 
 export interface TimesheetForm {

@@ -447,7 +447,7 @@ export class TimesheetsState {
   GetTimesheetDetails(
     ctx: StateContext<TimesheetsModel>,
     { timesheetId, orgId, isAgency }: Timesheets.GetTimesheetDetails
-  ): Observable<[void, void] | void> {
+  ): Observable<[void | null, void, void] | void> {
     return this.timesheetDetailsApiService.getTimesheetDetails(timesheetId, orgId, isAgency)
       .pipe(
         tap((res: TimesheetDetailsModel) => ctx.patchState({
@@ -455,7 +455,10 @@ export class TimesheetsState {
           }),
         ),
         mergeMap((res) => forkJoin([
-          ctx.dispatch(new TimesheetDetails.GetBillRates(res.jobId, orgId, isAgency)),
+          res.reorderDates !== null ? 
+            ctx.dispatch(new TimesheetDetails.GetTimesheetReorders(res.id, orgId)) :
+            of(null),
+          ctx.dispatch(new TimesheetDetails.GetBillRates(res.jobId, orgId, isAgency, res.reorderDates !== null, res.id)),
           ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId, orgId, isAgency)),
         ])),
         catchError((err: HttpErrorResponse) => {
@@ -675,17 +678,33 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.GetBillRates)
   GetBillRates({ patchState, dispatch }: StateContext<TimesheetsModel>,
-      { jobId, orgId, isAgency }: TimesheetDetails.GetBillRates): Observable<DropdownOption[] | void> {
-      return this.timesheetsApiService.getCandidateBillRates(jobId, orgId, isAgency)
-      .pipe(
-        tap((res) => patchState({
-          billRateTypes: res,
-        })),
-        catchError((err: HttpErrorResponse) => dispatch(
-          new ShowToast(MessageTypes.Error, getAllErrors(err.error)),
-        )),
-      );
-    }
+    { jobId, orgId, isAgency, isReorder, timesheetId }: TimesheetDetails.GetBillRates
+  ): Observable<DropdownOption[] | void> {
+    return this.timesheetsApiService.getCandidateBillRates(jobId, orgId, isAgency, isReorder, timesheetId)
+    .pipe(
+      tap((res) => patchState({
+        billRateTypes: res,
+      })),
+      catchError((err: HttpErrorResponse) => dispatch(
+        new ShowToast(MessageTypes.Error, getAllErrors(err.error)),
+      )),
+    );
+  }
+
+  @Action(TimesheetDetails.GetTimesheetReorders)
+  GetTimesheetReorders({ patchState, dispatch }: StateContext<TimesheetsModel>,
+    { orgId, timesheetId }: TimesheetDetails.GetTimesheetReorders
+  ): Observable<DropdownOption[] | void> {
+    return this.timesheetsApiService.getTimesheetReorders(orgId, timesheetId)
+    .pipe(
+      tap((res) => patchState({
+        timesheetReorders: res,
+      })),
+      catchError((err: HttpErrorResponse) => dispatch(
+        new ShowToast(MessageTypes.Error, getAllErrors(err.error)),
+      )),
+    );
+  }
 
   @Action(TimesheetDetails.GetCostCenters)
   GetCostCenters({ patchState, dispatch }: StateContext<TimesheetsModel>,
@@ -902,7 +921,7 @@ export class TimesheetsState {
           }),
         ),
         mergeMap((res) => forkJoin([
-          ctx.dispatch(new TimesheetDetails.GetBillRates(res.jobId, orgId, isAgency)),
+          ctx.dispatch(new TimesheetDetails.GetBillRates(res.jobId, orgId, isAgency, res.reorderDates !== null, res.id)),
           ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId, orgId, isAgency)),
         ])),
         catchError((err: HttpErrorResponse) => {

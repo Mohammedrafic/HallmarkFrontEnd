@@ -1471,16 +1471,24 @@ public RedirecttoIRPOrder(order:Order)
 
   private openMyAllTabWithCandidate(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementService;
+    let index = 0;
     if (selectedOrderAfterRedirect && this.ordersPage?.items) {
       const orderAllOrders = this.ordersPage.items.find(
-        (order: OrderManagement) => order.publicId === selectedOrderAfterRedirect.orderId
+        (order: OrderManagement, i: number) => {
+          index = i;
+          return order.publicId === selectedOrderAfterRedirect.orderId;
+        }
       );
       if (orderAllOrders) {
         const candidate = orderAllOrders.children.find(
           (candidate: OrderManagementChild) => candidate.candidateId === selectedOrderAfterRedirect.candidateId
         );
-        this.gridWithChildRow.detailRowModule.expand(0);
-        this.onOpenCandidateDialog(candidate as OrderManagementChild, orderAllOrders);
+        if (selectedOrderAfterRedirect.isReorder) {
+          this.gridWithChildRow.selectRow(index);
+        } else {
+          this.gridWithChildRow.detailRowModule.expand(0);
+          this.onOpenCandidateDialog(candidate as OrderManagementChild, orderAllOrders);
+        }
         this.orderManagementService.selectedOrderAfterRedirect = null;
       }
     }

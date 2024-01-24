@@ -13,7 +13,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import {
-  MealBreakeName, GetRecordAddDialogConfig, TimeInName, TimeOutName, TimesheetConfirmMessages,
+  MealBreakeName, GetRecordAddDialogConfig, TimeInName, TimeOutName, TimesheetConfirmMessages, Reorder, BillRateConfig,
 } from '../../constants';
 import { RecordFields } from '../../enums';
 import { GetCostCenterOptions, GetDropdownOptions, RecordsAdapter } from '../../helpers';
@@ -24,10 +24,13 @@ import {
   DialogConfigField,
   TimesheetDetailsAddDialogState,
   TimesheetDetailsModel,
+  TimesheetReorder,
 } from '../../interface';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
+import { formatDate } from '@angular/common';
+import { Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-add-timesheet',
@@ -41,13 +44,12 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
   @Input() public container: HTMLElement | null = null;
 
   public dialogConfig: DialogConfig = GetRecordAddDialogConfig(false);
-
   public formType: RecordFields = RecordFields.Time;
-  public filterType: string = 'Contains';
-
+  public filterType = 'Contains';
   public onCallId: number;
-
-  private initialCostCenterId: number | null = null;
+  public isReorder = false;
+  public reorderMaxDate: string;
+  public reorderMinDate: string;
 
   @Select(TimesheetsState.addDialogOpen)
   public readonly dialogState$: Observable<TimesheetDetailsAddDialogState>;
@@ -127,22 +129,24 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
       filter((value) => value.state),
       tap((value) => {
         const isMobile = this.store.selectSnapshot(AppState.isMobileScreen);
+        this.isReorder = this.timesheetDetails.reorderDates !== null;
         this.dialogConfig = GetRecordAddDialogConfig(isMobile);
-
+        this.setReordersRange(this.isReorder);
         if (this.form) {
           this.form = null;
           this.cd.detectChanges();
         }
         this.form = this.addService.createForm(value.type) as CustomFormGroup<AddTimesheetForm>;
+        this.checkReorderVisibility(this.isReorder);
         this.formType = value.type;
         this.setDateBounds(value.startDate, value.endDate);
-        this.initialCostCenterId = value.orderCostCenterId;
         this.populateOptions();
         this.sideAddDialog.show();
         this.cd.detectChanges();
       }),
       filter((value) => value.type === RecordFields.Time),
       switchMap(() => merge(
+        this.watchForReorders(),
         this.watchForLocations(),
         this.watchForBillRate(),
         this.watchForDayChange(),
@@ -180,26 +184,34 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
       }
 
       if (item.optionsStateKey === 'billRateTypes') {
-        const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'OT', 'Mileage'];
+        if (this.isReorder) {
+          item.options = [];
+        } else {
+          const filteredOptions = this.filterSelectableRates(item.options);
 
-        const filteredOptions = item.options?.filter((option) => {
-          return !ratesNotForSelect.includes(option.text);
-        }) as DropdownOption[];
+          const uniqBillRatesHashObj = createUniqHashObj(
+            filteredOptions,
+            (el: DropdownOption) => el.value,
+            (el: DropdownOption) => el,
+          );
 
-        const uniqBillRatesHashObj = createUniqHashObj(
-          filteredOptions,
-          (el: DropdownOption) => el.value,
-          (el: DropdownOption) => el,
-        );
+          item.options = Object.values(uniqBillRatesHashObj);
 
-        item.options = Object.values(uniqBillRatesHashObj);
-
-        this.onCallId = item.options?.find((rate) => rate.text.toLowerCase() === 'oncall')?.value as number;
+          this.onCallId = item.options?.find((rate) => rate.text.toLowerCase() === 'oncall')?.value as number;
+        }
       }
 
       this.form?.get('locationId')?.patchValue(this.timesheetDetails.orderLocationId, { emitEvent: false, onlySelf: true });
       this.form?.get('departmentId')?.patchValue(this.timesheetDetails.departmentId, { emitEvent: false, onlySelf: true });
     });
+  }
+
+  private filterSelectableRates(options?:  DropdownOption[]): AddRecordBillRate[] {
+    const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'OT', 'Mileage'];
+
+    return options?.filter((option) => {
+      return !ratesNotForSelect.includes(option.text);
+    }) as AddRecordBillRate[];
   }
 
   private watchForLocations(): Observable<number> {
@@ -270,6 +282,39 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
         this.cd.markForCheck();
       }),
     ) as Observable<number>;
+  }
+
+  private watchForReorders(): Observable<number> {
+    return this.form?.get('reorderCandidateJobId')?.valueChanges
+    .pipe(
+      tap((jobId) => {
+        this.form?.get('billRateConfigId')?.reset();
+        const rates = this.store.snapshot().timesheets.billRateTypes as AddRecordBillRate[];
+        const billRateField = this.dialogConfig.timesheets.fields
+          .find((field) => field.field === BillRateConfig) as DialogConfigField;
+        billRateField.options = this.filterSelectableRates(rates.filter(rate => rate.candidateJobId === jobId));
+        this.cd.markForCheck();
+      }),
+    ) as Observable<number>;
+  }
+
+  private checkReorderVisibility(isReorder: boolean): void {
+    const reorderField = this.dialogConfig.timesheets.fields
+        .find((field) => field.field === Reorder) as DialogConfigField;
+    reorderField.visible = reorderField.required = isReorder;
+    if (!isReorder) {
+      this.form?.get('reorderCandidateJobId')?.removeValidators(Validators.required);
+    }
+  }
+
+  private setReordersRange(isReorder: boolean): void {
+    if (isReorder) {
+      const reordersDates = this.store.snapshot().timesheets['timesheetReorders']
+        ?.map((reorder: TimesheetReorder) => new Date(reorder.reorderDate));
+      
+      this.reorderMaxDate = formatDate(Math.max(...reordersDates), 'MM/dd/yyyy', 'en-US');
+      this.reorderMinDate = formatDate(Math.min(...reordersDates), 'MM/dd/yyyy', 'en-US');
+    }
   }
 
   private checkFieldsVisibility(rate: AddRecordBillRate): void {

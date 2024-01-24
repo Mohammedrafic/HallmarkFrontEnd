@@ -9,6 +9,7 @@ import { GridRowDetailsCellRenderer } from '@shared/components/grid/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoiceRecordsTableRowDetailsComponent<T> extends GridRowDetailsCellRenderer<T> implements ICellRendererAngularComp, OnDestroy {
+  
   public gridReady(): void {
     this.addDetailsGridInfo();
   }

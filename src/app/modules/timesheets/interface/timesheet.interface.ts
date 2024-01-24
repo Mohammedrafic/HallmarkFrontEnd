@@ -97,3 +97,9 @@ export interface TimesheetGridSelections {
   selectedTimesheetIds: number[];
   rowNodes: RowNode[];
 }
+
+export interface TimesheetReorder {
+  reorderPublicName: string,
+  reorderDate: Date,
+  reorderCandidateJobId: number,
+}

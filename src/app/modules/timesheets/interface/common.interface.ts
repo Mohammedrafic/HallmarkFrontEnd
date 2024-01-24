@@ -159,4 +159,9 @@ export type AddRecordBillRate = DropdownOption & {
   timeNotRequired: boolean;
   disableMealBreak: boolean;
   disableTime: boolean;
+  candidateJobId?: number;
+};
+
+export type AddRecorTimesheetReorder = DropdownOption & {
+  candidateJobId: number;
 };

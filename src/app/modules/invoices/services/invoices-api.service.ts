@@ -16,7 +16,6 @@ import {
   ManualInvoiceReason,
   ManualInvoicesData,
   ManualInvoiceTimesheetResponse,
-  InvoiceDetail,
   PrintingPostDto,
   PrintInvoiceData,
   ManualInvoicePutDto,
@@ -29,6 +28,7 @@ import {
   InvoicesPendingInvoiceRecordsFilteringOptions,
   InvoiceManualPendingRecordsFilteringOptions,
   InvoiceDetailDto,
+  PendingInvoiceRecord,
 } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
@@ -45,7 +45,7 @@ export class InvoicesApiService {
   constructor(
     private http: HttpClient,
   ) {}
-
+  
   private invoicedataSubject = new BehaviorSubject<any>(null);
   public data$ = this.invoicedataSubject.asObservable();
 
@@ -152,6 +152,10 @@ export class InvoicesApiService {
 
   public getPendingInvoices(data: InvoicesFilterState): Observable<PendingInvoicesData> {
     return this.http.post<PendingInvoicesData>('/api/PendingInvoices', data);
+  }
+
+  public getInvoiceReorderDetails(timesheetId: number, organizationId: number): Observable<PendingInvoiceRecord[]> {
+    return this.http.get<PendingInvoiceRecord[]>(`/api/PendingInvoices/reorderDetails/${timesheetId}/${organizationId}`);
   }
 
   public getPendingApproval(data: InvoicesFilterState, isAgency = false): Observable<PendingApprovalInvoicesData> {
