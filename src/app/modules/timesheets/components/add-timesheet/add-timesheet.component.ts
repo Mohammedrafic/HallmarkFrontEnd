@@ -300,7 +300,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
   private checkReorderVisibility(isReorder: boolean): void {
     const reorderField = this.dialogConfig.timesheets.fields
         .find((field) => field.field === Reorder) as DialogConfigField;
-    reorderField.visible = isReorder;
+    reorderField.visible = reorderField.required = isReorder;
   }
 
   private setReordersRange(isReorder: boolean): void {

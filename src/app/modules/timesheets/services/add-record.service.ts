@@ -14,7 +14,7 @@ export class AddRecordService {
   createForm(type: RecordFields): CustomFormGroup<AddTimesheetForm> {
     if (type === RecordFields.Time) {
       return this.fb.group({
-        reorderCandidateJobId: [null, [Validators.required]],
+        reorderCandidateJobId: [null],
         day: [null, [Validators.required]],
         timeIn: [null, [Validators.required]],
         timeOut: [null, [Validators.required]],

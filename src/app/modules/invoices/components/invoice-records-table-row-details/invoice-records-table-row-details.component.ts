@@ -13,25 +13,18 @@ import { PendingInvoiceRecord } from '../../interfaces';
 })
 export class InvoiceRecordsTableRowDetailsComponent<T> extends GridRowDetailsCellRenderer<T> implements ICellRendererAngularComp, OnDestroy {
 
-  constructor(
-    private invoicesApiService: InvoicesApiService,
-  ) {
-    super();
-  }
+
 
   public override agInit(params: IDetailCellRendererParams): void {
-    if (params.data.isBasedOnPdTimesheet) {
+    /*if (params.data.isBasedOnPdTimesheet) {
       this.invoicesApiService.getInvoiceReorderDetails(params.data.id, params.data.organizationId)
         .subscribe((invoiceReordersData) => {
           params.data.invoiceRecords.map((record: PendingInvoiceRecord) => {
             record.reorderCandidatePosition = invoiceReordersData
               .find(reorderData => reorderData.id === record.id)?.reorderCandidatePosition || '';
           });
-          super.agInit(params);
-          this.addDetailsGridInfo();
         });
-      return;
-    }
+    }*/
     super.agInit(params);
   }
   
