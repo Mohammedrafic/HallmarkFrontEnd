@@ -3,7 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { debounceTime, filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, debounceTime, filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
 
 import { isEmpty, uniqBy } from 'lodash';
 
@@ -15,7 +15,7 @@ import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from 
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { getDepartmentFromLocations, getLocationsFromRegions, getRegionsFromOrganizationStructure } from './agency-order-filters.utils';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { AgencyOrderManagementTabs, orderLockList } from '@shared/enums/order-management-tabs.enum';
+import { AgencyOrderManagementTabs, orderLockList, clearedToStartList } from '@shared/enums/order-management-tabs.enum';
 import { CandidatesStatusText, FilterOrderStatusText } from '@shared/enums/status';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { placeholderDate } from '@shared/constants/placeholder-date';
@@ -25,7 +25,7 @@ import { datepickerMask } from '@shared/constants/datepicker-mask';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
-import { AllCandidateStatuses, filterOrderLockList } from '@client/order-management/constants';
+import { AllCandidateStatuses, filterClearedToStartList, filterOrderLockList } from '@client/order-management/constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
@@ -50,7 +50,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   @ViewChild('organizationMultiselect') organizationMultiselect: MultiSelectComponent;
   @ViewChild('locationMultiselect') locationMultiselect: MultiSelectComponent;
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
-
+  @Input() isEnableClearedToStart$: BehaviorSubject<boolean> =new BehaviorSubject<boolean>(false);
   @Input() form: FormGroup;
   @Input() filterColumns: any;
   @Input() activeTab: AgencyOrderManagementTabs;
@@ -82,6 +82,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   partneredOrganizations:OrganizationStructure[] = [];
   public isAgency:boolean = false;
   public isAgencyVisibilityFlagEnabled = false;
+  public clearedToStartList = clearedToStartList;
 
   public optionFields = {
     text: 'name',
@@ -390,6 +391,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       jobEndDate: new FormControl(null),
       annualSalaryRangeFrom: new FormControl(null),
       annualSalaryRangeTo: new FormControl(null),
+      clearedToStart: new FormControl(null),
       creationDateFrom: new FormControl(null),
       creationDateTo: new FormControl(null),
       distributedOnFrom: new FormControl(null),
@@ -519,6 +521,13 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         type: ControlTypes.Dropdown,
         valueType: ValueType.Id,
         dataSource: filterOrderLockList,
+        valueField: 'name',
+        valueId: 'id',
+      },
+      clearedToStart: {
+        type: ControlTypes.Dropdown,
+        valueType: ValueType.Id,
+        dataSource: filterClearedToStartList,
         valueField: 'name',
         valueId: 'id',
       },

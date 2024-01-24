@@ -16,7 +16,7 @@ import {
 import { FormGroup } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
 
-import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
+import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take, BehaviorSubject } from 'rxjs';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
@@ -191,7 +191,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderPublicId:string;
   public isAgencyVisibilityFlagEnabled = false;
   public isRedirectedFromDashboard : boolean;
-
+  public isEnableClearedToStart:boolean = false;
+  public isEnableClearedToStart$ : BehaviorSubject<boolean> =new BehaviorSubject<boolean>(false);
   constructor(
     private store: Store,
     private location: Location,
@@ -489,6 +490,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const filterState = { ...state, orderStatuses };
       const filterFormConfig = GetAgencyFilterFormConfig(this.selectedTab);
       this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
+      this.filters.clearedToStart = this.isEnableClearedToStart ? this.filters.clearedToStart : null;
       if(this.Organizations != null && this.Organizations.length > 0){
         this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.Organizations]);
         this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
@@ -966,6 +968,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       poNumberIds: this.filters.poNumberIds || null,
       shift:this.filters.shift || null,
       orderLocked:this.filters.orderLocked || null,
+      clearedToStart : this.filters.clearedToStart || null,
     });
 
     if(!prepopulate) {
@@ -1029,6 +1032,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
       this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
       this.filters.openPositions = this.filters.openPositions || null;
+      this.filters.clearedToStart = this.filters.clearedToStart || null;
       this.filters.regionIds = this.filters.regionIds || [];
       this.convertFilteredDates();
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
