@@ -73,7 +73,8 @@ export enum OrganizationSettingKeys {
   SplitReportedTimeOnBillRateEffectiveDate,
   AutoEnableClearedToStart,
   Leaverequestcomments,
-  Createreplacementorderswhenschedulesgetcancelled
+  Createreplacementorderswhenschedulesgetcancelled,
+  OnboardExtensionOrderafteraccepting
 }
 
 export enum OrganizationalHierarchy {
