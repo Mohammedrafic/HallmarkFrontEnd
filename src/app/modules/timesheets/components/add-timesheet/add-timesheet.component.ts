@@ -30,6 +30,7 @@ import { TimesheetDetails } from '../../store/actions/timesheet-details.actions'
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { formatDate } from '@angular/common';
+import { Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-add-timesheet',
@@ -131,12 +132,12 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
         this.isReorder = this.timesheetDetails.reorderDates !== null;
         this.dialogConfig = GetRecordAddDialogConfig(isMobile);
         this.setReordersRange(this.isReorder);
-        this.checkReorderVisibility(this.isReorder);
         if (this.form) {
           this.form = null;
           this.cd.detectChanges();
         }
         this.form = this.addService.createForm(value.type) as CustomFormGroup<AddTimesheetForm>;
+        this.checkReorderVisibility(this.isReorder);
         this.formType = value.type;
         this.setDateBounds(value.startDate, value.endDate);
         this.populateOptions();
@@ -301,6 +302,9 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
     const reorderField = this.dialogConfig.timesheets.fields
         .find((field) => field.field === Reorder) as DialogConfigField;
     reorderField.visible = reorderField.required = isReorder;
+    if (!isReorder) {
+      this.form?.get('reorderCandidateJobId')?.removeValidators(Validators.required);
+    }
   }
 
   private setReordersRange(isReorder: boolean): void {

@@ -15,7 +15,7 @@ export const GetRecordAddDialogConfig = (isMobile: boolean): DialogConfig => {
       title: 'Add Timesheet Record',
       fields: [
         {
-          title: 'Re-order',
+          title: 'Re-Order',
           field: 'reorderCandidateJobId',
           type: FieldType.Dropdown,
           disabled: false,
@@ -102,6 +102,16 @@ export const GetRecordAddDialogConfig = (isMobile: boolean): DialogConfig => {
     miles: {
       title: 'Add Miles Record',
       fields: [
+        {
+          title: 'Re-Order',
+          field: 'reorderCandidateJobId',
+          type: FieldType.Dropdown,
+          disabled: false,
+          required: true,
+          widthStyle: FieldWidthStyle.Long,
+          visible: true,
+          optionsStateKey: 'timesheetReorders',
+        },
         {
           title: 'Day',
           field: 'timeIn',

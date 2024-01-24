@@ -7,6 +7,7 @@ export type OrderTab = {
   candidateId: number | string;
   orderType: number | null;
   prefix: string;
+  isReorder?: boolean;
 };
 
 export interface CandidatesDetailsModel extends CandidatesBasicInfo {
