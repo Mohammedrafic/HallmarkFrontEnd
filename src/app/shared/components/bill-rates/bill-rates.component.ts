@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
@@ -75,6 +75,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
     private alertService: AlertService,
     private billRatesSyncService: BillRatesSyncService,
     private billRatesService: BillRatesService,
+    private cd: ChangeDetectorRef,
     ) {
     super(store);
     this.billRatesControl = new FormArray([]);
@@ -373,6 +374,7 @@ export class BillRatesComponent extends AbstractPermission implements OnInit, On
       )
       .subscribe((billRates: BillRateOption[]) => {
         this.allBillRatesConfigs = billRates;
+        this.cd.detectChanges();
       });
   }
 }
