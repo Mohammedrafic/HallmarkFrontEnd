@@ -1,4 +1,4 @@
-Codeimport { ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
@@ -441,6 +441,7 @@ this.paramsData =
   "PeriodTS": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id)),
 
 };
+console.log(this.paramsData);
 this.logiReportComponent.paramsData = this.paramsData;
 this.logiReportComponent.RenderReport();
   }
@@ -670,6 +671,7 @@ private onFilterChild(e: FilteringEventArgs) {
         // pass the filter data source to updateData method.
         e.updateData(this.candidateFilterData);
       });
-    }
+
   }
+}
 }
