@@ -206,7 +206,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="input-container bootstrap"  *ngIf="activeSystems !== systemTypes.IRP && !isOffered && !isAgency">
+                    <div class="input-container bootstrap"  *ngIf="(isAccepted && allowDeploycredentials) || (isOnBoarded && allowDeploycredentials) && activeSystems !== systemTypes.IRP && !isOffered && !isAgency ">
                       <ejs-checkbox
                         formControlName="allowDeployCredentials"
                         label="Allow deploy w/o credentials"

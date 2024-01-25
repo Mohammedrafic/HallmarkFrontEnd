@@ -207,6 +207,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public agencyId: number | undefined;
   public orderManagementPagerState: OrderManagementPagerState | null;
   public clearedToStart:boolean = false;
+  public allowDeploycredentials: boolean;
 
   private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
@@ -251,6 +252,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   get isOffboard(): boolean {
     return this.candidate?.status === ApplicantStatusEnum.Offboard;
+  }
+  get isOnBoarded(): boolean {
+    return this.candidate?.status === ApplicantStatusEnum.OnBoarded;
   }
 
   get templateEmailTitle(): string {
@@ -1100,10 +1104,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder, CanOrganizationEditOrdersIRP, CanOrganizationViewOrdersIRP }) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, CanOrganizationEditOrdersIRP, CanOrganizationViewOrdersIRP,AllowDeploycredentials }) => {
       this.canCreateOrder = canCreateOrder;
       this.CanOrganizationEditOrdersIRP = CanOrganizationEditOrdersIRP;
       this.CanOrganizationViewOrdersIRP = CanOrganizationViewOrdersIRP;
+      this.allowDeploycredentials = AllowDeploycredentials;
     });
   }
 

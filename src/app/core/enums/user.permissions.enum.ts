@@ -256,4 +256,5 @@ export enum UserPermissions {
 
   CanViewAgencyVendorScorecard = 9003,
   CanMigrateCandidate = 9031,
+  AllowDeploycredentials=9033,
 }
