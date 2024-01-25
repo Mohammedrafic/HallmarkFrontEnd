@@ -120,6 +120,7 @@ cssClass="dialog short"
                       format="MM/dd/yyyy"
                       [min]="isReorder ? reorderMinDate : dateSettings.timeIn.min"
                       [max]="isReorder ? reorderMaxDate : dateSettings.timeIn.max"
+                      (renderDayCell)="disableUnusedDates($event)"
                       [strictMode]="true"
                       [formControlName]="field.field"
                     >
