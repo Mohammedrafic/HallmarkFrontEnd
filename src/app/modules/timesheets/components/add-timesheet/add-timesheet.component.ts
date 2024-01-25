@@ -119,7 +119,9 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
     if (this.isReorder && !event.isOutOfRange && event.date) {
       const reordersDates = this.store.snapshot().timesheets['timesheetReorders']
         ?.map((reorder: TimesheetReorder) => 
-          formatDate(reorder.reorderDate, 'MM/dd/yyyy', 'en-US'));
+          formatDate(
+            new Date(new Date(reorder.reorderDate).toLocaleString('en-US', { timeZone: 'UTC' })), 'MM/dd/yyyy', 'en-US')
+          );
 
       if (!reordersDates.includes(formatDate(event.date, 'MM/dd/yyyy', 'en-US'))) {
         event.isDisabled = true;
