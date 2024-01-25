@@ -51,4 +51,7 @@ export enum PermissionTypes {
   CandidateAssigment=850,
   CanViewCandidateAssigment=851,
   AllowToUpdateDept=8137,
+
+  //allowDeploycredential
+  AllowDeploycredentials = 9033,
 }

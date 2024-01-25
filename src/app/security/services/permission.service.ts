@@ -21,6 +21,7 @@ export interface PermissionsModel {
   CanOrganizationViewOrdersIRP: boolean;
   CanOrganizationEditOrdersIRP: boolean;
   AllowToUpdateDept?:boolean;
+  AllowDeploycredentials:boolean;
 }
 
 export type CustomPermissionModel = { [key: string]: PermissionTypes  };
@@ -56,6 +57,7 @@ export class PermissionService extends DestroyableDirective {
           CanOrganizationEditOrdersIRP: permissionIds.includes(PermissionTypes.CanOrganizationEditOrdersIRP),
           CanOrganizationViewOrdersIRP: permissionIds.includes(PermissionTypes.CanOrganizationViewOrdersIRP),
           AllowToUpdateDept:permissionIds.includes(PermissionTypes.AllowToUpdateDept),
+          AllowDeploycredentials: permissionIds.includes(PermissionTypes.AllowDeploycredentials)
           };
       })
     );
