@@ -218,8 +218,10 @@ export class LogTimeSheetHistory {
   mname:            null;
   lname:            null;
   locationId:       string;
+  locationName:       string;
   costcenterId:     string;
   workedlocationid: string;
+  workedLocationName: string;
   workedccid:       string;
   shiftType:        string;
   punchIndate:      string;
