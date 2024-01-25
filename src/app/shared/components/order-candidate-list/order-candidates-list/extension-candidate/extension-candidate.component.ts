@@ -719,7 +719,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
 
   calculateActualEndDate(startDate: Date, daysToAdd: number): Date {
-    const actualEndDate = new Date(startDate); actualEndDate.setDate(startDate.getDate() + daysToAdd);
+    const actualEndDate = startDate; actualEndDate.setDate(startDate.getDate() + daysToAdd);
     return actualEndDate;
   }
 
@@ -736,7 +736,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const offeredStartDate = this.candidateJob.offeredStartDate && this.candidateJob.offeredStartDate !== '' ? this.datePipe.transform(this.candidateJob.offeredStartDate,'MM/dd/yyyy HH:mm', 'UTC') : null;
     const finalDate = offeredStartDate ? new Date(offeredStartDate) : jobStartDate;
     const daysDifference =  DateTimeHelper.getDateDiffInDays(jobStartDate, jobEndDate);
-    const actualEndDate = this.calculateActualEndDate(finalDate, daysDifference).toISOString();
+    const actualEndDate = this.calculateActualEndDate(finalDate, daysDifference);
     const accepted = applicantStatus.applicantStatus ===ApplicantStatusEnum.Accepted;
     if (accepted && (!value.actualStartDate || !value.actualEndDate)) {
       value.actualStartDate = this.candidateJob?.offeredStartDate;
