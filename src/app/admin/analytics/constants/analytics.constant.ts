@@ -334,7 +334,17 @@ export const ageGroups: { name: string; id: number }[] = [
   {name:"Above 90",id:5}
 
 ];
-
+export const periodList:{name:string;id:number}[]=[
+  { id: 0, name: 'Custom' },
+  { id: 1, name: 'Last 30 days'},
+  { id: 2, name: 'Last 60 days'},
+  { id: 3, name: 'Last 90 days'},
+  { id: 4, name: 'MTD' },
+  { id: 5, name: 'Last Quarter' },
+  { id: 6, name: 'YTD' },
+  { id: 7, name: 'Last 6 Month' },
+  { id: 8, name: 'Last 12 Months' },
+]
 //export const YTDReportSearchBy: { name: string; id: number }[] = [
 //  { name: 'By Month', id: 1 },
 //  { name: 'By Location', id: 2 }
