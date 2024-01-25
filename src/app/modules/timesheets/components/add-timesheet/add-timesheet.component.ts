@@ -316,7 +316,9 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
   private checkReorderVisibility(isReorder: boolean): void {
     const reorderField = this.dialogConfig.timesheets.fields
         .find((field) => field.field === Reorder) as DialogConfigField;
-    reorderField.visible = reorderField.required = isReorder;
+    const reorderFieldMiles = this.dialogConfig.miles.fields
+        .find((field) => field.field === Reorder) as DialogConfigField;
+    reorderField.visible = reorderField.required = reorderFieldMiles.required = reorderFieldMiles.visible = isReorder;
     if (!isReorder) {
       this.form?.get('reorderCandidateJobId')?.removeValidators(Validators.required);
     }
