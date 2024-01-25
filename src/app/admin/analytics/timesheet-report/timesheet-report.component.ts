@@ -670,3 +670,6 @@ private onFilterChild(e: FilteringEventArgs) {
         // pass the filter data source to updateData method.
         e.updateData(this.candidateFilterData);
       });
+    }
+  }
+}
