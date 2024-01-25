@@ -680,7 +680,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   private refreshData(): Observable<TimesheetInt.TimesheetDetailsModel> {
     return this.store.dispatch(
-      new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+      new Timesheets.GetTimesheetDetails(this.timesheetId, this.orgId as number, this.isAgency)
     );
   }
 
