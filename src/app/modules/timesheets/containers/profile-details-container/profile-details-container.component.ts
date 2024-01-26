@@ -274,7 +274,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     super(store);
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
     this.attachmentsListConfig$ = this.timesheetDetails$.pipe(
-      map(({ id }) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
+      map(({ id }) => 
+        this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId || this.orgId, this.isAgency))
     );
   }
 
