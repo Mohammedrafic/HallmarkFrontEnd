@@ -54,6 +54,10 @@ export class AddEditCandidateComponent extends DestroyableDirective implements O
   public titlevalue: string;
   public candidateName$ = this.candidatesService.getCandidateName();
 
+  get isAddMode(): boolean {
+    return this.title === DialogMode.Add;
+  }
+
   constructor(
     private router: Router,
     private candidateProfileFormService: CandidateProfileFormService,

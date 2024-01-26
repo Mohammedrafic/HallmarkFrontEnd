@@ -35,6 +35,7 @@
   <button
     ejs-button
     appHideBeforeSyncfusionLoad
+    *ngIf="isAddMode"
     cssClass="e-outline" 
     [disabled]="isCandidateFormPristine"
     (click)="clearForm()"
