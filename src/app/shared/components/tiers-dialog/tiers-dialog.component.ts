@@ -7,6 +7,7 @@ import {
   Input,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
 
@@ -68,14 +69,13 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
         this.allLocationsChange({ checked: this.allRecords.locationIds });
         this.allDepartmentsChange({ checked: this.allRecords.departmentIds }, false);  
       }
-      this.createForm();
     }
-  };
+  }
 
   @Input() set isEditDialog(value: boolean) {
     this.setDialogTitle(value);
       this.isEdit = value;  
-  };
+  }
 
   @Input() public permission: boolean;
   @Input() public organizationId: number;
@@ -120,26 +120,24 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
 
   ngOnInit(): void {
     this.watchForShowDialog();
-    this.createForm();
-    this.watchForRegions();
-    this.watchForLocation();
     this.watchForCloseDialog();
-    this.watchForDepartments();
   }
 
-  public watchForSystemType() {
+  ngOnChanges(changes: SimpleChanges) : void {
+    if (changes['systemType']) {
+      this.systemTypeHandler();
+    }
+  }
+
+  public systemTypeHandler() {
     this.systemType === 0 ? this.dialogType = Tiers.tierSettings : this.dialogType = Tiers.tierSettingsIRP;
     this.dialogConfig = TiersDialogConfig(this.regions, this.workcommitments)[this.dialogType];
     this.createForm();
-    if(this.systemType === 0){
+    if (this.systemType === 0) {
       this.watchForRegions();
       this.watchForLocation();
       this.watchForDepartments();  
     }
-  }
-
-  ngOnChanges() : void {
-    this.watchForSystemType();
   }
 
   public allRegionsChange(event: { checked: boolean }): void {
@@ -209,7 +207,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
         : query;
         let departments: TierDataSource | undefined = this.dialogConfig.fields.find((configField: TiersInputConfig) => configField.field === 'departmentIds')!.dataSource;
     e.updateData(departments as [], query);
-  };
+  }
 
   public saveTiers(): void {
     if (this.tierForm?.valid) {
@@ -225,7 +223,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
+          okButtonClass: 'delete-button',
         }).pipe(
         filter(Boolean),
         takeUntil(this.destroy$)
@@ -243,31 +241,35 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   }
 
   private resetToggles(): void {
-    if(this.systemType === 0){
+    if (this.systemType === 0) {
       this.allRegionsChange({ checked: false });
       this.allLocationsChange({ checked: false });
       this.allDepartmentsChange({ checked: false });  
     }
   }
 
+  private watchForCloseDialog(): void {
+    this.actions$.pipe(
+      ofActionDispatched(ShowSideDialog),
+      filter(({ isDialogShown }) => !isDialogShown),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.isTierSettingsDialog || setDataSourceValue(this.dialogConfig.fields, 'organizationTierId', []);
+      this.resetToggles();
+      this.tierForm?.reset({}, {emitEvent: false});
+      this.tierForm?.patchValue({
+        skills: '1',
+      });
+      this.changeDetection.markForCheck();
+    });
+  }
+
   private hideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false));
-    this.isTierSettingsDialog || setDataSourceValue(this.dialogConfig.fields, 'organizationTierId', []);
-    this.resetToggles();
-    this.tierForm?.reset({}, {emitEvent: false});
-    this.tierForm?.patchValue({
-      skills: "1"
-    });
-    this.changeDetection.markForCheck();
   }
 
   private createForm(): void {
     this.tierForm = this.tierService.createTierForm(this.dialogType);
-    if(this.isEdit){
-      setTimeout(() => {
-        this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, this.selectedTierDetails, this.regions));
-      },100)
-    }
   }
 
   private watchForRegions(): void {
@@ -302,17 +304,6 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
 
   private setDialogTitle(value: boolean): void {
     this.title = value ? this.dialogConfig.editTitle : this.dialogConfig.title;
-  }
-
-  private watchForCloseDialog(): void {
-    this.actions$.pipe(
-      ofActionDispatched(ShowSideDialog),
-      filter(({ isDialogShown }) => !isDialogShown),
-      takeUntil(this.destroy$)
-    ).subscribe(() => {
-      this.tierForm?.reset({}, {emitEvent: false});
-      this.resetToggles();
-    });
   }
 
   private watchForShowDialog(): void {
