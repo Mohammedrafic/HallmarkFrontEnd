@@ -18,6 +18,7 @@ export class GridActionsCellComponent extends GridCellRenderer<GridActionsCellCo
     super.agInit(params);
 
     this.actionsConfig = params.actionsConfig;
+    this.data = params.data;
   }
 
   public trackBy(_: number, item: GridActionsCellItem) {
