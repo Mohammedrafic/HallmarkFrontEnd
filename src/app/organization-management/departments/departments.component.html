@@ -156,10 +156,10 @@
                 id="gridPager"
                 #gridPager
                 [pageSize]="pageSize"
-                [totalRecordsCount]="(departments$ | async)?.totalCount" 
+                [totalRecordsCount]="(departments$ | async)?.totalCount"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPage"
-              
+
               >
               </ejs-pager>
             </section>
@@ -454,7 +454,7 @@
             [placeholder]="placeholderDate"
             [enableMask]="true"
             [maskPlaceholder]="datepickerMask"
-            [max]="maxInactivateDate"
+            (renderDayCell)="handleInactivationDatepickerRenderCell($event)"
             appValidateWithMessage
             formControlName="inactiveDate"
           >
