@@ -1,7 +1,7 @@
 import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { GetEmployeeUsers, GetNonEmployeeUsers, GetNotificationSubscription, GetRolePerUser } from '../../../security/store/security.actions';
 import { ButtonModel } from '@shared/models/buttons-group.model';
-import { Component, Input, NgZone, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, NgZone, OnDestroy, OnInit, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -36,7 +36,7 @@ import { SetHeaderState, ShouldDisableUserDropDown, ShowToast } from 'src/app/st
 import { User, UsersPage } from '@shared/models/user.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { GRID_CONFIG, USER_SUBSCRIPTION_PERMISSION } from '@shared/constants';
+import { GRID_CONFIG, Turn_Off_All_Notification, Turn_Off_Email_Notification, Turn_Off_OnScreen_Notification, Turn_Off_SMS_Notification, Turn_On_Email_Notification, Turn_On_OnScreen_Notification, Turn_On_SMS_Notification, USER_SUBSCRIPTION_PERMISSION } from '@shared/constants';
 import { AppState } from '../../../store/app.state';
 import { BUSINESS_UNITS_VALUES_WITH_IRP, BUSINESS_UNITS_VALUES_WITH_MSP } from '@shared/constants/business-unit-type-list';
 import { OutsideZone } from '@core/decorators';
@@ -47,6 +47,7 @@ import { isNumber } from 'lodash';
 import { GroupEmailRole } from '@shared/models/group-email.model';
 import { RolesPerUser, turnOffNotification } from '@shared/models/user-managment-page.model';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { CustomHeaderComponent } from '../custom-header/custom-header.component';
 
 @Component({
   selector: 'app-user-subscription',
@@ -86,8 +87,10 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   @Select(SecurityState.rolesPerUsers)
   rolesPerUsers$: Observable<RolesPerUser[]>;
-
+  
   @Input() filterForm: FormGroup;
+  @Output() emitActiveSystem: EventEmitter<any> = new EventEmitter();
+
   public businessForm: FormGroup;
   public isEditRole = false;
   public isBusinessFormDisabled = false;
@@ -117,6 +120,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   pagination: boolean;
   paginationPageSize: number;
   columnDefs: any;
+  columnDefsIRP: any;
+  columnDefsVMS: any;
   frameworkComponents: any;
   sideBar: any;
   serverSideStoreType: any;
@@ -143,6 +148,18 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public isOrgage: boolean;
   public roleData: GroupEmailRole[];
   public defaultRoleValue:any;
+  public passingParams: { businessUnit: any; userId: string; AlertChannel?: string; Enabled?: any; };
+  public checkBoxEnabled : boolean;
+  AlertChannel: string;
+  ConfirmationMessage: string;
+  activeSystemfromSubscription: string;
+  AlertChannelData = {
+    Email : "Email",
+    SMS : "SMS",
+    OnScreen : "OnScreen"
+  }
+  gridData: any;
+
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
   }
@@ -180,7 +197,71 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       this.cacheBlockSize = this.pageSize;
     this.serverSideStoreType = 'partial';
     this.maxBlocksInCache = 2;
-    this.columnDefs = [
+    this.columnDefsIRP = [
+      {
+        field: 'id',
+        hide: true
+      },
+      {
+        headerName: 'Notification Description',
+        field: 'alert.alertTitle',
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
+      },
+      {
+        headerName: 'Email',
+        field: 'isEmailEnabled',
+        cellRenderer: ToggleSwitchComponent,
+        headerComponent: CustomHeaderComponent,
+        cellRendererParams: {
+          onChange: this.onEmailChanged.bind(this),
+          label: 'email'
+        },
+        valueGetter: (params: { data: { isEmailEnabled: boolean } }) => { return AlertEnum[Number(params.data.isEmailEnabled)] },
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
+      {
+        headerName: 'SMS',
+        field: 'isSMSEnabled',
+        cellRenderer: ToggleSwitchComponent,
+        headerComponent: CustomHeaderComponent,
+        cellRendererParams: {
+          onChange: this.onSmsChanged.bind(this),
+          label: 'sms'
+        },
+        valueGetter: (params: { data: { isSMSEnabled: boolean } }) => { return AlertEnum[Number(params.data.isSMSEnabled)] },
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
+      {
+        headerName: 'OnScreen',
+        field: 'isOnScreenEnabled',
+        cellRenderer: ToggleSwitchComponent,
+        headerComponent: CustomHeaderComponent,
+        cellRendererParams: {
+          onChange: this.onScreenChanged.bind(this),
+          label: 'onScreen'
+        },
+        valueGetter: (params: { data: { isOnScreenEnabled: boolean } }) => { return AlertEnum[Number(params.data.isOnScreenEnabled)] },
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
+
+
+    ];
+
+    this.columnDefsVMS = [
       {
         field: 'id',
         hide: true
@@ -317,6 +398,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     this.onUserValueChanged();
     this.onOrganizationChangedHandler();
     this.onRolesValueChanged();
+    this.watchForShowDetailsEvent();
 
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
@@ -384,26 +466,58 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   }
 
-  public DisableNotification() {
+  public watchForShowDetailsEvent(){
+    this.orderManagementService.handleCheckBoxEvent.pipe(
+      takeUntil(this.unsubscribe$)).subscribe((Details) => {
+        this.DisableNotification(Details);
+    })
+  }
+
+  public DisableNotification(Details? : any) {
     const { businessUnit } = this.businessForm?.getRawValue();
-    this.confirmService.confirm("Are you sure you want to Turn Off All the Subscriptions for the user", {
+    if(Details){
+      if(Details.headerName === AlertChannel[AlertChannel.Email]){
+        this.ConfirmationMessage = Details.Checked ? Turn_On_Email_Notification : Turn_Off_Email_Notification;
+      } else if(Details.headerName === AlertChannel[AlertChannel.SMS]){
+        this.ConfirmationMessage = Details.Checked ? Turn_On_SMS_Notification : Turn_Off_SMS_Notification;
+      } else if(Details.headerName === AlertChannel[AlertChannel.OnScreen]){
+        this.ConfirmationMessage = Details.Checked ? Turn_On_OnScreen_Notification : Turn_Off_OnScreen_Notification;
+      }   
+    } else {
+      this.ConfirmationMessage = Turn_Off_All_Notification;
+    }
+    this.confirmService.confirm(this.ConfirmationMessage, {
       title: 'Confirm',
       okButtonLabel: 'OK',
       cancelButtonLabel: 'Cancel',
       okButtonClass: '',
     }).pipe(
-      filter((confirm: boolean) => !!confirm),
       take(1),
       takeWhile(() => this.isAlive)
     ).subscribe((value: boolean) => {
       if(value){
-        this.store.dispatch(new GetNotificationSubscription(businessUnit, this.usersControl.value));
+        if(Details){
+          this.AlertChannel = AlertChannel[Details.headerName];
+          this.checkBoxEnabled = Details.Checked;
+          this.store.dispatch(new GetNotificationSubscription(businessUnit, this.usersControl.value, this.AlertChannel, this.checkBoxEnabled ));
+        } else {
+          this.store.dispatch(new GetNotificationSubscription(businessUnit, this.usersControl.value ));
+        }
         this.NotificationData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
           setTimeout(() => {
-            this.dispatchNewPage(this.usersControl.value);
+            this.dispatchNewPage(this.usersControl.value, false);
+            if(!Details){
+              this.orderManagementService.HandleCheckBoxfromParent(false, "", true);
+            }
             this.changeDetector.detectChanges();
           },500);
         });  
+      } else {
+        if(Details){
+          this.orderManagementService.HandleCheckBoxfromParent(!Details.Checked, Details.headerName);
+        } else {
+          this.orderManagementService.HandleCheckBoxfromParent(false, Details.headerName);
+        }
       }
     });
   }
@@ -532,7 +646,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   }
   private onUserValueChanged(): void {
     this.usersControl.valueChanges.pipe(distinctUntilChanged(), takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.dispatchNewPage(value);
+      this.dispatchNewPage(value, true);
     });
   }
   createServerSideDatasource() {
@@ -556,7 +670,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
           let sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           self.userSubscriptionPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
-
+            self.gridData = data;
             self.itemList = data?.items;
             if(self.businessUnitControl?.value === BusinessUnitType.Employee) {
             self.itemList = self.itemList?.filter((x=>x.alertId!=AlertIdEnum['Order Comments-IRP']));
@@ -569,7 +683,19 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
             else {
               self.gridApi.hideOverlay();
             }
-
+            if(data){
+              data.items.every((item: {
+                isOnScreenEnabled: boolean;
+                isSMSEnabled: boolean; 
+                isEmailEnabled: boolean; 
+              }) => {
+                (item.isEmailEnabled === true) ? self.orderManagementService.HandleCheckBoxfromParent(true, AlertChannel[AlertChannel.Email]) :  self.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.Email]);
+                (item.isOnScreenEnabled === true) ? self.orderManagementService.HandleCheckBoxfromParent(true, AlertChannel[AlertChannel.OnScreen]) : self.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.OnScreen]);
+                (item.isSMSEnabled === true) ? self.orderManagementService.HandleCheckBoxfromParent(true, AlertChannel[AlertChannel.SMS]) : self.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.SMS]);
+              });
+            } else {
+              self.orderManagementService.HandleCheckBoxfromParent(false, "", true);
+            }
             params.successCallback(self.itemList, data?.totalCount || 1);
 
           });
@@ -592,6 +718,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     if (user != 0) {
       this.userGuid = user;
       this.getdata = this.store.dispatch(new GetUserSubscriptionPage(businessUnit || null, user, this.currentPage, this.pageSize, sortModel, filterModel, this.filters, this.activeSystem == OrderManagementIRPSystemId.IRP));
+      this.getErrorAlert();
     }
   }
 
@@ -621,17 +748,35 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         updateUserSubscription.businessUnitType = businessUnit;
         updateUserSubscription.isIRP = true;
       }
+      if(this.gridData){
+        this.gridData.items.every((item: {
+          isOnScreenEnabled: boolean;
+          isSMSEnabled: boolean; 
+          isEmailEnabled: boolean; 
+        }) => {
+          if(alertChannel == AlertChannel.Email){
+            this.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.Email])
+          }
+          if(alertChannel == AlertChannel.OnScreen){
+            this.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.OnScreen])
+          }
+          if(alertChannel == AlertChannel.SMS){
+            this.orderManagementService.HandleCheckBoxfromParent(false , AlertChannel[AlertChannel.SMS])
+          }
+        });
+      }
+
       this.store.dispatch(new UpdateUserSubscription(updateUserSubscription));
       this.actions$.pipe(
             ofActionDispatched(ShowToast),
             distinctUntilChanged(),
             takeUntil(this.unsubscribe$)
-          ).subscribe((val) => {
-            if(val.type === 1 && this.apiSaveReq){
-              this.apiSaveReq = false;
-              this.dispatchNewPage(this.usersControl.value);
-            }
-          });
+      ).subscribe((val) => {
+        if(val.type === 1 && this.apiSaveReq){
+          this.apiSaveReq = false;
+          this.dispatchNewPage(this.usersControl.value, false);
+        }
+      });
     }
   }
 
@@ -669,12 +814,14 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         this.businessUnitControl.enable();
         this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency && x.id !== BusinessUnitType.Hallmark);
       }
+      this.columnDefs = this.columnDefsIRP;
     }
 
     if(this.activeSystem == OrderManagementIRPSystemId.VMS){
       this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.Employee);
       this.businessUnitControl.patchValue(user?.businessUnitType);
       this.businessControl.setValue(user?.businessUnitId, {emitEvent:false});
+      this.columnDefs = this.columnDefsVMS;
     }
   }
   private onRolesValueChanged(): void {

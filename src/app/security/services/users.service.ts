@@ -41,9 +41,11 @@ export class UsersService {
 
   public turnOffSubscription(
     BusinessUnitType: BusinessUnitType,
-    userId: string
+    userId: string,
+    AlertChannel? : string,
+    Enabled? : boolean
   ): Observable<turnOffNotification> {
-    return this.http.post<turnOffNotification>(`/api/UserSubscription/IRPturnoffallsubscriptions`, { userId, BusinessUnitType });
+    return this.http.post<turnOffNotification>(`/api/UserSubscription/IRPturnoffallsubscriptions`, { userId, BusinessUnitType, AlertChannel, Enabled });
   }
 
   /**

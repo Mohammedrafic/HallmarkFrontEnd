@@ -183,4 +183,12 @@ export const CONFIRM_CANDIDATES_MIGRATION = 'Are you sure you want to migrate ca
 export const CANDIDATES_MIGRATION_SUCCESS = 'Cadidates are migrated successfully';
 
 export const Apply_Previous_Filters = 'Apply Previous Filters';
-export const Subscription_Turned_Off = 'Notification Subscription has been turned off';
+export const Subscription_Turned_Off = 'Notification Subscription has been Updated';
+
+export const Turn_Off_Email_Notification = 'Are you sure you want to Turn Off All the Email Notification for the user ?';
+export const Turn_Off_SMS_Notification = 'Are you sure you want to Turn Off All the SMS Notification for the user ?';
+export const Turn_Off_OnScreen_Notification = 'Are you sure you want to Turn Off All the OnScreen Notification for the user ?';
+export const Turn_On_Email_Notification = 'Are you sure you want to Turn On All the Email Notification for the user ?';
+export const Turn_On_SMS_Notification = 'Are you sure you want to Turn On All the SMS Notification for the user ?';
+export const Turn_On_OnScreen_Notification = 'Are you sure you want to Turn On All the OnScreen Notification for the user ?';
+export const Turn_Off_All_Notification = 'Are you sure you want to Turn Off All the Subscriptions for the user ?';
