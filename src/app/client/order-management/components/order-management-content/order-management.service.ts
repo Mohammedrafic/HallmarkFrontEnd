@@ -265,7 +265,6 @@ export class OrderManagementService extends DestroyableDirective {
 
   public handleCheckBoxEvent: Subject<{Checked : boolean, headerName : string}> = new Subject<{Checked : boolean, headerName : string}>();
   public handleCheckBoxEventfromParent: Subject<{Checked : boolean, headerName : string, UnCheckAll?: boolean}> = new Subject<{Checked : boolean, headerName : string, UnCheckAll? : boolean}>();
-  public handleSystems: Subject<{System : string}>;
 
   public HandleCheckBox(Checked: boolean, headerName : string): void {
       this.handleCheckBoxEvent.next({Checked : Checked, headerName : headerName});
@@ -274,10 +273,5 @@ export class OrderManagementService extends DestroyableDirective {
   public HandleCheckBoxfromParent(Checked: boolean, headerName : any, UnCheckAll? : boolean): void {
       this.handleCheckBoxEventfromParent.next({Checked : Checked, headerName : headerName, UnCheckAll : UnCheckAll});
   }
-
-  public getActiveSystem(system: string){
-    this.handleSystems.next({System : system});
-  }
-
-
+ 
 }
