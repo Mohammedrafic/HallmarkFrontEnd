@@ -95,7 +95,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() order: Order;
   @Input() isCandidatePayRateVisible: boolean;
   @Input() reloadOnUpdate = false;
-
+  @Input() isCandidateLeaveRequest: boolean;
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 
@@ -244,8 +244,20 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.subscribeOnSuccessRejection();
     this.subscribeOrderCandidatePage();
     this.clearToStartCheck();
+    this.leaveValidation();
   }
-
+  leaveValidation():void
+  {
+    if(this.isCandidateLeaveRequest)
+    {
+      this.form.get('comments')?.setValidators(Validators.required);
+      this.form.get('comments')?.updateValueAndValidity();
+    }else{
+      this.form.get('comments')?.setValidators(Validators.maxLength(2000));
+      this.form.get('comments')?.updateValueAndValidity();
+    }
+    this.changeDetectionRef.markForCheck();
+  }
   clearToStartCheck(){
     if(this.candidate && positionIdStatuses.includes(this.candidate.status)){
       this.clearedToStartCheck();
@@ -376,6 +388,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public onApply(): void {
+    this.leaveValidation();
     if (this.form.valid) {
       if (this.candidateSSNRequired) {
         if (!this.form.controls["ssn"].value) {
@@ -532,7 +545,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       yearExp: new FormControl(''),
       expAsTravelers: new FormControl(''),
       offeredBillRate: new FormControl(''),
-      comments: new FormControl(''),
+      comments: new FormControl('',[Validators.maxLength(2000)]),
       rejectReason: new FormControl(''),
       guaranteedWorkWeek: new FormControl(''),
       offeredStartDate: new FormControl(''),
@@ -544,7 +557,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       rate: new FormControl(''),
       hours: new FormControl(''),
       dob: new FormControl(''),
-      ssn: new FormControl(''),
+      ssn: new FormControl(''),      
     });
   }
 
