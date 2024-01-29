@@ -197,6 +197,8 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   public saveStatus:number =0;
   public partnershipStatus = PartnershipStatus;
   public agencyStatusMessage = AgencyPartnershipSuspended;
+  public allowDeploycredentials: boolean;
+
 
   get templateEmailTitle(): string {
     return "Onboarding Email";
@@ -657,8 +659,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy, OnChan
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder}) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder,AllowDeploycredentials}) => {
       this.canCreateOrder = canCreateOrder;
+      this.allowDeploycredentials = AllowDeploycredentials;
     });
   }
 
