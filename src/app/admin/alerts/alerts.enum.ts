@@ -58,5 +58,6 @@ export enum AlertEnum {
    "Candidate Status Update: Cancelled" = 31,
    "Candidate Level Comments" = 60,
    "Timesheet Level Comments" = 67,
+   "Candidate Status Update: Cleared to Start" = 68,
   }
   

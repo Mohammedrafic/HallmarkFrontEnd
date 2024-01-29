@@ -24,7 +24,8 @@ export class OrderCloseReasonInfoComponent {
   }
 
   get closeDate(): string {
-    return this.candidate?.closeDate || (this.orderInformation?.orderCloseDate as string);
+    return this.candidate?.closeDate || (this.orderInformation?.orderCloseDate as string) || 
+      this.orderInformation?.irpOrderMetadata?.orderCloseDate as string;
   }
 
   get showCloseDate(): boolean {

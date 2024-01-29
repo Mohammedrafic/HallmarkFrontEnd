@@ -88,6 +88,7 @@ const timesheetDetailsMock: TimesheetDetailsModel = {
   weekEndDate: "2023-08-06T00:00:00+00:00",
   unitName: "Solid Nurses",
   commentContainerId:0,
+  reorderDates: [],
   timesheetStatistic: {
     weekHours: 1.500000000000000,
     cumulativeHours: 74.366666666666670,

@@ -34,6 +34,7 @@ export const DefaultTimesheetState: TimesheetsModel = {
   isTimeSheetOpen: false,
   selectedTimeSheet: null,
   billRateTypes: [],
+  timesheetReorders: [],
   costCenterOptions: [],
   organizationStructure: null,
   isAddDialogOpen: {

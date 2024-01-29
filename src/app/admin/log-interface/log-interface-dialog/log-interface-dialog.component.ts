@@ -166,9 +166,35 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
       resizable: true
     },
     {
+      headerName: 'Location Name',
+      field: 'locationName',
+      minWidth: 125,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
+      sortable: false,
+      resizable: true
+    },
+    {
       headerName: 'Worked LocationId',
       field: 'workedlocationid',
       minWidth: 125,
+      sortable: false,
+      resizable: true
+    },
+    {
+      headerName: 'Worked Location Name',
+      field: 'workedLocationName',
+      minWidth: 125,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        debounceMs: 1000,
+        suppressAndOrCondition: true,
+      },
       sortable: false,
       resizable: true
     },
@@ -340,7 +366,9 @@ export class LogInterfaceDialogComponent extends AbstractGridConfigurationCompon
     { text: 'Middle Name', column: 'MiddleName' },
     { text: 'Last Name', column: 'LastName' },
     { text: 'Location Id', column: 'LocationId' },
+    { text: 'Location Name', column: 'LocationName' },
     { text: 'Worked LocationId', column: 'WorkedLocationId' },
+    { text: 'Worked Location Name', column: 'WorkedLocationName' },
     { text: 'Worked DeptId', column: 'WorkedDeptId'},
     { text: 'Shift Type', column: 'ShiftType' },
     { text: 'PunchIn Date', column: 'PunchInDate' },

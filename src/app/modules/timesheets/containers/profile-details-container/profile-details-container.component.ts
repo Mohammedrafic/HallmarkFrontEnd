@@ -274,7 +274,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     super(store);
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
     this.attachmentsListConfig$ = this.timesheetDetails$.pipe(
-      map(({ id }) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
+      map(({ id }) => 
+        this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId || this.orgId, this.isAgency))
     );
   }
 
@@ -560,7 +561,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.store.dispatch(
-          new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+          new Timesheets.GetTimesheetDetails(this.timesheetId, (this.organizationId || this.orgId) as number, this.isAgency)
         );
       });
   }
@@ -680,7 +681,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   private refreshData(): Observable<TimesheetInt.TimesheetDetailsModel> {
     return this.store.dispatch(
-      new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+      new Timesheets.GetTimesheetDetails(this.timesheetId, (this.organizationId || this.orgId) as number, this.isAgency)
     );
   }
 

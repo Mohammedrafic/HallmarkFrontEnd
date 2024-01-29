@@ -86,6 +86,8 @@ export namespace TimesheetDetails {
       public readonly jobId: number,
       public readonly orgId: number,
       public readonly isAgency: boolean,
+      public readonly isReorder: boolean,
+      public readonly timesheetId: number,
     ) {}
   }
 
@@ -174,5 +176,15 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.UpdateRecordSucceed;
 
     constructor() {}
+  }
+
+  export class GetTimesheetReorders {
+    static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEET_REORDERS;
+
+    constructor(
+      public timesheetId: number,
+      public orgId: number,
+      ) {
+    }
   }
 }
