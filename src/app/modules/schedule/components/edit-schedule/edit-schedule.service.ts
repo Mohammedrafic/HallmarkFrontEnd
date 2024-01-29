@@ -172,10 +172,10 @@ export class EditScheduleService {
     scheduleForm: CustomFormGroup<ScheduledShiftForm>
   ): RemainingBooking[] {
     const remainingBookingBase: RemainingBooking = {
-      region: selectedDaySchedule.orderMetadata.region,
-      location: selectedDaySchedule.orderMetadata.location,
-      department: selectedDaySchedule.orderMetadata.department,
-      skill: selectedDaySchedule.orderMetadata.primarySkill,
+      region: selectedDaySchedule?.orderMetadata?.region,
+      location: selectedDaySchedule?.orderMetadata?.location,
+      department: selectedDaySchedule?.orderMetadata?.department,
+      skill: selectedDaySchedule?.orderMetadata?.primarySkill,
     } as RemainingBooking;
 
     const { startTime: currentStartTime, endTime: currentEndTime } = scheduleForm.getRawValue();
