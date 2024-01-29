@@ -88,7 +88,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'TimeLimitforManagerReviewEmail',
   'Createreplacementorderswhenschedulesgetcancelled',
   'Leaverequestcomments',
-  'AutoEnableClearedToStart'
+  'AutoEnableClearedToStart',
+  'OnboardExtensionOrderafteraccepting'
 ];
 
 export const DisabledSettingsByDefault = [
