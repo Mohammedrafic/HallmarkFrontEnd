@@ -562,7 +562,11 @@ export const MENU_CONFIG: any = {
     134:{
       icon:"",
       route:'/analytics/opd-credential-summary'
-    }
+    },
+    136:{
+      icon:"",
+      route:'/analytics/clock-id'
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -1529,7 +1533,11 @@ export const MENU_CONFIG: any = {
     134:{
       icon:"",
       route:'/analytics/opd-credential-summary'
-    }
+    },
+    136:{
+      icon:"",
+      route:'/analytics/clock-id'
+    },
   },
 
   [BusinessUnitType.Agency]: {

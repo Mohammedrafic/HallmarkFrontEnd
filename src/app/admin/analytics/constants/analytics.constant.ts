@@ -43,6 +43,7 @@ export const analyticsConstants = {
     businessunitName: 'businessunitName',
     credentialType:"credentialType",
     duration:"duration",
+    clockid:"clockid",
   }
 }
 
@@ -364,11 +365,19 @@ export type Period = {
   id: number;
   name: string;
 };
+export type Clock = {
+  id: number;
+  name: string;
+};
 export type InvoiceStatus = {
   id: number;
   name: string;
 };
 
+export const clockList:{name:string;id:number}[]=[
+{name:"Missing",id:1},
+{name:"Exisiting",id:2},
+];
 export const searchByList: { name: string; id: number }[] = [
   { name: 'All', id: 0 },
   { name: 'By Candidate', id: 1 },

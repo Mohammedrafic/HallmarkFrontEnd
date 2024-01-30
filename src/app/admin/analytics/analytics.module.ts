@@ -88,6 +88,7 @@ import { UserVisibilityComponent } from '../../admin/analytics/user-visibility/u
 import { OPDCredentialsExpiryComponent } from './opd-credentials-expiry/opd-credentials-expiry.component';
 import { OpdMissingCredentialComponent } from './opd-missing-credential/opd-missing-credential.component';
 import { OpdCredentialSummaryComponent } from './opd-credential-summary/opd-credential-summary.component';
+import { CockIdComponent } from './cock-id/cock-id.component';
 
 
 @NgModule({
@@ -153,7 +154,8 @@ import { OpdCredentialSummaryComponent } from './opd-credential-summary/opd-cred
     UserVisibilityComponent,
     OPDCredentialsExpiryComponent,
     OpdMissingCredentialComponent,
-    OpdCredentialSummaryComponent],
+    OpdCredentialSummaryComponent,
+    CockIdComponent],
   exports: [
     CandidateListComponent
   ],
