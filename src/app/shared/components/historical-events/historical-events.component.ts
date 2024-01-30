@@ -34,7 +34,7 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
   @Input() organizationId: number;
   @Input() candidateId: number;
   @Input() isAgency: boolean;
-
+  @Input() activeSystem:number;
   @Select(OrderManagementContentState.candidateHistoricalData)
   historicalEventsOrg$: Observable<HistoricalEvent[]>;
 
