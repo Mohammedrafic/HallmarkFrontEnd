@@ -219,6 +219,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         valueGetter: (params: { data: { isEmailEnabled: boolean } }) => { return AlertEnum[Number(params.data.isEmailEnabled)] },
         suppressMovable: true,
         filter: false,
+        isHallmark : this.showTurnOffNotifications,
         sortable: false,
         menuTabs: []
       },
@@ -234,6 +235,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         valueGetter: (params: { data: { isSMSEnabled: boolean } }) => { return AlertEnum[Number(params.data.isSMSEnabled)] },
         suppressMovable: true,
         filter: false,
+        isHallmark : this.showTurnOffNotifications,
         sortable: false,
         menuTabs: []
       },
@@ -249,6 +251,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         valueGetter: (params: { data: { isOnScreenEnabled: boolean } }) => { return AlertEnum[Number(params.data.isOnScreenEnabled)] },
         suppressMovable: true,
         filter: false,
+        isHallmark : this.showTurnOffNotifications,
         sortable: false,
         menuTabs: []
       },
@@ -803,12 +806,13 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       if(user?.businessUnitType == BusinessUnitType.Hallmark){
         this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
         this.businessUnitControl.patchValue(this.filteredBusinessUnits[0].id);
+        this.columnDefs = this.columnDefsIRP;
       }
       if(user?.businessUnitType == BusinessUnitType.Organization){
         this.businessUnitControl.enable();
         this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency && x.id !== BusinessUnitType.Hallmark);
+        this.columnDefs = this.columnDefsVMS;
       }
-      this.columnDefs = this.columnDefsIRP;
     }
 
     if(this.activeSystem == OrderManagementIRPSystemId.VMS){
