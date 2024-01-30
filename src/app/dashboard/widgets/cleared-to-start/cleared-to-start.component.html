@@ -1,0 +1,48 @@
+<app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+  <ng-template #header>
+      <div class="cleared_to_start__title">
+        <h3 class="widget-header__title">Cleared to Start</h3>
+      </div>
+      <div class="cleared_to_start__tooltip" *ngIf="description.length>0">
+        <ejs-tooltip [content]="description" position='TopCenter'>
+          <span class="mytooltip">
+            <i-feather name="info" id="info"
+                       [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+          </span>
+        </ejs-tooltip>
+      </div>
+    </ng-template>
+  <ng-template #cleared_to_start>
+      <section>
+        <header>
+          <div class="col w-30"><span class="ml-20">WEEK</span></div>
+          <div class="col">
+            <div class="middle-col-header pos-center">
+              <div class="row flex-container">
+                <div class="range">TOTAL</div>
+                <div class="range">CLEARED TO START</div>
+                <div class="range">% CLEARED TO START</div>
+  
+              </div>
+            </div>
+          </div>
+        </header>
+        <div class="row" *ngFor="let data of chartData">
+          <div class="col" >
+            <div >
+              <span class="week" 
+             >{{data.dateRanges}}</span>
+            </div>
+          </div>
+          <div class="middle-col">
+            <div class="row flex-container">
+              <div class="totalclearto" (click)="navigateUrl($event,data,'total')">{{data.total}}</div>
+              <div class="totalclearto" (click)="navigateUrl($event,data,'cleared')">{{data.clearToStart}}</div>
+              <div class="percentage">{{data.clearToStartInPercentage}}</div>
+            </div>
+          </div>            
+        </div> 
+      </section>
+
+  </ng-template>
+</app-widget-wrapper>

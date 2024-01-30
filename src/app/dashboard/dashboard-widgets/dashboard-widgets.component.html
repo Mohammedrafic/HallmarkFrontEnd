@@ -147,7 +147,12 @@
                             [chartData]="widgetsData?.[widgetTypeEnum.AGENCY_TIMESHEET_SUMMARY]" [isLoading]="isLoading"
                             [description]="widgetDescriptionEnum.AGENCY_TIMESHEET_SUMMARY"
                             [isDarkTheme]="isDarkTheme"></app-agency-timesheet-summary>
-
+          <app-cleared-to-start *ngSwitchCase="widgetTypeEnum.CLEARED_TOSTART"
+                            [isLoading]="isLoading"
+                            [description]="widgetDescriptionEnum.CLEARED_TOSTART"
+                            [chartData]="widgetsData?.[widgetTypeEnum.CLEARED_TOSTART]"
+                            [isDarkTheme]="isDarkTheme" ></app-cleared-to-start>
+  
 
         </ng-template>
       </e-panel>
