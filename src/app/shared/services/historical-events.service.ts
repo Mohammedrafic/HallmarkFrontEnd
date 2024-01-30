@@ -12,12 +12,13 @@ export class HistoricalEventsService {
   public getEvents(
     orderId: number,
     organizationId?: number | null,
-    positionId?: number
+    positionId?: number,
+    isIrpFlag?:any,
   ): Observable<OrderHistoricalEvent[]> {
     if (organizationId) {
       const params = positionId ? 
-        new HttpParams().append('organizationId', organizationId).append('positionId', positionId) :
-        new HttpParams().append('organizationId', organizationId);
+        new HttpParams().append('organizationId', organizationId).append('positionId', positionId).append('irpFlag', isIrpFlag) :
+        new HttpParams().append('organizationId', organizationId).append('irpFlag', isIrpFlag);
       return this.http
         .get<OrderHistoricalEvent[]>(`/api/historicaldata/order/${orderId}`, { params: params })
         .pipe(catchError(() => of([])));
@@ -25,7 +26,7 @@ export class HistoricalEventsService {
       return this.http
         .get<OrderHistoricalEvent[]>(
           `/api/historicaldata/order/${orderId}`,
-          positionId ? { params: { positionId } } : {}
+          positionId ? { params: { positionId, isIrpFlag } } : { params: { isIrpFlag }}
         )
         .pipe(catchError(() => of([])));
     }

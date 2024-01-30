@@ -107,7 +107,7 @@ export class ClearOrders {
 
 export class GetAgencyHistoricalData {
   static readonly type = '[agency order management] Get Historical Data';
-  constructor(public organizationId: number, public candidateJobId: number) {}
+  constructor(public organizationId: number, public candidateJobId: number,public isIrpFlag:boolean) {}
 }
 
 export class ClearAgencyHistoricalData {

@@ -22,6 +22,7 @@ import {
 import { OrderCandidatesListPage } from '../../models/order-management.model';
 import { HistoricalEvent } from '../../models/historical-event.model';
 import { DestroyableDirective } from '../../directives/destroyable.directive';
+import { OrderManagementIRPSystemId } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-historical-events',
@@ -47,7 +48,7 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
   candidateListOrg$: Observable<OrderCandidatesListPage>;
 
   public historicalEvents$: Observable<HistoricalEvent[]>;
-
+  public historicalIrpFlag:boolean;
   constructor(private store: Store, private actions$: Actions) {
     super();
   }
@@ -57,13 +58,23 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
     this.subscribeToInitialObs();
   }
 
-  ngOnChanges() {
+  ngOnChanges() { 
+    this.IsIrpEnable();   
     if (this.organizationId && this.candidateJobId) {
-      this.dispatchHistoricalEvents(this.organizationId, this.candidateJobId);
+      this.dispatchHistoricalEvents(this.organizationId, this.candidateJobId,this.historicalIrpFlag);
     }
   }
-
-  private subscribeToInitialObs(): void {
+  private IsIrpEnable():void
+  {
+    let isIrpId = JSON.parse(localStorage.getItem('flagId') || '""') as number;;
+    this.historicalIrpFlag=false;
+    if(isIrpId==OrderManagementIRPSystemId.IRP)
+    {
+      this.historicalIrpFlag=true;
+    }
+  }
+  private subscribeToInitialObs(): void {  
+        this.IsIrpEnable();
     if (!this.candidateJobId) {
       merge(this.candidateListAg$, this.candidateListOrg$)
         .pipe(
@@ -72,7 +83,7 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
         )
         .subscribe((data: OrderCandidatesListPage) => {
           const [currentCandidate] = data.items.filter((item) => item.candidateId === this.candidateId);
-          this.dispatchHistoricalEvents(this.organizationId, currentCandidate.candidateJobId);
+          this.dispatchHistoricalEvents(this.organizationId, currentCandidate.candidateJobId,this.historicalIrpFlag);
         });
     }
 
@@ -91,15 +102,15 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        this.dispatchHistoricalEvents(this.organizationId, this.candidateJobId);
+        this.dispatchHistoricalEvents(this.organizationId, this.candidateJobId,this.historicalIrpFlag);
       });
   }
 
-  private dispatchHistoricalEvents(orgId: number, jobId: number): void {
+  private dispatchHistoricalEvents(orgId: number, jobId: number,isIrpFlag:boolean): void {
     if (this.isAgency) {
-      this.store.dispatch(new GetAgencyHistoricalData(orgId, jobId));
+      this.store.dispatch(new GetAgencyHistoricalData(orgId, jobId, isIrpFlag));
     } else {
-      this.store.dispatch(new GetHistoricalData(orgId, jobId));
+      this.store.dispatch(new GetHistoricalData(orgId, jobId, isIrpFlag));
     }
   }
 }
