@@ -291,6 +291,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   DeployedEmployeeConfigValue: boolean;
   deployedState: boolean;
   public allOrdersChildColumnsToExport:ExportColumn[] = allOrdersChildColumnsToExport;
+  public clearedtoStartWidget: boolean = false;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -1379,6 +1380,7 @@ public RedirecttoIRPOrder(order:Order)
 
   public onFilterClearAll(): void {
     this.ltaOrderFlag = false;
+    this.clearedtoStartWidget=false;
     this.store.dispatch(new PreservedFilters.ClearPageFilters(this.getPageName()));
     this.filterApplied = true;
     this.orderManagementService.selectedOrderAfterRedirect = null;
@@ -2270,6 +2272,10 @@ public RedirecttoIRPOrder(order:Order)
         this.filters.candidateStatuses = [];
         this.filters.reorderStatuses = [];
       }
+      if(this.clearedtoStartWidget)
+      {
+        this.filters.orderStatuses = [];
+      }
     }
   }
 
@@ -2705,7 +2711,31 @@ public RedirecttoIRPOrder(order:Order)
         (filters[filterKey] as number[]) = [item.value];
       }
     });
-
+    const clearedtostarttotal = this.globalWindow.localStorage.getItem('clearedtostarttotal');
+    const startend =  JSON.parse(this.globalWindow.localStorage.getItem('cleatedtostartdate') || '""');
+    var dates = startend.split('-');
+    var startDate = new Date(dates[0]);;
+    var endDate = new Date(dates[1]);
+   if(clearedtostarttotal)
+    {
+      filters.ActualStartDate=this.datePipe.transform(startDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');;
+      filters.ActualEndDate=this.datePipe.transform(endDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\''); 
+      filters.IsClearToStartDashboard=true
+      this.documentEle.defaultView?.localStorage.setItem('clearedtostarttotal', '');
+      this.documentEle.defaultView?.localStorage.setItem('cleatedtostartdate', '');
+      this.clearedtoStartWidget=true;
+    }
+    const clearedtostart= this.globalWindow.localStorage.getItem('clearedtostart');
+    if(clearedtostart)
+    {
+      filters.ActualStartDate=this.datePipe.transform(startDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');;
+      filters.ActualEndDate=this.datePipe.transform(endDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\''); 
+      filters.IsClearToStartDashboard=true 
+       filters.IsWidgetClearToStart=true
+      this.documentEle.defaultView?.localStorage.setItem('clearedtostart', '');
+      this.documentEle.defaultView?.localStorage.setItem('cleatedtostartdate', '');
+      this.clearedtoStartWidget=true;
+    }
     this.orderPositionStatus = null;
     this.isRedirectedFromDashboard = false;
 

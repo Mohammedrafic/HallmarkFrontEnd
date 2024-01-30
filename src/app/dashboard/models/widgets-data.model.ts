@@ -13,6 +13,7 @@ import { AvailableEmployeeModel } from './available-employee.model';
 import { PositionsCountByDayRangeDataset,OrdersPendingInCustomDataset } from './active-positions-dto.model';
 import { BillRateBySkillCategoryTypeAggregatedModel } from './bill-rate-by-skill-category-type-aggregated.model';
 import { AgencyTImesheetsummaryModel } from './agency-timesheet-summary.models';
+import { ClearedtoStartModel } from './clear-to-start.model';
 
 export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;
@@ -44,4 +45,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]:BillRateBySkillCategoryTypeAggregatedModel;
   [WidgetTypeEnum.MISSING_TIMESHEETS]: OrgDetailsInfoModel;
   [WidgetTypeEnum.AGENCY_TIMESHEET_SUMMARY]: AgencyTImesheetsummaryModel;
+  [WidgetTypeEnum.CLEARED_TOSTART] : ClearedtoStartModel[];
 }

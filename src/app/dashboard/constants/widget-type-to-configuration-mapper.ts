@@ -31,4 +31,5 @@ export const widgetTypeToConfigurationMapper: Record<WidgetTypeEnum, PanelModel>
   [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: { sizeX: 3, sizeY: 4, maxSizeY: 4, maxSizeX: 3, minSizeX: 3, minSizeY: 4.3},
   [WidgetTypeEnum.MISSING_TIMESHEETS]: { sizeX: 3, sizeY: 2, maxSizeX: 3, maxSizeY: 2, minSizeX: 3, minSizeY: 2 },
   [WidgetTypeEnum.AGENCY_TIMESHEET_SUMMARY]: { sizeX: 3, sizeY: 2, maxSizeX: 3, maxSizeY: 2, minSizeX: 3, minSizeY: 2 },
-};
+  [WidgetTypeEnum.CLEARED_TOSTART]: { sizeX: 5, sizeY: 3, maxSizeX: 5, maxSizeY: 3, minSizeX: 5, minSizeY: 3 },
+  };
