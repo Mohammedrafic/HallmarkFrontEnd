@@ -23,8 +23,9 @@ export class PaymentsAdapter {
 
       Object.keys(payments).forEach((invoiceFormatedId) => {
         const formValue = payments[invoiceFormatedId].value;
+        const formated_invoiceid = invoiceFormatedId.includes('~') ? invoiceFormatedId.split('~')[1] : invoiceFormatedId;
         const { agencySuffix, checkId, invoiceId } = invoiceData
-        .find((item) => item.invoiceNumber === invoiceFormatedId) as InvoicePaymentData;
+        .find((item) => item.invoiceNumber === formated_invoiceid) as InvoicePaymentData;
 
         const paymentId = payments[invoiceFormatedId].get('id')?.value;
 

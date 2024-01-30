@@ -50,9 +50,10 @@ export class TimesheetTableLinkComponent implements ICellRendererAngularComp {
           candidateId: this.cellValue.candidateId,
           orderType: null,
           prefix: this.params.data.orgPrefix,
+          isReorder: this.params.data.reorderDates !== null,
         });
         this.router.navigate(['agency/order-management'], {
-          state: { publicId: this.cellValue.orderPublicId, prefix: this.params.data.orgPrefix }
+          state: { publicId: this.cellValue.orderPublicId, prefix: this.params.data.orgPrefix },
         });
       }
     } else {
@@ -62,9 +63,10 @@ export class TimesheetTableLinkComponent implements ICellRendererAngularComp {
           candidateId: this.cellValue.candidateId,
           orderType: null,
           prefix: this.params.data.orgPrefix,
+          isReorder: this.params.data.reorderDates !== null,
         });
         this.router.navigate(['client/order-management'], {
-          state: { publicId: this.cellValue.orderPublicId, timesheetRedirect: true, prefix: this.cellValue.orgPrefix }
+          state: { publicId: this.cellValue.orderPublicId, timesheetRedirect: true, prefix: this.cellValue.orgPrefix },
         });
       }
     }

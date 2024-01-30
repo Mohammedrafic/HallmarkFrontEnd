@@ -3,6 +3,7 @@ import { OrganizationStructure } from '@shared/models/organization.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { RecordFields } from '../../enums';
 import {
+  AddRecorTimesheetReorder,
   AddRecordBillRate,
   Attachment,
   CandidateHoursAndMilesData, CandidateInfo, FilterColumns,
@@ -47,4 +48,5 @@ export interface TimesheetsModel {
   selectedOrganizationId: number;
   filterOptions: TimesheetsFilteringOptions | null;
   displayTimesheetHistoricalData: boolean;
+  timesheetReorders: AddRecorTimesheetReorder[];
 }

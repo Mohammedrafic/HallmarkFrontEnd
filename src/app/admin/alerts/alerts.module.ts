@@ -6,7 +6,7 @@ import { UserSubscriptionComponent } from './user-subscription/user-subscription
 import { AlertsComponent } from './alerts.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
 import { DropDownListModule,MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
-import {SwitchModule ,ButtonModule} from '@syncfusion/ej2-angular-buttons';
+import {SwitchModule ,ButtonModule, CheckBoxModule} from '@syncfusion/ej2-angular-buttons';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
 import {FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -28,6 +28,7 @@ import { SendGroupEmailComponent } from './group-email/send-group-email/send-gro
 import { GroupEmailTableComponent } from './group-email/group-email-table/group-email-table.component';
 import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { CustomHeaderComponent } from './custom-header/custom-header.component';
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     AlertsOnScreenTemplateFormComponent, 
     ToggleSwitchComponent, 
     GroupEmailComponent, 
-    SendGroupEmailComponent, GroupEmailTableComponent
+    SendGroupEmailComponent, GroupEmailTableComponent,
+    CustomHeaderComponent
   ],
   imports: [
     CommonModule,
@@ -65,6 +67,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     FontAwesomeModule,
     ButtonGroupModule,
     NgxsModule.forFeature([AlertsState]),
+    CheckBoxModule
   ]
 })
 export class AlertsModule { }

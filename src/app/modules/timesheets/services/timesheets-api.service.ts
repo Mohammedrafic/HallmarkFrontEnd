@@ -8,7 +8,7 @@ import { AgencyDataSourceItem, DataSourceItem, DropdownOption } from '@core/inte
 
 import {
   TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
-  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig, RawTimesheetRecordsDto, AddRecordBillRate,
+  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig, RawTimesheetRecordsDto, AddRecordBillRate, TimesheetReorder, AddRecorTimesheetReorder,
 } from '../interface';
 import { CostCenterAdapter, RecordsAdapter } from '../helpers';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
@@ -175,7 +175,25 @@ export class TimesheetsApiService {
     jobId: number,
     orgId: number,
     isAgency: boolean,
-    ): Observable<AddRecordBillRate[]> {
+    isReorder: boolean,
+    timesheetId: number,
+  ): Observable<AddRecordBillRate[]> {
+    if (isReorder) {
+      return this.billRatesApiService.getPDCandidateBillRates(orgId, timesheetId)
+      .pipe(
+        map((res) => res.map((item) => {
+          return {
+            text: item.billRateConfig.title,
+            value: item.billRateConfig.id,
+            efectiveDate: item.effectiveDate,
+            disableMealBreak: item.billRateConfig.disableMealBreak,
+            timeNotRequired: item.billRateConfig.doNotRequireTime,
+            disableTime: item.billRateConfig.disableTime,
+            candidateJobId: item.candidateJobId,
+          };
+        })),
+      );
+    }
     return this.billRatesApiService.getCandidateBillRates(jobId, orgId, isAgency)
     .pipe(
       map((res) => res.map((item) => {
@@ -189,6 +207,20 @@ export class TimesheetsApiService {
         };
       })),
     );
+  }
+
+  public getTimesheetReorders(organizationId: number, timesheetId: number): Observable<AddRecorTimesheetReorder[]> {
+    return this.http.get<TimesheetReorder[]>(`/api/timesheets/pdTimesheetReorders/${timesheetId}/${organizationId}`)
+      .pipe(
+        map((res) => res.map((item) => {
+          return {
+            text: item.reorderPublicName,
+            value: item.reorderCandidateJobId,
+            reorderDate: item.reorderDate,
+            candidateJobId: item.reorderCandidateJobId,
+          };
+        })),
+      );
   }
 
   public uploadMilesAttachments(

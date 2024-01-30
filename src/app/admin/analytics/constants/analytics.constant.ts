@@ -43,6 +43,7 @@ export const analyticsConstants = {
     businessunitName: 'businessunitName',
     credentialType:"credentialType",
     duration:"duration",
+    clockid:"clockid",
   }
 }
 
@@ -334,7 +335,17 @@ export const ageGroups: { name: string; id: number }[] = [
   {name:"Above 90",id:5}
 
 ];
-
+export const periodList:{name:string;id:number}[]=[
+  { id: 0, name: 'Custom' },
+  { id: 1, name: 'Last 30 days'},
+  { id: 2, name: 'Last 60 days'},
+  { id: 3, name: 'Last 90 days'},
+  { id: 4, name: 'MTD' },
+  { id: 5, name: 'Last Quarter' },
+  { id: 6, name: 'YTD' },
+  { id: 7, name: 'Last 6 Month' },
+  { id: 8, name: 'Last 12 Months' },
+]
 //export const YTDReportSearchBy: { name: string; id: number }[] = [
 //  { name: 'By Month', id: 1 },
 //  { name: 'By Location', id: 2 }
@@ -354,11 +365,19 @@ export type Period = {
   id: number;
   name: string;
 };
+export type Clock = {
+  id: number;
+  name: string;
+};
 export type InvoiceStatus = {
   id: number;
   name: string;
 };
 
+export const clockList:{name:string;id:number}[]=[
+{name:"Missing",id:1},
+{name:"Exisiting",id:2},
+];
 export const searchByList: { name: string; id: number }[] = [
   { name: 'All', id: 0 },
   { name: 'By Candidate', id: 1 },

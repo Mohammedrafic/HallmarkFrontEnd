@@ -7,7 +7,8 @@ import {
   Input,
   OnInit,
   Output,
-  ViewChild
+  SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
@@ -39,6 +40,7 @@ import { Query } from "@syncfusion/ej2-data";
 import { FilteringEventArgs } from "@syncfusion/ej2-dropdowns";
 import { SystemType } from '@shared/enums/system-type.enum';
 import { FieldNames, FiledNamesSettings } from '@shared/constants/base-dropdown-fields-settings';
+import { CandidateWorkCommitment } from '@client/candidates/candidate-work-commitment/models/candidate-work-commitment.model';
 
 @Component({
   selector: 'app-tiers-dialog',
@@ -50,12 +52,15 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Output() saveTier = new EventEmitter<TierDTO>();
-  @Input() workcommitments : any;
+  @Input() set workcommitments(commitments: CandidateWorkCommitment) {
+    this.commitments = commitments;
+    this.dialogConfig = TiersDialogConfig(this.regions, commitments)[this.dialogType];
+  }
   @Input() systemType: SystemType;
   @Input() set regionsStructure(regions: OrganizationRegion[]) {
     this.regions = regions;
-    this.dialogConfig = TiersDialogConfig(regions)[this.dialogType];
-  };
+    this.dialogConfig = TiersDialogConfig(this.regions, this.commitments)[this.dialogType];
+  }
   @Input() set selectedTier(tier: TierDetails) {
     if (tier) {
       this.selectedTierDetails = tier;
@@ -68,20 +73,19 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
         this.allLocationsChange({ checked: this.allRecords.locationIds });
         this.allDepartmentsChange({ checked: this.allRecords.departmentIds }, false);  
       }
-      this.createForm();
     }
-  };
+  }
 
   @Input() set isEditDialog(value: boolean) {
     this.setDialogTitle(value);
-      this.isEdit = value;  
-  };
+    this.isEdit = value;  
+  }
 
   @Input() public permission: boolean;
   @Input() public organizationId: number;
 
   public dialogConfig: TierDialogConfig;
-  public title: string = '';
+  public title = '';
   public regions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
   public tierForm: CustomFormGroup<TierDTO> | null;
@@ -94,6 +98,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   private selectedRegions: number[] = [];
   private selectedLocations: number[] = [];
   private selectedTierDetails: TierDetails;
+  private commitments: CandidateWorkCommitment;
 
   public allRecords: FiledNamesSettings = {
     'regionIds': false,
@@ -120,26 +125,24 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
 
   ngOnInit(): void {
     this.watchForShowDialog();
-    this.createForm();
-    this.watchForRegions();
-    this.watchForLocation();
     this.watchForCloseDialog();
-    this.watchForDepartments();
   }
 
-  public watchForSystemType() {
+  ngOnChanges(changes: SimpleChanges) : void {
+    if (changes['systemType']) {
+      this.systemTypeHandler();
+    }
+  }
+
+  public systemTypeHandler() {
     this.systemType === 0 ? this.dialogType = Tiers.tierSettings : this.dialogType = Tiers.tierSettingsIRP;
-    this.dialogConfig = TiersDialogConfig(this.regions, this.workcommitments)[this.dialogType];
+    this.dialogConfig = TiersDialogConfig(this.regions, this.commitments)[this.dialogType];
     this.createForm();
-    if(this.systemType === 0){
+    if (this.systemType === 0) {
       this.watchForRegions();
       this.watchForLocation();
       this.watchForDepartments();  
     }
-  }
-
-  ngOnChanges() : void {
-    this.watchForSystemType();
   }
 
   public allRegionsChange(event: { checked: boolean }): void {
@@ -178,7 +181,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     }
   }
 
-  public allDepartmentsChange(event: { checked: boolean }, emitEvent: boolean = true): void {
+  public allDepartmentsChange(event: { checked: boolean }, emitEvent = true): void {
     this.allRecords[FieldNames.departmentIds] = event.checked;
     const departmentsControl = this.tierForm?.controls['departmentIds'];
     if (this.allRecords[FieldNames.departmentIds]) {
@@ -209,7 +212,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
         : query;
         let departments: TierDataSource | undefined = this.dialogConfig.fields.find((configField: TiersInputConfig) => configField.field === 'departmentIds')!.dataSource;
     e.updateData(departments as [], query);
-  };
+  }
 
   public saveTiers(): void {
     if (this.tierForm?.valid) {
@@ -225,7 +228,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
+          okButtonClass: 'delete-button',
         }).pipe(
         filter(Boolean),
         takeUntil(this.destroy$)
@@ -243,31 +246,35 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   }
 
   private resetToggles(): void {
-    if(this.systemType === 0){
+    if (this.systemType === 0) {
       this.allRegionsChange({ checked: false });
       this.allLocationsChange({ checked: false });
       this.allDepartmentsChange({ checked: false });  
     }
   }
 
+  private watchForCloseDialog(): void {
+    this.actions$.pipe(
+      ofActionDispatched(ShowSideDialog),
+      filter(({ isDialogShown }) => !isDialogShown),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.isTierSettingsDialog || setDataSourceValue(this.dialogConfig.fields, 'organizationTierId', []);
+      this.resetToggles();
+      this.tierForm?.reset({}, {emitEvent: false});
+      this.tierForm?.patchValue({
+        skills: '1',
+      });
+      this.changeDetection.markForCheck();
+    });
+  }
+
   private hideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false));
-    this.isTierSettingsDialog || setDataSourceValue(this.dialogConfig.fields, 'organizationTierId', []);
-    this.resetToggles();
-    this.tierForm?.reset({}, {emitEvent: false});
-    this.tierForm?.patchValue({
-      skills: "1"
-    });
-    this.changeDetection.markForCheck();
   }
 
   private createForm(): void {
     this.tierForm = this.tierService.createTierForm(this.dialogType);
-    if(this.isEdit){
-      setTimeout(() => {
-        this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, this.selectedTierDetails, this.regions));
-      },100)
-    }
   }
 
   private watchForRegions(): void {
@@ -295,24 +302,13 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
         this.selectedLocations = value;
         const selectedLocation: OrganizationLocation[] = findSelectedItems(value, this.locations);
         const selectedDepartment: OrganizationDepartment[] = mapperSelectedItems(selectedLocation, 'departments');
-        setDataSourceValue(this.dialogConfig.fields, 'departmentIds', sortByField(selectedDepartment, 'name'))
+        setDataSourceValue(this.dialogConfig.fields, 'departmentIds', sortByField(selectedDepartment, 'name'));
         this.changeDetection.markForCheck();
-      })
+      });
   }
 
   private setDialogTitle(value: boolean): void {
     this.title = value ? this.dialogConfig.editTitle : this.dialogConfig.title;
-  }
-
-  private watchForCloseDialog(): void {
-    this.actions$.pipe(
-      ofActionDispatched(ShowSideDialog),
-      filter(({ isDialogShown }) => !isDialogShown),
-      takeUntil(this.destroy$)
-    ).subscribe(() => {
-      this.tierForm?.reset({}, {emitEvent: false});
-      this.resetToggles();
-    });
   }
 
   private watchForShowDialog(): void {
@@ -349,7 +345,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
 
         if (this.selectedTierDetails) {
           this.tierForm?.patchValue({
-            organizationTierId: this.selectedTierDetails.organizationTierId
+            organizationTierId: this.selectedTierDetails.organizationTierId,
           });
         }
 

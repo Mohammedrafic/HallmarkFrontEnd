@@ -63,6 +63,7 @@ import {
   ScheduleBook,
   ScheduleBookingErrors,
   ScheduledItem,
+  ScheduleFiltersData,
   ScheduleFilterStructure,
   ScheduleFormConfig,
   ScheduleItem,
@@ -106,6 +107,7 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   @Output() updateScheduleGrid: EventEmitter<void> = new EventEmitter<void>();
+  @Output() public updateScheduleFilter: EventEmitter<ScheduleFiltersData> = new EventEmitter<ScheduleFiltersData>();
 
   readonly targetElement: HTMLBodyElement = this.globalWindow.document.body as HTMLBodyElement;
   readonly FieldTypes = FieldType;
@@ -406,7 +408,11 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
         this.closeSideBar();
       }
 
-      this.updateScheduleGrid.emit();
+      // this.updateScheduleGrid.emit();
+      let filters = this.scheduleFiltersService.getScheduleFiltersData();
+      this.updateScheduleFilter.emit(
+        filters
+      );
       this.scheduleForm.markAsUntouched();
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
     });
@@ -663,7 +669,11 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
       catchError((error: HttpErrorResponse) => this.editScheduleService.handleError(error)),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
-      this.updateScheduleGrid.emit();
+      // this.updateScheduleGrid.emit();
+      let filters = this.scheduleFiltersService.getScheduleFiltersData();
+      this.updateScheduleFilter.emit(
+        filters
+      );
       this.scheduleForm.markAsUntouched();
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
     });
@@ -882,7 +892,11 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   }
 
   private handleSuccessAdding(): void {
-    this.updateScheduleGrid.emit();
+    let filters = this.scheduleFiltersService.getScheduleFiltersData();
+    this.updateScheduleFilter.emit(
+      filters
+    );
+   // this.updateScheduleGrid.emit();
     this.scheduleToBook = null;
     this.unavailabilityToSave = null;
     this.store.dispatch(new ShowToast(MessageTypes.Success, RECORDS_ADDED));
@@ -1090,9 +1104,9 @@ export class EditScheduleComponent extends Destroyable implements OnInit {
   private isPartialFloatingFieldsChanged(): boolean {
     const { regionId, locationId, departmentId, skillId } = this.scheduleForm.getRawValue();
 
-    return regionId !== this.selectedDaySchedule.orderMetadata.regionId
-      || locationId !== this.selectedDaySchedule.orderMetadata.locationId
-      || departmentId !== this.selectedDaySchedule.orderMetadata.departmentId
-      || skillId !== this.selectedDaySchedule.orderMetadata.primarySkillId;
+    return regionId !== this.selectedDaySchedule?.orderMetadata?.regionId
+      || locationId !== this.selectedDaySchedule?.orderMetadata?.locationId
+      || departmentId !== this.selectedDaySchedule?.orderMetadata?.departmentId
+      || skillId !== this.selectedDaySchedule?.orderMetadata?.primarySkillId;
   }
 }

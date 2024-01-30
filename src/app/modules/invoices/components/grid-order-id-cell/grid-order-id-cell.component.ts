@@ -50,6 +50,7 @@ export class GridOrderIdCellComponent extends GridCellRenderer {
         candidateId: candidateId,
         orderType: OrderType.ContractToPerm,
         prefix,
+        isReorder: this.params.data.isBasedOnPdTimesheet,
       });
     }
   }

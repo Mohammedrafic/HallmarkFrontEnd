@@ -35,4 +35,5 @@ export enum WidgetDescriptionEnum {
   BILL_RATE_BY_SKILL_CATEGORY = "Average Regular Bill Rate per Skill Category per Month",
   MISSING_TIMESHEETS = "Count of Missing Timesheet per Organization",
   AGENCY_TIMESHEET_SUMMARY="Count of Time Sheet Summary for Different Status",
+  CLEARED_TOSTART="Candidates in accepted and onboard statuses based on actual start date",
 }

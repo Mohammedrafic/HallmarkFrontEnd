@@ -20,12 +20,12 @@ import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { accrualReportTypesList, analyticsConstants } from '../constants/analytics.constant';
+import { Period, accrualReportTypesList, analyticsConstants ,periodList} from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
-import { uniqBy } from 'lodash';
+import { toNumber, uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import {
@@ -61,7 +61,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
     "organizationNameMSR": "",
     "reportPulledMessageMSR": "",
     "DateRangeMSR": "",
-    "UserIdMSR":""
+    "UserIdMSR": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/MissingCredentials/MissingCredentials.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/MissingCredentials/MissingCredentials.cat" };
@@ -75,6 +75,9 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegions: Region[] = [];
 
+  public periodList: Period[] = [];
+  public periodIsDefault: boolean = false;
+  periodFields: FieldSettingsModel = { text: 'name', value: 'name' };
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
@@ -156,7 +159,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
   private culture = 'en-US';
   private nullValue = "null";
   private joinString = ",";
-  
+
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
@@ -189,7 +192,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
         }
       });
       this.agencyOrganizationId = data;
-
+      this.loadperiod();
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
@@ -198,6 +201,10 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
     });
   }
 
+  private loadperiod(): void {
+    this.periodList = periodList;
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom"); 
+}
   private initForm(): void {
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
@@ -214,6 +221,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
         jobId: new FormControl(''),
         credentialName: new FormControl(null),
         IsOptionalRequred: new FormControl(false),
+        period: new FormControl(null),
       }
     );
   }
@@ -230,47 +238,55 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
         this.organizations = uniqBy(data, 'organizationId');
         this.filterColumns.businessIds.dataSource = this.organizations;
         this.defaultOrganizations = this.agencyOrganizationId;
-        this.missingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.missingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
         this.changeDetectorRef.detectChanges();
       }
     });
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.missingCredentialReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
-      if (typeof data === 'number' && data != this.previousOrgId) {
+      this.selectedOrganizations = [];
+      if (data && data.length > 0) {
         this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
-          let orgList = this.organizations?.filter((x) => data == x.organizationId);
-          this.selectedOrganizations = orgList;
+
           this.regionsList = [];
           let regionsList: Region[] = [];
           let locationsList: Location[] = [];
           let departmentsList: Department[] = [];
-          orgList.forEach((value) => {
-            regionsList.push(...value.regions);
-            locationsList = regionsList.map(obj => {
-              return obj.locations.filter(location => location.regionId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-            departmentsList = locationsList.map(obj => {
-              return obj.departments.filter(department => department.locationId === obj.id);
-            }).reduce((a, b) => a.concat(b), []);
-          });
-          this.regionsList = sortByField(regionsList, "name");
-          this.locationsList = sortByField(locationsList, 'name');
-          this.departmentsList = sortByField(departmentsList, 'name');
+          this.selectedOrganizations = data;
+          if (data.length == 1) {
+            let orgList = this.organizations?.filter((x) => data[0] == x.organizationId);
+            orgList.forEach((value) => {
+              regionsList.push(...value.regions);
+              locationsList = regionsList.map(obj => {
+                return obj.locations.filter(location => location.regionId === obj.id);
+              }).reduce((a, b) => a.concat(b), []);
+              departmentsList = locationsList.map(obj => {
+                return obj.departments.filter(department => department.locationId === obj.id);
+              }).reduce((a, b) => a.concat(b), []);
+            });
+          }
+          this.regionsList = regionsList.length > 0 ? sortByField(regionsList, "name") : [];
+          this.locationsList = locationsList.length > 0 ? sortByField(locationsList, 'name') : [];
+          this.departmentsList = departmentsList.length > 0 ? sortByField(departmentsList, 'name') : [];
+
 
           this.masterRegionsList = this.regionsList;
           this.masterLocationsList = this.locationsList;
           this.masterDepartmentsList = this.departmentsList;
-
-          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
-          }
-          else {
-            this.isResetFilter = true;
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          if (this.bussinessControl?.value.length == "1") {
+            if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+              this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+            }
+            else {
+              this.isResetFilter = true;
+            }
           }
           let businessIdData = [];
-          businessIdData.push(data);
+          businessIdData = data;
           let filter: CommonReportFilter = {
             businessUnitIds: businessIdData
           };
@@ -351,7 +367,7 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
       }
     }
     let { candidateName, candidateStatuses, departmentIds, jobId, locationIds,
-      regionIds, startDate, endDate, credentialName, IsOptionalRequred } = this.missingCredentialReportForm.getRawValue();
+      regionIds, startDate, endDate, credentialName, IsOptionalRequred, period } = this.missingCredentialReportForm.getRawValue();
     if (!this.missingCredentialReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
     }
@@ -368,10 +384,10 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
 
     let currentDate = new Date(Date.now());
-
     this.paramsData =
     {
-      "OrganizationParamMSR": this.selectedOrganizations?.length == 0 ? this.nullValue : this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
+      "OrganizationParamMSR": this.selectedOrganizations?.length == 0 ? "null" :
+        this.selectedOrganizations?.join(","),
       "StartDateParamMSR": formatDate(startDate, this.dateFormat, this.culture),
       "EndDateParamMSR": endDate == null ? "01/01/0001" : formatDate(endDate, this.dateFormat, this.culture),
       "RegionParamMSR": regionIds.length == 0 ? "null" : regionIds,
@@ -389,12 +405,14 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
       "HostName": this.baseUrl,
       "TodayMSR": formatDate(new Date(), this.dateFormat, this.culture),
       "ISOptionalRequired": IsOptionalRequred,
-      "organizationNameMSR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "organizationNameMSR": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
       //"reportPulledMessageMSR": "Report Print date: " + String(currentDate.getMonth() + 1).padStart(2, '0') + "/" + currentDate.getDate() + "/" + currentDate.getFullYear().toString(),
       "reportPulledMessageMSR": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
 
       "DateRangeMSR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
-      "UserIdMSR": this.user?.id
+      "UserIdMSR": this.user?.id,
+       "PeriodMSR": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id)),
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -464,6 +482,71 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
   private GetFixedCandidateStatusTypes(): any {
     return [4, 5];
   }
+  selectPeriod(event: any) {
+    let { startDate, period } = this.missingCredentialReportForm.getRawValue();
+    const value = event.itemData.id;
+    this.periodIsDefault = this.missingCredentialReportForm.controls['period'].value == "Custom" ? true : false;
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.startDate)?.setValue("");
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.endDate)?.setValue("");
+    const PeriodCheck = value;
+    let startDateControl = new Date(Date.now());
+    let endDateControl = new Date(Date.now());
+    let lastDayOfLastMonth = new Date();
+    lastDayOfLastMonth.setMonth(lastDayOfLastMonth.getMonth(), 0);
+
+    switch (PeriodCheck) {
+      case 0:
+        startDateControl.setDate(startDateControl.getDate() - 14);
+        endDateControl.setDate(endDateControl.getDate() + 28);
+        break;
+      case 1:
+        startDateControl.setDate(startDateControl.getDate() - 31);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 2:
+        startDateControl.setDate(startDateControl.getDate() - 61);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 3:
+        startDateControl.setDate(startDateControl.getDate() - 91);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 4:
+        startDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        break;
+      case 5:
+        const today = new Date(Date.now());
+        const quarter = Math.floor((today.getMonth() / 3));
+        startDateControl = new Date(today.getFullYear(), quarter * 3 - 3, 1);
+        endDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth() + 3, 0);
+        break;
+      case 6:
+        const startDate = new Date(startDateControl.getFullYear(), 0, 1)
+        startDate.setDate(startDate.getDate());
+        startDateControl = startDate;
+        break;
+      case 7:
+        const firstDay = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(firstDay, -6);
+        startDateControl.setDate(startDateControl.getDate());
+        endDateControl = new Date((lastDayOfLastMonth));
+        break;
+      case 8:
+        const dayFirst = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(dayFirst, -12);
+        startDateControl.setDate(startDateControl.getDate());
+        endDateControl = new Date((lastDayOfLastMonth));
+        break;
+    }
+
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.startDate)?.setValue(startDateControl);
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.endDate)?.setValue(new Date((endDateControl)));
+  }
+  private addMonths(date: any, months: any) {
+    date.setMonth(date.getMonth() + months);
+    return date;
+  }
+
   private SetReportData() {
     const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
     if (logiReportData != null && logiReportData.length == 0) {
@@ -487,6 +570,8 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
@@ -496,11 +581,12 @@ export class MissingCredentialsComponent implements OnInit, OnDestroy {
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.OrderTypes)?.setValue([]);
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.JobStatuses)?.setValue([]);
-    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
-    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.startDate)?.setValue(startDate);
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.endDate)?.setValue(new Date(Date.now()));
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.CredentialName)?.setValue([]);
     this.missingCredentialReportForm.get(analyticsConstants.formControlNames.IsOptionalRequred)?.setValue(false);
+    this.missingCredentialReportForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
     this.filteredItems = [];
     this.locations = [];
     this.departments = [];

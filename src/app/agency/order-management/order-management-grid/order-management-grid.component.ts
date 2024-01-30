@@ -434,18 +434,26 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private openMyAgencyTabWithCandidate(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+    let index = 0;
     if (selectedOrderAfterRedirect && this.ordersPage) {
       const orderMyAgency = this.ordersPage.items.find(
-        (order: AgencyOrderManagement) => order.publicId === selectedOrderAfterRedirect.orderId
+        (order: AgencyOrderManagement, i: number) => {
+          index = i;
+          return order.publicId === selectedOrderAfterRedirect.orderId;
+        }
       );
       if (orderMyAgency) {
         const candidate = orderMyAgency.children.find(
           (candidate: OrderManagementChild) => candidate.candidateId === selectedOrderAfterRedirect.candidateId
         );
-
-        this.onOpenCandidateDialog(candidate as OrderManagementChild, orderMyAgency);
+        if (selectedOrderAfterRedirect.isReorder) {
+          this.onRowClick({ data: orderMyAgency });
+          this.gridWithChildRow.selectRow(index);
+        } else {
+          this.onOpenCandidateDialog(candidate as OrderManagementChild, orderMyAgency);
+          this.gridWithChildRow.detailRowModule.expand(0);
+        }
         this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
-        this.gridWithChildRow.detailRowModule.expand(0);
       }
     }
     this.cd.detectChanges();

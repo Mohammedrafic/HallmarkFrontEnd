@@ -20,6 +20,7 @@ AgencyInvoicesGridTab.Manual];
 
 export const InvoiceExportCols : ExportColumn[] = [
   { text:'Invoice ID', column: 'invoiceId' },
+  { text:'Issue Date', column:'IssueDate'},
   { text:'Location Name', column: 'locationName' },
   { text:'Week', column: 'week' },
   { text:'Time In', column: 'timeIn' },
@@ -102,6 +103,7 @@ export const PendingInvoiceExportCols : ExportColumn[] = [
 
 export const AgencyInvoiceExportCols : ExportColumn[] = [
   { text:'Invoice ID', column: 'invoiceId' },
+  { text:'Issue Date', column:'IssueDate'},
   { text:'Location Name', column: 'locationName' },
   { text:'Week', column: 'week' },
   { text:'Time In', column: 'timeIn' },

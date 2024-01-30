@@ -172,6 +172,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public activeSystems: OrderManagementIRPSystemId | null;
   public CanOrganizationViewOrdersIRP: boolean;
   public CanOrganizationEditOrdersIRP: boolean;
+  public allowDeploycredentials: boolean;
   public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
   public commentContainerId: number;
   irpdata: any;
@@ -985,10 +986,11 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCreateOrder, CanOrganizationEditOrdersIRP, CanOrganizationViewOrdersIRP}) => {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, CanOrganizationEditOrdersIRP, CanOrganizationViewOrdersIRP,AllowDeploycredentials}) => {
       this.canCreateOrder = canCreateOrder;
       this.CanOrganizationViewOrdersIRP = CanOrganizationViewOrdersIRP;
       this.CanOrganizationEditOrdersIRP = CanOrganizationEditOrdersIRP;
+      this.allowDeploycredentials = AllowDeploycredentials;
     });
   }
 

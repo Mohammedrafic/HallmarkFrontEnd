@@ -122,8 +122,8 @@ export const reOrdersChildColumnToExport: ExportColumn[] = [
 
 export const allOrdersChildColumnsToExport: ExportColumn[] = [
   { text: 'Position ID', column: 'PositionID' },
-  { text: 'Candidate Name', column: 'CandidateName' },
   { text: 'Position Status', column: 'PositionStatus' },
+  { text: 'Candidate Name', column: 'CandidateName' },
   { text: 'Candidate Status', column: 'CandidateStatus' },
   { text: 'Candidate Bill Rate', column: 'CandidateBillRate' },
   { text: 'Submission %', column: 'Submission' },

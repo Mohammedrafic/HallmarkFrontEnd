@@ -125,6 +125,7 @@ export class OrderManagementIrpRowPositionComponent extends AbstractPermission i
       candidateId: data.candidateProfileId as number,
       orderType: this.params.data.orderType,
       prefix: data.organizationPrefix,
+      isReorder: this.params.data.reorderDates !== null,
     });
   }
 

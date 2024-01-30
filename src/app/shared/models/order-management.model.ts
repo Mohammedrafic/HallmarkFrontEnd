@@ -801,6 +801,10 @@ export class OrderFilter {
   ltaOrder? : boolean | null;
   orderDistributionType? : number | null;
   showDeletedOrders?: boolean | null;
+  ActualStartDate?:string | null;
+  ActualEndDate?:string | null;
+  IsClearToStartDashboard?:boolean | null;
+  IsWidgetClearToStart?:boolean | null;
 }
 
 export class SortModel {

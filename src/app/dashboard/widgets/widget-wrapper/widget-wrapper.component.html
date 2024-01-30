@@ -64,5 +64,8 @@
     <div *ngIf="bill_rate_by_skill_category" class="app-widget-wrapper__line-chart">
       <ng-container [ngTemplateOutlet]="bill_rate_by_skill_category"></ng-container>
     </div>
+    <div *ngIf="cleared_to_start" class="app-widget-wrapper__cleared_to_start">
+      <ng-container [ngTemplateOutlet]="cleared_to_start"></ng-container>
+    </div>
   </div> 
 </ng-template>

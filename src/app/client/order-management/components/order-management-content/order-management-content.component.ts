@@ -292,6 +292,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   DeployedEmployeeConfigValue: boolean;
   deployedState: boolean;
   public allOrdersChildColumnsToExport:ExportColumn[] = allOrdersChildColumnsToExport;
+  public clearedtoStartWidget: boolean = false;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -734,6 +735,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Open']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Closed']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order public comments']].trim().toLowerCase()
+       ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Candidate Status Update: Cleared to Start']].trim().toLowerCase()
       ){
         this.isOrderDetailsTab=true;
       }
@@ -1384,6 +1386,7 @@ public RedirecttoIRPOrder(order:Order)
 
   public onFilterClearAll(): void {
     this.ltaOrderFlag = false;
+    this.clearedtoStartWidget=false;
     this.store.dispatch(new PreservedFilters.ClearPageFilters(this.getPageName()));
     this.filterApplied = true;
     this.orderManagementService.selectedOrderAfterRedirect = null;
@@ -1476,16 +1479,24 @@ public RedirecttoIRPOrder(order:Order)
 
   private openMyAllTabWithCandidate(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementService;
+    let index = 0;
     if (selectedOrderAfterRedirect && this.ordersPage?.items) {
       const orderAllOrders = this.ordersPage.items.find(
-        (order: OrderManagement) => order.publicId === selectedOrderAfterRedirect.orderId
+        (order: OrderManagement, i: number) => {
+          index = i;
+          return order.publicId === selectedOrderAfterRedirect.orderId;
+        }
       );
       if (orderAllOrders) {
         const candidate = orderAllOrders.children.find(
           (candidate: OrderManagementChild) => candidate.candidateId === selectedOrderAfterRedirect.candidateId
         );
-        this.gridWithChildRow.detailRowModule.expand(0);
-        this.onOpenCandidateDialog(candidate as OrderManagementChild, orderAllOrders);
+        if (selectedOrderAfterRedirect.isReorder) {
+          this.gridWithChildRow.selectRow(index);
+        } else {
+          this.gridWithChildRow.detailRowModule.expand(0);
+          this.onOpenCandidateDialog(candidate as OrderManagementChild, orderAllOrders);
+        }
         this.orderManagementService.selectedOrderAfterRedirect = null;
       }
     }
@@ -2267,6 +2278,10 @@ public RedirecttoIRPOrder(order:Order)
         this.filters.candidateStatuses = [];
         this.filters.reorderStatuses = [];
       }
+      if(this.clearedtoStartWidget)
+      {
+        this.filters.orderStatuses = [];
+      }
     }
   }
 
@@ -2702,7 +2717,31 @@ public RedirecttoIRPOrder(order:Order)
         (filters[filterKey] as number[]) = [item.value];
       }
     });
-
+    const clearedtostarttotal = this.globalWindow.localStorage.getItem('clearedtostarttotal');
+    const startend =  JSON.parse(this.globalWindow.localStorage.getItem('cleatedtostartdate') || '""');
+    var dates = startend.split('-');
+    var startDate = new Date(dates[0]);;
+    var endDate = new Date(dates[1]);
+   if(clearedtostarttotal)
+    {
+      filters.ActualStartDate=this.datePipe.transform(startDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');;
+      filters.ActualEndDate=this.datePipe.transform(endDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\''); 
+      filters.IsClearToStartDashboard=true
+      this.documentEle.defaultView?.localStorage.setItem('clearedtostarttotal', '');
+      this.documentEle.defaultView?.localStorage.setItem('cleatedtostartdate', '');
+      this.clearedtoStartWidget=true;
+    }
+    const clearedtostart= this.globalWindow.localStorage.getItem('clearedtostart');
+    if(clearedtostart)
+    {
+      filters.ActualStartDate=this.datePipe.transform(startDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');;
+      filters.ActualEndDate=this.datePipe.transform(endDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\''); 
+      filters.IsClearToStartDashboard=true 
+       filters.IsWidgetClearToStart=true
+      this.documentEle.defaultView?.localStorage.setItem('clearedtostart', '');
+      this.documentEle.defaultView?.localStorage.setItem('cleatedtostartdate', '');
+      this.clearedtoStartWidget=true;
+    }
     this.orderPositionStatus = null;
     this.isRedirectedFromDashboard = false;
 
