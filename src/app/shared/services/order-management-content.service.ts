@@ -489,7 +489,13 @@ export class OrderManagementContentService {
    * Get the historical data for candidate
    * @return Array of historical events
    */
-  public getHistoricalData(organizationId: number, jobId: number): Observable<HistoricalEvent[]> {
+  public getHistoricalData(organizationId: number, jobId: number,isIrpFlag:boolean): Observable<HistoricalEvent[]> {
+   if(isIrpFlag)
+   {
+    return this.http.get<HistoricalEvent[]>(
+      `/api/AppliedCandidates/IrpHistoricalData?OrganizationId=${organizationId}&CandidateJobId=${jobId}`
+    );
+   }
     return this.http.get<HistoricalEvent[]>(
       `/api/AppliedCandidates/historicalData?OrganizationId=${organizationId}&CandidateJobId=${jobId}`
     );

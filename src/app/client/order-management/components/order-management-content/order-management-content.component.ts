@@ -1894,6 +1894,7 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   changeSystem(selectedBtn: ButtonModel) {
+    localStorage.setItem('flagId', JSON.stringify(selectedBtn.id));
     this.activeSystem = selectedBtn.id;
     this.closeModalsBeforeSwitchSystem();
     this.orderManagementService.saveSelectedOrderManagementSystem(this.activeSystem);

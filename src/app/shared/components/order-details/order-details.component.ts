@@ -50,7 +50,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
   private eventsHandler: Subject<void> = new Subject();
   public activeSystems: OrderManagementIRPSystemId | null;
-
+  public isIrpFlag:boolean;
     constructor(
     private store: Store,
     private cdr: ChangeDetectorRef,
@@ -123,9 +123,15 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   }
 
   private getHistoricalEvents(): void {
+    let flagId = JSON.parse(localStorage.getItem('flagId') || '""') as number;;
+    this.isIrpFlag =false;
+    if(this.activeSystem==OrderManagementIRPSystemId.IRP||flagId==OrderManagementIRPSystemId.IRP)
+    {
+      this.isIrpFlag =true;
+    }
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const organizationId = isAgencyArea ? this.order.organizationId : null;
-    this.historicalEventsService.getEvents(this.order.id, organizationId, this.jobId).pipe(
+    this.historicalEventsService.getEvents(this.order.id, organizationId, this.jobId, this.isIrpFlag).pipe(
       takeUntil(this.unsubscribe$)
     ).subscribe(data => {
       this.events = data;
