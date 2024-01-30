@@ -56,13 +56,18 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     "BearerParamJDSR": "",
     "BusinessUnitIdParamJDSR": "",
     "HostName": "",
+    OrganizationNameJDSR: '',
+    reportPulledMessageJDSR: '',
+    DateRangeJDSR: ''
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialSummary/CredentialSummary.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialSummary/Credential.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialSummary/CredentialSummary.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialSummary/CredentialSummary.cat" };
   public title: string = "Credential Summary";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
   public allOption: string = "All";
+  private culture = 'en-US';
+
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -568,6 +573,9 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     regionIds = regionIds.length > 0 ? regionIds.join(",") : "null";
     locationIds = locationIds.length > 0 ? locationIds.join(",") :  "null";
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : "null";
+    let currentDate = new Date(Date.now());
+
+
     this.paramsData =
     {
       //"OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
@@ -588,6 +596,10 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       "BearerParamJDSR": auth,
       "BusinessUnitIdParamJDSR": businessIds,
       "HostName": this.baseUrl,
+      "OrganizationNameJDSR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      "reportPulledMessageJDSR": ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      "DateRangeJDSR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
