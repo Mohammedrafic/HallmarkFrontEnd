@@ -355,6 +355,10 @@ class TimesheetsApiStubService {
   getOrganizationsStructure(): Observable<OrganizationStructure> {
     return of({} as OrganizationStructure);
   }
+
+  getTimesheetReorders(): Observable<[]> {
+    return of([]);
+  }
 }
 
 class ConfirmServiceStub {

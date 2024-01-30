@@ -44,7 +44,9 @@ export class GetNotificationSubscription {
   static readonly type = '[security] Get Notification Subscription';
   constructor(
     public businessUnitType: BusinessUnitType,
-    public userId: string
+    public userId: string,
+    public AlertChannel? : string,
+    public Enabled? : boolean
   ) {}
 }
 

@@ -37,6 +37,8 @@ export type UsersPage = PageOfCollections<User>;
 export type turnOffNotification = {
   userId: string;
   businessUnitType: number;
+  AlertChannel : string; 
+  checkBoxEnabled : boolean;
 }
 
 export type RolesPerUser = {

@@ -31,6 +31,7 @@ import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { formatDate } from '@angular/common';
 import { Validators } from '@angular/forms';
+import { RenderDayCellEventArgs } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
   selector: 'app-add-timesheet',
@@ -111,6 +112,20 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
       this.form?.markAllAsTouched();
       this.form?.updateValueAndValidity();
       this.cd.detectChanges();
+    }
+  }
+
+  public disableUnusedDates(event: RenderDayCellEventArgs): void {
+    if (this.isReorder && !event.isOutOfRange && event.date) {
+      const reordersDates = this.store.snapshot().timesheets['timesheetReorders']
+        ?.map((reorder: TimesheetReorder) => 
+          formatDate(
+            new Date(new Date(reorder.reorderDate).toLocaleString('en-US', { timeZone: 'UTC' })), 'MM/dd/yyyy', 'en-US')
+          );
+
+      if (!reordersDates.includes(formatDate(event.date, 'MM/dd/yyyy', 'en-US'))) {
+        event.isDisabled = true;
+      }
     }
   }
 
@@ -301,7 +316,9 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
   private checkReorderVisibility(isReorder: boolean): void {
     const reorderField = this.dialogConfig.timesheets.fields
         .find((field) => field.field === Reorder) as DialogConfigField;
-    reorderField.visible = reorderField.required = isReorder;
+    const reorderFieldMiles = this.dialogConfig.miles.fields
+        .find((field) => field.field === Reorder) as DialogConfigField;
+    reorderField.visible = reorderField.required = reorderFieldMiles.required = reorderFieldMiles.visible = isReorder;
     if (!isReorder) {
       this.form?.get('reorderCandidateJobId')?.removeValidators(Validators.required);
     }
@@ -310,7 +327,8 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimesheetForm> imp
   private setReordersRange(isReorder: boolean): void {
     if (isReorder) {
       const reordersDates = this.store.snapshot().timesheets['timesheetReorders']
-        ?.map((reorder: TimesheetReorder) => new Date(reorder.reorderDate));
+        ?.map((reorder: TimesheetReorder) => 
+          new Date(new Date(reorder.reorderDate).toLocaleString('en-US', { timeZone: 'UTC' })));
       
       this.reorderMaxDate = formatDate(Math.max(...reordersDates), 'MM/dd/yyyy', 'en-US');
       this.reorderMinDate = formatDate(Math.min(...reordersDates), 'MM/dd/yyyy', 'en-US');

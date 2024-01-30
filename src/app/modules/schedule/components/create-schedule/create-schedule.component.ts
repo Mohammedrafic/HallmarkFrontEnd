@@ -3,12 +3,14 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  EventEmitter,
   Inject,
   Input,
   NgZone,
   OnChanges,
   OnDestroy,
   OnInit,
+  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -66,6 +68,7 @@ import {
   ScheduleBookingErrors,
   ScheduleCandidate,
   ScheduleDay,
+  ScheduleFiltersData,
   ScheduleFormFieldConfig,
 } from '../../interface';
 import { ScheduleItemsComponent } from '../schedule-items/schedule-items.component';
@@ -113,6 +116,8 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       this.createScheduleService.scheduleData = page.items;
     }
   }
+  
+  @Output() public updateScheduleFilter: EventEmitter<ScheduleFiltersData> = new EventEmitter<ScheduleFiltersData>();
 
   readonly targetElement: HTMLBodyElement = this.globalWindow.document.body as HTMLBodyElement;
   readonly FieldTypes = FieldType;
@@ -222,7 +227,11 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
       catchError((error: HttpErrorResponse) => this.createScheduleService.handleError(error)),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
-      this.createScheduleService.closeSideBarEvent.next(false);
+      // this.createScheduleService.closeSideBarEvent.next(false);
+      let filters = this.scheduleFiltersService.getScheduleFiltersData();
+      this.updateScheduleFilter.emit(
+        filters
+      );
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
     });
   }
@@ -561,7 +570,11 @@ export class CreateScheduleComponent extends Destroyable implements OnInit, OnCh
 
   private handleSuccessSaveDate(message: string): void {
     this.createScheduleService.resetScheduleControls(this.scheduleForm, ScheduleControlsToReset);
-    this.createScheduleService.closeSideBarEvent.next(false);
+   // this.createScheduleService.closeSideBarEvent.next(false);
+    let filters = this.scheduleFiltersService.getScheduleFiltersData();
+    this.updateScheduleFilter.emit(
+      filters
+    );
     this.scheduleForm.markAsUntouched();
     this.store.dispatch(new ShowToast(MessageTypes.Success, message));
   }

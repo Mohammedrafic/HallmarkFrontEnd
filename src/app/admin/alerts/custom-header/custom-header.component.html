@@ -1,0 +1,13 @@
+<section class="container">
+    <form [formGroup]="CustomHeaderForm" class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <ejs-checkbox 
+            label={{params.displayName}}
+            formControlName="checkedState"
+            (change)="checkboxStateChanged($event, params.displayName)"
+          ></ejs-checkbox>
+        </div>
+      </div>
+    </form>
+  </section>
