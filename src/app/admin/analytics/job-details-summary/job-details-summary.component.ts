@@ -64,7 +64,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialSummary/CredentialSummary.cat" };
   public title: string = "Credential Summary";
   public message: string = "";
-  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
+  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   private culture = 'en-US';
 
