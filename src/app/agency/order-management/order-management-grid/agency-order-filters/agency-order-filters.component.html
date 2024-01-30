@@ -339,14 +339,23 @@
       </div>
     </div>
   </div>
-  <div>
+  <ng-container *ngIf="(isEnableClearedToStart$ | async) as isEnableClearedToStart">
+  <div [ngClass]="isEnableClearedToStart ? 'row' : ''">
     <div *ngIf="activeTab !== AgencyOrderManagementTabs.PermPlacement && activeTab !== AgencyOrderManagementTabs.PerDiem" class="input-container">
       <label for="numberOfPositions"># of Positions</label>
       <div class="input-group">
         <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />
       </div>
     </div>
+    <div class="input-container" *ngIf="isEnableClearedToStart">
+      <label>Cleared to Start</label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist  formControlName="clearedToStart" [fields]="optionFields" [dataSource]="clearedToStartList">
+        </ejs-dropdownlist>
+      </div>
+    </div>
   </div>
+</ng-container>
   <div class="row" *ngIf="activeTab !== AgencyOrderManagementTabs.PerDiem">
     <div class="input-container calendar">
       <label for="jobStartDate">{{ activeTab !== AgencyOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date' }}</label>

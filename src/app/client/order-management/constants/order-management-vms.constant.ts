@@ -49,6 +49,10 @@ export const AllCandidateStatuses = [
   CandidatesStatusText['Offered Bill Rate'],
 ];
 
+export const filterClearedToStartList: { text: string; value: any }[] = [
+  { text: 'Cleared to Start - Yes', value: 'yes' },
+  { text: 'Cleared to Start - No', value: 'no' }
+];
 
 export const filterOrderLockList: { text: string; value: any }[] = [
   { text: 'All', value: 'all' },
@@ -207,6 +211,13 @@ export const initOrderManagementFilterColumns = () => ({
     type: ControlTypes.Dropdown,
     valueType: ValueType.Id,
     dataSource: filterOrderLockList,
+    valueField: 'name',
+    valueId: 'id',
+  },
+  clearedToStart: {
+    type: ControlTypes.Dropdown,
+    valueType: ValueType.Id,
+    dataSource: filterClearedToStartList,
     valueField: 'name',
     valueId: 'id',
   },

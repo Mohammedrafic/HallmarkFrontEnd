@@ -129,6 +129,7 @@ import {
   OrderManagementIRPTabsIndex,
   OrganizationOrderManagementTabs,
   orderLockList,
+  clearedToStartList,
   orderDistributionList,
 } from '@shared/enums/order-management-tabs.enum';
 import { FilterIrpOrderTypes, OrderType, OrderTypeOptions, VmsOrderTypeTooltipMessage } from '@shared/enums/order-type';
@@ -510,6 +511,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
   public orderLockList = orderLockList;
+  public clearedToStartList = clearedToStartList
   public orderDistributionList = orderDistributionList;
   private ltaOrderFlag: boolean|null = false;
   public reorderFilledStatus:boolean = false
@@ -1157,6 +1159,9 @@ public RedirecttoIRPOrder(order:Order)
         if(this.filters.orderLocked){
           filtersAllOrders.orderLocked = filtersAllOrders.orderLocked == 'false' ? false : filtersAllOrders.orderLocked == 'true' ? true : null
         }
+        if(this.filters.clearedToStart){
+          filtersAllOrders.clearedToStart = filtersAllOrders.clearedToStart == 'no' ? false : filtersAllOrders.clearedToStart == 'yes' ? true : null
+        }
         cleared ? this.store.dispatch([new GetOrders(filtersAllOrders)])
           : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
@@ -1283,6 +1288,7 @@ public RedirecttoIRPOrder(order:Order)
       reOrderDate: this.filters.reOrderDate || null,
       shift:this.filters.shift || null,
       orderLocked:this.filters.orderLocked || null,
+      clearedToStart:this.filters.clearedToStart || null,
       orderDistributionType:this.filters.orderDistributionType || null,
       showDeletedOrders: this.filters.showDeletedOrders || null
     });
@@ -3286,7 +3292,7 @@ public RedirecttoIRPOrder(order:Order)
       : GetVMSFilterFormConfig(this.activeTab);
 
     this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
-
+    this.filters.clearedToStart = this.isEnableClearedToStart ? this.filters.clearedToStart == false ? "no" : this.filters.clearedToStart == true ? 'yes' : null : null;
     if (this.activeTab === OrganizationOrderManagementTabs.Incomplete && this.filters) {
       this.filters  = this.checkFiltersForIncompleteTab(this.filters);
     }

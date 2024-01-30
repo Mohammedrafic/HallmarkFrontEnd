@@ -44,6 +44,10 @@ export const orderLockList: { name: string; id: any }[] = [
   { name: 'Locked', id: 'true' },
   { name: 'Unlocked', id: 'false' }
 ];
+export const clearedToStartList: { name: string; id: any }[] = [
+  { name: 'Yes', id: 'yes' },
+  { name: 'No', id: 'no' }
+];
 export const orderDistributionList: { name: string; id: any }[] = [
   { name: 'All', id: 0 },
   { name: 'VMS and IRP', id: 1 },

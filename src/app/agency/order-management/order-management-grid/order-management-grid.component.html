@@ -361,6 +361,7 @@
     [form]="OrderFilterFormGroup"
     [filterColumns]="filterColumns"
     [activeTab]="selectedTab"
+    [isEnableClearedToStart$]="isEnableClearedToStart$"
     (setDefault)="setDefaultFilters($event)"
     (mappedOrganizations)="getMappedOrganizations($event)"
   ></app-agency-order-filters>
