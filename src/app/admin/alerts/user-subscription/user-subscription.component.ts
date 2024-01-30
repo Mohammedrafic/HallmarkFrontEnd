@@ -803,12 +803,13 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       if(user?.businessUnitType == BusinessUnitType.Hallmark){
         this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency);
         this.businessUnitControl.patchValue(this.filteredBusinessUnits[0].id);
+        this.columnDefs = this.columnDefsIRP;
       }
       if(user?.businessUnitType == BusinessUnitType.Organization){
         this.businessUnitControl.enable();
         this.filteredBusinessUnits = this.filteredBusinessUnits.filter(x=> x.id !== BusinessUnitType.MSP && x.id !== BusinessUnitType.Agency && x.id !== BusinessUnitType.Hallmark);
+        this.columnDefs = this.columnDefsVMS;
       }
-      this.columnDefs = this.columnDefsIRP;
     }
 
     if(this.activeSystem == OrderManagementIRPSystemId.VMS){
