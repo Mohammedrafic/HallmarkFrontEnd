@@ -57,14 +57,14 @@
       <ng-container *ngIf="sideBarSettings.isEditMode; else createSideBar">
         <app-edit-schedule *ngIf="sideBarSettings.isOpen" [datePickerLimitations]="datePickerLimitations"
           [scheduledShift]="scheduledShift" [isEmployee]="isEmployee" [userPermission]="userPermission"
-          [scheduleOnlyWithAvailability]="scheduleOnlyWithAvailability"
+          [scheduleOnlyWithAvailability]="scheduleOnlyWithAvailability" (updateScheduleFilter)="updateScheduleFilter($event)"
           (updateScheduleGrid)="updateScheduleGrid(false)"></app-edit-schedule>
       </ng-container>
 
       <ng-template #createSideBar>
         <app-create-schedule *ngIf="sideBarSettings.isOpen" [datePickerLimitations]="datePickerLimitations"
           [scheduleSelectedSlots]="scheduleSelectedSlots" [scheduleData]="scheduleData" [isEmployee]="isEmployee"
-          [userPermission]="userPermission"
+          [userPermission]="userPermission" (updateScheduleFilter)="updateScheduleFilter($event)"
           [scheduleOnlyWithAvailability]="scheduleOnlyWithAvailability"></app-create-schedule>
       </ng-template>
     </div>
