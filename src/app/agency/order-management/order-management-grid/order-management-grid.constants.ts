@@ -41,9 +41,8 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
 
 export const myAgencyChildColumnsToExport: ExportColumn[] = [
   { text: 'Position ID', column: 'PositionId' },
-
+  { text: 'Position Status', column: 'PositionStatus' },
   { text: 'Candidate Name', column: 'CandidateName' },
-  { text: 'Position Status', column: 'ChildOrderStatus' },
   { text: 'Candidate Status', column: 'CandidateStatus' },
   { text: 'Candidate Skill', column: 'ChildOrderSkill' },
   { text: 'Candidate Bill Rate', column: 'CandidateBillRate' },
