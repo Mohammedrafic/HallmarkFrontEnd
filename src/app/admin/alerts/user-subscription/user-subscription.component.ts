@@ -219,7 +219,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         valueGetter: (params: { data: { isEmailEnabled: boolean } }) => { return AlertEnum[Number(params.data.isEmailEnabled)] },
         suppressMovable: true,
         filter: false,
-        isHallmark : this.showTurnOffNotifications,
         sortable: false,
         menuTabs: []
       },
@@ -235,7 +234,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         valueGetter: (params: { data: { isSMSEnabled: boolean } }) => { return AlertEnum[Number(params.data.isSMSEnabled)] },
         suppressMovable: true,
         filter: false,
-        isHallmark : this.showTurnOffNotifications,
         sortable: false,
         menuTabs: []
       },
@@ -251,7 +249,6 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         valueGetter: (params: { data: { isOnScreenEnabled: boolean } }) => { return AlertEnum[Number(params.data.isOnScreenEnabled)] },
         suppressMovable: true,
         filter: false,
-        isHallmark : this.showTurnOffNotifications,
         sortable: false,
         menuTabs: []
       },
