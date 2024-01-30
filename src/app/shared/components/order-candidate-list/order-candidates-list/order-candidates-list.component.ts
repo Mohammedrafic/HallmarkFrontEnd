@@ -163,7 +163,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     let alertId = JSON.parse((localStorage.getItem('alertId') || '0')) as number;
     let alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
     this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
-    if(alertId > 0 && (alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Candidate Level Comments']].trim().toLowerCase()){
+    if(alertId > 0 && ((alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Candidate Level Comments']].trim().toLowerCase() || (alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Candidate Status Update: Cleared to Start']].trim().toLowerCase())){
       this.userService.getAlertDetailsForId(alertId).subscribe((data:any)=>{
         window.localStorage.setItem("alertId", JSON.stringify(""));
         if(this.candidatesList && data.candidateId){
