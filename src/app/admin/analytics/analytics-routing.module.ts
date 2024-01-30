@@ -62,6 +62,7 @@ import { UserVisibilityComponent } from './user-visibility/user-visibility.compo
 import { OPDCredentialsExpiryComponent } from './opd-credentials-expiry/opd-credentials-expiry.component';
 import { OpdMissingCredentialComponent } from './opd-missing-credential/opd-missing-credential.component';
 import { OpdCredentialSummaryComponent } from './opd-credential-summary/opd-credential-summary.component';
+import { CockIdComponent } from './cock-id/cock-id.component';
 const routes: Routes = [
   {
     path: '',
@@ -484,6 +485,13 @@ const routes: Routes = [
       {
         path:"opd-credential-summary",
         component:OpdCredentialSummaryComponent,
+        data:{
+          isOrganizationArea:true,
+        }
+      },
+      {
+        path:"clock-id",
+        component:CockIdComponent,
         data:{
           isOrganizationArea:true,
         }
