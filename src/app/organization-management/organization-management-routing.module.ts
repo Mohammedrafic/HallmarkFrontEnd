@@ -132,6 +132,9 @@ const routes: Routes = [
         path: '**',
         redirectTo: '',
         pathMatch: 'full',
+        data: {
+          isOrganizationArea: true,
+        },
       },
     ],
   },
