@@ -256,16 +256,18 @@ export class DepartmentsComponent extends AbstractPermissionGrid implements OnIn
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = 'Organization Departments ' + this.generateDateTime(this.datePipe);
+    const payload = new ExportPayload(
+      fileType,
+      { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
+      options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
+      this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
+      options?.fileName || this.defaultFileName,
+      this.selectedItems.length ? 180 : null
+    );
+    console.log(payload);
     this.store.dispatch(
       new ExportDepartments(
-        new ExportPayload(
-          fileType,
-          { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
-          options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
-          this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
-          options?.fileName || this.defaultFileName,
-          this.selectedItems.length ? 180 : null
-        )
+        payload
       )
     );
     this.clearSelection(this.grid);
