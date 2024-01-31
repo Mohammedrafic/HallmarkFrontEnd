@@ -30,7 +30,7 @@ import { Department, Region, Location, Organisation } from '@shared/models/visib
 import { FilterService } from '@shared/services/filter.service';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { uniqBy, isBoolean } from 'lodash';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { debounceTime, Observable, distinctUntilChanged, Subject, takeUntil, takeWhile } from 'rxjs';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
@@ -39,7 +39,7 @@ import { UserState } from 'src/app/store/user.state';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { OutsideZone } from '@core/decorators';
 import { Skill } from '../../../shared/models/skill.model';
-import { PositionSummaryConstants, analyticsConstants } from '../constants/analytics.constant';
+import { PositionSummaryConstants, analyticsConstants, Period } from '../constants/analytics.constant';
 
 @Component({
   selector: 'app-Position-Summary',
@@ -102,6 +102,8 @@ export class PositionSummaryComponent implements OnInit, OnDestroy {
   public regionsList: Region[] = [];
   public locationsList: Location[] = [];
   public departmentsList: Department[] = [];
+  public defaultSkillCategories: (number | undefined)[] = [];
+  public defaultSkills: (number | undefined)[] = [];
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
@@ -168,13 +170,14 @@ export class PositionSummaryComponent implements OnInit, OnDestroy {
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
   public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
   candidateWaterMark: string = 'e.g. Andrew Fuller';
-
+  periodFields: FieldSettingsModel = { text: 'name', value: 'name' };
   public masterRegionsList: Region[] = [];
   public masterLocationsList: Location[] = [];
   public masterDepartmentsList: Department[] = [];
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
-
+  public periodList: Period[] = [];
+  public periodIsDefault: boolean = false;
 
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   filterOptionsData: CommonReportFilterOptions;
@@ -197,18 +200,40 @@ export class PositionSummaryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
-      //this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
         }
       });
-
       this.agencyOrganizationId = data;
-      this.isInitialLoad = true;
+      this.loadperiod();
+
+      //this.store.dispatch(new ClearLogiReportState());
+      //this.orderFilterColumnsSetup();
+      ////this.SetReportData();
+      //this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
+      //  if (data.length > 0) {
+      //    this.logiReportComponent.SetReportData(data);
+      //  }
+      //});
+      this.PositionSummaryForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
+      this.organizationData$.pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$)).subscribe((data) => {
+        if (data != null && data.length > 0) {
+          this.organizations = uniqBy(data, 'organizationId');
+          this.filterColumns.businessIds.dataSource = this.organizations;
+          if (this.agencyOrganizationId) {
+            this.defaultOrganizations = this.agencyOrganizationId;
+            this.PositionSummaryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
+          }
+          this.changeDetectorRef.detectChanges();
+        }
+      });
+      //this.agencyOrganizationId = data;
+     // this.isInitialLoad = true;
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
@@ -233,6 +258,7 @@ export class PositionSummaryComponent implements OnInit, OnDestroy {
         skillIds: new FormControl([]),        
         candidateName: new FormControl(null),
         candidateStatuses: new FormControl([]),
+        period: new FormControl(null)
         }
     );
   }
@@ -242,23 +268,105 @@ export class PositionSummaryComponent implements OnInit, OnDestroy {
     this.isAlive = false;
   }
 
+  selectPeriod(event: any) {
+    let { startDate, period } = this.PositionSummaryForm.getRawValue();
+    const value = event.itemData.id;
+    this.periodIsDefault = this.PositionSummaryForm.controls['period'].value == "Custom" ? true : false;
+    this.PositionSummaryForm.get(analyticsConstants.formControlNames.startDate)?.setValue("");
+    this.PositionSummaryForm.get(analyticsConstants.formControlNames.endDate)?.setValue("");
+    const PeriodCheck = value;
+    let startDateControl = new Date(Date.now());
+    let endDateControl = new Date(Date.now());
+    let lastDayOfLastMonth = new Date();
+    lastDayOfLastMonth.setMonth(lastDayOfLastMonth.getMonth(), 0);
+
+    switch (PeriodCheck) {
+      case 0:
+        startDateControl.setDate(startDateControl.getDate() - 30);
+        break;
+      case 1:
+        startDateControl.setDate(startDateControl.getDate() - 31);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 2:
+        startDateControl.setDate(startDateControl.getDate() - 61);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 3:
+        startDateControl.setDate(startDateControl.getDate() - 91);
+        endDateControl.setDate(endDateControl.getDate() - 1);
+        break;
+      case 4:
+        startDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        break;
+      case 5:
+        const today = new Date(Date.now());
+        const quarter = Math.floor((today.getMonth() / 3));
+        startDateControl = new Date(today.getFullYear(), quarter * 3 - 3, 1);
+        endDateControl = new Date(startDateControl.getFullYear(), startDateControl.getMonth() + 3, 0);
+        break;
+      case 6:
+        const startDate = new Date(startDateControl.getFullYear(), 0, 1)
+        startDate.setDate(startDate.getDate());
+        startDateControl = startDate;
+        break;
+      case 7:
+        const firstDay = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(firstDay, -6);
+        startDateControl.setDate(startDateControl.getDate());
+        endDateControl = new Date((lastDayOfLastMonth));
+        break;
+      case 8:
+        const dayFirst = new Date(startDateControl.getFullYear(), startDateControl.getMonth(), 1);
+        startDateControl = this.addMonths(dayFirst, -12);
+        startDateControl.setDate(startDateControl.getDate());
+        endDateControl = new Date((lastDayOfLastMonth));
+        break;
+    }
+
+    this.PositionSummaryForm.get(analyticsConstants.formControlNames.startDate)?.setValue(startDateControl);
+    this.PositionSummaryForm.get(analyticsConstants.formControlNames.endDate)?.setValue(new Date((endDateControl)));
+
+  }
+  private addMonths(date: any, months: any) {
+    date.setMonth(date.getMonth() + months);
+    return date;
+  }
+  private loadperiod(): void {
+    this.periodList = [];
+    this.periodList.push({ id: 0, name: 'Custom' });
+    this.periodList.push({ id: 1, name: 'Last 30 days' });
+    this.periodList.push({ id: 2, name: 'Last 60 days' });
+    this.periodList.push({ id: 3, name: 'Last 90 days' });
+    this.periodList.push({ id: 4, name: 'MTD' });
+    this.periodList.push({ id: 5, name: 'Last Quarter' });
+    this.periodList.push({ id: 6, name: 'YTD' });
+    this.periodList.push({ id: 7, name: 'Last 6 Months' });
+    this.periodList.push({ id: 8, name: 'Last 12 Months' });
+    this.PositionSummaryForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
+  }
 
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.businessIds) as AbstractControl;
 
-    this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data != null && data.length > 0) {
-        this.organizations = uniqBy(data, 'organizationId');
-        this.filterColumns.businessIds.dataSource = this.organizations;
-        this.defaultOrganizations = this.agencyOrganizationId;
-        this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.businessIds)?.setValue(this.agencyOrganizationId);
-        this.changeDetectorRef.detectChanges();
-      }
-    });
+    //this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+    //  if (data != null && data.length > 0) {
+    //    this.organizations = uniqBy(data, 'organizationId');
+    //    this.filterColumns.businessIds.dataSource = this.organizations;
+    //    this.defaultOrganizations = this.agencyOrganizationId;
+    //    this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.businessIds)?.setValue(this.agencyOrganizationId);
+    //    this.changeDetectorRef.detectChanges();
+    //  }
+    //});
 
-    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.regionIds)?.setValue([]);
-      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+    //this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+    //  this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.regionIds)?.setValue([]);
+    //  if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((data) => {
+      this.PositionSummaryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+      this.selectedOrganizations = [];
+      // if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+      if (data && data.length > 0) {
         this.isAlive = true;
         this.previousOrgId = data;
         if (!this.isClearAll) {
@@ -294,24 +402,44 @@ export class PositionSummaryComponent implements OnInit, OnDestroy {
             this.isResetFilter = true;
           }
           let businessIdData = [];
-          businessIdData.push(data);
+         // businessIdData.push(data);
+          businessIdData = data;
           let filter: CommonReportFilter = {
             businessUnitIds: businessIdData
           };
 
+          //this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          //this.PositionSummaryFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+          //  if (data != null) {
+          //    this.isAlive = true;
+          //    this.filterOptionsData = data;
+          //      this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+          //      this.filterColumns.skillIds.dataSource = data.masterSkills;
+          //    this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
+          //    this.filterColumns.agencyIds.dataSource = data.agencies;
+          //    this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
+          //    this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.agencyIds)?.setValue(this.defaultAgencyIds);
+          //      this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.candidateStatuses)?.setValue(this.defaultCandidateStatuses);
+          //     this.SearchReport() ;
+          //  }
+          //});
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.PositionSummaryFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
-            if (data != null) {
+            if (data != null) {             
               this.isAlive = true;
               this.filterOptionsData = data;
-                this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
-                this.filterColumns.skillIds.dataSource = data.masterSkills;
-              this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
+              this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+              this.filterColumns.skillIds.dataSource = data.masterSkills;
+              //this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
+              this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses.filter(i => this.fixedCandidateStatusesIncluded.includes(i.status));
               this.filterColumns.agencyIds.dataSource = data.agencies;
+              this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+              this.defaultSkills = [];
               this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
-              this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.agencyIds)?.setValue(this.defaultAgencyIds);
-                this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.candidateStatuses)?.setValue(this.defaultCandidateStatuses); 
-               this.SearchReport() ;
+              this.PositionSummaryForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+              this.PositionSummaryForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
+              this.changeDetectorRef.detectChanges();
+              this.SearchReport();
             }
           });
           this.regions = this.regionsList;
@@ -428,7 +556,7 @@ export class PositionSummaryComponent implements OnInit, OnDestroy {
       skillIds,
       startDate,
       endDate,
-      UserIdPS    }
+      UserIdPS, period    }
       = this.PositionSummaryForm.getRawValue();
     if (!this.PositionSummaryForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 14 days";
@@ -551,6 +679,8 @@ export class PositionSummaryComponent implements OnInit, OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 14);
+    this.PositionSummaryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
+    this.PositionSummaryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
     this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.regionIds)?.setValue([]);
     this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.locationIds)?.setValue([]);
       this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.departmentIds)?.setValue([]);
@@ -563,6 +693,7 @@ export class PositionSummaryComponent implements OnInit, OnDestroy {
     this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.candidateStatuses)?.setValue(this.defaultCandidateStatuses);
     this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.startDate)?.setValue(startDate);
     this.PositionSummaryForm.get(PositionSummaryConstants.formControlNames.endDate)?.setValue(new Date(Date.now()));
+    this.PositionSummaryForm.get(analyticsConstants.formControlNames.Period)?.setValue("Custom");
     
     this.filteredItems = [];
     this.locations = [];

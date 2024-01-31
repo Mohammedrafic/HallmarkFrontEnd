@@ -34,9 +34,13 @@
       <div class="input-container bootstrap">
         <label>Organization Name<span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
-                            [dataSource]="filterColumns.businessIds.dataSource" [allowFiltering]="true" placeholder="Business">
-          </ejs-dropdownlist>
+          <!--<ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
+                          [dataSource]="filterColumns.businessIds.dataSource" [allowFiltering]="true" placeholder="Business">
+        </ejs-dropdownlist>-->
+          <ejs-multiselect mode="CheckBox" formControlName="businessIds" placeholder="Business"
+                           [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.businessIds.dataSource"
+                           [fields]="organizationFields" [selectAllText]='allOption' showSelectAll=true>
+          </ejs-multiselect>
         </div>
       </div>
     </div>
@@ -135,10 +139,24 @@
     <div class="form-element">
       <div class="group">
         <div class="input-container bootstrap">
+          <label>Period</label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist (change)="selectPeriod($event)" formControlName="period" appValidateWithMessage placeholder="All"
+                              [allowFiltering]="true" [dataSource]="periodList"
+                              [fields]="periodFields" showSelectAll=true>
+            </ejs-dropdownlist>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-element">
+      <div class="group">
+        <div class="input-container bootstrap">
           <label>Start Date<span class="required">*</span></label>
           <div class="input-group datepicker">
             <ejs-datepicker id="startDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            appValidateWithMessage formControlName="startDate">
+                            appValidateWithMessage formControlName="startDate" [disabled]="periodIsDefault"
+                            [enabled]="PositionSummaryForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
         </div>
@@ -146,7 +164,8 @@
           <label>End Date</label>
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY"
-                            formControlName="endDate" [min]="PositionSummaryForm.controls['startDate'].value">
+                            formControlName="endDate" [min]="PositionSummaryForm.controls['startDate'].value"
+                            [enabled]="PositionSummaryForm.controls['period'].value=='Custom'">
             </ejs-datepicker>
           </div>
         </div>
