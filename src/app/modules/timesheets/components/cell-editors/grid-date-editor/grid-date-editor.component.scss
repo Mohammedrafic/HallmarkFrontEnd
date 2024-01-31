@@ -1,45 +1,41 @@
 @import 'colors';
 
-.date-editor-container {
-  height: 40px;
-  width: 98px;
-  border: 1px solid $secondary-dark-blue-40;
-  border-radius: 8px;
-}
+.grid-date-editor {
+  ::ng-deep {
+    .wrapper {
+      height: 40px;
+      width: 114px;
 
-::ng-deep {
-  .wrapper {
-    height: 40px;
-    width: 100%;
+      &.errored {
+        ejs-timepicker.e-timepicker {
+          .e-input-group.e-control-wrapper.e-time-wrapper {
+            border-color: $supportive-red!important;
+          }
+        }
+      }
 
-    &.errored {
       ejs-timepicker.e-timepicker {
         .e-input-group.e-control-wrapper.e-time-wrapper {
-          border-color: $supportive-red!important;
+          height: 40px!important;
+          width: 100%!important;
+          display: flex!important;
+          align-items: center!important;
+          padding: 0 16px;
+
+          .e-input {
+            padding: 0!important;
+          }
         }
       }
     }
 
-    ejs-timepicker.e-timepicker {
-      .e-input-group.e-control-wrapper.e-time-wrapper {
-        height: 40px!important;
-        width: 100%!important;
-        display: flex!important;
-        align-items: center!important;
-        padding: 0 16px;
+    .init-value-wrapper {
+      padding-left: 17px;
+      padding-right: 17px;
 
-        .e-input {
-          padding: 0!important;
-        }
+      .value {
+        line-height: 20px;
       }
-    }
-  }
-  .init-value-wrapper {
-    padding-left: 17px;
-    padding-right: 17px;
-
-    .value {
-      line-height: 20px;
     }
   }
 }
