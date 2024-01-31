@@ -13,7 +13,6 @@ import { OrganizationSettingFilter, ConfigurationDTO } from '@shared/models/orga
 import { ExportPayload } from '@shared/models/export.model';
 import { ImportedBillRate } from '@shared/models';
 import { SkillParams } from '@client/order-management/interfaces';
-import { SystemType } from '@shared/enums/system-type.enum';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[organizationManagement] Set General States By Country';

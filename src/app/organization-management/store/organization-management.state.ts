@@ -1570,7 +1570,9 @@ export class OrganizationManagementState {
   }
 
   @Action(ExportLocations)
-  ExportLocations({ payload }: ExportLocations): Observable<any> {
+  ExportLocations(
+    _: StateContext<OrganizationManagementStateModel>,
+    { payload }: ExportLocations): Observable<any> {
     return this.locationService.export(payload).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
@@ -1579,7 +1581,10 @@ export class OrganizationManagementState {
     );
   }
   @Action(ExportRegions)
-  ExportRegions({ payload }: ExportRegions): Observable<any> {
+  ExportRegions(
+    _: StateContext<OrganizationManagementStateModel>,
+    { payload }: ExportRegions
+  ): Observable<any> {
     return this.regionService.exportRegion(payload).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
@@ -1590,6 +1595,7 @@ export class OrganizationManagementState {
 
   @Action(ExportDepartments)
   ExportDepartments(
+    _: StateContext<OrganizationManagementStateModel>,
     { payload }: ExportDepartments
   ): Observable<any> {
     return this.departmentService.export(payload).pipe(
@@ -1601,7 +1607,10 @@ export class OrganizationManagementState {
   }
 
   @Action(ExportSkills)
-  ExportSkills({ payload }: ExportSkills): Observable<any> {
+  ExportSkills(
+    _: StateContext<OrganizationManagementStateModel>,
+    { payload }: ExportSkills
+  ): Observable<any> {
     return this.skillsService.exportAssignedSkills(payload).pipe(
       tap((file) => {
         const url = window.URL.createObjectURL(file);
