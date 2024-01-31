@@ -981,7 +981,7 @@
         </div>
       </div>
     </div>
-    <div class="bootstrap">
+    <div class="bootstrap" [ngClass]="isEnableClearedToStart ? 'filter-row' : ''">
       <div class="input-container">
         <label *ngIf="activeSystem === OrderManagementIRPSystemId.IRP">Employee Status</label>
         <label *ngIf="activeSystem === OrderManagementIRPSystemId.VMS">Candidate Status</label>
@@ -997,6 +997,13 @@
             [changeOnBlur]="!(isMobile || isTablet)"
           >
           </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container" *ngIf="isEnableClearedToStart">
+        <label>Cleared to Start</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist  formControlName="clearedToStart" [fields]="optionFields" [dataSource]="clearedToStartList">
+          </ejs-dropdownlist>
         </div>
       </div>
     </div>

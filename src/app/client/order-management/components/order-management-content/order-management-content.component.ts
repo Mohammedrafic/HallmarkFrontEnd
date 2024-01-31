@@ -129,6 +129,7 @@ import {
   OrderManagementIRPTabsIndex,
   OrganizationOrderManagementTabs,
   orderLockList,
+  clearedToStartList,
   orderDistributionList,
 } from '@shared/enums/order-management-tabs.enum';
 import { FilterIrpOrderTypes, OrderType, OrderTypeOptions, VmsOrderTypeTooltipMessage } from '@shared/enums/order-type';
@@ -291,6 +292,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   DeployedEmployeeConfigValue: boolean;
   deployedState: boolean;
   public allOrdersChildColumnsToExport:ExportColumn[] = allOrdersChildColumnsToExport;
+  public clearedtoStartWidget: boolean = false;
 
   @HostListener('window:wheel', ['$event'])
   onScroll() {
@@ -509,6 +511,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public threeDotsMenuOptionsIRP:Record<string, ItemModel[]>;
   public shift = ORDER_MASTER_SHIFT_NAME_LIST;
   public orderLockList = orderLockList;
+  public clearedToStartList = clearedToStartList
   public orderDistributionList = orderDistributionList;
   private ltaOrderFlag: boolean|null = false;
   public reorderFilledStatus:boolean = false
@@ -723,8 +726,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public getalerttitle(): void {
     this.alertTitle = JSON.parse(localStorage.getItem('alertTitle') || '""') as string;
-    if((this.alertTitle.trim()).toLowerCase()!=AlertIdEnum[AlertIdEnum['Candidate Level Comments']].trim().toLowerCase()){
-      this.globalWindow.localStorage.setItem("alertTitle", JSON.stringify(""));
+    if (
+      this.alertTitle.trim().toLowerCase() !=
+        AlertIdEnum[AlertIdEnum['Candidate Level Comments']].trim().toLowerCase() ||
+      this.alertTitle.trim().toLowerCase() ==
+        AlertIdEnum[AlertIdEnum['Candidate Status Update: Cleared to Start']].trim().toLowerCase()
+    ) {
+      this.globalWindow.localStorage.setItem('alertTitle', JSON.stringify(''));
     }
     if (Object.values(AlertIdEnum).includes(this.alertTitle)) {
       if((this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Comments-IRP']].trim().toLowerCase()
@@ -732,7 +740,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Open']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order Status Update: Closed']].trim().toLowerCase()
        ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Order public comments']].trim().toLowerCase()
-       ||  (this.alertTitle.trim()).toLowerCase()==AlertIdEnum[AlertIdEnum['Candidate Status Update: Cleared to Start']].trim().toLowerCase()
+       
       ){
         this.isOrderDetailsTab=true;
       }
@@ -1156,6 +1164,9 @@ public RedirecttoIRPOrder(order:Order)
         if(this.filters.orderLocked){
           filtersAllOrders.orderLocked = filtersAllOrders.orderLocked == 'false' ? false : filtersAllOrders.orderLocked == 'true' ? true : null
         }
+        if(this.filters.clearedToStart){
+          filtersAllOrders.clearedToStart = filtersAllOrders.clearedToStart == 'no' ? false : filtersAllOrders.clearedToStart == 'yes' ? true : null
+        }
         cleared ? this.store.dispatch([new GetOrders(filtersAllOrders)])
           : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
@@ -1282,6 +1293,7 @@ public RedirecttoIRPOrder(order:Order)
       reOrderDate: this.filters.reOrderDate || null,
       shift:this.filters.shift || null,
       orderLocked:this.filters.orderLocked || null,
+      clearedToStart:this.filters.clearedToStart || null,
       orderDistributionType:this.filters.orderDistributionType || null,
       showDeletedOrders: this.filters.showDeletedOrders || null
     });
@@ -1379,6 +1391,7 @@ public RedirecttoIRPOrder(order:Order)
 
   public onFilterClearAll(): void {
     this.ltaOrderFlag = false;
+    this.clearedtoStartWidget=false;
     this.store.dispatch(new PreservedFilters.ClearPageFilters(this.getPageName()));
     this.filterApplied = true;
     this.orderManagementService.selectedOrderAfterRedirect = null;
@@ -1881,6 +1894,7 @@ public RedirecttoIRPOrder(order:Order)
   }
 
   changeSystem(selectedBtn: ButtonModel) {
+    localStorage.setItem('flagId', JSON.stringify(selectedBtn.id));
     this.activeSystem = selectedBtn.id;
     this.closeModalsBeforeSwitchSystem();
     this.orderManagementService.saveSelectedOrderManagementSystem(this.activeSystem);
@@ -2269,6 +2283,10 @@ public RedirecttoIRPOrder(order:Order)
         this.filters.orderStatuses = [];
         this.filters.candidateStatuses = [];
         this.filters.reorderStatuses = [];
+      }
+      if(this.clearedtoStartWidget)
+      {
+        this.filters.orderStatuses = [];
       }
     }
   }
@@ -2705,7 +2723,31 @@ public RedirecttoIRPOrder(order:Order)
         (filters[filterKey] as number[]) = [item.value];
       }
     });
-
+    const clearedtostarttotal = this.globalWindow.localStorage.getItem('clearedtostarttotal');
+    const startend =  JSON.parse(this.globalWindow.localStorage.getItem('cleatedtostartdate') || '""');
+    var dates = startend.split('-');
+    var startDate = new Date(dates[0]);;
+    var endDate = new Date(dates[1]);
+   if(clearedtostarttotal)
+    {
+      filters.ActualStartDate=this.datePipe.transform(startDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');;
+      filters.ActualEndDate=this.datePipe.transform(endDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\''); 
+      filters.IsClearToStartDashboard=true
+      this.documentEle.defaultView?.localStorage.setItem('clearedtostarttotal', '');
+      this.documentEle.defaultView?.localStorage.setItem('cleatedtostartdate', '');
+      this.clearedtoStartWidget=true;
+    }
+    const clearedtostart= this.globalWindow.localStorage.getItem('clearedtostart');
+    if(clearedtostart)
+    {
+      filters.ActualStartDate=this.datePipe.transform(startDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');;
+      filters.ActualEndDate=this.datePipe.transform(endDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\''); 
+      filters.IsClearToStartDashboard=true 
+       filters.IsWidgetClearToStart=true
+      this.documentEle.defaultView?.localStorage.setItem('clearedtostart', '');
+      this.documentEle.defaultView?.localStorage.setItem('cleatedtostartdate', '');
+      this.clearedtoStartWidget=true;
+    }
     this.orderPositionStatus = null;
     this.isRedirectedFromDashboard = false;
 
@@ -3256,7 +3298,7 @@ public RedirecttoIRPOrder(order:Order)
       : GetVMSFilterFormConfig(this.activeTab);
 
     this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
-
+    this.filters.clearedToStart = this.isEnableClearedToStart ? this.filters.clearedToStart == false ? "no" : this.filters.clearedToStart == true ? 'yes' : null : null;
     if (this.activeTab === OrganizationOrderManagementTabs.Incomplete && this.filters) {
       this.filters  = this.checkFiltersForIncompleteTab(this.filters);
     }

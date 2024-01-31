@@ -56,6 +56,7 @@ const AllOrdersFilterFormConfig: CommonFormConfig[] = [
   { field: 'poNumberIds' },
   { field: 'contactEmails' },
   { field: 'orderLocked' },
+  { field: 'clearedToStart' },
   { field: 'orderDistributionType' },
 ];
 

@@ -368,9 +368,9 @@ export class OrderManagementState {
   @Action(GetAgencyHistoricalData)
   GetAgencyHistoricalData(
     { patchState, dispatch }: StateContext<OrderManagementModel>,
-    { organizationId, candidateJobId }: GetAgencyHistoricalData
+    { organizationId, candidateJobId, isIrpFlag }: GetAgencyHistoricalData
   ): Observable<HistoricalEvent[]> {
-    return this.orderManagementContentService.getHistoricalData(organizationId, candidateJobId).pipe(
+    return this.orderManagementContentService.getHistoricalData(organizationId, candidateJobId, isIrpFlag).pipe(
       tap((payload) => {
         patchState({ historicalEvents: payload });
         return payload;

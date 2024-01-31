@@ -67,6 +67,7 @@ import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { sum } from 'lodash';
 import { AgencyTImesheetsummaryModel } from '../models/agency-timesheet-summary.models';
+import { ClearedtoStartModel } from '../models/clear-to-start.model';
 
 @Injectable()
 export class DashboardService {
@@ -104,6 +105,7 @@ export class DashboardService {
     [WidgetTypeEnum.BILL_RATE_BY_SKILL_CATEGORY]: (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => this.getSkillCategoryByTypes(filters, timeSelection),
     [WidgetTypeEnum.MISSING_TIMESHEETS]: (filters: DashboartFilterDto) => this.getAgencyTimesheetWidgetdata(filters),
     [WidgetTypeEnum.AGENCY_TIMESHEET_SUMMARY]: (filters: DashboartFilterDto) => this.getAgencytimesheetsummary(filters),
+    [WidgetTypeEnum.CLEARED_TOSTART]: (filters: DashboartFilterDto) => this.getClearedtostart(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -719,5 +721,10 @@ export class DashboardService {
       )
     }
     
+    private getClearedtostart(filter: DashboartFilterDto) : Observable<ClearedtoStartModel[]> {
+      return this.httpClient.post<ClearedtoStartModel[]>(`${this.baseUrl}/ClearToStart`, { ...filter }).pipe(
+        map((data)=> data)
+      )
+    }
  
 }

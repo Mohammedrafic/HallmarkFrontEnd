@@ -23,6 +23,7 @@ import { StackColumnChartModule } from '../widgets/stack-column-chart/stack-colu
 import { OrdersPendingCustomStatusModule } from '../widgets/orders-pending-custom-status/orders-pending-custom-status.module';
 import { BillrateWidgetModule } from '../widgets/bill-rate-widget/bill-rate-widget.module';
 import { AgencyTimesheetWidgetModule } from '../widgets/agency-timesheet-summary/agency-timesheet-summary.module';
+import { ClearedtostartModule } from '../widgets/cleared-to-start/cleared-to-start.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -48,6 +49,7 @@ import { AgencyTimesheetWidgetModule } from '../widgets/agency-timesheet-summary
     OrdersPendingCustomStatusModule,
     BillrateWidgetModule,
     AgencyTimesheetWidgetModule,
+    ClearedtostartModule,
     NgxsModule.forFeature([ UserState]),
   ],
 })

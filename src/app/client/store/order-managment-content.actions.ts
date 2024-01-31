@@ -339,7 +339,7 @@ export class ClearOrderFilterDataSources {
 
 export class GetHistoricalData {
   static readonly type = '[order management] Get Historical Data';
-  constructor(public organizationId: number, public candidateJobId: number) {}
+  constructor(public organizationId: number, public candidateJobId: number, public isIrpFlag:boolean) {}
 }
 
 export class ClearHistoricalData {

@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { takeUntil } from 'rxjs';
+import { take, takeUntil } from 'rxjs';
 import { createSpinner, hideSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -30,17 +30,18 @@ export class LoginPageComponent extends DestroyableDirective implements AfterVie
     // B2C Login
     this.b2CAuthService
       .onLoginSuccess()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(take(1),takeUntil(this.destroy$))
       .subscribe(() => this.navigateToDefaultPage());
 
     this.b2CAuthService
       .interactionStatusNone()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(take(1),takeUntil(this.destroy$))
       .subscribe(() => {
         if (!this.b2CAuthService.isLoggedIn()) {
           this.loginWithSSO();
         } else {
           this.navigateToDefaultPage();
+          SsoManagement.clearRedirectUrl();
         }
       });
   }
@@ -68,7 +69,6 @@ export class LoginPageComponent extends DestroyableDirective implements AfterVie
     } else {
       const redirect = SsoManagement.getRedirectUrl();
       if (redirect) {
-        SsoManagement.clearRedirectUrl();
         this.router.navigate([redirect]);
       } else {
         this.router.navigate(['/']);
