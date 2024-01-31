@@ -3298,7 +3298,6 @@ public RedirecttoIRPOrder(order:Order)
       : GetVMSFilterFormConfig(this.activeTab);
 
     this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
-    this.filters.clearedToStart = this.isEnableClearedToStart ? this.filters.clearedToStart == false ? "no" : this.filters.clearedToStart == true ? 'yes' : null : null;
     if (this.activeTab === OrganizationOrderManagementTabs.Incomplete && this.filters) {
       this.filters  = this.checkFiltersForIncompleteTab(this.filters);
     }
