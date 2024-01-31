@@ -596,7 +596,8 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       "BearerParamJDSR": auth,
       "BusinessUnitIdParamJDSR": businessIds,
       "HostName": this.baseUrl,
-      "OrganizationNameJDSR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")),
+      "OrganizationNameJDSR": this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list).join(",")).name,
+
       "reportPulledMessageJDSR": ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
       "DateRangeJDSR": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
 
