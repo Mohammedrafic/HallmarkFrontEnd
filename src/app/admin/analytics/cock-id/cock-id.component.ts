@@ -50,7 +50,7 @@ export class CockIdComponent implements OnInit {
   public paramsData: any = {
 
     "OrganizationIdsCl": "",
-    "SkillIdsCLStartdateFromCL": "",
+    "StartdateFromCL": "",
     "StartdateToCL": "",
     "RegionIdsCL": "",
     "LocationIdsCL": "",
@@ -544,12 +544,11 @@ export class CockIdComponent implements OnInit {
 
     let currentDate = new Date(Date.now());
 
-
     this.paramsData =
     {
       "OrganizationIdsCl": this.selectedOrganizations?.length == 0 ? businessIds.tostring() :
         this.selectedOrganizations?.map((list) => list).join(","),
-      "SkillIdsCLStartdateFromCL": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "StartdateFromCL": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "StartdateToCL": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionIdsCL": regionIds==null ? "" : regionIds,
       "LocationIdsCL": locationIds==null ? "" : locationIds,
@@ -573,7 +572,7 @@ export class CockIdComponent implements OnInit {
       "SkillIdsCL":skillIds.length == 0 ? "" : skillIds.join(","),
       "CandidateNameCL":candidateName==null?"":candidateName,
       "OrderIdCL":jobId == "" ? "" : jobId.trim(),
-      "ClockIDCL":clockid,
+      "ClockIDCL":clockid.length==0?"":clockid.length==1?clockList.filter(x=>x.id==clockid).map(x=>x.name).toString():clockList.map(x=>x.name).join(','),
       
     };
     this.logiReportComponent.paramsData = this.paramsData;
