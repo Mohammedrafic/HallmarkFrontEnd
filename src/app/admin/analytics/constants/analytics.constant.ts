@@ -376,7 +376,7 @@ export type InvoiceStatus = {
 
 export const clockList:{name:string;id:number}[]=[
 {name:"Missing",id:1},
-{name:"Exisiting",id:2},
+{name:"Existing",id:2},
 ];
 export const searchByList: { name: string; id: number }[] = [
   { name: 'All', id: 0 },
