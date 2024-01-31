@@ -47,15 +47,15 @@ export class OpdMissingCredentialComponent implements OnInit {
     "OrganizationIdOMC": "",
     "CertifiedUntilFromOMC": "",
     "CertifiedUntilToOMC": "",
-    "CredentialsOMC":"",
-    "PositionIdOMC":"",
+    "CredentialsOMC": "",
+    "PositionIdOMC": "",
     "RegionIdsOMC": "",
     "LocationIdsOMC": "",
     "DepartmentIdsOMC": "",
-    "SkillCategoryOMC":"",
-    "SkillOMC":"",
+    "SkillCategoryOMC": "",
+    "SkillOMC": "",
     "AgencyIdOMC": "",
-    "CandidateNameOMC":"",
+    "CandidateNameOMC": "",
     "CandidateStatusOMC": "",
     "BOrganizationIdOMC": "",
     "OptionalOMC": "",
@@ -65,7 +65,7 @@ export class OpdMissingCredentialComponent implements OnInit {
     "DateRangeOMC": "",
     "PeriodOMC": ""
   };
-  
+
   @Select(LogiReportState.commonReportCandidateSearch)
   public financialTimeSheetCandidateSearchData$: Observable<SearchCandidate[]>;
 
@@ -77,9 +77,9 @@ export class OpdMissingCredentialComponent implements OnInit {
   public title: string = "OPD Missing Credential";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
-  
+
   public defaultSkillCategories: (number | undefined)[] = [];
-  
+
   public defaultSkills: (number | undefined)[] = [];
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   @Select(LogiReportState.regions)
@@ -161,7 +161,7 @@ export class OpdMissingCredentialComponent implements OnInit {
   public periodIsDefault: boolean = false;
   periodFields: FieldSettingsModel = { text: 'name', value: 'name' };
   public defaultOrganizations: number;
-
+  loadreport = true;
 
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedAgencies: AgencyDto[] = [];
@@ -217,7 +217,7 @@ export class OpdMissingCredentialComponent implements OnInit {
       this.onFilterControlValueChangedHandler();
       this.onFilterRegionChangedHandler();
       this.onFilterLocationChangedHandler();
-      
+
       // this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.opdMissingcredentialForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
 
       if (this.user)
@@ -232,7 +232,7 @@ export class OpdMissingCredentialComponent implements OnInit {
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 14);
     let endate = new Date(Date.now())
-    endate.setDate(endate.getDate() + 28);
+    endate.setDate(endate.getDate() + 27);
     this.opdMissingcredentialForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
@@ -401,15 +401,18 @@ export class OpdMissingCredentialComponent implements OnInit {
               this.defaultAgencys = data.agencies.map((list) => list.agencyId);
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = data.masterSkills;
-            let masterSkills = this.filterOptionsData.masterSkills;
-            this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
-              this.changeDetectorRef.detectChanges();
-              this.SearchReport();
+              let masterSkills = this.filterOptionsData.masterSkills;
+              this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+              this.changeDetectorRef.detectChanges();         
+              if (this.loadreport) {
+                this.SearchReport();
+                this.loadreport = false;
+              }
             }
           });
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
-          this.SearchReport();
+          // this.SearchReport();
         }
         else {
           this.isClearAll = false;
@@ -446,13 +449,13 @@ export class OpdMissingCredentialComponent implements OnInit {
         this.filterColumns.skillIds.dataSource = skills;
       }
       else {
-          this.opdMissingcredentialForm.get(OPDMissingCredentialReportConstants.formControlNames.skillIds)?.setValue([]);
-          let masterSkills = this.filterOptionsData.masterSkills;
+        this.opdMissingcredentialForm.get(OPDMissingCredentialReportConstants.formControlNames.skillIds)?.setValue([]);
+        let masterSkills = this.filterOptionsData.masterSkills;
 
-          this.filterColumns.skillIds.dataSource = masterSkills;
+        this.filterColumns.skillIds.dataSource = masterSkills;
       }
     });
-      this.skillIdControl = this.opdMissingcredentialForm.get(OPDMissingCredentialReportConstants.formControlNames.skillIds) as AbstractControl;
+    this.skillIdControl = this.opdMissingcredentialForm.get(OPDMissingCredentialReportConstants.formControlNames.skillIds) as AbstractControl;
     this.skillIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.skillIdControl.value.length > 0) {
         let masterSkills = this.filterOptionsData.masterSkills;
@@ -505,7 +508,7 @@ export class OpdMissingCredentialComponent implements OnInit {
 
 
   public SearchReport(): void {
-    let { businessIds, departmentIds, locationIds, regionIds,skillCategoryIds,skillIds,candidateName, startDate, endDate, jobId, candidateStatuses, opcredFlag, agencyIds, period } = this.opdMissingcredentialForm.getRawValue();
+    let { businessIds, departmentIds, locationIds, regionIds, skillCategoryIds, skillIds, candidateName, startDate, endDate, jobId, candidateStatuses, opcredFlag, agencyIds, period } = this.opdMissingcredentialForm.getRawValue();
 
     if (!this.opdMissingcredentialForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments for 90 days";
@@ -528,10 +531,10 @@ export class OpdMissingCredentialComponent implements OnInit {
         this.selectedOrganizations?.map((list) => list).join(","),
       "CertifiedUntilFromOMC": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "CertifiedUntilToOMC": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionIdsOMC": regionIds==null ? "" : regionIds,
-      "LocationIdsOMC": locationIds==null ? "" : locationIds,
-      "DepartmentIdsOMC": departmentIds==null? "" : departmentIds,
-      "AgencyIdOMC": this.selectedAgencies.length == 0 ? "0" : this.selectedAgencies?.map((list) => list.agencyId).join(","),
+      "RegionIdsOMC": regionIds == null ? "" : regionIds,
+      "LocationIdsOMC": locationIds == null ? "" : locationIds,
+      "DepartmentIdsOMC": departmentIds == null ? "" : departmentIds,
+      "AgencyIdOMC": this.selectedAgencies.length == 0 ? '': this.selectedAgencies?.map((list) => list.agencyId).join(","),
       "CandidateStatusOMC": candidateStatuses.length == 0 ? '' : candidateStatuses.join(this.joinString),
       "PositionIdOMC": jobId == "" ? "" : jobId.trim(),
       "BOrganizationIdOMC": window.localStorage.getItem("lastSelectedOrganizationId") == null
@@ -544,12 +547,12 @@ export class OpdMissingCredentialComponent implements OnInit {
       "ReportpulledMessageOMC": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
       "DateRangeOMC": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
       "PeriodOCE": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id)),
-      "CredentialsOMC":"",
+      "CredentialsOMC": "",
       // "PositionIdOMC":jobId.tostring(),
       "SkillCategoryOMC": skillCategoryIds.length == 0 ? "" : skillCategoryIds.join(","),
-      "SkillOMC":skillIds.length == 0 ? "" : skillIds.join(","),
-      "CandidateNameOMC":candidateName==null?"":candidateName,
-      
+      "SkillOMC": skillIds.length == 0 ? "" : skillIds.join(","),
+      "CandidateNameOMC": candidateName == null ? "" : candidateName,
+
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -627,7 +630,7 @@ export class OpdMissingCredentialComponent implements OnInit {
       },
     }
   }
-  
+
   private SetReportData() {
     const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
     if (logiReportData != null && logiReportData.length == 0) {
@@ -653,7 +656,7 @@ export class OpdMissingCredentialComponent implements OnInit {
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 14);
     let endDate = new Date(Date.now());
-    endDate.setDate(endDate.getDate() + 28);
+    endDate.setDate(endDate.getDate() + 27);
     this.opdMissingcredentialForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.opdMissingcredentialForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([this.agencyOrganizationId]);
     this.opdMissingcredentialForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
@@ -723,4 +726,3 @@ export class OpdMissingCredentialComponent implements OnInit {
     }
   }
 }
-
