@@ -148,7 +148,10 @@ export class HolidaysState {
   }
 
   @Action(ExportHolidays)
-  ExportHolidays({ payload }: ExportHolidays): Observable<any> {
+  ExportHolidays(
+    _: StateContext<HolidaysStateModel>,
+    { payload }: ExportHolidays
+  ): Observable<any> {
     return this.holidaysService.exportOrganizationHolidays(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
