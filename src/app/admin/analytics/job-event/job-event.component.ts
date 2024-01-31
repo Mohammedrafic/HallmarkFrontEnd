@@ -90,13 +90,16 @@ export class JobEventComponent implements OnInit, OnDestroy {
     OrganizationidParam: '',
     RegionIDParam: '',
     SkillIDParam: '',
-    Userid:''
+    Userid: '',
+    OrganizationNameParam: '',
+    reportPulledMessageParam: '',
+    DateRangeParam: ''
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/JobEvent/JobEventReport.wls" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/JobEvent/JobEventReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/JobEvent/JobEventReport.cat" };
   public message: string = "";
   public title: string = "Job Event";
-  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
+  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
 
   public regionsList: Region[] = [];
@@ -458,7 +461,7 @@ export class JobEventComponent implements OnInit, OnDestroy {
     departmentIds = departmentIds.length > 0 ? departmentIds.join(",") : '';
     skillCategoryIds = skillCategoryIds.length > 0 ? skillCategoryIds.join(",") : this.filterColumns.skillCategoryIds.dataSource?.length > 0 ? this.filterColumns.skillCategoryIds.dataSource.map((x: { id: any; }) => x.id).join(",") : '';
     skillIds = skillIds.length > 0 ? skillIds.join(",") : this.filterColumns.skillIds.dataSource?.length > 0 ? this.filterColumns.skillIds.dataSource.map((x: { id: any; }) => x.id).join(",") : '';
-
+    let currentDate = new Date(Date.now());
 
     this.paramsData =
     {
@@ -475,9 +478,14 @@ export class JobEventComponent implements OnInit, OnDestroy {
       OrganizationidParam: this.selectedOrganizations?.length == 0 ? this.nullValue : this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
       RegionIDParam: regionIds,
       SkillIDParam: skillIds,
-      Userid: this.user?.id
+      Userid: this.user?.id,
       //"SkillCategoriesParamCJR": skillCategoryIds.length == 0 ? "null" : skillCategoryIds,
       //"BearerParamCJR": auth,
+      OrganizationNameParam: this.filterColumns.businessIds.dataSource?.find((item: any) => item.organizationId?.toString() === this.selectedOrganizations?.map((list) => list.organizationId).join(",")).name,
+      reportPulledMessageParam: ("Report Print date: " + formatDate(startDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
+      DateRangeParam: (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim()
+
+
       };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
