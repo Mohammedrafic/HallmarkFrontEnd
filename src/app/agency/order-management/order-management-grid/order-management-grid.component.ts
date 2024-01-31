@@ -524,7 +524,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const filterState = { ...state, orderStatuses };
       const filterFormConfig = GetAgencyFilterFormConfig(this.selectedTab);
       this.filters = this.filterService.composeFilterState(filterFormConfig, filterState);
-      this.filters.clearedToStart = this.isEnableClearedToStart ? this.filters.clearedToStart == false ? "no" : this.filters.clearedToStart == true ? 'yes' : null :  null;
       if(this.Organizations != null && this.Organizations.length > 0){
         this.OrderFilterFormGroup.get('organizationIds')?.setValue([...this.Organizations]);
         this.filters.organizationIds = (this.Organizations.length > 0) ? this.Organizations : undefined;
