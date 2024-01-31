@@ -90,6 +90,7 @@ import { GetRecentRunListComponent } from './organization-integrations/widgets/g
 import { ScheduledIntegrationsComponent } from './organization-integrations/widgets/scheduled-integrations/scheduled-integrations.component';
 import { MigrateCandidatesComponent } from './migrate-candidates/migrate-candidates.component';
 import { MatCardModule } from '@angular/material/card';
+import { InterfaceListComponent } from './interface-list/interface-list.component';
 
 const sidebarIcons = {
   Download,
@@ -138,7 +139,9 @@ const sidebarIcons = {
     NewInterfacesComponent,
     GetRecentRunListComponent,
     ScheduledIntegrationsComponent,
-    MigrateCandidatesComponent
+    MigrateCandidatesComponent,
+    InterfaceListComponent
+
   ],
     imports: [
         CommonModule,

@@ -74,7 +74,8 @@ export enum OrganizationSettingKeys {
   AutoEnableClearedToStart,
   Leaverequestcomments,
   Createreplacementorderswhenschedulesgetcancelled,
-  OnboardExtensionOrderafteraccepting
+  OnboardExtensionOrderafteraccepting,
+  HRInterfacePrimarySkillAndCellphoneMandatoryforEmployee
 }
 
 export enum OrganizationalHierarchy {

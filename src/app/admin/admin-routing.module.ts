@@ -24,6 +24,7 @@ import { LogInterfaceComponent } from './log-interface/log-interface.component';
 import { InterfaceLogSummaryIrpComponent } from './interface-log-summary-irp/interface-log-summary-irp.component';
 import { OrganizationIntegrationsComponent } from './organization-integrations/organization-integrations.component';
 import { MigrateCandidatesComponent } from './migrate-candidates/migrate-candidates.component';
+import { InterfaceListComponent } from './interface-list/interface-list.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -89,6 +90,13 @@ const routes: Routes = [
       {
         path: 'migrate-candidates',
         component: MigrateCandidatesComponent,        
+      },
+      {
+        path: 'interface-list',
+        component: InterfaceListComponent,
+        data: {
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'master-data',

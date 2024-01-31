@@ -5,10 +5,11 @@ import { ChartAccumulation } from '../../dashboard/models/chart-accumulation-wid
 
 import { IntegrationFilterDto } from "../../shared/models/integrations.model";
 import { OrgintegrationsService } from '../organization-integrations/services/orgintegrations.service';
-import { GetLast12MonthIntegrationRuns, GetLast12MonthFailIntegrationRuns, GetNewInterfaceList, GetRecentRunsList, GetScheduledIntegrationsList } from "./integrations.actions";
+import { GetLast12MonthIntegrationRuns, GetLast12MonthFailIntegrationRuns, GetNewInterfaceList, GetRecentRunsList, GetScheduledIntegrationsList, GetInterfaceList, GetInterfaceListPage } from "./integrations.actions";
 import { NewInterfaceListdata } from '@admin/organization-integrations/models/IntegrationMonthReportModel';
 import { RecentRunsListModel } from 'src/app/admin/organization-integrations/models/RecentRunsListModel';
 import { ScheduledIntegrationsListData } from '@admin/organization-integrations/models/IntegrationMonthReportModel';
+import { InterfaceListModel, InterfaceListPage } from '../interface-list/models/InterfaceListModel';
 
 export interface IntegrationsStateModel extends IntegrationStateModel {
 }
@@ -24,6 +25,8 @@ interface IntegrationStateModel {
   Latestinterfacedata: NewInterfaceListdata | null;
   RecentRunsList: RecentRunsListModel[] | null;
   ScheduledIntegrationsRunsList: ScheduledIntegrationsListData | null;
+  InterfaceList: InterfaceListModel[] | null;
+  InterfaceListPage: InterfaceListPage | null;
 }
 @State<IntegrationsStateModel>({
   name: 'integrations',
@@ -36,6 +39,8 @@ interface IntegrationStateModel {
     Latestinterfacedata: null,
     RecentRunsList: null,
     ScheduledIntegrationsRunsList: null,
+    InterfaceList: null,
+    InterfaceListPage: null
   },
 })
 @Injectable()
@@ -61,6 +66,17 @@ export class IntegrationsState {
   @Selector()
   static GetScheduledIntegrationsList(state: IntegrationsStateModel): ScheduledIntegrationsListData | null {
     return state.ScheduledIntegrationsRunsList;
+  }
+
+  @Selector()
+  static getInterfaceList(state: IntegrationsStateModel): InterfaceListModel[] | null {
+    return state.InterfaceList;
+  }
+
+
+  @Selector()
+  static getInterfaceListPage(state: IntegrationsStateModel): InterfaceListPage | null {
+    return state.InterfaceListPage;
   }
 
   @Action(GetLast12MonthIntegrationRuns)
@@ -114,6 +130,15 @@ export class IntegrationsState {
     return this.orgintegrationsService.getScheduledIntegrationRunsList(payload).pipe(
       tap((payload) => {
         patchState({ isDashboardLoading: false, ScheduledIntegrationsRunsList: payload });
+        return payload;
+      })
+    );
+  }
+  @Action(GetInterfaceListPage)
+  GetRegionsPage({ patchState }: StateContext<IntegrationsStateModel>, { filter }: any): Observable<GetInterfaceListPage> {
+    return this.orgintegrationsService.getInterfaceList(filter).pipe(
+      tap((payload: any) => {
+        patchState({ InterfaceListPage: payload });
         return payload;
       })
     );

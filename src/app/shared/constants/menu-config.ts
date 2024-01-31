@@ -567,6 +567,10 @@ export const MENU_CONFIG: any = {
       icon:"",
       route:'/analytics/clock-id'
     },
+    137: {
+      icon: '',
+      route: '/admin/interface-list',
+    },
   },
 
   [BusinessUnitType.MSP]: {

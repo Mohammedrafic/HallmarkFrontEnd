@@ -1,0 +1,99 @@
+@import 'colors';
+
+.flex-column {
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    h3 {
+      color: var(--text);
+      margin: 8px;
+    }
+
+    button {
+      margin-left: 18px;
+    }
+  }
+
+  .grid-component {
+    margin-top: 25px;
+    overflow-y: auto;
+  }
+}
+
+.grid {
+  margin-top: 20px;
+}
+
+.input-group {
+  margin-top: 5px;
+
+  &.checkboxes {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    ejs-checkbox {
+      margin-right: 16px;
+    }
+  }
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.skills-form-dialog {
+  &.form-container {
+    margin-top: 20px;
+  }
+
+  .inactive-date-container {
+    width: 198px;
+  }
+}
+
+.controls-group-title {
+  font-size: 14px;
+  color: var(--sub-title-2);
+}
+
+.required {
+  color: $supportive-red;
+  vertical-align: top;
+  font-size: 14px;
+}
+
+.bulk-section {
+  background-color: $primary-active-blue-10;
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+  margin-bottom: 10px;
+
+  &__rowscount {
+    margin-right: 60px;
+    margin-left: 31px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.015em;
+    color: #fff
+  }
+
+  .edit-button,
+  .delete-button {
+    color: #fff
+  }
+}
+
+.gridrightpager {
+  position: absolute;
+  right: 0;
+}
+
+.e-pager {
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
