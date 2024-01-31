@@ -1,4 +1,5 @@
 import { IntegrationFilterDto, IntegraionFailFilterDto, ScheduledIntegrationsFilterDto } from "../../shared/models/integrations.model";
+import { InterfaceListFilter } from "../interface-list/models/InterfaceListModel";
 
 const integrationsStatePrefix = '[integrations]';
 
@@ -25,4 +26,13 @@ export class GetRecentRunsList {
 export class GetScheduledIntegrationsList{
   static readonly type = `${integrationsStatePrefix} Get Scheduled Run List`;
   constructor(public payload :  ScheduledIntegrationsFilterDto) {}
+}
+export class GetInterfaceList {
+  static readonly type = `${integrationsStatePrefix} GetInterfaceListQuery`;
+  constructor(public payload: IntegrationFilterDto) { }
+}
+
+export class GetInterfaceListPage {
+  static readonly type = ' Get Interface List';
+  constructor(public filter?: InterfaceListFilter) { }
 }

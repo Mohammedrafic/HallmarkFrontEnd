@@ -10,6 +10,8 @@ import { ChartAccumulation } from '../../../dashboard/models/chart-accumulation-
 import { IntegrationFilterDto, IntegraionFailFilterDto, ScheduledIntegrationsFilterDto } from '../../../shared/models/integrations.model';
 import { IntegrationMonthReportModel, NewInterfaceListModel, NewInterfaceListdata, ScheduledIntegrationsListModel, ScheduledIntegrationsListData } from '../models/IntegrationMonthReportModel';
 import { RecentRunsListModel } from '../models/RecentRunsListModel';
+import { InterfaceListFilter, InterfaceListModel } from '../../interface-list/models/InterfaceListModel';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -101,6 +103,10 @@ export class OrgintegrationsService {
           })),
         };
       }))
+  }
+  public getInterfaceList(filter: IntegrationFilterDto): Observable<InterfaceListModel[] | InterfaceListFilter> {
+    return this.httpClient.post<InterfaceListModel[]>(`${this.baseUrl}/getInterfaceList`, { ...filter }).pipe(
+      map((data) => data))
   }
 }
  

@@ -89,7 +89,8 @@ export const SettingsAppliedToPermissions: string[] = [
   'Createreplacementorderswhenschedulesgetcancelled',
   'Leaverequestcomments',
   'AutoEnableClearedToStart',
-  'OnboardExtensionOrderafteraccepting'
+  'OnboardExtensionOrderafteraccepting',
+  'HRInterfacePrimarySkillAndCellphoneMandatoryforEmployee'
 ];
 
 export const DisabledSettingsByDefault = [
@@ -121,7 +122,8 @@ export const DisabledSettingsByDefault = [
   'TimeLimitforManagerReviewEmail',
   'Createreplacementorderswhenschedulesgetcancelled',
   'Leaverequestcomments',
-  'AutoEnableClearedToStart'
+  'AutoEnableClearedToStart',
+  'HRInterfacePrimarySkillAndCellphoneMandatoryforEmployee'
 ];
 
 export const GetSettingSystemButtons = (isIRP: boolean, showOnlyActive: boolean): ButtonModel[] => {
