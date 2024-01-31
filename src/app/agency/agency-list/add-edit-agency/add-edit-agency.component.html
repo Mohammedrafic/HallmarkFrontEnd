@@ -113,7 +113,7 @@
 
 <ng-template #buttonSection>
   <ng-container *ngIf="!isSeccondStepActive">
-    <button appHideBeforeSyncfusionLoad [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline item"
+    <button appHideBeforeSyncfusionLoad *ngIf="!isEdit" [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline item"
       (click)="onClear()">
       Clear
     </button>

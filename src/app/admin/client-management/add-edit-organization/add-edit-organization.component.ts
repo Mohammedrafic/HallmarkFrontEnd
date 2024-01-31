@@ -465,7 +465,7 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
     this.store.dispatch(new SetHeaderState({ iconName: 'organization', custom: true, title: 'Organization Profile' }));
     const user = this.store.selectSnapshot(UserState.user);
     this.store.dispatch([
-      new GetOrganizationById(user?.businessUnitId as number), new GetOrganizationLogo(user?.businessUnitId as number)
+      new GetOrganizationById(user?.businessUnitId as number), new GetOrganizationLogo(user?.businessUnitId as number),
     ]);
   }
 

@@ -55,6 +55,7 @@ import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { User } from "@shared/models/user.model";
 import { CandidateService } from "@agency/services/candidates.service";
 import { SettingsViewService } from "@shared/services/settings-view.service";
+import { DialogMode } from "@shared/enums/dialog-mode.enum";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -120,6 +121,11 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   public disableNonlinkedagency:boolean;
 
   private unsubscribe$: Subject<void> = new Subject();
+
+  get isAddMode(): boolean {
+    return this.title === DialogMode.Add;
+  }
+  
   constructor(
     protected override store: Store,
     private fb: FormBuilder,

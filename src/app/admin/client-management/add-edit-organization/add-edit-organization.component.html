@@ -632,7 +632,7 @@
     [ngClass]="{'sidebar-open': isSidebarOpened$ | async}"
   >
     <button
-      *ngIf="!profileMode"
+      *ngIf="!profileMode && isAddMode"
       ejs-button
       appHideBeforeSyncfusionLoad
       id="clearButton"
