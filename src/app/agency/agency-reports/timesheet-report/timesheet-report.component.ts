@@ -631,7 +631,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy {
     this.timesheetReportForm.get(analyticsConstants.formControlNames.JobStatuses)?.setValue([]);
     this.timesheetReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.timesheetReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(endDate);
-    this.timesheetReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue([]);
+    this.timesheetReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue(null);
     //this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
     this.filteredItems = [];
     this.locations = [];

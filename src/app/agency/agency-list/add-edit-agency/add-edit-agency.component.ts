@@ -77,7 +77,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
     isHallmarkUser: false,
     agencyIsMsp: false,
     isEditMode: false,
-  }
+  };
 
   get contacts(): FormArray {
     return this.agencyForm.get('agencyContactDetails') as FormArray;
@@ -113,14 +113,14 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   public currentUser$: Observable<User>;
 
   public logo: Blob | null = null;
+  public isEdit = false;
 
   private populatedSubscription: Subscription | undefined;
   private isAlive = true;
   private filesDetails: Blob[] = [];
   private agencyId: number | null = null;
-  private isRemoveLogo: boolean = false;
+  private isRemoveLogo = false;
   private fetchedAgency: Agency;
-  private isEdit = false;
 
   constructor(
     protected override store: Store,
@@ -235,7 +235,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
       .pipe(
         filter((confirm) => !!confirm),
         takeWhile(() => this.isAlive))
-      .subscribe(() => { });
+      .subscribe();
   }
 
   public onBack(): void {
@@ -371,12 +371,12 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
   }
 
   private createPaymentDetails(paymentDetails: PaymentDetails[] | ElectronicPaymentDetails[]): FormGroup[] {
-    return paymentDetails.map((paymentDetail: any) => {
+    return paymentDetails.map((paymentDetail: PaymentDetails) => {
       let controls = {};
-      for (let key in paymentDetail) {
+      for (const key in paymentDetail) {
         controls = {
           ...controls,
-          [key]: new FormControl(paymentDetail[key]),
+          [key]: new FormControl(paymentDetail[key as keyof PaymentDetails]),
         };
       }
 

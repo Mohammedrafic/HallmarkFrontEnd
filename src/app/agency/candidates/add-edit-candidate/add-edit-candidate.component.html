@@ -124,6 +124,7 @@
 <ng-template #actionButtons>
   <button
     ejs-button 
+    *ngIf="isAddMode"
     cssClass="e-outline"
     [disabled]="!candidateForm?.dirty"
     (click)="clearForm()"
