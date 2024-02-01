@@ -305,10 +305,11 @@
             <ng-template #content>
               <app-historical-events
                 [organizationId]="candidateJob?.organizationId!"
-                [candidateJobId]="candidate?.jobId!"
+                [candidateJobId]="candidate?.candidateJobId!"
                 [candidateId]="candidate.candidateId"
                 [isAgency]="isAgency"
                 [activeSystem]="activeSystem"
+                [jobId]="candidate?.jobId!"
               ></app-historical-events>
             </ng-template>
           </e-accordionitem>
