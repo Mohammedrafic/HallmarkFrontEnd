@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, tap } from 'rxjs';
 
 
 import { AgencyDataSourceItem, DataSourceItem, DropdownOption } from '@core/interface';
 
 import {
   TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
-  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig, RawTimesheetRecordsDto, AddRecordBillRate, TimesheetReorder, AddRecorTimesheetReorder,
+  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig, RawTimesheetRecordsDto, AddRecordBillRate, TimesheetReorder, AddRecorTimesheetReorder, RecordDto,
 } from '../interface';
 import { CostCenterAdapter, RecordsAdapter } from '../helpers';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
@@ -63,7 +63,14 @@ export class TimesheetsApiService {
     ));
   }
 
+  public getHistoricalDataRecords(records: TimesheetRecordsDto, id: number, orgId: number): Observable<TimesheetRecordsDto> {
+    return this.http.get<RecordDto[]>(`/api/timesheets/invoiceRecordsHistoricalData/${id}/${orgId}`).pipe(
+      map((data: RecordDto[]) => RecordsAdapter.adoptHistoricalDataDto(records, data)),
+    );
+  }
+
   public getTimesheetRecords(
+    records: TimesheetRecordsDto,
     id: number,
     orgId: number,
     isAgency: boolean,
@@ -72,7 +79,7 @@ export class TimesheetsApiService {
     ? `/api/Timesheets/${id}/records` : `/api/Timesheets/${id}/records/organization/${orgId}`;
     return this.http.get<RawTimesheetRecordsDto>(endpoint)
     .pipe(
-      map((data) => RecordsAdapter.adaptRecordsDto(data)),
+      map((data) => RecordsAdapter.adaptRecordsDto(records, data)),
       catchError(() => of({
         timesheets: {
           editMode: [],

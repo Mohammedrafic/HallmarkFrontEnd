@@ -61,60 +61,59 @@ export class RecordsAdapter {
     return dto;
   }
 
-  static adaptRecordsDto(data: RawTimesheetRecordsDto): TimesheetRecordsDto {
-    const records: TimesheetRecordsDto = {
-      [RecordFields.Time]: {
-        [RecordsMode.Edit]: data.timesheets.map((item: RecordDto) => {
-          return ({
-            ...item,
-            day: item.timeIn,
-            isTimeInNull: !!item['isTimeInNull'],
-          });
-        }),
-        [RecordsMode.View]: data.timesheetsCalculated.map((item: RecordDto) => {
-          return ({
-            ...item,
-            day: item.timeIn,
-          });
-        }),
-      },
-      [RecordFields.HistoricalData]: {
-        [RecordsMode.Edit]: [],
-        [RecordsMode.View]: data.invoiceHistoricalRecords.map((item: RecordDto) => {
-          return ({
-            ...item,
-            day: item.timeIn,
-          });
-        }),
-      },
-      [RecordFields.Miles]: {
-        [RecordsMode.Edit]: data.miles.map((item: RecordDto) => {
-          return ({
-            ...item,
-            day: item.timeIn,
-          });
-        }),
-        [RecordsMode.View]: data.milesCalculated.map((item: RecordDto) => {
-          return ({
-            ...item,
-            day: item.timeIn,
-          });
-        }),
-      },
-      [RecordFields.Expenses]: {
-        [RecordsMode.Edit]: data.expenses.map((item: RecordDto) => {
-          return ({
-            ...item,
-            day: item.timeIn,
-          });
-        }),
-        [RecordsMode.View]: data.expensesCalculated.map((item: RecordDto) => {
-          return ({
-            ...item,
-            day: item.timeIn,
-          });
-        }),
-      },
+  static adoptHistoricalDataDto(records: TimesheetRecordsDto, invoiceHistoricalRecords: RecordDto[]): TimesheetRecordsDto {
+    records[RecordFields.HistoricalData][RecordsMode.View] = invoiceHistoricalRecords.map((item: RecordDto) => {
+      return ({
+        ...item,
+        day: item.timeIn,
+      });
+    });
+    return records;
+  }
+
+  static adaptRecordsDto(records: TimesheetRecordsDto, data: RawTimesheetRecordsDto): TimesheetRecordsDto {
+    records[RecordFields.Time] = {
+      [RecordsMode.Edit]: data.timesheets.map((item: RecordDto) => {
+        return ({
+          ...item,
+          day: item.timeIn,
+          isTimeInNull: !!item['isTimeInNull'],
+        });
+      }),
+      [RecordsMode.View]: data.timesheetsCalculated.map((item: RecordDto) => {
+        return ({
+          ...item,
+          day: item.timeIn,
+        });
+      }),
+    };
+    records[RecordFields.Miles] = {
+      [RecordsMode.Edit]: data.miles.map((item: RecordDto) => {
+        return ({
+          ...item,
+          day: item.timeIn,
+        });
+      }),
+      [RecordsMode.View]: data.milesCalculated.map((item: RecordDto) => {
+        return ({
+          ...item,
+          day: item.timeIn,
+        });
+      }),
+    };
+    records[RecordFields.Expenses] = {
+      [RecordsMode.Edit]: data.expenses.map((item: RecordDto) => {
+        return ({
+          ...item,
+          day: item.timeIn,
+        });
+      }),
+      [RecordsMode.View]: data.expensesCalculated.map((item: RecordDto) => {
+        return ({
+          ...item,
+          day: item.timeIn,
+        });
+      }),
     };
     return records;
   }

@@ -26,6 +26,15 @@ export namespace TimesheetDetails {
       ) {}
   }
 
+  export class GetHistoricalDataRecords {
+    static readonly type = TimesheetDetailsActions.GetHistoricalDataRecords;
+
+    constructor(
+      public readonly id: number,
+      public readonly orgId: number,
+      ) {}
+  }
+
   export class AgencySubmitTimesheet {
     static readonly type = TIMESHEETS_ACTIONS.AGENCY_SUBMIT_TIMESHEET;
 
