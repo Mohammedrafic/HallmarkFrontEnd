@@ -605,9 +605,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       menu = [...menu, { text: MobileMenuItems.Import }];
     }
     if (
-      this.activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
-      this.activeTab !== OrganizationOrderManagementTabs.Incomplete
-    ) {
+      this.activeTab !== OrganizationOrderManagementTabs.OrderTemplates) {
       menu = [
         ...menu,
         { text: MobileMenuItems.ExportExel },
