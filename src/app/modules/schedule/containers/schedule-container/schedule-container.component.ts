@@ -438,7 +438,7 @@ public undoFilter() :void
           )
           .pipe(takeUntil(this.componentDestroy()))
           .subscribe((exportData) => {
-            this.sortData(exportData);
+            //this.sortData(exportData);
             const state = {
               data: exportData,
               dateRange: this.dateRange,
@@ -453,6 +453,7 @@ public undoFilter() :void
             } else {
               window.open(window.location.origin + '/schedule-export', '_blank');
             }
+            this.scheduleFilters.pageSize = 30;
           });
       });
   }
