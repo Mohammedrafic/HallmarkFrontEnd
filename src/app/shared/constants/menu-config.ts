@@ -942,6 +942,16 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/staffschedulebyshift-irp',
     },
+    89: {
+      // Finance Medicare Wage Report
+      icon: '',
+      route: '/analytics/finance-medicare-wage-report',
+    },
+    90: {
+      // Grant Report
+      icon: '',
+      route: '/analytics/grant-report',
+    },
     91: {
       // Staff List Report
       icon: '',
@@ -991,6 +1001,11 @@ export const MENU_CONFIG: any = {
       // shift-breakdown
       icon: '',
       route: '/analytics/shift-breakdown',
+    },
+     102: {
+      // Position-Summary
+      icon: '',
+      route: '/analytics/Position-Summary',
     },
     103: {
       // Agency-Spend
