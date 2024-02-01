@@ -357,7 +357,25 @@ describe('RecordsAdapter', () => {
           },
         ]
       };
-      const result = RecordsAdapter.adaptRecordsDto(incomingData);
+      const records = {
+        timesheets: {
+          editMode: [],
+          viewMode: [],
+        },
+        historicalData: {
+          editMode: [],
+          viewMode: [],
+        },
+        miles: {
+          editMode: [],
+          viewMode: [],
+        },
+        expenses: {
+          editMode: [],
+          viewMode: [],
+        },
+      };
+      const result = RecordsAdapter.adaptRecordsDto(records, incomingData);
 
       expect(result.timesheets.editMode[0].day).toBe('2023-07-02T00:00:00+00:00');
       expect(result.timesheets.viewMode[0].day).toBe('2023-07-01T00:00:00+00:00');
