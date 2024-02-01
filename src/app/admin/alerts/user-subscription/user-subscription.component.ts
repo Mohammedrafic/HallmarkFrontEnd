@@ -679,20 +679,13 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
               self.gridApi.hideOverlay();
             }
             if(data){
-              data.items.every((item: {
-                isOnScreenEnabled: boolean;
-                isSMSEnabled: boolean; 
-                isEmailEnabled: boolean; 
-              }) => {
-                (item.isEmailEnabled === true) ? self.orderManagementService.HandleCheckBoxfromParent(true, AlertChannel[AlertChannel.Email]) :  self.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.Email]);
-                (item.isOnScreenEnabled === true) ? self.orderManagementService.HandleCheckBoxfromParent(true, AlertChannel[AlertChannel.OnScreen]) : self.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.OnScreen]);
-                (item.isSMSEnabled === true) ? self.orderManagementService.HandleCheckBoxfromParent(true, AlertChannel[AlertChannel.SMS]) : self.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.SMS]);
-              });
+              data.items.every((item: { isOnScreenEnabled: any; }) => item.isOnScreenEnabled) ? self.orderManagementService.HandleCheckBoxfromParent(true, AlertChannel[AlertChannel.OnScreen]) : self.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.OnScreen]) ;
+              data.items.every((item: { isSMSEnabled: any; }) => item.isSMSEnabled) ? self.orderManagementService.HandleCheckBoxfromParent(true, AlertChannel[AlertChannel.SMS]) : self.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.SMS]) ;
+              data.items.every((item: { isEmailEnabled: any; }) => item.isEmailEnabled) ? self.orderManagementService.HandleCheckBoxfromParent(true, AlertChannel[AlertChannel.Email]) : self.orderManagementService.HandleCheckBoxfromParent(false, AlertChannel[AlertChannel.Email]) ;
             } else {
               self.orderManagementService.HandleCheckBoxfromParent(false, "", true);
             }
             params.successCallback(self.itemList, data?.totalCount || 1);
-
           });
         }, 500);
       }
