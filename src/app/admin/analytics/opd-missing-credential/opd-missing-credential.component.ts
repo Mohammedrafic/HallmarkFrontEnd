@@ -236,8 +236,8 @@ export class OpdMissingCredentialComponent implements OnInit {
     this.opdMissingcredentialForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
-        startDate: new FormControl(startDate, [Validators.required]),
-        endDate: new FormControl(endate, [Validators.required]),
+        startDate: new FormControl(startDate, []),
+        endDate: new FormControl(endate, []),
         regionIds: new FormControl([]),
         locationIds: new FormControl([]),
         departmentIds: new FormControl([]),
@@ -393,7 +393,7 @@ export class OpdMissingCredentialComponent implements OnInit {
             if (data != null) {
               this.isAlive = true;
               this.filterOptionsData = data;
-              this.defaultCandidateStatuses = ['Onboard'];
+              this.defaultCandidateStatuses = ['Onboard','Accepted'];
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses.filter(i => this.fixedCandidateStatusesIncluded.includes(i.statusText));
               this.opdMissingcredentialForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
               this.opdMissingcredentialForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(this.defaultCandidateStatuses);
@@ -529,8 +529,8 @@ export class OpdMissingCredentialComponent implements OnInit {
     {
       "OrganizationIdOMC": this.selectedOrganizations?.length == 0 ? businessIds.tostring() :
         this.selectedOrganizations?.map((list) => list).join(","),
-      "CertifiedUntilFromOMC": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "CertifiedUntilToOMC": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "CertifiedUntilFromOMC": startDate==null?"":formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "CertifiedUntilToOMC": endDate==null?"":formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionIdsOMC": regionIds == null ? "" : regionIds,
       "LocationIdsOMC": locationIds == null ? "" : locationIds,
       "DepartmentIdsOMC": departmentIds == null ? "" : departmentIds,
@@ -545,7 +545,7 @@ export class OpdMissingCredentialComponent implements OnInit {
       "UserIdOMC": this.user?.id,
       "OrganizationNameOMC": this.selectedOrganizations.length == 1 ? this.filterColumns.businessIds.dataSource.filter((elem: any) => this.selectedOrganizations.includes(elem.organizationId)).map((value: any) => value.name).join(",") : "",
       "ReportpulledMessageOMC": ("Report Print date: " + formatDate(currentDate, "MMM", this.culture) + " " + currentDate.getDate() + ", " + currentDate.getFullYear().toString()).trim(),
-      "DateRangeOMC": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
+      "DateRangeOMC": (startDate==null ||endDate==null)?"": (formatDate(startDate, "MMM", this.culture) + " " + startDate.getDate() + ", " + startDate.getFullYear().toString()).trim() + " - " + (formatDate(endDate, "MMM", this.culture) + " " + endDate.getDate() + ", " + endDate.getFullYear().toString()).trim(),
       "PeriodOCE": toNumber(this.periodList.filter(x => x.name == period).map(y => y.id)),
       "CredentialsOMC": "",
       // "PositionIdOMC":jobId.tostring(),
