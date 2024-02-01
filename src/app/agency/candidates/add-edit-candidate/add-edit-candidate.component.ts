@@ -466,7 +466,7 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
       email: formValue.contactDetails.email,
       professionalSummary: formValue.profSummary.professionalSummary,
       candidateProfileContactDetail: {
-        candidateProfileId: this.fetchedCandidate?.candidateProfileContactDetail.candidateProfileId,
+        candidateProfileId: this.fetchedCandidate && this.fetchedCandidate?.candidateProfileContactDetail? this.fetchedCandidate?.candidateProfileContactDetail?.candidateProfileId:this.fetchedCandidate?.id,
         phoneType1: this.fetchedCandidate?.candidateProfileContactDetail.phoneType1,
         phoneType2: this.fetchedCandidate?.candidateProfileContactDetail.phoneType2,
         country: formValue.contactDetails.country,
