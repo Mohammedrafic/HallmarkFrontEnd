@@ -86,8 +86,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
         bankName: ['', [Validators.required]],
         routingNumber: ['', [
           Validators.required,
-          patternMessageValidator(NumberValidatorRegExp(20), RoutingNumberMessage),
-          Validators.maxLength(20),
+          patternMessageValidator(NumberRangeRegExp(9, 20), RoutingNumberMessage),
         ]],
         bankAddress1: ['', [Validators.required]],
         bankAddress2: [''],

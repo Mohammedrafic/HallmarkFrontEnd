@@ -166,7 +166,7 @@ export const ViewOrderVMS_PERMISSION = 'Additional permission is required (CanOr
 export const TaxIdValidationMessage = '9-12-digit number';
 export const NumberValidationMessage = '10-12 digit number';
 export const SwiftCodeValidationMessage = '8-11 alphanumeric code for international payments';
-export const RoutingNumberMessage = '20-digit code to identify financial institution';
+export const RoutingNumberMessage = '9-20 digit code to identify financial institution';
 export const Bulk_Update_Skills = 'Selected Records are modified';
 export const Bulk_Delete_Skills = 'Selected Records are deleted';
 
