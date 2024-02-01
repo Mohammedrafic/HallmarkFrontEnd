@@ -324,16 +324,36 @@ export class TimesheetsState {
     );
   }
 
-  @Action(TimesheetDetails.GetTimesheetRecords)
-  GetTimesheetRecords(
-    { patchState, dispatch }: StateContext<TimesheetsModel>,
-    { id, orgId, isAgency }: TimesheetDetails.GetTimesheetRecords
+  @Action(TimesheetDetails.GetHistoricalDataRecords)
+  GetHistoricalDataRecords(
+    { patchState, getState, dispatch }: StateContext<TimesheetsModel>,
+    { id, orgId }: TimesheetDetails.GetHistoricalDataRecords
   ): Observable<TimesheetRecordsDto | void> {
-    return this.timesheetsApiService.getTimesheetRecords(id, orgId, isAgency)
+    const timesheets = getState().timeSheetRecords;
+    return this.timesheetsApiService.getHistoricalDataRecords(timesheets, id, orgId)
     .pipe(
       tap((res) => {
         patchState({
-          timeSheetRecords: res,
+          timeSheetRecords: {...res},
+        });
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+      }),
+    );
+  }
+
+  @Action(TimesheetDetails.GetTimesheetRecords)
+  GetTimesheetRecords(
+    { patchState, getState, dispatch }: StateContext<TimesheetsModel>,
+    { id, orgId, isAgency }: TimesheetDetails.GetTimesheetRecords
+  ): Observable<TimesheetRecordsDto | void> {
+    const timesheets = getState().timeSheetRecords;
+    return this.timesheetsApiService.getTimesheetRecords(timesheets, id, orgId, isAgency)
+    .pipe(
+      tap((res) => {
+        patchState({
+          timeSheetRecords: {...res},
         });
       }),
       catchError((err: HttpErrorResponse) => {
@@ -388,6 +408,28 @@ export class TimesheetsState {
       isTimeSheetOpen: action === DialogAction.Open,
       selectedTimeSheet: timesheet,
     });
+    if (action === DialogAction.Close) {
+      patchState({
+        timeSheetRecords: {
+          timesheets: {
+            editMode: [],
+            viewMode: [],
+          },
+          historicalData: {
+            editMode: [],
+            viewMode: [],
+          },
+          miles: {
+            editMode: [],
+            viewMode: [],
+          },
+          expenses: {
+            editMode: [],
+            viewMode: [],
+          },
+        },
+      });
+    }
   }
 
   @Action(Timesheets.ToggleTimesheetAddDialog)

@@ -36,6 +36,7 @@ export enum TIMESHEETS_ACTIONS {
 
 export enum TimesheetDetailsActions {
   GetTimesheetRecords = '[timesheets details] Get timesheet records',
+  GetHistoricalDataRecords = '[timesheets details] Get historical data records',
   GetCandidateInfo = '[timesheet details] Get candidate info',
   GetCandidateChartData = '[timesheet details] Get candidate chart data',
   GetCandidateAttachments = '[timesheet details] Get candidate attachments',

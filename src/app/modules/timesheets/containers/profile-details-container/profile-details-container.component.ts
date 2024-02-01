@@ -324,6 +324,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
           if (submitted) {
             this.isChangesSaved = true;
             this.currentTab = this.timesheetRecordsService.getCurrentTabName(selectEvent.selectedIndex);
+            this.getHistoricalDataRecords(selectEvent.selectedIndex === TableTabIndex.HistoricalData);
           } else {
             this.slectingindex = selectEvent.previousIndex;
             this.tabs.select(selectEvent.previousIndex);
@@ -341,6 +342,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         });
     } else {
       this.currentTab = this.timesheetRecordsService.getCurrentTabName(selectEvent.selectedIndex);
+      this.getHistoricalDataRecords(selectEvent.selectedIndex === TableTabIndex.HistoricalData);
 
       if (this.currentTab === 'details') {
         this.previewAttachemnt = false;
@@ -638,6 +640,16 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     }
   }
 
+  public getHistoricalDataRecords(dispatch: boolean): void {
+    if (dispatch) {
+      this.store.dispatch(new TimesheetDetails.GetHistoricalDataRecords(this.timesheetId, this.orgId as number)).subscribe(
+        () => {
+          this.cd.detectChanges();
+        }
+      );
+    }
+  }
+
   private refreshGrid(): void {
     this.store.dispatch([new Timesheets.GetAll(), new Timesheets.GetTabsCounts()]);
   }
@@ -821,6 +833,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
         takeUntil(this.componentDestroy())
       )
       .subscribe(() => {
+        this.getHistoricalDataRecords(this.currentTab === RecordFields.HistoricalData);
         this.candidateDialog?.show();
         this.openEvent = true;
       });
