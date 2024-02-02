@@ -34,7 +34,8 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
   @Input() organizationId: number;
   @Input() candidateId: number;
   @Input() isAgency: boolean;
-  @Input() activeSystem:number;
+  @Input() activeSystem: number;
+  @Input() jobId: number;
   @Select(OrderManagementContentState.candidateHistoricalData)
   historicalEventsOrg$: Observable<HistoricalEvent[]>;
 
@@ -59,7 +60,10 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
   }
 
   ngOnChanges() { 
-    this.IsIrpEnable();   
+    this.IsIrpEnable();
+    if (this.candidateJobId == undefined) {
+      this.candidateJobId = this.jobId;
+    }
     if (this.organizationId && this.candidateJobId) {
       this.dispatchHistoricalEvents(this.organizationId, this.candidateJobId,this.historicalIrpFlag);
     }
@@ -74,7 +78,10 @@ export class HistoricalEventsComponent extends DestroyableDirective implements O
     }
   }
   private subscribeToInitialObs(): void {  
-        this.IsIrpEnable();
+    this.IsIrpEnable();
+    if (this.candidateJobId == undefined) {
+      this.candidateJobId = this.jobId;
+    }
     if (!this.candidateJobId) {
       merge(this.candidateListAg$, this.candidateListOrg$)
         .pipe(
