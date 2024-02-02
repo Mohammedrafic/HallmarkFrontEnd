@@ -880,7 +880,6 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       if(this.isOrganization && this.activeSystem === OrderManagementIRPSystemId.VMS){
         this.candidateJob = orderCandidateJob;
         if (orderCandidateJob) {
-          this.getExtensions();
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
         }
