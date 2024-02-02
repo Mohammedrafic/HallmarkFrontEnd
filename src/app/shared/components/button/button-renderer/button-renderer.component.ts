@@ -32,7 +32,9 @@ export class ButtonRendererComponent extends AbstractPermission implements ICell
     this.label = this.params.label || null;
     this.selectedType = this.params.selectedType
 
-    this.alertEditDisable = (this.params.alertChannel== AlertChannel.OnScreen || this.params.alertChannel==AlertChannel.SMS) && this.params.data.alertId == AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets'];
+    if ((this.params.alertChannel== AlertChannel.OnScreen || this.params.alertChannel==AlertChannel.SMS) && (this.params.data.alertId == AlertIdEnum['Missing TimeSheets: Reorder Missing TimeSheets'] || this.params.data.alertId == AlertIdEnum['Missing Credentials: Daily Alerts'] || this.params.data.alertId == AlertIdEnum['Missing Credentials: Weekly Alerts'] || this.params.data.alertId == AlertIdEnum['Expiry Credentials: Weekly Alerts'])){
+      this.alertEditDisable = true;
+    }
   }
 
   refresh(params?: any): boolean {
